@@ -15,7 +15,7 @@
 #include <atlbase.h>
 #include <WTL/atlapp.h>
 //#define TSLOG
-//#define DD_GROUP "DD"
+//#define TSLOG_GROUP "GXZB"	//可选,默认为 "TSLOG"
 //#include <tslog\tslog.h>
 
 extern CAppModule _Module;

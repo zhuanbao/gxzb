@@ -2,8 +2,8 @@
 #include "atlwin.h"
 #include "map"
 
-#define LUA_MSG_WND_CALSS _T("{9E18143F-FAF9-4438-8FC1-32371276AED0}_aswndclass")
-#define LUA_MSG_MUTEX _T("{9E18143F-FAF9-4438-8FC1-32371276AED1}_asmutex")
+#define LUA_MSG_WND_CALSS _T("{659630F6-734C-4ead-B105-1BE419F93F5C}_prowndclass")
+#define LUA_MSG_MUTEX _T("{659630F6-734C-4ead-B105-1BE419F93F5C}_promutex")
 
 #include <XLLuaRuntime.h>
 typedef void (*funResultCallBack) (DWORD userdata1,DWORD userdata2, const char* pszKey,  DISPPARAMS* pParams);
