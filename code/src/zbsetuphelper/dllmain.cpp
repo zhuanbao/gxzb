@@ -29,6 +29,29 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 
 
+extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath){
+	STARTUPINFOA si = { 0 };
+	si.cb = sizeof(STARTUPINFOA);
+	GetStartupInfoA(&si);
+	si.wShowWindow = SW_HIDE;
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	PROCESS_INFORMATION   pi = {0};
+	if (!CreateProcessA(NULL, (LPSTR)szExePath, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)){
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+		return FALSE;
+	}
+	DWORD dwResult = WaitForSingleObject(pi.hProcess, 5000);
+	if (dwResult == WAIT_TIMEOUT){
+		return FALSE;
+	}
+	DWORD dwExitCode = 0xFFFFFFFF;
+	if (!GetExitCodeProcess(pi.hProcess, &dwExitCode)){
+		return FALSE;
+	}
+	return dwExitCode == 0;
+}
+
 //程序退出保证所有子线程结束
 static HANDLE s_ListenHandle = CreateEvent(NULL,TRUE,TRUE,NULL);
 //引用计数,默认是0
@@ -143,7 +166,7 @@ extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *e
 		sprintf(szev, "&ev=%ld",ev);
 		str += szev;
 	}
-	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-77713162-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
+	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-57884150-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
 	
 	ResetUserHandle();
 	DWORD dwThreadId = 0;
