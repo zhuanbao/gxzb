@@ -3,7 +3,7 @@
 #include <shlobj.h>
 #include <list>
 #include "ImagePreReader.h"
-#define KERNEL_NAME  "gxzbkernel.dll"
+#define KERNEL_NAME  "zbkernel.dll"
 class Pretender
 {
 public:
@@ -50,8 +50,6 @@ public:
 			("libpng13.dll"), 
 			("xlgraphic.dll"), 
 			("xlgraphicplus.dll"),
-			("FreeImage.dll"),
-			("FreeImagePlus.dll"),
 			("xlue.dll"),
 			(KERNEL_NAME)
 		};
