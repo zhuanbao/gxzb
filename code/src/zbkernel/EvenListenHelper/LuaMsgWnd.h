@@ -5,8 +5,18 @@
 #define LUA_MSG_WND_CALSS _T("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 #define LUA_MSG_MUTEX _T("{MutexWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 
+#define WM_USER_DAG		WM_USER+701
+
 #include <XLLuaRuntime.h>
 typedef void (*funResultCallBack) (DWORD userdata1,DWORD userdata2, const char* pszKey,  DISPPARAMS* pParams);
+
+struct SOLUTION_SS
+{
+	char sz_nonce[MAX_PATH];
+	char sz_headerHash[MAX_PATH];
+	char sz_mixHash[MAX_PATH];
+
+};
 
 
 struct CallbackNode
@@ -33,7 +43,7 @@ public:
 	DECLARE_WND_CLASS(LUA_MSG_WND_CALSS)
 	BEGIN_MSG_MAP(LuaMsgWindow)
 		MESSAGE_HANDLER(WM_COPYDATA, OnCopyData)
-
+		MESSAGE_HANDLER(WM_USER_DAG, OnDagInit)
 	END_MSG_MAP()
 private:
 	LuaMsgWindow(void);
@@ -53,6 +63,7 @@ private:
 
 public:
 	LRESULT OnCopyData(UINT , WPARAM , LPARAM , BOOL&);
+	LRESULT OnDagInit(UINT , WPARAM , LPARAM , BOOL&);
 public:
 	void SetKeyboardHook(void);
 	void DelKeyboardHook(void);

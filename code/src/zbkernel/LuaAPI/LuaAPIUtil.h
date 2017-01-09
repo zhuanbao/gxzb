@@ -224,7 +224,6 @@ public:
 	static int RenameFile(lua_State* luaState);	// 重命名
 	static int SHChangeNotify(lua_State* luaState);
 	static int GetCurveProgress(lua_State* luaState);
-	static int IsCanSetToWallPaperFile(lua_State* luaState);
 
 	static int GetSystemRatio(lua_State* luaState);
 	static int CopyTextToClipboard(lua_State* luaState); //复制一段文本到剪贴板中

@@ -10,7 +10,6 @@
 #include "../Utility/PeeIdHelper.h"
 #include "../Utility/AES.h"
 #include "../Utility/base64.h"
-#include "../Utility/FileAssociationNew.h"
 #include <comdef.h>
 #include "../XLUEApplication.h"
 #include "../EvenListenHelper/LuaMsgWnd.h"
@@ -25,8 +24,6 @@
 
 extern HANDLE g_hInst;
 extern CXLUEApplication theApp;
-
-#define  CanSetToWallPaperFileExt	L".jpg;.jpe;.jpeg;.png;.bmp;"		// 可以设为壁纸的文件后缀名
 
 LuaAPIUtil::LuaAPIUtil(void)
 {
@@ -195,7 +192,6 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"RenameFile", RenameFile},
 	{"SHChangeNotify", SHChangeNotify},
 	{"GetCurveProgress", GetCurveProgress},
-	{"IsCanSetToWallPaperFile", IsCanSetToWallPaperFile},
 	{"GetPeerId", GetPeerId},
 	{"GetSystemRatio", GetSystemRatio},
 	{"CopyTextToClipboard", CopyTextToClipboard},
@@ -4976,25 +4972,6 @@ int LuaAPIUtil::GetCurveProgress(lua_State* luaState)
 	return 1;
 }
 
-int LuaAPIUtil::IsCanSetToWallPaperFile(lua_State* luaState)
-{
-	bool bRet = false;
-	const char* utf8FilePath = luaL_checkstring(luaState, 2);
-	wstring wstrFilePath = ultra::_UTF2T(utf8FilePath);
-	wstring wstrExtName = PathFindExtensionW(wstrFilePath.c_str());
-	if (!wstrExtName.empty())
-	{
-		wstring lowerExtName = ultra::ToLower(wstrExtName);
-		lowerExtName.append(L";");
-		wstring wstrCanSuperBatchFileExtList = CanSetToWallPaperFileExt;
-		if(wstrCanSuperBatchFileExtList.find(lowerExtName.c_str()) != wstring::npos)
-		{
-			bRet = true;
-		}
-	}
-	lua_pushboolean(luaState, bRet);
-	return 1;
-}
 
 int LuaAPIUtil::CopyTextToClipboard(lua_State* luaState)
 {

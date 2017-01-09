@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "XLUEApplication.h"
 #include ".\EvenListenHelper\LuaMsgWnd.h"
-#include "Utility\AppPathHelper.h"
+
 CXLUEApplication theApp;
 
 

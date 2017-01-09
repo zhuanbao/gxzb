@@ -14,8 +14,7 @@
 #include <fstream>
 #pragma comment(lib, "Wininet.lib")
 #include "..\XLUEApplication.h"
-#include "../Utility/FileAssociationNew.h"
-
+#include "..\Utility\LuaAPIHelper.h"
 LuaMsgWindow::LuaMsgWindow(void)
 {
 	TSAUTO();
@@ -125,7 +124,64 @@ int LuaMsgWindow::DetachListener(DWORD userData1, const void* pfun)
 	return 0;
 }
 
-LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
+//wParam:0表示命令行，100表示速度，200答案
+LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	TSAUTO();
+	USES_CONVERSION;
+	COPYDATASTRUCT * pcs = (COPYDATASTRUCT *)lParam;
+	if(wParam == 0)
+	{
+		LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
+		TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
+		if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
+		{
+			CComVariant vParam[1];
+			vParam[0] = (LPWSTR)pcszCommandLine;
+
+			DISPPARAMS params = { vParam, NULL, 1, 0 };
+			Fire_LuaEvent("OnCommandLine", &params);
+		}	
+	}
+	else if (wParam == 100)
+	{
+		LPCSTR pcszMinerSpeed = (LPCSTR)pcs->lpData;
+		if(pcszMinerSpeed && strlen(pcszMinerSpeed) > 0)
+		{
+			std::wstring wstrSpeed;
+			AnsiStringToWideString(pcszMinerSpeed,wstrSpeed);
+			CComVariant vParam[1];
+			vParam[0] = (LPWSTR)wstrSpeed.c_str();
+
+			DISPPARAMS params = { vParam, NULL, 1, 0 };
+			Fire_LuaEvent("OnMinerSpeed", &params);
+		}	
+	}
+	else if (wParam == 200)
+	{
+		SOLUTION_SS* pss = (SOLUTION_SS*)pcs->lpData;
+		if (pss->sz_nonce && strlen(pss->sz_nonce) > 0)
+		{
+			std::wstring wstrNonce;
+			AnsiStringToWideString(pss->sz_nonce,wstrNonce);
+			std::wstring wstrHeaderHash;
+			AnsiStringToWideString(pss->sz_headerHash,wstrHeaderHash);
+
+			std::wstring wstrMixHash;
+			AnsiStringToWideString(pss->sz_mixHash,wstrMixHash);
+
+			CComVariant vParam[3];
+			vParam[0] = (LPWSTR)(wstrNonce.c_str());
+			vParam[1] = (LPWSTR)(wstrHeaderHash.c_str());
+			vParam[2] = (LPWSTR)(wstrMixHash.c_str());
+			DISPPARAMS params = { vParam, NULL, 3, 0 };
+			Fire_LuaEvent("OnSolutionFind", &params);
+		}
+	}
+	return 0;
+}
+
+LRESULT LuaMsgWindow::OnDagInit(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	TSAUTO();
 	USES_CONVERSION;
@@ -143,7 +199,6 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam
 
 	return 0;
 }
-
 
 void LuaMsgWindow::SetKeyboardHook()
 {
