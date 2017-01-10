@@ -181,7 +181,7 @@ Helper.timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
 Helper.treeManager = XLGetObject("Xunlei.UIEngine.TreeManager")
 Helper.objectFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 Helper.hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
-Helper.templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
+Helper.templateManager = XLGetObject("Xunlei.UIEngine.TemplateManager")
 Helper.objTreeManager = XLGetObject("Xunlei.UIEngine.TreeManager")
 Helper.xarManager = XLGetObject("Xunlei.UIEngine.XARManager")
 
@@ -196,7 +196,7 @@ function Helper:CreateModalWnd(wndTemplateID, treeTemplateID, parentWnd, userDat
 --userData, 调用者想传的数据
 --bAllowMulti, 若想用一对wndTemplate + treeTemplate 创建多个模态框，将该值传true
 	self.iModalWndCount = self.iModalWndCount + 1
-	local modalWndTemplate = self.templateMananger:GetTemplate(wndTemplateID, "HostWndTemplate")
+	local modalWndTemplate = self.templateManager:GetTemplate(wndTemplateID, "HostWndTemplate")
 	if not modalWndTemplate then return end
 	
 	local modalWndID = wndTemplateID..".Instance"
@@ -206,7 +206,7 @@ function Helper:CreateModalWnd(wndTemplateID, treeTemplateID, parentWnd, userDat
 	local modalWnd = modalWndTemplate:CreateInstance(modalWndID)
 	if not modalWnd then return end
 	
-	local treeTemplate = self.templateMananger:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
+	local treeTemplate = self.templateManager:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
 	if not treeTemplate then return end
 	
 	local treeID = treeTemplateID..".Instance"
@@ -242,7 +242,7 @@ end
 
 function Helper:CreateModelessWnd(wndTemplateID, treeTemplateID, parentWnd, userData, instanceSuffix, onBindFunc)
 	LOG("-->Helper CreateModelessWnd")
-	local wndTemplate = self.templateMananger:GetTemplate(wndTemplateID, "HostWndTemplate")
+	local wndTemplate = self.templateManager:GetTemplate(wndTemplateID, "HostWndTemplate")
 	if not wndTemplate then return end
 	
 	-- local modelessWndID = wndTemplateID..".Instance"
@@ -255,7 +255,7 @@ function Helper:CreateModelessWnd(wndTemplateID, treeTemplateID, parentWnd, user
 		return 
 	end
 	
-	local treeTemplate = self.templateMananger:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
+	local treeTemplate = self.templateManager:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
 	if not treeTemplate then return end
 	
 	local treeID = instanceSuffix and treeTemplateID.."."..instanceSuffix or treeTemplateID..".Instance"
@@ -282,7 +282,7 @@ end
 
 function Helper:CreateModelessWndEx(wndTemplateID, treeTemplateID, parentWnd, userData, manualWndID, manualTreeID, onBindFunc)
 	LOG("-->Helper CreateModelessWndEx")
-	local wndTemplate = self.templateMananger:GetTemplate(wndTemplateID, "HostWndTemplate")
+	local wndTemplate = self.templateManager:GetTemplate(wndTemplateID, "HostWndTemplate")
 	if not wndTemplate then return end
 
 	local modelessWndID = manualWndID or wndTemplateID..".Instance"
@@ -294,7 +294,7 @@ function Helper:CreateModelessWndEx(wndTemplateID, treeTemplateID, parentWnd, us
 		return 
 	end
 	
-	local treeTemplate = self.templateMananger:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
+	local treeTemplate = self.templateManager:GetTemplate(treeTemplateID,"ObjectTreeTemplate")
 	if not treeTemplate then return end
 	
 	local treeID = manualTreeID or treeTemplateID..".Instance"
@@ -394,46 +394,27 @@ end
 	-- OnShowSubMenuFun, SubMenu = {...},
 	--}
 --}
---其中 id 与 text 是必须的，其他的皆可不传。OnInitFun 与 OnSelectFun 根据规则匹配，查找menuFunTable中对应的方法
---例如：item id为”new.notepad“，则item初始化方法名应为OnInit_new_notepad, 若id为”addData“,item click响应方法名应为 OnClick_addData
---OnInit_new_notepad方法若存在于menuFunTable中，则匹配成功
+--其中 id 与 text 是必须的，其他的皆为可选。
+--OnInitFun调用SetEnable值，控制item的隐藏与显示(常显的item，可不提供该方法)；OnSelectFun响应用户的点击。
+--若menuTable中未指定OnInitFun 与 OnSelectFun，则根据规则匹配，查找menuFunTable中对应的方法
+--例如：item id为”new.notepad“，则item初始化方法名应为OnInit_new_notepad, 若id为”addData“,item click响应方法名应为 OnSelect_addData
+--方法若存在于menuFunTable中，则匹配成功
 
 function Helper:CreateMenu(x, y, parentWnd, menuTable, menuFunTable, userData)
-	-- local menuTemplateID = "menu.object.template"
-	local menuWndTemplID = "wnd.common.menu"
-	local menuTreeTemplID = "tree.common.menu"
-	local menuObjID = "menu.common"
-	local menuItemTemplID = "item.common.menu"
-    self:CreateMenuEx(x, y, parentWnd, menuTable, menuFunTable, userData, menuWndTemplID, menuTreeTemplID, menuObjID, menuItemTemplID)
+	--menuTable 与 template 共同完成item外观的定义，template定义item共有的特征(例如字体、背景)
+	--menuTable定义item间不同的特征，如文案、id、图标等
+	--其他未定义的效果(例如文案居中对齐)，请在OnInitFun中调整
+	local menuItemTemplID = "menu.common.item.template"
+	local menuItemContainerTemplID = "menu.common.container.template"
+    self:CreateMenuEx(x, y, parentWnd, menuTable, menuFunTable, userData, menuItemTemplID, menuItemContainerTemplID)
 end
 
-function Helper:CreateMenuEx(x, y, parentWnd, menuTable, menuFunTable, userData, menuWndTemplID, menuTreeTemplID, menuObjID, menuItemTemplID)
-	-- 防止 不通过 CreateMenuEx 创建的菜单存在，导致出现2个菜单的问题
-	if _G["gMenu"] then 
-		self:Assert(false, "gMenugMenu")
-		return 
-	end
-	
-	--创建菜单窗口
-	local menuWndTemplate = self.templateMananger:GetTemplate(menuWndTemplID, "HostWndTemplate")
-	local menuWndID = menuWndTemplID..".Instance"
-	local menuWnd = menuWndTemplate:CreateInstance(menuWndID)
-
-	--创建菜单对象树
-	local menuTreeTemplate = self.templateMananger:GetTemplate(menuTreeTemplID,"ObjectTreeTemplate")
-	local menuTreeID = menuTreeTemplID..".Instance"
-	local menuTree = menuTreeTemplate:CreateInstance(menuTreeID)
-		
-	if nil == menuWnd then 
-		self:Assert(false, "menuWnd")
-		return 
-	end
-	--绑定
-	menuWnd:SetUserData(userData)
-	menuWnd:BindUIObjectTree(menuTree)
-	
-	local menuContext = menuTree:GetUIObject(menuObjID)
-	local menuItemTemplate = self.templateMananger:GetTemplate(menuItemTemplID, "ObjectTemplate")
+function Helper:AddItemToContainer(menuItemContainer, menuTable, menuFunTable)
+	local tree = menuItemContainer:GetOwner()
+	local menuWnd = tree:GetBindHostWnd()
+	local userData = menuWnd:GetUserData()
+	menuItemTemplID = userData.menuItemTemplID
+	local menuItemTemplate = self.templateManager:GetTemplate(menuItemTemplID, "ObjectTemplate")
 	self:Assert(menuItemTemplate)
 	
 	for index = 1, #menuTable do
@@ -456,57 +437,107 @@ function Helper:CreateMenuEx(x, y, parentWnd, menuTable, menuFunTable, userData,
 			end
 		end
 		
-		menuItem:SetText(menuTable[index].text)
-		menuItem:AttachListener("OnInit", false, function(menuItem) 
-													if "function" == type(menuTable[index].OnInitFun) then
-														menuTable[index].OnInitFun(menuItem) 
-													end
-								end)
-		menuItem:AttachListener("OnSelect", false, function(menuItem)
-													if "function" == type(menuTable[index].OnSelectFun) then
-														menuTable[index].OnSelectFun(menuItem) 
-													end
-								end)
+		if not menuTable[index].bSplitter then
+			self:Assert("function" == type(menuTable[index].OnSelectFun), "必须提供OnSelectFun!")
+		end
+		menuItem:SetItemData(menuTable[index])
+		menuItemContainer:AddItem(menuItem)
+	end
+end
+
+function Helper:CreateMenuEx(x, y, parentWnd, menuTable, menuFunTable, userData, menuItemTemplID, menuItemContainerTemplID)
+	if _G["gMenu"] then return end
+	--这两个Template都是空架子
+	local menuWndTemplID = "MenuHostWnd"
+	local menuTreeTemplID = "MenuHostWndTree"
+	
+	--创建菜单窗口
+	local menuWndTemplate = self.templateManager:GetTemplate(menuWndTemplID, "HostWndTemplate")
+	local menuWnd = menuWndTemplate:CreateInstance(menuWndTemplID..".Instance")
+	
+	--创建菜单对象树
+	local menuTreeTemplate = self.templateManager:GetTemplate(menuTreeTemplID,"ObjectTreeTemplate")
+	local menuTree = menuTreeTemplate:CreateInstance(menuTreeTemplID..".Instance")
 		
-		menuContext:AddItem(menuItem)
+	if nil == menuWnd then 
+		self:Assert(false, "menuWnd")
+		return 
+	end
+	--绑定
+	if not userData then
+		userData = {}
 	end
 	
-	menuContext:SetFocus(true)
-	
-	local left, top = x, y
-	local objLeft, objTop, objRight, objBottom = menuContext:GetObjPos()
-	local width, height = objRight - objLeft, objBottom - objTop
-	-- if left + width > screenRight then
-		-- left = screenRight - width
-	-- end
+	--子菜单与父菜单共用一个MenuWnd，子菜单使用该menuItemTemplID，以便
+	--生成与父菜单一样的风格。子菜单的显示与消失，由item自己处理
+	userData.menuItemTemplID = menuItemTemplID
+	userData.menuItemContainerTemplID = menuItemContainerTemplID
+	userData.parentWnd = parentWnd
+	menuWnd:SetUserData(userData)
+	menuWnd:BindUIObjectTree(menuTree)
 	
 	local root = menuTree:GetRootObject()
-	local root_left, root_top, root_right, root_bottom = root:GetObjPos()
+	local menuItemContainerTempl = self.templateManager:GetTemplate(menuItemContainerTemplID, "ObjectTemplate")
+	local menuItemContainer = menuItemContainerTempl:CreateInstance(menuItemContainerTemplID..".Instance")
+	root:AddChild(menuItemContainer)
 	
-	local screenLeft, screenTop, screenRight, screenBottom = tipUtil:GetScreenRectFromPoint(x, y)
-	root_left = root_left + left - screenLeft
-	root_top = root_top + top - screenTop
-	root_right = root_right + left - screenLeft
-	root_bottom = root_bottom + top - screenTop
-	menuContext:SetPopStatus(1,1)
+	self:AddItemToContainer(menuItemContainer, menuTable, menuFunTable)
+	menuItemContainer:SetFocus(true)
 	
-	root:SetObjPos(root_left, root_top, root_right, root_bottom)	
-	self:LOG("root pos: root_left: ", root_left," root_top: ", root_top , " width: ", root_right - root_left," height: " , root_bottom - root_top)
-	self:LOG("menuWnd pos: screenLeft: ", screenLeft," screenTop: ", screenTop , " width: ", screenRight-screenLeft," height: " , screenBottom-screenTop-1)
-	menuWnd:SetFocus(true)
-	menuWnd:Move(screenLeft, screenTop+1, screenRight-screenLeft, screenBottom-screenTop-1)
-	-- local ret = menuWnd:TrackPopupMenu(parentWnd, screenLeft, screenTop+1, screenRight-screenLeft, screenBottom-screenTop-1)
-	root:SetVisible(true)
-	root:SetChildrenVisible(true)
-	self:LOG("TrackPopupMenu ret: ", tostring(ret))
+	local screenLeft, screenTop, screenRight, screenBottom = self.tipUtil:GetScreenRectFromPoint(x, y)
+	--菜单窗口大小是整个屏幕，以方便子菜单的显示
+	menuWnd:Move(screenLeft , screenTop, screenRight, screenBottom)
+	containerL, containerT, containerR, containerB = self:CalcMenuPopPosition(x, y, menuItemContainer)
+	--真正的菜单内容都在menuItemContainer里面
+	menuItemContainer:SetObjPos(containerL, containerT, containerR, containerB)
 	
-	menuWnd:AttachListener("OnDestroy", false, function()  _G["gMenu"] = nil end)
-	-- self:Assert(false, "OnDestroy Menu")
-	-- if menuWnd:GetMenuMode() == "manual" then	
-		-- self.objTreeManager:DestroyTree(menuTreeID)
-		-- self.hostWndManager:RemoveHostWnd(menuWnd)
-	-- end
+	--展示菜单
+	menuWnd:SetTopMost(true)
+	menuWnd:SetTrapMouse(true)
+	menuWnd:TrackPopupMenu(parentWnd, screenLeft, screenTop, screenRight, screenBottom)
+end
+
+--计算菜单的弹出方向，不跑到屏幕外，若有父菜单，也要考虑父菜单的位置，不遮住父菜单(可遮住祖父菜单)
+--CalcMenuPopPosition返回的是menuContainer在menuWnd中的相对位置
+function Helper:CalcMenuPopPosition(x, y, curContainer, parentContainer)
+	local curContainerL, curContainerT, curContainerR, curContainerB = curContainer:GetObjPos()
+	local menuWidth, menuHeight= curContainerR - curContainerL, curContainerB - curContainerT
 	
+	local screenLeft, screenTop, screenRight, screenBottom = self.tipUtil:GetScreenRectFromPoint(x, y)
+	local tarContainerL, tarContainerT, tarContainerR, tarContainerB = x, y, x + menuWidth, y + menuHeight
+	
+	if not parentContainer then
+		--一级菜单，不能跑到屏幕外
+		if screenRight - x < menuWidth then
+			--鼠标太靠右，则调整菜单恰好显示完
+			tarContainerL = screenRight - menuWidth - 3
+			tarContainerR = tarContainerL + menuWidth
+		end
+		if screenBottom - y < menuHeight then
+			--鼠标太靠下，则菜单向上弹
+			tarContainerB = y --菜单高度一般不会大于半个屏幕高度
+			tarContainerT = tarContainerB - menuHeight
+		end
+	else
+		--有parentContainer(父菜单)，则x,y为当前被选中的item的右上角坐标，而非鼠标坐标
+		parentL, parentT, parentR, parentB = parentContainer:GetObjPos()
+		if screenRight - x < menuWidth then
+			--太靠右，则子菜单显示到父菜单的左侧
+			tarContainerL = parentL - menuWidth
+			tarContainerR = tarContainerL + menuWidth
+		end
+		if screenBottom - y < menuHeight then
+			--太靠下，则子菜单下缘与item下缘齐平
+			local item = parentContainer:GetChildByIndex(0)
+			local _, itemT, _, itemB = item:GetObjPos()
+			local itemHeight = itemB - itemT
+			
+			tarContainerB = y + itemHeight
+			tarContainerT = tarContainerB - menuHeight
+		end
+	end
+	
+	return tarContainerL, tarContainerT, tarContainerR, tarContainerB
 end
 
 --以下四个方法暂时挂到Helper下，等CreateMenu方法写好后，去掉这三个

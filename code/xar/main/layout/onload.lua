@@ -42,6 +42,7 @@ local File = {
 "luacode\\objectbase.lua",
 "luacode\\helper.lua",
 "luacode\\helper_token.lua",
+"menu\\SettingMenu.lua",
 }
 LoadLuaModule(File, __document)
 

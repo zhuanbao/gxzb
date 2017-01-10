@@ -1,0 +1,131 @@
+<xlue>
+	<objtreetemplate id="GXZB.BindWeiXin2WeiMaWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>503</width>
+			<height>536</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>503</width>
+				<height>536</height>
+				<texture>bindweixin-bkg2</texture>
+			</attr>	
+			<children>
+				<obj id="BindWeiXin2WeiMaWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="BindWeiXin2WeiMaWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-25</left>
+								<top>9</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" >
+									local self = ...
+									local objTree = self:GetOwner()
+									local objHostWnd = objTree:GetBindHostWnd()
+									objHostWnd:EndDialog(0)
+								</event>
+							</eventlist>	
+						</obj>
+						<obj id = "BindWeiXin2WeiMaWnd.Caption.Time" class = "TextObject">
+							<attr>
+								<left>(father.width-150)/2</left>
+								<top>80</top>
+								<width>150</width>
+								<height>36</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>system.black</textcolor>
+								<font>font.text18.bold</font>
+								<text></text>
+							</attr>
+						</obj>
+						<obj id="BindWeiXin2WeiMaWnd.Caption.2WeiMa" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>120</top>
+								<valign>center</valign>
+								<halign>center</halign>
+								<zorder>99</zorder>
+								<drawmode>1</drawmode>
+								<antialias>2</antialias>
+								<width>father.width</width>
+								<height>father.height-120</height>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.BindWeiXin2WeiMaWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>503</width>
+            <height>536</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+            <event name="OnCreate">
+				local self = ...
+				local userData = self:GetUserData()
+				if userData and userData.parentWnd then
+					local objtree = self:GetBindUIObjectTree()
+					local objRootLayout = objtree:GetUIObject("root")
+					local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
+					local nLayoutWidth  = nLayoutR - nLayoutL
+					local nLayoutHeight = nLayoutB - nLayoutT
+				
+					local parentLeft, parentTop, parentRight, parentBottom = userData.parentWnd:GetWindowRect()
+					local parentWidth  = parentRight - parentLeft
+					local parentHeight = parentBottom - parentTop
+					self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
+					
+					local textObject = objtree:GetUIObject("BindWeiXin2WeiMaWnd.Caption.Time")
+					if textObject then
+						local timetotal = 100
+						textObject:SetText(tostring(timetotal).."秒")
+						local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
+						timerManager:SetTimer(function(item, id)
+							timetotal = timetotal - 1
+							textObject:SetText(tostring(timetotal).."秒")
+							if timetotal &lt;= 0 then
+								timetotal = 100
+							end
+						end, 1000)
+					end
+				end
+			</event>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

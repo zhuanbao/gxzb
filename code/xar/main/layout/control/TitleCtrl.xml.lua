@@ -30,14 +30,25 @@ function OnClickConfigBtn(self)
 		-- objRootCtrl:SetCaptionStyle(true)
 	-- end
 	
-	local wndTree = self:GetOwner()
+	--[[local wndTree = self:GetOwner()
 	local wnd = wndTree:GetBindHostWnd()
 	local maskWnd, maskWndTree = Helper:CreateTransparentMask(wnd)
 	
 	--创建“设置“窗口之前，先创建一个半透明蒙层（Mask）窗口覆盖到主窗口上，再以Mask窗口为父窗口创建”设置“窗口
 	--此时”设置“窗口已经成为主窗口的 孙子 窗口
 	local userData = {["maskWndParent"] = wnd, ["parentWnd"] = maskWnd}
-	Helper:CreateModalWnd("ConfigWnd", "ConfigWndTree", maskWnd:GetWndHandle(), userData)
+	Helper:CreateModalWnd("ConfigWnd", "ConfigWndTree", maskWnd:GetWndHandle(), userData)]]
+	
+	local tree = self:GetOwner()
+	local wnd = tree:GetBindHostWnd()
+	local curX, curY = self:GetAbsPos()
+	local wndX, WmdY = wnd:GetWindowRect()
+	curX = curX + wndX
+	curY = curY + WmdY
+	local menuTable = GXZBMenu.SettingMenu.menuTable
+	local menuFunTable = GXZBMenu.SettingMenu.menuFunTable
+	local userData = {}
+	Helper:CreateMenu(curX-50, curY+20, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
 
 function OnClickHomePage(self)

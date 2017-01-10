@@ -1,0 +1,122 @@
+<xlue>
+	<objtreetemplate id="GXZB.BindWeiXinWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>246</width>
+			<height>217</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>246</width>
+				<height>217</height>
+				<texture>bindweixin-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="BindWeiXinWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height - 56</height>
+					</attr>
+					<children>
+						<obj id="BindWeiXinWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-25</left>
+								<top>9</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" >
+									local self = ...
+									local objTree = self:GetOwner()
+									local objHostWnd = objTree:GetBindHostWnd()
+									objHostWnd:EndDialog(0)
+								</event>
+							</eventlist>	
+						</obj>									
+					</children>
+				</obj>
+				<obj id="BindWeiXinWnd.CkickBind" class="TipAddin.Button">
+					<attr>
+						<left>0</left>
+						<top>father.height-56</top>
+						<width>father.width</width>
+						<height>56</height>
+						<NormalBkgID>bindweixin-btn-normal</NormalBkgID>
+						<DownBkgID>bindweixin-btn-normal</DownBkgID>
+						<HoverBkgID>bindweixin-btn-hover</HoverBkgID>
+						<DisableBkgID>bindweixin-btn-hover</DisableBkgID>
+					</attr>
+					<eventlist>
+						<event name="OnClick">
+							--弹出绑定微信二维码
+							local self = ...
+							local objTree = self:GetOwner()
+							local objHostWnd = objTree:GetBindHostWnd()
+							objHostWnd:EndDialog(0)
+							
+							local Helper =  XLGetGlobal("Helper")
+							if Helper then
+								local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+								local maskWnd = Helper:CreateTransparentMask(wnd)
+								Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+								Helper:DestoryTransparentMask(wnd)
+							else
+								--XLMessageBox("error helper is nil")
+							end
+						</event>
+					</eventlist>	
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.BindWeiXinWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>246</width>
+            <height>217</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+            <event name="OnCreate">
+				local self = ...
+				local userData = self:GetUserData()
+				if userData and userData.parentWnd then
+					local objtree = self:GetBindUIObjectTree()
+					local objRootLayout = objtree:GetUIObject("root")
+					local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
+					local nLayoutWidth  = nLayoutR - nLayoutL
+					local nLayoutHeight = nLayoutB - nLayoutT
+				
+					local parentLeft, parentTop, parentRight, parentBottom = userData.parentWnd:GetWindowRect()
+					local parentWidth  = parentRight - parentLeft
+					local parentHeight = parentBottom - parentTop
+					self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
+				end
+			</event>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>
