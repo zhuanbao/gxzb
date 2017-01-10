@@ -5,6 +5,11 @@
 		<texture id="bindweixin-btn-normal" image="zbbitmap\bindweixin-btn-normal.png" />
 		<texture id="bindweixin-btn-hover" image="zbbitmap\bindweixin-btn-hover.png" />
 		
+		<texture id="tixian-bkg" image="zbbitmap\tixian-bkg.png" />
+		<texture id="tixian-btn-normal" image="zbbitmap\tixian-btn-normal.png" />
+		<texture id="tixian-btn-hover" image="zbbitmap\tixian-btn-hover.png" />
+		<texture id="tixian-edit" image="zbbitmap\tixian-edit.png" />
+		
 		<!--菜单-->
 		<texture id="MenuBar.Select.Bkg" image="zbbitmap\menu\MenuBar.Select.Bkg.png" />
 		<texture id="texture.menu.container.bkg" type="NineInOne" image="zbbitmap\menu\texture.menu.container.bkg.png" />

@@ -123,7 +123,17 @@ function OnClickHistoryIncome(self)
 end
 
 function OnClickTakeCash(self)
-
+	--弹出绑定微信
+	local Helper =  XLGetGlobal("Helper")
+	local objTree = self:GetOwner()
+	local objHostWnd = objTree:GetBindHostWnd()
+	if Helper then
+		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+		Helper:CreateModalWnd("GXZB.TiXianWnd", "GXZB.TiXianWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+		Helper:DestoryTransparentMask(objHostWnd)
+	else
+		--XLMessageBox("error helper is nil")
+	end
 end
 
 
