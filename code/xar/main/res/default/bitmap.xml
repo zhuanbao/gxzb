@@ -1,0 +1,27 @@
+<XLUE>
+	<resource>
+		<texture id="GXZB.MainWnd.Bkg" image="bitmap\GXZB.MainWndBkg.png" />
+		
+		<texture id="MainPanel.Buttom.Button.Normal" image="bitmap\GXZB.MainPanel.Buttom.Button.png" />
+		<texture id="MainPanel.Buttom.Button.Hover" image="bitmap\GXZB.MainPanel.Buttom.Button.png" />
+		<texture id="GXZB.MainPanel.Cycle" image="bitmap\GXZB.MainPanel.Cycle.png" />
+			
+		<texture id="GXZB.Caption.Bkg" image="bitmap\GXZB.Caption.Bkg.png" />	
+		<bitmap id="GXZB.Logo" path="bitmap\GXZB.Logo.png"/>
+		<bitmap id="WeiXin.HeadImg.default" path="bitmap\weixindefault.jpg"/>
+		
+		<texture id="GXZB.BtnClose.Normal" image="bitmap\GXZB.Caption.BtnClose.Normal.png" />
+		<texture id="GXZB.BtnClose.Hover"  image="bitmap\GXZB.Caption.BtnClose.Hover.png" />
+		<texture id="GXZB.BtnClose.Down"   image="bitmap\GXZB.Caption.BtnClose.Hover.png" />
+
+		<texture id="GXZB.BtnMin.Normal" image="bitmap\GXZB.Caption.BtnMin.Normal.png" />
+		<texture id="GXZB.BtnMin.Hover"  image="bitmap\GXZB.Caption.BtnMin.Hover.png" />
+		<texture id="GXZB.BtnMin.Down"   image="bitmap\GXZB.Caption.BtnMin.Hover.png" />
+		
+		<texture id="GXZB.Config.Normal" image="bitmap\GXZB.Caption.Config.Normal.png" />
+		<texture id="GXZB.Config.Hover"  image="bitmap\GXZB.Caption.Config.Hover.png" />
+		<texture id="GXZB.Config.Down"   image="bitmap\GXZB.Caption.Config.Hover.png" />
+		
+		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
+	</resource>
+</XLUE>

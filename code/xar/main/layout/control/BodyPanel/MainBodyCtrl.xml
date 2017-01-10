@@ -1,0 +1,94 @@
+<xlue>
+	<control class="MainBodyCtrl">
+		<attr_def>
+			<attr name="CurCtrlName" type="string"></attr>
+		</attr_def>
+		<method_def>
+			<ChangePanel file="MainBodyCtrl.xml.lua" func="ChangePanel"/>
+			<InitPanelList file="MainBodyCtrl.xml.lua" func="InitPanelList"/>
+			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
+			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
+			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="MainBodyCtrl.MainPanel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="MainPanel.Center" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-50</height>
+							</attr>
+						</obj>
+						<obj id="MainPanel.Buttom" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>father.height-50</top>
+								<width>father.width</width>
+								<height>50</height>
+							</attr>
+							<children>
+								<obj id="MainPanel.Buttom.BindWeiXin" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 176*3)/4</left>
+										<top>(father.height-42)/2</top>
+										<width>176</width>
+										<height>42</height>
+										<NormalBkgID>MainPanel.Buttom.Button.Normal</NormalBkgID>
+										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
+										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
+										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickBindWeiXin" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.HistoryIncome" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 176*3)/4*2+176</left>
+										<top>(father.height-42)/2</top>
+										<width>176</width>
+										<height>42</height>
+										<NormalBkgID>MainPanel.Buttom.Button.Normal</NormalBkgID>
+										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
+										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
+										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickHistoryIncome" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.TakeCash" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 176*3)/4*3+176*2</left>
+										<top>(father.height-42)/2</top>
+										<width>176</width>
+										<height>42</height>
+										<NormalBkgID>MainPanel.Buttom.Button.Normal</NormalBkgID>
+										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
+										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
+										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickTakeCash" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>						
+			</children>
+		</objtemplate>
+	</control>
+</xlue>

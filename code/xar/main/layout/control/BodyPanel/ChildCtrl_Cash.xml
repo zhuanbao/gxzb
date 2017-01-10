@@ -1,0 +1,100 @@
+<xlue>
+	<control class="ChildCtrl_Cash">
+		<attr_def>
+			<attr name="bHasInit" type="bool"/>
+		</attr_def>
+		<method_def>
+			
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="ChildCtrl_Cash.UserInfo" class="LayoutObject">
+					<attr>
+						<left>16</left>
+						<top>16</top>
+						<width>132</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="ChildCtrl_Cash.UserInfo.HeadImg" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>132</width>
+								<height>132</height>
+								<image>WeiXin.HeadImg.default</image>
+							</attr>
+						</obj>
+						<obj id="ChildCtrl_Cash.UserInfo.NickName" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>132+5</top>
+								<width>132</width>
+								<height>20</height>
+								<text>小胜六步</text>
+								<font>font.text15</font>
+								<textcolor>system.black</textcolor>
+								<halign>center</halign>
+								<endellipsis>1</endellipsis>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+				<obj id="ChildCtrl_Cash.Cycle" class="TextureObject">
+					<attr>
+						<left>(father.width - 184)/2</left>
+						<top>30</top>
+						<width>184</width>
+						<height>184</height>
+						<texture>GXZB.MainPanel.Cycle</texture>
+					</attr>
+					<children>
+						<obj id="ChildCtrl_Cash.Text" class="TextObject">
+							<attr>
+								<left>(184-130)/2</left>
+								<top>(184-40)/2</top>
+								<width>130</width>
+								<height>40</height>
+								<text>余额</text>
+								<halign>center</halign>
+								<font>font.text15</font>
+								<textcolor>system.black</textcolor>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+				<obj id="ChildCtrl_Cash.StartMiner" class="TipAddin.Button">
+					<attr>
+						<left>(father.width - 176)/2</left>
+						<top>30+184+20</top>
+						<width>176</width>
+						<height>42</height>
+						<NormalBkgID>MainPanel.Buttom.Button.Normal</NormalBkgID>
+						<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
+						<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
+						<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+						<Text>开始赚宝</Text>
+					</attr>									
+					<eventlist>
+						<event name="OnClick" file="ChildCtrl_Cash.lua" func="OnClickStartMiner" />
+					</eventlist>
+				</obj>
+				<obj id="ChildCtrl_Cash.MinerInfo" class="TextObject">
+					<attr>
+						<left>16</left>
+						<top>father.height-30</top>
+						<width>father.width-16*2</width>
+						<height>20</height>
+						<text>余额余额余额余额余额余额余额余额</text>
+						<halign>left</halign>
+						<font>font.text15</font>
+						<textcolor>system.black</textcolor>
+					</attr>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>	
+</xlue>
