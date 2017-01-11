@@ -3,15 +3,15 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>503</width>
-			<height>536</height>
+			<width>419</width>
+			<height>376</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>503</width>
-				<height>536</height>
+				<width>419</width>
+				<height>376</height>
 				<texture>bindweixin-bkg2</texture>
 			</attr>	
 			<children>
@@ -23,6 +23,19 @@
 						<height>father.height</height>
 					</attr>
 					<children>
+						<obj id = "BindWeiXin2WeiMaWnd.Caption.Title" class = "TextObject">
+							<attr>
+								<left>5</left>
+								<top>5</top>
+								<width>150</width>
+								<height>25</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>system.black</textcolor>
+								<font>font.text22</font>
+								<text>绑定微信</text>
+							</attr>
+						</obj>
 						<obj id="BindWeiXin2WeiMaWnd.Caption.CloseBtn" class="TipAddin.Button">
 							<attr>
 								<left>father.width-25</left>
@@ -35,38 +48,49 @@
 								<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
 							</attr>
 							<eventlist>
-								<event name="OnClick" >
-									local self = ...
-									local objTree = self:GetOwner()
-									local objHostWnd = objTree:GetBindHostWnd()
-									objHostWnd:EndDialog(0)
-								</event>
+								<event name="OnClick" file="BindWeiXin2WeiMaWnd.xml.lua" func="OnCloseDialog" />
 							</eventlist>	
 						</obj>
-						<obj id = "BindWeiXin2WeiMaWnd.Caption.Time" class = "TextObject">
+						<obj id = "BindWeiXin2WeiMaWnd.Caption.Tip" class = "TextObject">
 							<attr>
-								<left>(father.width-150)/2</left>
-								<top>80</top>
-								<width>150</width>
-								<height>36</height>
-								<valign>center</valign>
+								<left>15</left>
+								<top>5+25+10</top>
+								<width>father.width-2*15</width>
+								<height>25*2</height>
+								<valign>left</valign>
 								<halign>center</halign>
 								<textcolor>system.black</textcolor>
-								<font>font.text18.bold</font>
-								<text></text>
+								<font>font.text19</font>
+								<multiline>1</multiline>
+								<text>请扫描以下二维码进行微信绑定，二维码剩余有效期</text>
+							</attr>
+						</obj>
+						<obj id="BindWeiXin2WeiMaWnd.Caption.Wait" class="TextObject">
+							<attr>
+								<left>(father.width-160)/2</left>
+								<top>5+25+10+25*2+15+40</top>
+								<width>160</width>
+								<height>25</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>system.black</textcolor>
+								<font>font.text18</font>
+								<text>获取二维码图片中</text>
+								<visible>1</visible>
 							</attr>
 						</obj>
 						<obj id="BindWeiXin2WeiMaWnd.Caption.2WeiMa" class="ImageObject">
 							<attr>
-								<left>0</left>
-								<top>120</top>
+								<left>(father.width-9*2-250)/2+9</left>
+								<top>5+25+10+25*2+15</top>
 								<valign>center</valign>
 								<halign>center</halign>
 								<zorder>99</zorder>
 								<drawmode>1</drawmode>
 								<antialias>2</antialias>
-								<width>father.width</width>
-								<height>father.height-120</height>
+								<width>250</width>
+								<height>250</height>
+								<visible>0</visible>
 							</attr>
 						</obj>
 					</children>
@@ -80,8 +104,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>503</width>
-            <height>536</height>
+            <width>419</width>
+            <height>376</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
@@ -96,36 +120,8 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-            <event name="OnCreate">
-				local self = ...
-				local userData = self:GetUserData()
-				if userData and userData.parentWnd then
-					local objtree = self:GetBindUIObjectTree()
-					local objRootLayout = objtree:GetUIObject("root")
-					local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
-					local nLayoutWidth  = nLayoutR - nLayoutL
-					local nLayoutHeight = nLayoutB - nLayoutT
-				
-					local parentLeft, parentTop, parentRight, parentBottom = userData.parentWnd:GetWindowRect()
-					local parentWidth  = parentRight - parentLeft
-					local parentHeight = parentBottom - parentTop
-					self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
-					
-					local textObject = objtree:GetUIObject("BindWeiXin2WeiMaWnd.Caption.Time")
-					if textObject then
-						local timetotal = 100
-						textObject:SetText(tostring(timetotal).."秒")
-						local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
-						timerManager:SetTimer(function(item, id)
-							timetotal = timetotal - 1
-							textObject:SetText(tostring(timetotal).."秒")
-							if timetotal &lt;= 0 then
-								timetotal = 100
-							end
-						end, 1000)
-					end
-				end
-			</event>
+			 <event name="OnCreate" file="BindWeiXin2WeiMaWnd.xml.lua" func="OnCreate"/>
+			 <event name="OnDestroy" file="BindWeiXin2WeiMaWnd.xml.lua" func="OnDestroy"/>
         </eventlist>
     </hostwndtemplate>
 </xlue>
