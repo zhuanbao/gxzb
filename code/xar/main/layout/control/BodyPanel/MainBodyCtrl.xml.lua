@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-
+local FunctionObj = XLGetGlobal("Global.FunctionHelper")
 -----事件----
 
 
@@ -104,18 +104,31 @@ function GetChildObjByCtrlName(self, strCtrlName)
 	return objCurPanel
 end
 
-function OnClickBindWeiXin(self)
-	--弹出绑定微信
-	local Helper =  XLGetGlobal("Helper")
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	if Helper then
-		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-		Helper:CreateModalWnd("GXZB.BindWeiXinWnd", "GXZB.BindWeiXinWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-		Helper:DestoryTransparentMask(objHostWnd)
-	else
-		--XLMessageBox("error helper is nil")
+function UpdateWeixinInfo(self, tUserConfig)
+	local objPanelCenter= self:GetControlObject("MainPanel.Center")
+	if objPanelCenter == nil then
+		
+		TipLog("[UpdateWeixinInfo] get objPanelCenter failed ")
+		return false
 	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateWeixinInfo) == "function" then
+			objChild:UpdateWeixinInfo(tUserConfig)
+		end	
+	end
+	return true
+end
+
+
+function OnClickBindWeiXin(self)
+	local Helper =  XLGetGlobal("Helper")
+	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	local maskWnd = Helper:CreateTransparentMask(wnd)
+	Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(wnd)
 end
 
 function OnClickHistoryIncome(self)

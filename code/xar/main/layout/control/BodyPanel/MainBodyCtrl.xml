@@ -9,6 +9,7 @@
 			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
 			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+			<UpdateWeixinInfo file="MainBodyCtrl.xml.lua" func="UpdateWeixinInfo"/>
 		</method_def>
 		<event_def>
 			
@@ -49,6 +50,7 @@
 										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
 										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
 										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+										<Text>绑定微信</Text>
 									</attr>									
 									<eventlist>
 										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickBindWeiXin" />
@@ -64,6 +66,7 @@
 										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
 										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
 										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+										<Text>历史收益</Text>
 									</attr>									
 									<eventlist>
 										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickHistoryIncome" />
@@ -79,6 +82,7 @@
 										<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
 										<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
 										<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
+										<Text>提现</Text>
 									</attr>									
 									<eventlist>
 										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickTakeCash" />

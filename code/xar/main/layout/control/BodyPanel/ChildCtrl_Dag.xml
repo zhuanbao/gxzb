@@ -4,7 +4,7 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			
+			<UpdateWeixinInfo file="ChildCtrl_Dag.xml.lua" func="UpdateWeixinInfo"/>
 		</method_def>
 		<event_def>
 			

@@ -4,7 +4,7 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			
+			<UpdateWeixinInfo file="ChildCtrl_Cash.xml.lua" func="UpdateWeixinInfo"/>
 		</method_def>
 		<event_def>
 			
@@ -34,7 +34,7 @@
 								<top>132+5</top>
 								<width>132</width>
 								<height>20</height>
-								<text>小胜六步</text>
+								<text>昵称未知</text>
 								<font>font.text15</font>
 								<textcolor>system.black</textcolor>
 								<halign>center</halign>
@@ -79,7 +79,7 @@
 						<Text>开始赚宝</Text>
 					</attr>									
 					<eventlist>
-						<event name="OnClick" file="ChildCtrl_Cash.lua" func="OnClickStartMiner" />
+						<event name="OnClick" file="ChildCtrl_Cash.xml.lua" func="OnClickStartMiner" />
 					</eventlist>
 				</obj>
 				<obj id="ChildCtrl_Cash.MinerInfo" class="TextObject">
