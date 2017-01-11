@@ -739,7 +739,7 @@ function RegisterObject()
 		end,
 	}
 	
-	XLSetGlobal("GS.Json", obj)
+	XLSetGlobal("Clent.Json", obj)
 end
 
 RegisterObject()
