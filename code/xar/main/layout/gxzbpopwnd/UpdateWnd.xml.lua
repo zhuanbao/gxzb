@@ -70,6 +70,7 @@ function OnCreate(self)
 		local function ShowNoUpdate()
 			--已经是最新
 			TextMain:SetText("你的共享赚宝已经是最新版本，无需更新")
+			TextVersion:SetText("版本："..tFunctionHelper.GetGXZBVersion() or "1.0.0.1")
 			TextVersion:SetVisible(true)
 			BtnSure:SetText("确定")
 		end
@@ -123,6 +124,6 @@ function OnCreate(self)
 			ShowReadyUpdate(tNewVersionInfo["strContent"] or "修改已知bug")
 			g_tNewVersionInfo = tNewVersionInfo
 		end
-		FunctionObj.DownLoadServerConfig(InitMainWnd)
+		tFunctionHelper.DownLoadServerConfig(InitMainWnd)
 	end
 end
