@@ -148,7 +148,7 @@ function RegisterFunctionObject(self)
 	obj.RegQueryValue = RegQueryValue
 	obj.RegSetValue = RegSetValue
 	obj.RegDeleteValue = RegDeleteValue
-	obj.GetGSVersion = GetGSVersion
+	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGSMinorVer = GetGSMinorVer
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
 	obj.GetVideoDomainState = GetVideoDomainState
@@ -481,13 +481,13 @@ function DestroyPopupWnd()
 end
 
 
-function GetGSVersion()
-	local strGreenShieldPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\GreenShield\\path")
-	if not IsRealString(strGreenShieldPath) or not tipUtil:QueryFileExists(strGreenShieldPath) then
+function GetGXZBVersion()
+	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\path")
+	if not IsRealString(strgxzbPath) or not tipUtil:QueryFileExists(strgxzbPath) then
 		return ""
 	end
 
-	return tipUtil:GetFileVersionString(strGreenShieldPath)
+	return tipUtil:GetFileVersionString(strgxzbPath)
 end
 
 
@@ -502,7 +502,7 @@ end
 
 
 function GetGSMinorVer()
-	local strVersion = GetGSVersion()
+	local strVersion = GetGXZBVersion()
 	if not IsRealString(strVersion) then
 		return ""
 	end
@@ -1253,7 +1253,7 @@ function CheckForceVersion(tForceVersion)
 
 	local bRightVer = false
 	
-	local strCurVersion = GetGSVersion()
+	local strCurVersion = GetGXZBVersion()
 	local _, _, _, _, _, strCurVersion_4 = string.find(strCurVersion, "(%d+)%.(%d+)%.(%d+)%.(%d+)")
 	local nCurVersion_4 = tonumber(strCurVersion_4)
 	if type(nCurVersion_4) ~= "number" then
@@ -1429,7 +1429,7 @@ function TryForceUpdate(tServerConfig)
 		return 
 	end
 	
-	local strCurVersion = GetGSVersion()
+	local strCurVersion = GetGXZBVersion()
 	local versionInfo = CheckCondition(tForceUpdate)
 	local strNewVersion = versionInfo and versionInfo.strVersion		
 	if not IsRealString(strCurVersion) or not IsRealString(strNewVersion)
@@ -1559,7 +1559,7 @@ end
 function ShowIntroduceOnce()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\GreenShield\\ShowIntroduce"
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\ShowIntroduce"
 	
 	if not IsNilString(nLastShowIntroduce) then
 		RegDeleteValue(strRegPath)

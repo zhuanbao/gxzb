@@ -7,43 +7,72 @@ end
 local bReverse = true
 local menuFunTable = {}
 
-function menuFunTable.OnInit_FileName(self)
+function menuFunTable.OnInit_autowork(self)
+	if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
+		local icon = self:GetControlObject("menu.item.icon")
+		icon:SetObjPos2(9, "(father.height - 13)/2", 13, 13)
+		icon:SetResID("bitmap.menu.setting_check.normal")
+	end
+end
+
+function menuFunTable.OnSelect_autowork(self)
+	if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
+		Helper.tipUtil:DeleteRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb")
+	else
+		local strExePath = Helper.tipUtil:QueryRegValue("HKEY_LOCAL_MACHINE", "Software\\gxzb", "Path")
+		if not Helper:IsRealString(strExePath) or not Helper.tipUtil:QueryFileExists(strExePath) then
+			return
+		end
+		Helper.tipUtil:SetRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", "gxzb", "\""..strExePath.."\" /sstartfrom sysboot /embedding")
+	end
+end
+
+function menuFunTable.OnInit_hideball(self)
 	
 end
 
-function menuFunTable.OnSelect_FileName(self)
+function menuFunTable.OnSelect_hideball(self)
 	
 end
 
-function menuFunTable.OnInit_Size(self)
-	
+function menuFunTable.OnSelect_setting(self)
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	objHostWnd:Show(1)
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.SettingWnd", "GXZB.SettingWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(objHostWnd)
 end
 
-function menuFunTable.OnSelect_Size(self)
-	
+function menuFunTable.OnSelect_checkupdate(self)
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	objHostWnd:Show(1)
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.UpdateWnd", "GXZB.UpdateWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(objHostWnd)
 end
 
-function menuFunTable.OnInit_OperateTime(self)
-	
+function menuFunTable.OnSelect_about(self)
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	objHostWnd:Show(1)
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.AboutWnd", "GXZB.AboutWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(objHostWnd)
 end
 
-function menuFunTable.OnSelect_OperateTime(self)
-	
-end
-
-function menuFunTable.OnInit_Ext(self)
-	
-end
-
-function menuFunTable.OnSelect_Ext(self)
-	
+function menuFunTable.OnSelect_exit(self)
+	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	if wnd then
+		wnd:Show(0)
+	end
 end
 
 local menuTable = {
-{id="FileName", text = "文件名"},
-{id="Size", text = "大小"},
-{id="OperateTime", text = "修改日期"},
-{id="Ext", text = "类型"},
+{id="autowork", text = "开机自动赚宝"},
+{id="hideball", text = "隐藏悬浮球"},
+{id="setting", text = "设置"},
+{id="checkupdate", text = "检查更新"},
+{id="about", text = "关于"},
+{id="exit", text = "退出"},
 }
 
 GXZBMenu.SettingMenu = {}

@@ -100,11 +100,11 @@
 	
 	<objtemplate class="MenuItemObject" id="menu.context.item">
 		<attr>
-			<height>27</height>
+			<height>31</height>
 			<width>father.width</width>
-			<TextPos>18</TextPos>
-			<Font>font.default12</Font>
-			<FontColorNormal>4D4D4D</FontColorNormal>
+			<TextPos>28</TextPos>
+			<Font>font.text12</Font>
+			<FontColorNormal>system.white</FontColorNormal>
 		</attr>
 	</objtemplate>
 

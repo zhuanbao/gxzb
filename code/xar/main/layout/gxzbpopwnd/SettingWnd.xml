@@ -1,0 +1,269 @@
+<xlue>
+	<objtreetemplate id="GXZB.SettingWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>530</width>
+			<height>380</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>530</width>
+				<height>380</height>
+				<texture>setting-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="SettingWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="SettingWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-25</left>
+								<top>9</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+						<obj id="SettingWnd.CheckBox.Sysboot" class="CheckBox">
+							<attr>
+								<CheckHover>setting_check.hover</CheckHover>
+								<Select>true</Select>
+								<Text>开机自动赚宝</Text>
+								<left>230</left>
+								<width>150</width>
+								<top>88</top>
+								<CheckNormal>setting_check.normal</CheckNormal>
+								<UnCheckNormal>setting_uncheck.normal</UnCheckNormal>
+								<height>25</height>
+								<UnCheckHover>setting_uncheck.hover</UnCheckHover>
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSysBoot" />
+							</eventlist>
+						</obj>
+						<obj id="SettingWnd.Radio.AllSpeed" class="CheckBox">
+							<attr>
+								<Type>radio</Type>
+								<Select>true</Select>
+								<Text>全速赚宝</Text>
+								<left>230</left>
+								<top>270</top>
+								<width>150</width>
+								<height>25</height>
+								<CheckHover>setting_radio.hover</CheckHover>
+								<CheckNormal>setting_radio.hover</CheckNormal>
+								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+								<UnCheckHover>setting_radio.normal</UnCheckHover>
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSuDu" />
+							</eventlist>
+						</obj>
+						<obj id="SettingWnd.Radio.Zhineng" class="CheckBox">
+							<attr>
+								<Type>radio</Type>
+								<Select>false</Select>
+								<Text>智能赚宝</Text>
+								<left>230</left>
+								<top>304</top>
+								<width>150</width>
+								<height>25</height>
+								<CheckHover>setting_radio.hover</CheckHover>
+								<CheckNormal>setting_radio.hover</CheckNormal>
+								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+								<UnCheckHover>setting_radio.normal</UnCheckHover>
+
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSuDu" />
+							</eventlist>
+						</obj>
+						<obj id="SettingWnd.EditMachine.bkg" class="TextureObject">
+							<attr>
+								<left>206</left>
+								<top>134</top>
+								<width>230</width>
+								<height>28</height>
+								<texture>setting-edit-bkg</texture>
+							</attr>	
+							<children>
+								<obj id = "SettingWnd.EditMachine" class = "EditObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+										<transparent>1</transparent>
+										<viewinset>2, 2, 2, 2</viewinset>
+										<textcolor>444444</textcolor>
+										<font>font.text16</font>
+										<text></text>
+									</attr>
+									<eventlist>
+										<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnFocusChangeEdit" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+						<obj id="SettingWnd.EditMachine.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>修改名称</Text>
+								<TextFont>font.text16</TextFont>
+								<TextColor>DDDDDD</TextColor>
+								<left>436</left>
+								<top>134</top>
+								<width>88</width>
+								<height>26</height>
+								<NormalBkgID>setting-btn-normal</NormalBkgID>
+								<DownBkgID>setting-btn-normal</DownBkgID>
+								<HoverBkgID>setting-btn-hover</HoverBkgID>
+								<DisableBkgID>setting-btn-hover</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickMachineBtn" />
+							</eventlist>	
+						</obj>
+						
+						<obj id="SettingWnd.EditCache.bkg" class="TextureObject">
+							<attr>
+								<left>206</left>
+								<top>190</top>
+								<width>230</width>
+								<height>28</height>
+								<texture>setting-edit-bkg</texture>
+							</attr>	
+							<children>
+								<obj id = "SettingWnd.EditCache" class = "EditObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+										<transparent>1</transparent>
+										<viewinset>2, 2, 2, 2</viewinset>
+										<textcolor>444444</textcolor>
+										<font>font.text16</font>
+										<text></text>
+									</attr>
+									<eventlist>
+										<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnFocusChangeEdit" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+						<obj id="SettingWnd.EditCache.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>选择目录</Text>
+								<TextFont>font.text16</TextFont>
+								<TextColor>DDDDDD</TextColor>
+								<left>436</left>
+								<top>190</top>
+								<width>88</width>
+								<height>26</height>
+								<NormalBkgID>setting-btn-normal</NormalBkgID>
+								<DownBkgID>setting-btn-normal</DownBkgID>
+								<HoverBkgID>setting-btn-hover</HoverBkgID>
+								<DisableBkgID>setting-btn-hover</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCacheBtn" />
+							</eventlist>	
+						</obj>
+						<obj id="SettingWnd.ShowFreeSpace" class="TextObject">
+							<attr>
+								<left>286</left>
+								<top>218</top>
+								<width>168</width>
+								<height>25</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>12.6GB</text>
+							</attr>
+						</obj>
+						
+						<obj id="SettingWnd.Sure.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>确定</Text>
+								<TextFont>font.text16</TextFont>
+								<TextColor>DDDDDD</TextColor>
+								<left>343</left>
+								<top>340</top>
+								<width>73</width>
+								<height>30</height>
+								<NormalBkgID>setting-btn-normal</NormalBkgID>
+								<DownBkgID>setting-btn-normal</DownBkgID>
+								<HoverBkgID>setting-btn-hover</HoverBkgID>
+								<DisableBkgID>setting-btn-hover</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+						<obj id="SettingWnd.Cancel.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>取消</Text>
+								<TextFont>font.text16</TextFont>
+								<TextColor>DDDDDD</TextColor>
+								<left>437</left>
+								<top>340</top>
+								<width>73</width>
+								<height>30</height>
+								<NormalBkgID>setting-btn-normal</NormalBkgID>
+								<DownBkgID>setting-btn-normal</DownBkgID>
+								<HoverBkgID>setting-btn-hover</HoverBkgID>
+								<DisableBkgID>setting-btn-hover</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+					</children>
+					<eventlist>
+						<event name="OnLButtonDown" file="SettingWnd.xml.lua" func="OnLButtonDownCaption" />
+					</eventlist>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.SettingWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>530</width>
+            <height>380</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="SettingWnd.xml.lua" func="OnCreate" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

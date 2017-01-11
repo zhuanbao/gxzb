@@ -10,6 +10,14 @@
 		<texture id="tixian-btn-hover" image="zbbitmap\tixian-btn-hover.png" />
 		<texture id="tixian-edit" image="zbbitmap\tixian-edit.png" />
 		
+		<texture id="setting-bkg" image="zbbitmap\setting-bkg.png" />
+		<texture id="setting-btn-normal" image="zbbitmap\setting-btn-normal.png" />
+		<texture id="setting-btn-hover" image="zbbitmap\setting-btn-hover.png" />
+		<texture id="setting-edit-bkg" image="zbbitmap\setting-edit-bkg.png" />
+		
+		<texture id="common-bkg" image="zbbitmap\common-bkg.png" />
+		<bitmap id="logo-mid" path="zbbitmap\logo-mid.png" />
+		
 		<!--菜单-->
 		<texture id="MenuBar.Select.Bkg" image="zbbitmap\menu\MenuBar.Select.Bkg.png" />
 		<texture id="texture.menu.container.bkg" type="NineInOne" image="zbbitmap\menu\texture.menu.container.bkg.png" />
@@ -34,6 +42,20 @@
 		<bitmap id="bitmap.menu.arrow.normal"  path="zbbitmap\menu\bitmap.menu.submenu.arrow.png" />
 		
 		<texture id="texture.menu.splitter" type="ThreeInOneH" image="zbbitmap\menu\texture.menu.splitter.png" />
+		<imagelist id="imagelist.menu.setting_check" splitter="1" varyblock="1" image="zbbitmap\menu\setting_check.png"/>
+			<bitmap id="bitmap.menu.setting_check.normal"  imagelist="imagelist.menu.setting_check" index="1" />
+			<texture id="setting_check.normal"   imagelist="imagelist.menu.setting_check" index="1" />
+			<texture id="setting_check.hover"   imagelist="imagelist.menu.setting_check" index="2" />
+			<texture id="setting_check.down"   imagelist="imagelist.menu.setting_check" index="3" />
+		<imagelist id="setting_radio" vertical="0" splitter="1" varyblock="1" image="zbbitmap\menu\setting_radio.png" />
+			<texture id="setting_radio.normal"   imagelist="setting_radio" index="1" />
+			<texture id="setting_radio.hover"   imagelist="setting_radio" index="2" />
+			<bitmap id="setting_radio.icon"   imagelist="setting_radio" index="2" />
+		<imagelist id="setting_uncheck" vertical="0" splitter="1" varyblock="1" image="zbbitmap\menu\setting_uncheck.png" />
+			<bitmap id="setting_uncheck.icon"   imagelist="setting_uncheck" index="1" />
+			<texture id="setting_uncheck.normal"   imagelist="setting_uncheck" index="1" />
+			<texture id="setting_uncheck.hover"   imagelist="setting_uncheck" index="2" />
+			<texture id="setting_uncheck.down"   imagelist="setting_uncheck" index="3" />
 		<!--菜单-->
 		
 		<!--字体id -->
