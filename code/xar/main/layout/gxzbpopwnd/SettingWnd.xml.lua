@@ -60,6 +60,18 @@ function OnFocusChangeEdit(self, isFocus)
 	end
 end
 
+function OnChangeEditCache(self)
+	local textDAGDir = self:GetText()
+	local freeSpace = self:GetObject("tree:SettingWnd.ShowFreeSpace")
+	if Helper:IsRealString(textDAGDir) and Helper.tipUtil:QueryFileExists(textDAGDir) then
+		freeSpace:SetTextColorResID("DDDDDD")
+		freeSpace:SetText("13GB")
+	else
+		freeSpace:SetText("无效路径")
+		freeSpace:SetTextColorResID("system.red")
+	end
+end
+
 function OnLButtonDownCaption(self, x, y)
 	local edit = self:GetObject("control:TiXianWnd.Caption.Edit")
 	local editL, editT, editR, editB = edit:GetAbsPos()
@@ -86,6 +98,7 @@ function OnCreate(self)
 		local chkboxKaiji = objtree:GetUIObject("SettingWnd.CheckBox.Sysboot")
 		local editMachine = objtree:GetUIObject("SettingWnd.EditMachine")
 		local editCache = objtree:GetUIObject("SettingWnd.EditCache")
+		local freeSpace = objtree:GetUIObject("SettingWnd.ShowFreeSpace")
 		local radio1 = objtree:GetUIObject("SettingWnd.Radio.AllSpeed")
 		local radio2 = objtree:GetUIObject("SettingWnd.Radio.Zhineng")
 		
@@ -98,6 +111,7 @@ function OnCreate(self)
 		local cacheDir = Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir")
 		if Helper:IsRealString(cacheDir) then
 			editCache:SetText(cacheDir)
+			OnChangeEditCache(editMachine)
 		end
 		
 		local machineName = tUserConfig["machinename"]

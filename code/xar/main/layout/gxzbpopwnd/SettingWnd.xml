@@ -161,6 +161,7 @@
 									</attr>
 									<eventlist>
 										<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnFocusChangeEdit" />
+										<event name="OnChange" file="SettingWnd.xml.lua" func="OnChangeEditCache" />
 									</eventlist>
 								</obj>
 							</children>
