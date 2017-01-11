@@ -22,6 +22,7 @@ public:
 	CComBSTR m_bstrSavedPath;
 	CComBSTR m_bstrResponseHeader;
 	bool bException;
+	LONG  m_httpstatus;
 	CAJAX(): m_nID(0), bException(false)
 	{
 
@@ -187,7 +188,7 @@ public:
 	STDMETHOD(Invoke)(long dispID,const struct _GUID &,unsigned long,unsigned short,struct tagDISPPARAMS * /*pParams*/,struct tagVARIANT *,struct tagEXCEPINFO *,unsigned int *)
 	{
 		TSAUTO();
-		long s_httpstatus = -1;
+		//long s_httpstatus = -1;
 		if(0 == dispID)
 		{
 			if(m_spXmlRequest)
@@ -205,7 +206,7 @@ public:
 				}*/
 				else if(4 == lstate)
 				{
-					s_httpstatus = m_spXmlRequest->status;
+					m_httpstatus = m_spXmlRequest->status;
 					_bstr_t statusText = m_spXmlRequest->statusText;
 					_bstr_t responseHeaders = m_spXmlRequest->getAllResponseHeaders();
 					BSTR bstrResponseHeader = NULL;
@@ -214,10 +215,10 @@ public:
 						m_bstrResponseHeader.Attach(bstrResponseHeader);
 					}
 					//_bstr_t responseText = m_spXmlRequest->responseText;Ì«´ó»á³ö´í
-					TSDEBUG4CXX(" status : "<<s_httpstatus<<" statusText : "<<statusText.GetBSTR()<<" Url : "<<m_bstrUrl<<", responseHeaders : "<<responseHeaders.GetBSTR());					
+					TSDEBUG4CXX(" status : "<<m_httpstatus<<" statusText : "<<statusText.GetBSTR()<<" Url : "<<m_bstrUrl<<", responseHeaders : "<<responseHeaders.GetBSTR());					
 					if(!m_bOutDOM)
 					{						
-						m_spAJAXStateChange->OnStateChange(this,true, s_httpstatus, NULL, m_spXmlRequest.operator->() );
+						m_spAJAXStateChange->OnStateChange(this,true, m_httpstatus, NULL, m_spXmlRequest.operator->() );
 					}
 					else
 					{
@@ -226,7 +227,7 @@ public:
 						long l = spError->GeterrorCode(); 
 						l;
 						TSDEBUG4CXX(" DOM : "<<spDOM.operator->()<<" error : "<<l);
-						m_spAJAXStateChange->OnStateChange(this, true, s_httpstatus, NULL, spDOM.operator->() );					  	
+						m_spAJAXStateChange->OnStateChange(this, true, m_httpstatus, NULL, spDOM.operator->() );					  	
 					}
 				}
 			}

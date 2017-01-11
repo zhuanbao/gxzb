@@ -423,6 +423,9 @@ public:
 			BSTRToLuaString(m_bstrResponseHeader,utf8RespHeader);
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
 			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
+			iRetCount++;
 		}
 		else if (atFlag == AJAXTASKFLAG_GETHTTPCONTENT)
 		{
@@ -437,6 +440,9 @@ public:
 
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
 			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
+			iRetCount++;
 		}
 		else if (atFlag == AJAXTASKFLAG_SENDHTTPSTAT || atFlag == AJAXTASKFLAG_SENDHTTPSTATEX)
 		{
@@ -446,6 +452,9 @@ public:
 			std::string utf8RespHeader;
 			BSTRToLuaString(m_bstrResponseHeader,utf8RespHeader);
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
+			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
 			iRetCount++;
 		}
 
@@ -468,6 +477,9 @@ public:
 			BSTRToLuaString(m_bstrResponseHeader,utf8RespHeader);
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
 			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
+			iRetCount++;
 		}
 		else if (atFlag == AJAXTASKFLAG_GETHTTPCONTENT)
 		{
@@ -478,6 +490,9 @@ public:
 			BSTRToLuaString(m_bstrResponseHeader,utf8RespHeader);
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
 			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
+			iRetCount++;
 		}
 		else if (atFlag == AJAXTASKFLAG_SENDHTTPSTAT)
 		{
@@ -487,6 +502,9 @@ public:
 			std::string utf8RespHeader;
 			BSTRToLuaString(m_bstrResponseHeader,utf8RespHeader);
 			lua_pushstring(m_callInfo.GetLuaState(), utf8RespHeader.c_str());
+			iRetCount++;
+
+			lua_pushinteger(m_callInfo.GetLuaState(), m_httpstatus);
 			iRetCount++;
 		}
 
