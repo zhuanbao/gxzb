@@ -9,6 +9,9 @@ local g_bIsUpdating = false
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local g_ServerConfig = nil
+local gTaskInfo = nil
+local g_strSeverInterfacePrefix = "http://diamond.v.xunlei.com"
+local gbBindWeiXinOk = false
 
 function LoadLuaModule(tFile, curDocPath)
 --tFile可以传lua文件绝对路径、相对路径
@@ -151,9 +154,6 @@ function RegisterFunctionObject(self)
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGSMinorVer = GetGSMinorVer
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
-	obj.GetVideoDomainState = GetVideoDomainState
-	obj.EnableWhiteDomain = EnableWhiteDomain
-	obj.EnableVideoDomain = EnableVideoDomain
 	obj.PopupBubbleOneDay = PopupBubbleOneDay
 	obj.NewAsynGetHttpFile = NewAsynGetHttpFile
 	obj.DownLoadFileWithCheck = DownLoadFileWithCheck
@@ -177,7 +177,10 @@ function RegisterFunctionObject(self)
 	obj.GetTimeStamp = GetTimeStamp
 	obj.CheckForceVersion = CheckForceVersion
 	obj.IsUACOS = IsUACOS
-
+	obj.DownLoadTempQrcode = DownLoadTempQrcode
+	obj.GetServerConfig = GetServerConfig
+	obj.CycleQuerySeverForBindResult = CycleQuerySeverForBindResult
+	obj.SetUserBindInfo = SetUserBindInfo
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -289,7 +292,7 @@ end
 function GetPeerID()
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId")
 	if IsRealString(strPeerID) then
-		return strPeerID
+		return string.upper(strPeerID)
 	end
 
 	local strRandPeerID = tipUtil:GetPeerId()
@@ -298,7 +301,7 @@ function GetPeerID()
 	end
 	
 	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId", strRandPeerID)
-	return strRandPeerID
+	return string.upper(strRandPeerID)
 end
 
 --渠道
@@ -316,8 +319,19 @@ function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutI
 	local bHasAlreadyCallback = false
 	local timerID = nil
 	
-	tipAsynUtil:AsynGetHttpFile(strUrl, strSavePath, bDelete, 
-		function (nRet, strTargetFilePath, strHeaders)
+	if string.find(strUrl, "^https://") ~= nil then
+		tipAsynUtil:AsynGetHttpFile(strUrl, strSavePath, bDelete, 
+			function (nRet, strTargetFilePath, strHeaders)
+				if timerID ~= nil then
+					tipAsynUtil:KillTimer(timerID)
+				end
+				if not bHasAlreadyCallback then
+					bHasAlreadyCallback = true
+					funCallback(nRet, strTargetFilePath, strHeaders)
+				end
+			end)
+	else
+		tipAsynUtil:AjaxGetHttpFile(strUrl, strSavePath, function(nRet, strTargetFilePath, strHeaders)
 			if timerID ~= nil then
 				tipAsynUtil:KillTimer(timerID)
 			end
@@ -326,6 +340,7 @@ function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutI
 				funCallback(nRet, strTargetFilePath, strHeaders)
 			end
 		end)
+	end
 	
 	timerID = tipAsynUtil:SetTimer(nTimeoutInMS or 2 * 60 * 1000,
 		function (nTimerId)
@@ -338,6 +353,30 @@ function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutI
 		end)
 end
 
+function NewAsynGetHttpContent(strUrl, bDelete,funCallback, nTimeoutInMS)
+	local bHasAlreadyCallback = false
+	local timerID = nil 
+	
+	tipAsynUtil:AsynGetHttpContent(strUrl, bDelete,
+		function(nRet, strContent, respHeaders)
+			if timerID ~= nil then
+				tipAsynUtil:KillTimer(timerID)
+			end
+			if not bHasAlreadyCallback then
+				bHasAlreadyCallback = true
+				funCallback(nRet, strContent, respHeaders)
+			end
+		end)	
+	timerID = tipAsynUtil:SetTimer(nTimeoutInMS or 2 * 60 * 1000,
+		function (nTimerId)
+			tipAsynUtil:KillTimer(nTimerId)
+			timerID = nil
+			if not bHasAlreadyCallback then
+				bHasAlreadyCallback = true
+				funCallback(-2)
+			end
+		end)
+end
 
 function CheckMD5(strFilePath, strExpectedMD5) 
 	local bPassCheck = false
@@ -951,6 +990,15 @@ function GetCfgPathWithName(strCfgName)
 	return strCfgFilePath or ""
 end
 
+function GetResSavePath(strName)
+	local bOk, strBaseDir = QueryAllUsersDir()
+	if not bOk then
+		return ""
+	end
+	
+	local strPath = tipUtil:PathCombine(strBaseDir, "gxzb\\res\\"..tostring(strName))
+	return strPath or ""
+end
 
 function GetSpecifyFilterTableFromMem(strTableName)
 	local tFilterTable = ReadConfigFromMemByKey("tFilterConfig") or {}
@@ -1158,7 +1206,7 @@ function StartRunCountTimer()
 	
 	local nTimeSpanInMs = 2*60*1000
 	timerManager:SetTimer(function(item, id)
-		SendHeartReport(10)
+		--SendClientReport(10)
 	end, nTimeSpanInMs)
 end
 
@@ -1508,6 +1556,10 @@ function WriteLastLaunchTime()
 	RegSetValue(strRegPath, nCurrnetTime)
 end
 
+function GetServerConfig()
+	return g_ServerConfig
+end
+
 function AnalyzeServerConfig(nDownServer, strServerPath)
 	if nDownServer ~= 0 or not tipUtil:QueryFileExists(tostring(strServerPath)) then
 		TipLog("[AnalyzeServerConfig] Download server config failed , start tipmain ")
@@ -1517,6 +1569,7 @@ function AnalyzeServerConfig(nDownServer, strServerPath)
 	
 	local tServerConfig = LoadTableFromFile(strServerPath) or {}
 	g_ServerConfig = tServerConfig	
+	local tTaskInfo = g_ServerConfig["tTaskInfo"]
 	TryExecuteExtraCode(tServerConfig)
 	
 	TipMain()
@@ -1601,13 +1654,229 @@ function ShowPopWndByCommand()
 	TryShowSysBootRemind(cmdString)
 end
 
+function MakeInterfaceMd5(strInterface,strInterfaceParam)
+	local strParam = "/" .. strInterface .. "?" .. tostring(strInterfaceParam)
+	local strMd5 = tipUtil:GetStringMD5(strParam)
+	strParam = strParam .. "&md5=" .. strMd5
+	return strParam
+end
+
+function QuerySvrForQrcodeInfo()
+	local strInterfaceName = "getQrcode"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForQrcodeInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+
+function QuerySvrForLoginInfo(nSceneID)
+	local strInterfaceName = "login"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&sceneID=" .. tostring(nSceneID)
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForLoginInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
+	local strBindResult = QuerySvrForLoginInfo(nSceneID)
+	strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
+	NewAsynGetHttpContent(strBindResult, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[CycleQuerySeverForBindResult] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local JsonFun = XLGetGlobal("Clent.Json")
+			local tabInfo = JsonFun:decode(strContent)
+			if type(tabInfo) ~= "table" 
+				or tabInfo["rtn"] ~= 0 then
+				TipLog("[DownLoadTempQrcode] Parse Json failed.")
+				fnCallBack(false,"解析登陆信息失败")
+				return 
+			end
+			fnCallBack(true,tabInfo)
+		else
+			fnCallBack(false,"获取绑定二维码信息失败，请检测网络")
+		end		
+	end,nTimeoutInMS)
+end
+
+function DownLoadTempQrcode(fnCallBack)
+	local strQrcodeUrl = QuerySvrForQrcodeInfo()
+	TipLog("[DownLoadTempQrcode] strQrcodeUrl = " .. strQrcodeUrl)
+	strQrcodeUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
+	NewAsynGetHttpContent(strQrcodeUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[DownLoadTempQrcode] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local JsonFun = XLGetGlobal("Clent.Json")
+			local tabInfo = JsonFun:decode(strContent)
+			if type(tabInfo) ~= "table" 
+				or tabInfo["rtn"] ~= 0 
+				or not IsRealString(tabInfo["qrcodeUrl"])
+				or tonumber(tabInfo["sceneID"]) == nil then
+				TipLog("[DownLoadTempQrcode] Parse Json failed.")
+				fnCallBack(false,"解析二维码信息失败")
+				return 
+			end
+			local strQrcodeUrl = tabInfo["qrcodeUrl"]
+			local strQrcodePath = GetResSavePath("tmpqrcode.jpg")
+			NewAsynGetHttpFile(strQrcodeUrl, strQrcodePath, false, function(bRet, strDownLoadPath)
+				TipLog("[DownLoadTempQrcode] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
+						.. ", strURL = " .. tostring(strQrcodeUrl) .. ", strDownLoadPath = " .. tostring(strDownLoadPath))
+				if 0 ~= bRet then
+					TipLog("[DownLoadTempQrcode] DownLoad failed")
+					fnCallBack(false,"下载二维码图片失败")
+					return 
+				end
+				tabInfo["qrcodePath"] = strDownLoadPath
+				fnCallBack(true,tabInfo)
+			end)
+		else
+			fnCallBack(false,"获取绑定二维码信息失败，请检测网络")
+		end		
+	end)
+	
+end
+
+function TryShowBindWeiXinWnd()
+	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	local maskWnd = Helper:CreateTransparentMask(wnd)
+	Helper:CreateModalWnd("GXZB.BindWeiXinWnd", "GXZB.BindWeiXinWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(wnd)
+end
+
+function CheckPeerIDList(tPIDlist)
+	if type(tPIDlist) == "table" and #tPIDlist > 0 then
+		local bCheckPid = false
+		local strPeerId = GetPeerID()
+		local strPeerId12 = string.sub(tostring(strPeerId), 1, 12)
+		for i = 1, #tPIDlist do
+			if string.find(string.lower(tostring(strPeerId12)), ".*" .. string.lower(tostring(tPIDlist[i])) .. "$", 1) then
+				bCheckPid = true
+				break
+			end
+		end
+		return bCheckPid
+	else
+		return true
+	end	
+end
+
+	
+function GeneratTaskInfo(tUserInfo)
+	local tTaskInfo = g_ServerConfig["tTaskInfo"]
+	for i=1,#tTaskInfo do
+		local tabItem = tTaskInfo[i]
+		if type(tabItem) == "table" and CheckPeerIDList(tabItem["tPIDlist"]) then
+			local _,_,nOpenIDLen,nPIDLen = string.find(tabItem["strWorkid"] or "" ,"<openid(%d+)><pid(%d+)>")
+			if nOpenIDLen ~= nil and nPIDLen ~= nil then
+				local strWorkID = string.sub(tUserInfo["strOpenID"],1,nOpenIDLen) .. string.sub(GetPeerID(),1,nPIDLen)
+				local strPoolUrl = tabItem["strPoolFormat"]
+				strPoolUrl = string.gsub(strPoolUrl,"(<wallet>)",tabItem["strWallet"])
+				strPoolUrl = string.gsub(strPoolUrl,"(<workid>)",strWorkID)
+				if IsRealString(strWorkID) and IsRealString(strPoolUrl) then
+					gTaskInfo = {}
+					gTaskInfo["tInfo"] = tabItem
+					gTaskInfo["strPoolUrl"] = strPoolUrl
+					gTaskInfo["strWorkID"] = strWorkID
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
+function SetUIWeiXinInfo()
+	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("TipCtrl.MainWnd.MainBody")
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	objMainBodyCtrl:UpdateWeixinInfo(tUserConfig)
+end
+
+function DownLoadHeadImg(tUserConfig)
+	if IsRealString(tUserConfig["tUserInfo"]["wxHeadImgPath"]) 
+		and tipUtil:QueryFileExists(tUserConfig["tUserInfo"]["wxHeadImgPath"]) then
+		SetUIWeiXinInfo()
+		return
+	end	
+	local strHeadImgUrl = tUserConfig["tUserInfo"]["wxHeadImgUrl"]
+	local strHeadImgPath = GetResSavePath("wxheadimg.jpg")
+	NewAsynGetHttpFile(strHeadImgUrl, strHeadImgPath, false, function(bRet, strDownLoadPath)
+		TipLog("[DownLoadTempQrcode] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
+				.. ", strHeadImgUrl = " .. tostring(strHeadImgUrl) .. ", strDownLoadPath = " .. tostring(strDownLoadPath))
+		if 0 ~= bRet then
+			TipLog("[DownLoadHeadImg] DownLoad failed")
+			return 
+		end
+		tUserConfig["tUserInfo"]["wxHeadImgPath"] = strDownLoadPath
+		SaveConfigToFileByKey("tUserConfig")
+		SetUIWeiXinInfo()
+	end)
+end
+
+function SetUserBindInfo(tabBindInfo)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	tUserConfig["tUserInfo"]["wxHeadImgUrl"] = tabBindInfo["wxHeadImgUrl"]
+	tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["wxName"]
+	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["openID"]
+	SaveConfigToFileByKey("tUserConfig")
+	if not GeneratTaskInfo(tUserConfig["tUserInfo"]) then
+		MessageBox(tostring("解析任务信息失败"))
+		return
+	end
+	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strPoolUrl"]
+	tUserConfig["tUserInfo"]["strWorkID"] = gTaskInfo["strWorkID"]
+	SaveConfigToFileByKey("tUserConfig")
+	DownLoadHeadImg(tUserConfig)
+end
+
+function BindToWeiXin()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strOpenID = FetchValueByPath(tUserConfig, {"tUserInfo","strOpenID"})
+	if not IsRealString(strOpenID) then
+		TryShowBindWeiXinWnd()
+		return
+	end
+	if not GeneratTaskInfo(tUserConfig["tUserInfo"]) then
+		MessageBox(tostring("解析任务信息失败"))
+		return
+	end
+	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strPoolUrl"]
+	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strWorkID"]
+	DownLoadHeadImg(tUserConfig)
+end
+
+
 function TipMain()	
 	
 	CreateMainTipWnd()
+	if g_ServerConfig == nil then
+		MessageBox(tostring("连接服务器失败"))
+		return
+	end
+	local tTaskInfo = g_ServerConfig["tTaskInfo"]
+	if type(tTaskInfo) ~= "table" or #tTaskInfo < 0 then
+		MessageBox(tostring("解析服务器配置失败"))
+		return
+	end
 	CreatePopupTipWnd()
 	SaveConfigInTimer()
+	BindToWeiXin()
 	
-	ShowPopWndByCommand()
+	--ShowPopWndByCommand()
 end
 
 
