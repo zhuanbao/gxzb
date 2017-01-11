@@ -18,7 +18,7 @@ function OnFocusChangeEdit(self, isFocus)
 end
 
 function OnLButtonDownCaption(self, x, y)
-	local edit = self:GetObject("control:TiXianWnd.Caption.Edit")
+	local edit = self:GetObject("tree:TiXianWnd.Caption.Edit")
 	local editL, editT, editR, editB = edit:GetAbsPos()
 	if x > editL and x < editR and y > editT and y < editB then
 		edit:SetFocus(true)

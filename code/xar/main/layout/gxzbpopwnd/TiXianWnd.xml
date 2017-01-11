@@ -54,8 +54,6 @@
 										<width>father.width</width>
 										<height>father.height</height>
 										<transparent>1</transparent>
-										<valign>center</valign>
-										<halign>left</halign>
 										<textcolor>444444</textcolor>
 										<font>font.text14</font>
 										<text>可提现12.05元</text>

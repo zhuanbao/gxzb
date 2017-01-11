@@ -64,6 +64,8 @@ function menuFunTable.OnSelect_exit(self)
 	if wnd then
 		wnd:Show(0)
 	end
+	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+	tFunctionHelper.ReportAndExit()
 end
 
 local menuTable = {

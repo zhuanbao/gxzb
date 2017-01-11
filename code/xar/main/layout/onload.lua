@@ -319,7 +319,7 @@ function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutI
 	local bHasAlreadyCallback = false
 	local timerID = nil
 	
-	if string.find(strUrl, "^https://") ~= nil then
+	if string.find(strUrl, "^https://") == nil then
 		tipAsynUtil:AsynGetHttpFile(strUrl, strSavePath, bDelete, 
 			function (nRet, strTargetFilePath, strHeaders)
 				if timerID ~= nil then
@@ -817,18 +817,18 @@ function SetNotifyIconState(strText)
 	g_tipNotifyIcon:ShowNotifyIconTip(false)
 	
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local bFilterOpen = tUserConfig["bFilterOpen"] or false
-	local nFilterCount = tUserConfig["nFilterCountOneDay"] or 0
+	local bWorkOpen = tUserConfig["bWorkOpen"] or false
+	local nMoneyCount = tUserConfig["nMoneyCountOneDay"] or 0
 	
-	local strState = "正常过滤"
-	if not bFilterOpen then
-		strState = "停止过滤"
+	local strState = "正常赚宝"
+	if not bWorkOpen then
+		strState = "停止赚宝"
 	end
-	local strDefaultText = "绿盾广告管家\r\n状态："..strState.."\r\n今日累计过滤："..tostring(nFilterCount).."次"
+	local strDefaultText = "共享赚宝\r\n状态："..strState.."\r\n今日赚得元宝："..tostring(nMoneyCount).."元"
 	
 	local strResImageDir = __document .. "\\..\\..\\..\\..\\res"
 	local strImageName = "GXZB.TrayIcon.Close.ico"
-	if bFilterOpen then
+	if bWorkOpen then
 		strImageName = "GXZB.TrayIcon.Open.ico"
 	end
 	

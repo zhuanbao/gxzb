@@ -31,8 +31,11 @@ function OnClickMachineBtn(self)
 	local editMachine = self:GetObject("tree:SettingWnd.editMachine")
 	local strmachine = editMachine:GetText()
 	if Helper:IsRealString(strmachine) then
-		tUserConfig["machinename"] = strmachine
-		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+		local strMachine = string.len(strmachine)
+		if strMachine <= 20 and strMachine >= 3 then
+			tUserConfig["strMachineName"] = strmachine
+			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+		end
 	end
 end
 
@@ -72,14 +75,20 @@ function OnChangeEditCache(self)
 	end
 end
 
-function OnLButtonDownCaption(self, x, y)
-	local edit = self:GetObject("control:TiXianWnd.Caption.Edit")
+local function SetEditFocus(edit, x, y)
 	local editL, editT, editR, editB = edit:GetAbsPos()
 	if x > editL and x < editR and y > editT and y < editB then
 		edit:SetFocus(true)
 	else
 		edit:SetFocus(false)
 	end
+end
+
+function OnLButtonDownCaption(self, x, y)
+	local editMachine = self:GetObject("tree:SettingWnd.EditMachine")
+	local editCache = self:GetObject("tree:SettingWnd.EditCache")
+	SetEditFocus(editMachine, x, y)
+	SetEditFocus(editCache, x, y)
 end
 
 function OnCreate(self)
@@ -114,7 +123,7 @@ function OnCreate(self)
 			OnChangeEditCache(editMachine)
 		end
 		
-		local machineName = tUserConfig["machinename"]
+		local machineName = tUserConfig["strMachineName"]
 		if not machineName then
 			machineName = Helper:QueryRegValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\gxzb\\PeerId")
 		end
