@@ -28,7 +28,7 @@ function OnClickCacheBtn(self)
 end
 
 function OnClickMachineBtn(self)
-	local editMachine = self:GetObject("tree:SettingWnd.editMachine")
+	local editMachine = self:GetObject("tree:SettingWnd.EditMachine")
 	local strmachine = editMachine:GetText()
 	if Helper:IsRealString(strmachine) then
 		local strMachine = string.len(strmachine)

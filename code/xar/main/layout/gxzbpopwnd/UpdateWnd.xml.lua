@@ -107,7 +107,7 @@ function OnCreate(self)
 				return 
 			end
 			
-			local strCurVersion = tFunctionHelper.GetGSVersion()
+			local strCurVersion = tFunctionHelper.GetGXZBVersion()
 			local strNewVersion = tNewVersionInfo.strVersion
 			if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
 				or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then

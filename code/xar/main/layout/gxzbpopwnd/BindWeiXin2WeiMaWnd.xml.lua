@@ -73,7 +73,7 @@ function OnCreate( self )
 					textTipObject:SetText(tostring(strText))
 						
 					local bTimeOut = false
-					local tServerConfig = FunctionObj.GetServerConfig()
+					local tServerConfig = g_ServerConfig
 					local tServerInterfaceCfg = tServerConfig["tServerInterfaceCfg"]
 					if type(tServerInterfaceCfg) ~= "table" then
 						tServerInterfaceCfg = {}
