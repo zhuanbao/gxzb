@@ -16,7 +16,7 @@
 						<left>16</left>
 						<top>16</top>
 						<width>132</width>
-						<height>father.height</height>
+						<height>132+5+20</height>
 					</attr>
 					<children>
 						<obj id="ChildCtrl_Cash.UserInfo.HeadImg" class="ImageObject">
@@ -82,13 +82,25 @@
 						<event name="OnClick" file="ChildCtrl_Cash.xml.lua" func="OnClickStartMiner" />
 					</eventlist>
 				</obj>
+				<obj id="ChildCtrl_Cash.Speed" class="TextObject">
+					<attr>
+						<left>16</left>
+						<top>father.height-30</top>
+						<width>father.width-16*2</width>
+						<height>20</height>
+						<text>当前速度0MH/S</text>
+						<halign>left</halign>
+						<font>font.text15</font>
+						<textcolor>system.black</textcolor>
+					</attr>
+				</obj>
 				<obj id="ChildCtrl_Cash.MinerInfo" class="TextObject">
 					<attr>
 						<left>16</left>
 						<top>father.height-30</top>
 						<width>father.width-16*2</width>
 						<height>20</height>
-						<text>余额余额余额余额余额余额余额余额</text>
+						<text>机器名称：</text>
 						<halign>left</halign>
 						<font>font.text15</font>
 						<textcolor>system.black</textcolor>
