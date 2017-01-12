@@ -8,10 +8,10 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
+local JsonFun = nil
 local g_ServerConfig = nil
 local gTaskInfo = nil
-local g_strSeverInterfacePrefix = "http://diamond.v.xunlei.com"
-local gbBindWeiXinOk = false
+local g_strSeverInterfacePrefix = "http://diamond.test.com/pc"
 
 function LoadLuaModule(tFile, curDocPath)
 --tFile可以传lua文件绝对路径、相对路径
@@ -229,6 +229,13 @@ function IsUserFullScreen()
 	return bRet
 end
 
+function GetHostName(URL) --获取域名
+	if string.find(URL, "://") then
+		URL = string.match(URL, "^.*://(.*)$" ) or ""
+	end
+	URL = string.match(URL, "^([^/]*).*$" )  or ""
+	return URL
+end
 
 function CheckTimeIsAnotherDay(LastTime)
 	local bRet = false
@@ -685,7 +692,7 @@ function ShowMainTipWnd(objMainWnd)
 		SetWndForeGround(objMainWnd)
 	end
 	
-	objMainWnd:SetTitle("绿盾广告管家")
+	objMainWnd:SetTitle("共享赚宝")
 	SendStartupReport(true)
 	WriteLastLaunchTime()
 end
@@ -1633,6 +1640,7 @@ end
 function LoadJSONHelper()
 	local strJSONHelperPath = __document.."\\..\\JSON.lua"
 	local Module = XLLoadModule(strJSONHelperPath)
+	JsonFun = XLGetGlobal("Clent.Json")
 end
 
 
@@ -1681,6 +1689,81 @@ function QuerySvrForLoginInfo(nSceneID)
 	return strReguestUrl
 end
 
+function QuerySvrForReportClientInfo()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "reportClientConf"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
+	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strMachineName"]))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function QuerySvrForReportPoolInfo()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "registeCalc"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(GetHostName(tUserConfig["tUserInfo"]["strPoolUrl"]))))
+	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strWallet"])))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function QuerySvrForPushCalcInfo(nSpeed)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "pushCalc"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nSpeed)))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
+	NewAsynGetHttpContent(strUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[SendMinerInfoToServer] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local tabInfo = JsonFun:decode(strContent)
+			if type(tabInfo) ~= "table" 
+				or tabInfo["rtn"] ~= 0 then
+				TipLog("[DownLoadTempQrcode] Parse Json failed.")
+				return 
+			end
+			if fnSuccess ~= nil then
+				fnSuccess(tabInfo)
+			end	
+		else
+			TipLog("send client info failed")
+			nRetryTimes = nRetryTimes -1
+			if nRetryTimes > 0 then
+				SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
+			end	
+		end		
+	end)
+end
+
 function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
 	local strBindResult = QuerySvrForLoginInfo(nSceneID)
 	strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
@@ -1690,7 +1773,6 @@ function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local JsonFun = XLGetGlobal("Clent.Json")
 			local tabInfo = JsonFun:decode(strContent)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 then
@@ -1715,7 +1797,6 @@ function DownLoadTempQrcode(fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local JsonFun = XLGetGlobal("Clent.Json")
 			local tabInfo = JsonFun:decode(strContent)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 
@@ -1747,6 +1828,11 @@ end
 
 function TryShowBindWeiXinWnd()
 	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	if not wnd:GetVisible() then
+		wnd:GetVisible()
+		wnd:Show(5)
+		SetWndForeGround(wnd)
+	end
 	local maskWnd = Helper:CreateTransparentMask(wnd)
 	Helper:CreateModalWnd("GXZB.BindWeiXinWnd", "GXZB.BindWeiXinWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
 	Helper:DestoryTransparentMask(wnd)
@@ -1824,6 +1910,14 @@ function DownLoadHeadImg(tUserConfig)
 	end)
 end
 
+function InitMinerInfoToServer()
+	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
+	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+	SendMinerInfoToServer(QuerySvrForPushCalcInfo(0),1,function(tabInfo)
+		
+	end)
+end
+
 function SetUserBindInfo(tabBindInfo)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
@@ -1839,8 +1933,11 @@ function SetUserBindInfo(tabBindInfo)
 	end
 	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strPoolUrl"]
 	tUserConfig["tUserInfo"]["strWorkID"] = gTaskInfo["strWorkID"]
+	tUserConfig["tUserInfo"]["strWallet"] = gTaskInfo["tInfo"]["strWallet"]
 	SaveConfigToFileByKey("tUserConfig")
+	
 	DownLoadHeadImg(tUserConfig)
+	InitMinerInfoToServer()
 end
 
 function BindToWeiXin()
@@ -1855,8 +1952,10 @@ function BindToWeiXin()
 		return
 	end
 	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strPoolUrl"]
-	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strWorkID"]
+	tUserConfig["tUserInfo"]["strWorkID"] = gTaskInfo["strWorkID"]
+	tUserConfig["tUserInfo"]["strWallet"] = gTaskInfo["tInfo"]["strWallet"]
 	DownLoadHeadImg(tUserConfig)
+	InitMinerInfoToServer()
 end
 
 
