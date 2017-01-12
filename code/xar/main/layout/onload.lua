@@ -52,7 +52,7 @@ LoadLuaModule(File, __document)
 local Helper = XLGetGlobal("Helper")
 
 local g_tPopupWndList = {
-	--[1] = {"TipFilterBubbleWnd", "TipFilterBubbleTree"},
+	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
 	--[2] = {"TipExitRemindWnd", "TipExitRemindTree"},
 	--[3] = {"TipAboutWnd", "TipAboutTree"},
 	--[4] = {"TipUpdateWnd", "TipUpdateTree"},
@@ -2003,3 +2003,7 @@ function PreTipMain()
 end
 
 PreTipMain()
+--测试弹出气泡
+SetOnceTimer(function(item, id)
+	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+end, 1000)

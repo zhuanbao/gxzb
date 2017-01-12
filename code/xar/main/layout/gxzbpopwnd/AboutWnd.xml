@@ -46,8 +46,8 @@
 								<height>20</height>
 								<valign>center</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text14</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
 								<text>关于</text>
 							</attr>
 						</obj>
@@ -68,8 +68,8 @@
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text12</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
 								<text>程序版本：</text>
 							</attr>
 						</obj>
@@ -81,8 +81,8 @@
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text12</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
 								<text></text>
 							</attr>
 						</obj>
@@ -94,8 +94,8 @@
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text12</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
 								<text>更新日期：</text>
 							</attr>
 						</obj>
@@ -107,8 +107,8 @@
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text12</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
 								<text></text>
 							</attr>
 						</obj>
@@ -120,8 +120,8 @@
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text12</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
 								<text>http://www.baidu.com</text>
 							</attr>
 						</obj>

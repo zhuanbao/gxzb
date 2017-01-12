@@ -46,8 +46,8 @@
 								<height>20</height>
 								<valign>center</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
-								<font>font.text14</font>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
 								<text>检查更新</text>
 							</attr>
 						</obj>
@@ -68,7 +68,7 @@
 								<height>36</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
+								<textcolor>DDDDDD</textcolor>
 								<font>font.text16</font>
 								<text>发现了新版本</text>
 								<visible>0</visible>
@@ -82,7 +82,7 @@
 								<height>40</height>
 								<valign>center</valign>
 								<halign>left</halign>
-								<textcolor>333333</textcolor>
+								<textcolor>DDDDDD</textcolor>
 								<font>font.text14</font>
 								<text>你的共享赚宝已经是最新版本，无需更新！</text>
 								<multiline>1</multiline>

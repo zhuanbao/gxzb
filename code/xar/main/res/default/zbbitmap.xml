@@ -18,6 +18,8 @@
 		<texture id="common-bkg" image="zbbitmap\common-bkg.png" />
 		<bitmap id="logo-mid" path="zbbitmap\logo-mid.png" />
 		
+		<texture id="xuanfu-bkg" image="zbbitmap\xuanfu-bkg.png" />
+		
 		<!--菜单-->
 		<texture id="MenuBar.Select.Bkg" image="zbbitmap\menu\MenuBar.Select.Bkg.png" />
 		<texture id="texture.menu.container.bkg" type="NineInOne" image="zbbitmap\menu\texture.menu.container.bkg.png" />
