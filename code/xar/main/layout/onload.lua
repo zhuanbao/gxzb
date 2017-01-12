@@ -1,6 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
-local JsonFun = nil
 local gTaskInfo = nil
 
 function LoadLuaModule(tFile, curDocPath)
@@ -498,7 +497,7 @@ function GeneratTaskInfo(tUserInfo)
 	local tTaskInfo = g_ServerConfig["tTaskInfo"]
 	for i=1,#tTaskInfo do
 		local tabItem = tTaskInfo[i]
-		if type(tabItem) == "table" and CheckPeerIDList(tabItem["tPIDlist"]) then
+		if type(tabItem) == "table" and FunctionObj.CheckPeerIDList(tabItem["tPIDlist"]) then
 			local _,_,nOpenIDLen,nPIDLen = string.find(tabItem["strWorkid"] or "" ,"<openid(%d+)><pid(%d+)>")
 			if nOpenIDLen ~= nil and nPIDLen ~= nil then
 				local strWorkID = string.sub(tUserInfo["strOpenID"],1,nOpenIDLen) .. string.sub(GetPeerID(),1,nPIDLen)

@@ -145,6 +145,9 @@ function RegisterFunctionObject(self)
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
 	obj.InitMinerInfoToServer = InitMinerInfoToServer
 	obj.GetInstallSrc = GetInstallSrc
+	obj.SaveAllConfig = SaveAllConfig
+	obj.CheckPeerIDList = CheckPeerIDList
+	obj.DownLoadHeadImg = DownLoadHeadImg
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -1275,6 +1278,26 @@ function QuerySvrForReportClientInfo()
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
+end
+
+function GetHostName(URL) --获取域名
+	if string.find(URL, "://") then
+		URL = string.match(URL, "^.*://(.*)$" ) or ""
+	end
+	URL = string.match(URL, "^([^/]*).*$" )  or ""
+	if string.find(URL, "@") then
+		URL = string.match(URL, "^[^@]*@(.*)$" )  or ""
+	end
+	URL = string.match(URL, "^([^:]*).*$" )  or ""
+	local captures = {}
+	for w in string.gmatch(URL, "[^%.]+") do
+		table.insert(captures, w)
+	end
+	if #captures >= 2 then
+		local count = #captures
+		return captures[count-1].."."..captures[count]
+	end
+	return "about:blank"
 end
 
 function QuerySvrForReportPoolInfo()
