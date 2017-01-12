@@ -113,7 +113,10 @@ function OnCreate( self )
 								timerManager:KillTimer(gTimeoutTimerId)
 								gTimeoutTimerId = nil
 								FunctionObj.SetUserBindInfo(info)
-								self:EndDialog(0)
+								textObject:SetText("恭喜您，绑定成功")
+								textObject:SetVisible(true)
+								imgObject:SetVisible(false)
+								--self:EndDialog(0)
 							end, nAskBindPeriod)
 						end
 						nCnt = nCnt + 1
