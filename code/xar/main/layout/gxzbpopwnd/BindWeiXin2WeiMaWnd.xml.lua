@@ -46,6 +46,10 @@ function OnCreate( self )
 				return
 			end
 			if not bRet then
+				if gTimeoutTimerId ~= nil then
+					timerManager:KillTimer(gTimeoutTimerId)
+					gTimeoutTimerId = nil
+				end
 				textObject:SetText(tostring(info))
 				return
 			end
@@ -74,7 +78,7 @@ function OnCreate( self )
 					if type(tServerInterfaceCfg) ~= "table" then
 						tServerInterfaceCfg = {}
 					end
-					local nAskBindPeriod = tServerInterfaceCfg["nAskBindPeriod"] or 10
+					local nAskBindPeriod = info["interval"] or tServerInterfaceCfg["nAskBindPeriod"] or 10
 					--TEST 
 					local bAsking = false
 					
