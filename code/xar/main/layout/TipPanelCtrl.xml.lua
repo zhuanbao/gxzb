@@ -2,7 +2,7 @@ local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 local g_tPanelCtrlList = {
-	"ChildCtrl_Dag",
+	--"ChildCtrl_Dag",
 	"ChildCtrl_Cash",
 }
 
