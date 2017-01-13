@@ -463,7 +463,7 @@ function ShowIntroduceOnce()
 	if IsRealString(strValue) then
 		FunctionObj.ShowPopupWndByName("TipIntroduceWnd.Instance", true)
 		tUserConfig["nLastShowIntroduce"] = tipUtil:GetCurrentUTCTime()
-		SaveConfigToFileByKey("tUserConfig")
+		FunctionObj.SaveConfigToFileByKey("tUserConfig")
 	end
 	
 	FunctionObj.RegDeleteValue(strRegPath)
@@ -547,6 +547,7 @@ function TipMain()
 		MessageBox(tostring("解析服务器配置失败"))
 		return
 	end
+	FunctionObj.InitMachName()
 	FunctionObj.CreatePopupTipWnd()
 	SaveConfigInTimer()
 	BindToWeiXin()

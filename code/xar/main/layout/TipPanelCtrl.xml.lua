@@ -2,8 +2,7 @@ local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 local g_tPanelCtrlList = {
-	--"ChildCtrl_Dag",
-	"ChildCtrl_Cash",
+	"ChildCtrl_MinerInfo",
 }
 
 ----方法----
@@ -33,7 +32,7 @@ function InitMainBodyCtrl(objRootCtrl)
 		return false
 	end
 	
-	local bSucc = objMainBodyCtrl:ChangePanel("ChildCtrl_Cash")
+	local bSucc = objMainBodyCtrl:ChangePanel("ChildCtrl_MinerInfo")
 	if not bSucc then
 		return false
 	end

@@ -30,3 +30,33 @@ function UpdateWeixinInfo(self, tUserConfig)
 		objNickName:SetText(tUserConfig["tUserInfo"]["strNickName"])
 	end
 end
+
+
+function OnInitControl(self)
+	local objMachineName= self:GetControlObject("ChildCtrl_Cash.UserInfo.MachineName")
+	if not objMachineName then
+		return
+	end
+	local strText = "机器名称："
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strText = "机器名称：" .. (tUserConfig["tUserInfo"]["strMachineName"] or tFunctionHelper.GetPeerID())
+	objMachineName:SetText(strText)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

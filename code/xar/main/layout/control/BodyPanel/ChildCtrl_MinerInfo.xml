@@ -1,17 +1,17 @@
 <xlue>
-	<control class="ChildCtrl_Cash">
+	<control class="ChildCtrl_MinerInfo">
 		<attr_def>
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			<UpdateWeixinInfo file="ChildCtrl_Cash.xml.lua" func="UpdateWeixinInfo"/>
+			<UpdateWeixinInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateWeixinInfo"/>
 		</method_def>
 		<event_def>
 			
 		</event_def>
 		<objtemplate>
 			<children>
-				<obj id="ChildCtrl_Cash.UserInfo" class="LayoutObject">
+				<obj id="ChildCtrl_MinerInfo.UserInfo" class="LayoutObject">
 					<attr>
 						<left>16</left>
 						<top>16</top>
@@ -19,7 +19,7 @@
 						<height>132+5+20</height>
 					</attr>
 					<children>
-						<obj id="ChildCtrl_Cash.UserInfo.HeadImg" class="ImageObject">
+						<obj id="ChildCtrl_MinerInfo.UserInfo.HeadImg" class="ImageObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
@@ -28,7 +28,7 @@
 								<image>WeiXin.HeadImg.default</image>
 							</attr>
 						</obj>
-						<obj id="ChildCtrl_Cash.UserInfo.NickName" class="TextObject">
+						<obj id="ChildCtrl_MinerInfo.UserInfo.NickName" class="TextObject">
 							<attr>
 								<left>0</left>
 								<top>132+5</top>
@@ -43,7 +43,7 @@
 						</obj>
 					</children>
 				</obj>
-				<obj id="ChildCtrl_Cash.Cycle" class="TextureObject">
+				<obj id="ChildCtrl_MinerInfo.Cycle" class="TextureObject">
 					<attr>
 						<left>(father.width - 184)/2</left>
 						<top>30</top>
@@ -52,7 +52,7 @@
 						<texture>GXZB.MainPanel.Cycle</texture>
 					</attr>
 					<children>
-						<obj id="ChildCtrl_Cash.Text" class="TextObject">
+						<obj id="ChildCtrl_MinerInfo.Text" class="TextObject">
 							<attr>
 								<left>(184-130)/2</left>
 								<top>(184-40)/2</top>
@@ -66,7 +66,7 @@
 						</obj>
 					</children>
 				</obj>
-				<obj id="ChildCtrl_Cash.StartMiner" class="TipAddin.Button">
+				<obj id="ChildCtrl_MinerInfo.StartMiner" class="TipAddin.Button">
 					<attr>
 						<left>(father.width - 176)/2</left>
 						<top>30+184+20</top>
@@ -79,26 +79,26 @@
 						<Text>开始赚宝</Text>
 					</attr>									
 					<eventlist>
-						<event name="OnClick" file="ChildCtrl_Cash.xml.lua" func="OnClickStartMiner" />
+						<event name="OnClick" file="ChildCtrl_MinerInfo.xml.lua" func="OnClickStartMiner" />
 					</eventlist>
 				</obj>
-				<obj id="ChildCtrl_Cash.Speed" class="TextObject">
+				<obj id="ChildCtrl_MinerInfo.Speed" class="TextObject">
 					<attr>
 						<left>16</left>
 						<top>father.height-30</top>
-						<width>father.width-16*2</width>
+						<width>130</width>
 						<height>20</height>
-						<text>当前速度0MH/S</text>
+						<text>当前速度：0H/S</text>
 						<halign>left</halign>
 						<font>font.text15</font>
 						<textcolor>system.black</textcolor>
 					</attr>
 				</obj>
-				<obj id="ChildCtrl_Cash.MinerInfo" class="TextObject">
+				<obj id="ChildCtrl_MinerInfo.MachineName" class="TextObject">
 					<attr>
-						<left>16</left>
+						<left>16+130+10</left>
 						<top>father.height-30</top>
-						<width>father.width-16*2</width>
+						<width>130</width>
 						<height>20</height>
 						<text>机器名称：</text>
 						<halign>left</halign>
@@ -107,6 +107,9 @@
 					</attr>
 				</obj>
 			</children>
+			<eventlist>
+				<event name="OnInitControl" file="ChildCtrl_MinerInfo.xml.lua" func="OnInitControl" />
+			</eventlist>
 		</objtemplate>
 	</control>	
 </xlue>

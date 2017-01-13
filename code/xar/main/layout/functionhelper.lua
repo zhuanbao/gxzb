@@ -148,6 +148,7 @@ function RegisterFunctionObject(self)
 	obj.SaveAllConfig = SaveAllConfig
 	obj.CheckPeerIDList = CheckPeerIDList
 	obj.DownLoadHeadImg = DownLoadHeadImg
+	obj.InitMachName = InitMachName
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -1370,6 +1371,17 @@ function DownLoadHeadImg(tUserConfig)
 		SaveConfigToFileByKey("tUserConfig")
 		SetUIWeiXinInfo()
 	end)
+end
+
+function InitMachName()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
+		tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
+		SaveConfigToFileByKey("tUserConfig")
+	end
 end
 
 
