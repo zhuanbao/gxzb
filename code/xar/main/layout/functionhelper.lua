@@ -33,6 +33,31 @@ function LoadJSONHelper()
 end
 LoadJSONHelper()
 
+
+local tryCatch=function(fnFail)  
+    local ret,errMessage=pcall(fun); 
+	if not ret then
+		TipLog("ret:" .. (ret and "true" or "false" )  .. " \nerrMessage:" .. (errMessage or "null")); 
+		if type(funFail) == "function" then
+			funFail()
+		end
+	end	
+end 
+
+function DeCodeJson(strInfo,fnFail)
+	local tabInfo = nil	
+	local ret,errMessage=pcall(function()
+								tabInfo = JsonFun:decode(strInfo)
+							   end) 
+	if not ret then
+		TipLog("ret:" .. (ret and "true" or "false" )  .. " \nerrMessage:" .. (errMessage or "null")); 
+		if type(funFail) == "function" then
+			funFail()
+		end
+	end
+	return tabInfo
+end
+
 function FailExitTipWnd(iExitCode)
 	local tStatInfo = {}
 		
@@ -1172,7 +1197,7 @@ function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local tabInfo = JsonFun:decode(strContent)
+			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 then
 				TipLog("[DownLoadTempQrcode] Parse Json failed.")
@@ -1213,7 +1238,7 @@ function DownLoadTempQrcode(fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local tabInfo = JsonFun:decode(strContent)
+			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 
 				or not IsRealString(tabInfo["qrcodeUrl"])
@@ -1275,15 +1300,16 @@ function SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local tabInfo = JsonFun:decode(strContent)
-			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 then
-				TipLog("[DownLoadTempQrcode] Parse Json failed.")
-				return 
-			end
-			if fnSuccess ~= nil then
-				fnSuccess(tabInfo)
-			end	
+				local tabInfo = DeCodeJson(strContent)
+				
+				if type(tabInfo) ~= "table" 
+					or tabInfo["rtn"] ~= 0 then
+					TipLog("[DownLoadTempQrcode] Parse Json failed.")
+					return 
+				end
+				if fnSuccess ~= nil then
+					fnSuccess(tabInfo)
+				end	
 		else
 			TipLog("send client info failed")
 			nRetryTimes = nRetryTimes -1
@@ -1390,7 +1416,7 @@ function DownLoadHeadImg(tUserConfig)
 	local strHeadImgUrl = tUserConfig["tUserInfo"]["wxHeadImgUrl"]
 	local strHeadImgPath = GetResSavePath("wxheadimg.jpg")
 	NewAsynGetHttpFile(strHeadImgUrl, strHeadImgPath, false, function(bRet, strDownLoadPath)
-		TipLog("[DownLoadTempQrcode] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
+		TipLog("[DownLoadHeadImg] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
 				.. ", strHeadImgUrl = " .. tostring(strHeadImgUrl) .. ", strDownLoadPath = " .. tostring(strDownLoadPath))
 		if 0 ~= bRet then
 			TipLog("[DownLoadHeadImg] DownLoad failed")

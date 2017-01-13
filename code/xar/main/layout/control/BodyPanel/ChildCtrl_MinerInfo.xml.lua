@@ -5,7 +5,7 @@ local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@ChildCtrl_Cash: " .. tostring(strLog))
+		tipUtil:Log("@@ChildCtrl_MinerInfo: " .. tostring(strLog))
 	end
 end
 
@@ -20,8 +20,8 @@ function UpdateWeixinInfo(self, tUserConfig)
 		TipLog("[UpdateWeixinInfo] create Head Img bitmap failed")
 		return false
 	end
-	local objHeadImg= self:GetControlObject("ChildCtrl_Cash.UserInfo.HeadImg")
-	local objNickName= self:GetControlObject("ChildCtrl_Cash.UserInfo.NickName")
+	local objHeadImg= self:GetControlObject("ChildCtrl_MinerInfo.UserInfo.HeadImg")
+	local objNickName= self:GetControlObject("ChildCtrl_MinerInfo.UserInfo.NickName")
 	
 	if objHeadImg ~= nil then
 		objHeadImg:SetBitmap(objBitmap)
@@ -33,7 +33,7 @@ end
 
 
 function OnInitControl(self)
-	local objMachineName= self:GetControlObject("ChildCtrl_Cash.UserInfo.MachineName")
+	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")
 	if not objMachineName then
 		return
 	end

@@ -98,7 +98,7 @@
 					<attr>
 						<left>16+130+10</left>
 						<top>father.height-30</top>
-						<width>130</width>
+						<width>father.width-16-130-10-16</width>
 						<height>20</height>
 						<text>机器名称：</text>
 						<halign>left</halign>
