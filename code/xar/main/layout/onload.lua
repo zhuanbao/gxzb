@@ -445,28 +445,7 @@ function TryShowIntroduceWnd(strCmd)
 		return
 	end
 
-	ShowIntroduceOnce()
-end
-
-
-function ShowIntroduceOnce()
-	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
-	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\ShowIntroduce"
-	
-	if not IsNilString(nLastShowIntroduce) then
-		FunctionObj.RegDeleteValue(strRegPath)
-		return
-	end
-	
-	local strValue = FunctionObj.RegQueryValue(strRegPath)
-	if IsRealString(strValue) then
-		FunctionObj.ShowPopupWndByName("TipIntroduceWnd.Instance", true)
-		tUserConfig["nLastShowIntroduce"] = tipUtil:GetCurrentUTCTime()
-		FunctionObj.SaveConfigToFileByKey("tUserConfig")
-	end
-	
-	FunctionObj.RegDeleteValue(strRegPath)
+	FunctionObj.ShowIntroduceOnce()
 end
 
 function LoadDynamicFont()

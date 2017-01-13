@@ -149,6 +149,7 @@ function RegisterFunctionObject(self)
 	obj.CheckPeerIDList = CheckPeerIDList
 	obj.DownLoadHeadImg = DownLoadHeadImg
 	obj.InitMachName = InitMachName
+	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -673,6 +674,25 @@ function HideTray()
 	end
 end
 
+function ShowIntroduceOnce()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\ShowIntroduce"
+	
+	if not IsNilString(nLastShowIntroduce) then
+		RegDeleteValue(strRegPath)
+		return
+	end
+	
+	local strValue = RegQueryValue(strRegPath)
+	if IsRealString(strValue) then
+		ShowPopupWndByName("TipIntroduceWnd.Instance", true)
+		tUserConfig["nLastShowIntroduce"] = tipUtil:GetCurrentUTCTime()
+		SaveConfigToFileByKey("tUserConfig")
+	end
+	
+	RegDeleteValue(strRegPath)
+end
 
 function InitTrayTipWnd(objHostWnd)
     if not objHostWnd then
