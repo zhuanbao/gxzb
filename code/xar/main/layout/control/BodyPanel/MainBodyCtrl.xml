@@ -9,7 +9,8 @@
 			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
 			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
-			<UpdateWeixinInfo file="MainBodyCtrl.xml.lua" func="UpdateWeixinInfo"/>
+			<UpdateWeiXinInfo file="MainBodyCtrl.xml.lua" func="UpdateWeiXinInfo"/>
+			<UpdateMachineName file="MainBodyCtrl.xml.lua" func="UpdateMachineName"/>
 		</method_def>
 		<event_def>
 			

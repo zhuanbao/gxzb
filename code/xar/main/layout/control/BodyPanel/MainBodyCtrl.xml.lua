@@ -104,24 +104,41 @@ function GetChildObjByCtrlName(self, strCtrlName)
 	return objCurPanel
 end
 
-function UpdateWeixinInfo(self, tUserConfig)
+function UpdateWeiXinInfo(self, tUserConfig)
 	local objPanelCenter= self:GetControlObject("MainPanel.Center")
 	if objPanelCenter == nil then
 		
-		TipLog("[UpdateWeixinInfo] get objPanelCenter failed ")
+		TipLog("[UpdateWeiXinInfo] get objPanelCenter failed ")
 		return false
 	end
 	
 	local nChildCnt = objPanelCenter:GetChildCount()
 	for i=0,nChildCnt-1 do
 		local objChild = objPanelCenter:GetChildByIndex(i)
-		if objChild and type(objChild.UpdateWeixinInfo) == "function" then
-			objChild:UpdateWeixinInfo(tUserConfig)
+		if objChild and type(objChild.UpdateWeiXinInfo) == "function" then
+			objChild:UpdateWeiXinInfo(tUserConfig)
 		end	
 	end
 	return true
 end
 
+function UpdateMachineName(self, tUserConfig)
+	local objPanelCenter= self:GetControlObject("MainPanel.Center")
+	if objPanelCenter == nil then
+		
+		TipLog("[UpdateMachineName] get objPanelCenter failed ")
+		return false
+	end
+	local nChildCnt = objPanelCenter:GetControlObject()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateMachineName) == "function" then
+			objChild:UpdateMachineName(tUserConfig)
+		end	
+	end
+	
+	return true
+end
 
 function OnClickBindWeiXin(self)
 	local Helper =  XLGetGlobal("Helper")

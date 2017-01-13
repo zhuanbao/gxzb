@@ -13,11 +13,11 @@ function OnClickStartMiner(self)
 
 end
 
-function UpdateWeixinInfo(self, tUserConfig)
+function UpdateWeiXinInfo(self, tUserConfig)
 	local strImagePath = tUserConfig["tUserInfo"]["wxHeadImgPath"]
 	local objBitmap = objGraphicFac:CreateBitmap(strImagePath, "ARGB32")
 	if not objBitmap then
-		TipLog("[UpdateWeixinInfo] create Head Img bitmap failed")
+		TipLog("[UpdateWeiXinInfo] create Head Img bitmap failed")
 		return false
 	end
 	local objHeadImg= self:GetControlObject("ChildCtrl_MinerInfo.UserInfo.HeadImg")
@@ -28,6 +28,16 @@ function UpdateWeixinInfo(self, tUserConfig)
 	end
 	if objNickName ~= nil then
 		objNickName:SetText(tUserConfig["tUserInfo"]["strNickName"])
+	end
+end
+
+function UpdateMachineName(self, tUserConfig)
+	local strMachineName = tUserConfig["tUserInfo"]["strMachineName"]
+
+	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")
+
+	if objMachineName ~= nil then
+		objMachineName:SetText(strMachineName)
 	end
 end
 

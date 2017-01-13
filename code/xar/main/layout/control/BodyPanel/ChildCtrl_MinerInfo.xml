@@ -4,7 +4,8 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			<UpdateWeixinInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateWeixinInfo"/>
+			<UpdateWeiXinInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateWeiXinInfo"/>
+			<UpdateMachineName file="ChildCtrl_MinerInfo.xml.lua" func="UpdateMachineName"/>
 		</method_def>
 		<event_def>
 			

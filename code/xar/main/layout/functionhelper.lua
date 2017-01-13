@@ -176,6 +176,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
+	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -485,13 +486,14 @@ function ExitTipWnd(statInfo)
 	tipUtil:Exit("Exit")
 end
 
+function GetMainHostWnd()
+	return Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+end
 
 function DestroyMainWnd()
-	local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
-	local strHostWndName = "GXZBTipWnd.MainFrame"
-	local objHostWnd = hostwndManager:GetHostWnd(strHostWndName)
+	local objHostWnd = GetMainHostWnd()
 	if objHostWnd then
-		hostwndManager:RemoveHostWnd(strHostWndName)
+		Helper.hostWndManager:RemoveHostWnd("GXZBTipWnd.MainFrame")
 	end
 end
 
@@ -1398,13 +1400,29 @@ function InitMinerInfoToServer()
 	end)
 end
 
-function SetUIWeiXinInfo()
-	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+function SetMachineNameChangeInfo()
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("TipCtrl.MainWnd.MainBody")
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	objMainBodyCtrl:UpdateWeixinInfo(tUserConfig)
+	objMainBodyCtrl:UpdateMachineName(tUserConfig)
+	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
+end
+
+function SetUIWeiXinInfo()
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("TipCtrl.MainWnd.MainBody")
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	objMainBodyCtrl:UpdateWeiXinInfo(tUserConfig)
 end
 
 function DownLoadHeadImg(tUserConfig)
