@@ -530,7 +530,7 @@ function TipMain()
 	FunctionObj.CreatePopupTipWnd()
 	SaveConfigInTimer()
 	BindToWeiXin()
-	
+	FunctionObj.PopTipPre4Hour()
 	--ShowPopWndByCommand()
 end
 
@@ -544,7 +544,3 @@ function PreTipMain()
 end
 
 PreTipMain()
---测试弹出气泡
-SetOnceTimer(function(item, id)
-	FunctionObj.ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-end, 1000)

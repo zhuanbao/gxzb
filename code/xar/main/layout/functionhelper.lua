@@ -150,6 +150,7 @@ function RegisterFunctionObject(self)
 	obj.DownLoadHeadImg = DownLoadHeadImg
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
+	obj.PopTipPre4Hour = PopTipPre4Hour
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -504,6 +505,8 @@ function CreateWndByName(strHostWndName, strTreeName)
 					local iRet = frameHostWnd:Create()
 					if iRet ~= nil and iRet ~= 0 then
 						bSuccess = true
+						--强制隐藏
+						frameHostWnd:Show(0)
 					end
 				end
 			end
@@ -672,6 +675,12 @@ function HideTray()
 	if g_tipNotifyIcon then
 		g_tipNotifyIcon:Hide()
 	end
+end
+
+function PopTipPre4Hour()
+	SetTimer(function(item, id)
+		ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+	end, 4*3600*1000)
 end
 
 function ShowIntroduceOnce()
