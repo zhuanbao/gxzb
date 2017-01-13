@@ -216,8 +216,35 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"FileDialog", FileDialog},
 	
 	{"GetProcessElevation", GetProcessElevation},
+	{"GetDiskFreeSpace", FnGetDiskFreeSpaceEx},
 	{NULL, NULL}
 };
+
+int LuaAPIUtil::FnGetDiskFreeSpaceEx(lua_State* pLuaState)
+{
+	LuaAPIUtil** ppUtil = (LuaAPIUtil **)luaL_checkudata(pLuaState, 1, API_UTIL_CLASS);
+	if (ppUtil != NULL)
+	{
+		const char* utf8FileName = luaL_checkstring(pLuaState, 2);
+		if (utf8FileName != NULL)
+		{
+			CComBSTR bstrFileName;
+			LuaStringToCComBSTR(utf8FileName,bstrFileName);
+
+			ULARGE_INTEGER nFreeBytesAvailable;
+			ULARGE_INTEGER nTotalNumberOfBytes;
+			ULARGE_INTEGER nTotalNumberOfFreeBytes;
+			if (::GetDiskFreeSpaceEx(bstrFileName.m_str, &nFreeBytesAvailable, &nTotalNumberOfBytes, &nTotalNumberOfFreeBytes))
+			{
+				lua_pushnumber(pLuaState, (lua_Number)nFreeBytesAvailable.QuadPart);
+				lua_pushnumber(pLuaState, (lua_Number)nTotalNumberOfBytes.QuadPart);
+				lua_pushnumber(pLuaState, (lua_Number)nTotalNumberOfFreeBytes.QuadPart);
+				return 3;
+			}
+		}
+	}
+	return 0;
+}
 
 int LuaAPIUtil::LuaGc(lua_State* luaState)
 {

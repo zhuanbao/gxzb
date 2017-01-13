@@ -213,7 +213,7 @@
 								<DisableBkgID>setting-btn-hover</DisableBkgID>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickSureBtn" />
 							</eventlist>	
 						</obj>
 						<obj id="SettingWnd.Cancel.Btn" class="TipAddin.Button">

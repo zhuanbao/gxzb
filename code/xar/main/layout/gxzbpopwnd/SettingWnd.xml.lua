@@ -19,12 +19,23 @@ function OnSelectSysBoot(self, event, bSelect)
 	end
 end
 
-function OnClickCacheBtn(self)
+function OnClickSureBtn(self)
+	OnClickClose(self)
 	local editCache = self:GetObject("tree:SettingWnd.EditCache")
 	local strPath = editCache:GetText()
 	if Helper:IsRealString(strPath) and Helper.tipUtil:QueryFileExists(strPath) then
 		Helper.tipUtil:SetRegValue("HKEY_CURRENT_USER", "Software\\gxzb", "DAGDir", strPath)
 	end
+end
+
+function OnClickCacheBtn(self)
+	local editCache = self:GetObject("tree:SettingWnd.EditCache")
+	local strPath = editCache:GetText()
+	if not Helper:IsRealString(strPath) or not Helper.tipUtil:QueryFileExists(strPath) then
+		strPath = "C:\\"
+	end
+	local strNewPath = Helper.tipUtil:FolderDialog("目录选择", strPath)
+	editCache:SetText(strNewPath)
 end
 
 function OnClickMachineBtn(self)
@@ -66,9 +77,15 @@ end
 function OnChangeEditCache(self)
 	local textDAGDir = self:GetText()
 	local freeSpace = self:GetObject("tree:SettingWnd.ShowFreeSpace")
+	--XLMessageBox(tostring(textDAGDir))
 	if Helper:IsRealString(textDAGDir) and Helper.tipUtil:QueryFileExists(textDAGDir) then
-		freeSpace:SetTextColorResID("DDDDDD")
-		freeSpace:SetText("13GB")
+		local FreeBiyes = Helper.tipUtil:GetDiskFreeSpace(textDAGDir)
+		--XLMessageBox(tostring(p1/1073741824))
+		if type(FreeBiyes) == "number" then
+			local n1, n2 = math.modf(FreeBiyes/1073741824)
+			freeSpace:SetTextColorResID("DDDDDD")
+			freeSpace:SetText(tostring(n1).."."..math.floor(n2*100).."GB")
+		end
 	else
 		freeSpace:SetText("无效路径")
 		freeSpace:SetTextColorResID("system.red")
@@ -118,10 +135,11 @@ function OnCreate(self)
 		end
 	
 		local cacheDir = Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir")
-		if Helper:IsRealString(cacheDir) then
-			editCache:SetText(cacheDir)
-			OnChangeEditCache(editMachine)
+		if not Helper:IsRealString(cacheDir) then
+			cacheDir = "C:"
 		end
+		editCache:SetText(cacheDir)
+		--OnChangeEditCache(editMachine)
 		
 		local machineName = tUserConfig["strMachineName"]
 		if not machineName then
@@ -134,9 +152,9 @@ function OnCreate(self)
 		local model = tUserConfig["workmodel"]
 		--model=0全速， model=1智能，默认全速
 		if tonumber(model) == 1 then
-			OnSelectSuDu(radio2)
+			radio2:SetCheck(true)
 		else
-			OnSelectSuDu(radio1)
+			radio1:SetCheck(true)
 		end
 	end
 end

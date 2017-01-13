@@ -1388,7 +1388,7 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nSpeed)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
-	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
+	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 

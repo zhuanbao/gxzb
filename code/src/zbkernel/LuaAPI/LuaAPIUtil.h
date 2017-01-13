@@ -247,6 +247,7 @@ public:
 	static int FileDialog(lua_State* luaState);
 	
 	static int GetProcessElevation(lua_State* pLuaState);
+	static int  FnGetDiskFreeSpaceEx(lua_State* pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };
