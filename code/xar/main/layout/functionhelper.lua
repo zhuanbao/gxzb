@@ -178,6 +178,7 @@ function RegisterFunctionObject(self)
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
+	obj.UpdateSpeed2XuanFuUI = UpdateSpeed2XuanFuUI
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
