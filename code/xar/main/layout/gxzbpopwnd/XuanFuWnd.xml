@@ -1,0 +1,69 @@
+<xlue>
+	<objtreetemplate id="GXZB.XuanFuWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>75</width>
+			<height>75</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>75</width>
+				<height>75</height>
+				<texture>xuanfu-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="XuanFuWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="XuanFuWnd.ShowSpeed" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>40</top>
+								<width>father.width</width>
+								<height>father.height-40</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text12</font>
+								<text>0H/S</text>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.XuanFuWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>75</width>
+            <height>75</height>
+            
+            <topmost>1</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+             <event name="OnCreate" file="XuanFuWnd.xml.lua" func="OnCreate"/>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

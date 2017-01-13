@@ -530,7 +530,10 @@ function TipMain()
 	FunctionObj.CreatePopupTipWnd()
 	SaveConfigInTimer()
 	BindToWeiXin()
+	--4小时1次提醒
 	FunctionObj.PopTipPre4Hour()
+	--显示悬浮框
+	FunctionObj.ShowPopupWndByName("GXZB.XuanFuWnd.Instance", true)
 	--ShowPopWndByCommand()
 end
 

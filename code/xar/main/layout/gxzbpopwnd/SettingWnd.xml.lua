@@ -46,6 +46,7 @@ function OnClickMachineBtn(self)
 		if strMachine <= 20 and strMachine >= 3 then
 			tUserConfig["strMachineName"] = strmachine
 			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+			tFunctionHelper.SetMachineNameChangeInfo()
 		end
 	end
 end

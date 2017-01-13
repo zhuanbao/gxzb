@@ -15,6 +15,7 @@ local g_strSeverInterfacePrefix = "http://diamond.test.com/pc"
 
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
+	[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
 }
 
 local g_tConfigFileStruct = {
@@ -1411,6 +1412,17 @@ function SetMachineNameChangeInfo()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	objMainBodyCtrl:UpdateMachineName(tUserConfig)
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
+end
+
+function UpdateSpeed2XuanFuUI(nSpeed)
+	local XuanFuWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	if XuanFuWnd and XuanFuWnd:GetVisible() then
+		local objtree = XuanFuWnd:GetBindUIObjectTree()
+		local textShowSpeed = objtree:GetUIObject("XuanFuWnd.ShowSpeed")
+		if textShowSpeed then
+			textShowSpeed:SetText(tostring(nSpeed).."H/S")
+		end
+	end
 end
 
 function SetUIWeiXinInfo()
