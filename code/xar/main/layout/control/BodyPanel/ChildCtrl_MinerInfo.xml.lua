@@ -37,7 +37,8 @@ function UpdateMachineName(self, tUserConfig)
 	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")
 
 	if objMachineName ~= nil then
-		objMachineName:SetText(strMachineName)
+		local strText = "机器名称：" .. strMachineName
+		objMachineName:SetText(strText)
 	end
 end
 
@@ -47,7 +48,6 @@ function OnInitControl(self)
 	if not objMachineName then
 		return
 	end
-	local strText = "机器名称："
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}

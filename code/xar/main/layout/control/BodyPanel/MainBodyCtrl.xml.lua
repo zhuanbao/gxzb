@@ -129,7 +129,7 @@ function UpdateMachineName(self, tUserConfig)
 		TipLog("[UpdateMachineName] get objPanelCenter failed ")
 		return false
 	end
-	local nChildCnt = objPanelCenter:GetControlObject()
+	local nChildCnt = objPanelCenter:GetChildCount()
 	for i=0,nChildCnt-1 do
 		local objChild = objPanelCenter:GetChildByIndex(i)
 		if objChild and type(objChild.UpdateMachineName) == "function" then
