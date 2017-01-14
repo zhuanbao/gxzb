@@ -91,7 +91,7 @@ inline std::string credits()
 class BadArgument: public Exception {};
 struct MiningChannel: public LogChannel
 {
-	static const char* name() { return EthGreen "miner"; }
+	static const char* name() { return "miner"; }
 	static const int verbosity = 2;
 	static const bool debug = false;
 };
@@ -611,21 +611,21 @@ private:
 					auto mp = f.miningProgress();
 					f.resetMiningProgress();
 					if (current)
+					{
 						if (IsDebug())
 						{
-							minelog << "Mining on PoWhash" << current.headerHash.hex() << ": " << mp;
+							minelog << "Mining on PoWhash" << current.headerHash.hex();
+							minelog << mp;
 						}
-						else
-						{
-							uint64_t rate = (uint64_t)mp.rate();
-							char sz_rate[1024] = { 0 };
-							sprintf(sz_rate, "%I64d", rate);
-							COPYDATASTRUCT cds = { 0 };
-							cds.dwData = APP_MINER_MAGIC;          // function identifier
-							cds.cbData = (int) sizeof(char) * ((int)strlen(sz_rate) + 1);  // size of data
-							cds.lpData = sz_rate;
-							PostMessageToUserWnd(WM_COPYDATA, (WPARAM)WP_SPEED, (LPARAM)(LPVOID)&cds);
-						}
+						uint64_t rate = (uint64_t)mp.rate();
+						char sz_rate[1024] = { 0 };
+						sprintf(sz_rate, "%I64d", rate);
+						COPYDATASTRUCT cds = { 0 };
+						cds.dwData = APP_MINER_MAGIC;          // function identifier
+						cds.cbData = (int) sizeof(char) * ((int)strlen(sz_rate) + 1);  // size of data
+						cds.lpData = sz_rate;
+						PostMessageToUserWnd(WM_COPYDATA, (WPARAM)WP_SPEED, (LPARAM)(LPVOID)&cds);
+					}	
 					else
 						minelog << "Getting work package...";
 
@@ -656,12 +656,9 @@ private:
 						{
 							if (IsDebug())
 							{
-								minelog << "Mining on PoWhash" << current.headerHash.hex() << ": " << mp;
+								minelog << "Creating DAG. " << _pc << "% done...";
 							}
-							else
-							{
-								PostMessageToUserWnd(WM_USER_DAG, DAG_CREATE_PROGRESS, _pc);
-							}
+							PostMessageToUserWnd(WM_USER_DAG, DAG_CREATE_PROGRESS, _pc);
 							return 0;
 						});
 						if (ret)

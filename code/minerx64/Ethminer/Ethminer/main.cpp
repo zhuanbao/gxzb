@@ -101,6 +101,7 @@ int main(int argc, char** argv)
 	unique_ptr<thread> threadMiner;
 	MinerCLI m(MinerCLI::OperationMode::Farm);
 	threadMiner.reset(new thread([&]() {
+		setThreadName("workertd");
 		for (int i = 1; i < argc; ++i)
 		{
 			string arg = argv[i];

@@ -17,7 +17,7 @@ using namespace dev::eth;
 //暂停
 #define WM_USER_PAUSE				WM_USER+101
 //限制线程数，填0不做限制
-#define WM_USER_LMT_THRDNUMB		WM_USER+102
+#define WM_USER_CONTRAL_SPEED		WM_USER+102
 
 unique_ptr<thread> g_msgthread;
 HANDLE g_pasuEvent;
@@ -45,6 +45,13 @@ unsigned g_CPU_MAX_Thread_Num;
 #define WORK_MUTEX	"WorkMutex_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 
 
+struct MsgWndChannel : public LogChannel
+{
+	static const char* name() { return "msgwnd"; }
+	static const bool debug = false;
+};
+#define msgwndlog clog(MsgWndChannel)
+
 class MsgWindow {
 public:
 	static LRESULT CALLBACK MyWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -52,12 +59,12 @@ public:
 		switch (msg)
 		{
 		case WM_CREATE:
-			cout << "WM_CREATE" << endl;
+			msgwndlog << "msg wnd create";
 			g_pasuEvent = CreateEvent(NULL, TRUE, TRUE, _T(WORK_EVENT));
 			break;
 		case WM_CLOSE:
-			cout << "WM_CLOSE" << endl;
 			//TerminateProcess(GetCurrentProcess(), 0);
+			msgwndlog << "msg wnd close";
 			g_pfarm->stop();
 			CloseSingletonMutex();
 			exit((uint32_t)wparam);
@@ -65,18 +72,16 @@ public:
 			return 0;
 			//break;
 		case WM_USER_START:
-			cout << "WM_USER_START" << endl;
 			g_pfarm->start(g_minertype);
 			SetEvent(g_pasuEvent);
 			break;
 		case WM_USER_PAUSE:
-			cout << "WM_USER_PAUSE" << endl;
 			ResetEvent(g_pasuEvent);
 			g_pfarm->stop();
 			break;
-		case WM_USER_LMT_THRDNUMB:
+		case WM_USER_CONTRAL_SPEED:
 		{
-			cout << "WM_USER_LMT_THRDNUMB " << wparam << ", " << lparam << endl;
+			msgwndlog << "contral speed,speed precent = %" << wparam;
 			uint32_t precent = uint32_t(wparam);
 			if (precent > 100 || precent < 0)
 			{
@@ -141,10 +146,10 @@ public:
 	{
 		function<void()> fnThread = [&]()
 		{
-			//cout << "MsgWindow Entry....." << endl;
+			msgwndlog << "entry create msg wnd";
 			AllowMessageToRecv(WM_USER_START, TRUE);
 			AllowMessageToRecv(WM_USER_PAUSE, TRUE);
-			AllowMessageToRecv(WM_USER_LMT_THRDNUMB, TRUE);
+			AllowMessageToRecv(WM_USER_CONTRAL_SPEED, TRUE);
 			HINSTANCE instance = GetModuleHandle(NULL);
 			TCHAR* lpWndClassName = _T(MSG_WND_CALSS);
 			WNDCLASS wc;
@@ -155,16 +160,15 @@ public:
 			wc.hInstance = instance;
 			if (!::RegisterClass(&wc)) {
 				DWORD lastError = ::GetLastError();
-				cout << "MsgWindow RegisterClass Failed!!!!!" << lastError << endl;
+				msgwndlog << "msg wnd register class failed" << lastError;
 				return;
 			}
 			HWND hwnd = ::CreateWindow(lpWndClassName, NULL, WS_POPUP, 0, 0, 50, 50, NULL, NULL, instance, NULL);
 			DWORD lastError = ::GetLastError();
 			if (!hwnd) {
-				cout << "MsgWindow Create Failed!!!!!" << lastError << endl;
+				msgwndlog << "msg wnd create failed" << lastError;
 				return;
 			}
-			cout << "MsgWindow wait msg....." << endl;
 			ShowWindow(hwnd, SW_HIDE);
 			UpdateWindow(hwnd);
 			MSG msg;
@@ -204,15 +208,15 @@ public:
 		uint64_t _currentBlock,
 		std::vector<uint32_t> _v_deviceID) {
 
-		cout << "SetGPUParam :" << endl
-			<< "_localWorkSize :" << _localWorkSize << endl
-			<< "_globalWorkSizeMultiplier :" << _globalWorkSizeMultiplier << endl
-			<< "_msPerBatch :" << _msPerBatch << endl
-			<< "_platformId :" << _platformId << endl
-			<< "_deviceId :" << _deviceId << endl
-			<< "_allowCPU :" << _allowCPU << endl
-			<< "_extraGPUMemory :" << _extraGPUMemory << endl
-			<< "_currentBlock :" << _currentBlock << endl;
+		msgwndlog << "SetGPUParam :" << "\r\n"
+			<< "_localWorkSize :" << _localWorkSize << "\r\n"
+			<< "_globalWorkSizeMultiplier :" << _globalWorkSizeMultiplier << "\r\n"
+			<< "_msPerBatch :" << _msPerBatch << "\r\n"
+			<< "_platformId :" << _platformId << "\r\n"
+			<< "_deviceId :" << _deviceId << "\r\n"
+			<< "_allowCPU :" << _allowCPU << "\r\n"
+			<< "_extraGPUMemory :" << _extraGPUMemory << "\r\n"
+			<< "_currentBlock :" << _currentBlock << "\r\n";
 
 		g_GPUParam._localworksize = _localWorkSize;
 		g_GPUParam._globalworksizemultiplier = _globalWorkSizeMultiplier;
@@ -226,7 +230,7 @@ public:
 	};
 	static void SetCPUMaxThread(unsigned num)
 	{
-		cout << "SetCPUMaxThread : " << num << endl;
+		msgwndlog << "set cpu max thread : " << num;
 		g_CPU_MAX_Thread_Num = num;
 	}
 
