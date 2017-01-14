@@ -89,7 +89,9 @@ function CreateListener(objRootCtrl)
 		if not IsRealString(strCommand) then
 			return
 		end
-
+		local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+		objHostWnd:Show(4)
+		objHostWnd:BringWindowToTop(true)
 	end	
 end
 
