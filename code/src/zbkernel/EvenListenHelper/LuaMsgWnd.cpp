@@ -185,9 +185,10 @@ LRESULT LuaMsgWindow::OnDagInit(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 {
 	TSAUTO();
 	USES_CONVERSION;
-	CComVariant vParam[1];
+	CComVariant vParam[2];
 	vParam[0] = CComVariant((UINT)wParam);
-	DISPPARAMS params = { vParam, NULL, 1, 0 };
+	vParam[1] = CComVariant((UINT)lParam);
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
 	Fire_LuaEvent("OnDagInit", &params);
 
 	return 0;
