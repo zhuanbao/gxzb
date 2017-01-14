@@ -36,7 +36,9 @@ function OnClickCacheBtn(self)
 		strPath = "C:\\"
 	end
 	local strNewPath = Helper.tipUtil:FolderDialog("目录选择", strPath)
-	editCache:SetText(strNewPath)
+	if Helper:IsRealString(strNewPath) and Helper.tipUtil:QueryFileExists(strNewPath) then
+		editCache:SetText(strNewPath)
+	end
 end
 
 function OnClickMachineBtn(self)
