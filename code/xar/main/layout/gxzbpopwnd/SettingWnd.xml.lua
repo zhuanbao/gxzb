@@ -146,7 +146,7 @@ function OnCreate(self)
 		
 		local machineName
 		if tUserConfig["tUserInfo"] and tUserConfig["tUserInfo"]["strMachineName"] then
-			machineName = tUserConfig["strMachineName"]
+			machineName = tUserConfig["tUserInfo"]["strMachineName"]
 		else
 			machineName = Helper:QueryRegValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\gxzb\\PeerId")
 		end
