@@ -28,11 +28,24 @@ function menuFunTable.OnSelect_autowork(self)
 end
 
 function menuFunTable.OnInit_hideball(self)
-	
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	local text = self:GetControlObject("menu.item.text")
+	if objHostWnd and objHostWnd:GetVisible() then
+		text:SetText("隐藏悬浮球")
+	else
+		text:SetText("显示悬浮球")
+	end
 end
 
 function menuFunTable.OnSelect_hideball(self)
-	
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	if objHostWnd then
+		if objHostWnd:GetVisible() then
+			objHostWnd:Show(0)
+		else
+			objHostWnd:Show(1)
+		end
+	end
 end
 
 function menuFunTable.OnSelect_setting(self)

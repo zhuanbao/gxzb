@@ -18,9 +18,26 @@ function OnInit_Sysboot(self)
 	end
 end
 
+function OnInit_Hideball(self)
+	local attr = self:GetAttribute()
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	if objHostWnd and objHostWnd:GetVisible() then
+		attr.Text = "隐藏悬浮球"
+	else
+		attr.Text = "显示悬浮球"
+	end
+end
 
 function OnSelect_Hideball(self)
-	GXZBMenu.SettingMenu.menuFunTable.OnInit_hideball()
+	--GXZBMenu.SettingMenu.menuFunTable.OnInit_hideball()
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	if objHostWnd then
+		if objHostWnd:GetVisible() then
+			objHostWnd:Show(0)
+		else
+			objHostWnd:Show(1)
+		end
+	end
 end
 
 function OnSelect_Update(self)

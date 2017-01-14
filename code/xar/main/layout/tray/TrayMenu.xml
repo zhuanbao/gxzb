@@ -23,6 +23,7 @@
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Hideball" />
+					<event name="OnInit" file="TrayMenu.xml.lua" function="OnInit_Hideball" />
 				</eventlist>
 			</obj>
 			

@@ -42,6 +42,9 @@
 			<eventlist>
 				<event name="OnRButtonUp" file="XuanFuWnd.xml.lua" func="OnRButtonUpXuanFu"/>
 				<event name="OnLButtonDbClick" file="XuanFuWnd.xml.lua" func="OnLButtonDbClickXuanFu"/>
+				<event name="OnMouseMove" file="XuanFuWnd.xml.lua" func="OnMouseMoveXuanFu"/>
+				<event name="OnLButtonDown" file="XuanFuWnd.xml.lua" func="OnLButtonDownXuanFu"/>
+				<event name="OnMouseLeave" file="XuanFuWnd.xml.lua" func="OnMouseLeaveXuanFu"/>
 			</eventlist>
 		</obj>
 	</objtreetemplate>
