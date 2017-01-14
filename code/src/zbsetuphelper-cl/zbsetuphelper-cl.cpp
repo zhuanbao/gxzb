@@ -63,14 +63,14 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 			cl_ulong result;
 			cl::STRING_CLASS name = _device.getInfo<CL_DEVICE_NAME>();
 			cl_device_type nType =  _device.getInfo<CL_DEVICE_TYPE>();
-			//cl_uint maxClockfr =  _device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
-			//cout<<"maxClockfr = "<<maxClockfr<<endl;
+			cl_uint maxClockfr =  _device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
+			cout<<"maxClockfr = "<<maxClockfr<<endl;
 			_device.getInfo(CL_DEVICE_GLOBAL_MEM_SIZE, &result);
 			transform(name.begin(), name.end(), name.begin(),  toupper);   
 			//必须是非Intel的GPU设备， 排除集显
 			if (name.find("intel") == string::npos && nType == CL_DEVICE_TYPE_GPU){
-				if (result >= 2147483648 && result > maxRet) {
-				//if (result > maxRet) {
+				//if (result >= 2147483648 && result > maxRet) {
+				if (result > maxRet) {
 					maxRet = result;
 					idxPlatform = i;
 					idxDevice = j;
@@ -87,7 +87,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	GetBestPlatform(i, j);
 	if (i != 0xFFFFFFFF && j != 0xFFFFFFFF){
 		cout<<"i = "<<i<<", j = "<<j<<endl;
-		//system("pause");
+		system("pause");
 		return 0;
 	}
 	else{
