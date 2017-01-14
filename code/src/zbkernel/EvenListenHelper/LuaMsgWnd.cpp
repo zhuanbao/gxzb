@@ -185,17 +185,10 @@ LRESULT LuaMsgWindow::OnDagInit(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 {
 	TSAUTO();
 	USES_CONVERSION;
-	COPYDATASTRUCT * pcs = (COPYDATASTRUCT *)lParam;
-	LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
-	TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
-	if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
-	{
-		CComVariant vParam[1];
-		vParam[0] = (LPWSTR)pcszCommandLine;
-
-		DISPPARAMS params = { vParam, NULL, 1, 0 };
-		Fire_LuaEvent("OnCommandLine", &params);
-	}	
+	CComVariant vParam[1];
+	vParam[0] = CComVariant((UINT)wParam);
+	DISPPARAMS params = { vParam, NULL, 1, 0 };
+	Fire_LuaEvent("OnDagInit", &params);
 
 	return 0;
 }
