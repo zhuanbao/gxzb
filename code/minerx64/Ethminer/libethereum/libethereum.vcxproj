@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2A42A488-C608-4869-991D-4209EC260E94}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libethereum</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;STATICLIB;_WIN32_WINNT=0x0600;NOMINMAX;MINIUPNP_STATICLIB;ETH_TRUE;DISABLE_BROKEN_UNIT_TESTS_UNTIL_WE_FIX_THEM;ETH_FATDB;ETH_HAVE_SECP256K1;ETH_MINIUPNPC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>..\..\win64\include;..\..\x64\include;..\..\build\include;..\;..\..\deps\jsoncpp\include;..\..\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4068;4996;4503;4267;4180;4290;4297;4244;4800</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Lib>
+      <OutputFile>..\..\PJLib\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <Lib>
+      <AdditionalOptions> /machine:x64 /ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MinSpace</Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;STATICLIB;NDEBUG;_WIN32_WINNT=0x0600;NOMINMAX;MINIUPNP_STATICLIB;ETH_TRUE;DISABLE_BROKEN_UNIT_TESTS_UNTIL_WE_FIX_THEM;ETH_FATDB;ETH_HAVE_SECP256K1;ETH_MINIUPNPC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>..\..\win64\include;..\..\x64\include;..\..\build\include;..\;..\..\deps\jsoncpp\include;..\..\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat />
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4068;4996;4503;4267;4180;4290;4297;4244;4800</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>..\..\PJLib\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <Lib>
+      <AdditionalOptions> /machine:x64 /ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="All.h" />
+    <ClInclude Include="BasicGasPricer.h" />
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="BlockChain.h" />
+    <ClInclude Include="BlockChainSync.h" />
+    <ClInclude Include="BlockDetails.h" />
+    <ClInclude Include="BlockQueue.h" />
+    <ClInclude Include="ChainParams.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientBase.h" />
+    <ClInclude Include="ClientTest.h" />
+    <ClInclude Include="CodeSizeCache.h" />
+    <ClInclude Include="CommonNet.h" />
+    <ClInclude Include="Defaults.h" />
+    <ClInclude Include="EthereumHost.h" />
+    <ClInclude Include="EthereumPeer.h" />
+    <ClInclude Include="Executive.h" />
+    <ClInclude Include="ExtVM.h" />
+    <ClInclude Include="GasPricer.h" />
+    <ClInclude Include="GenericFarm.h" />
+    <ClInclude Include="GenericMiner.h" />
+    <ClInclude Include="GenesisInfo.h" />
+    <ClInclude Include="Interface.h" />
+    <ClInclude Include="LogFilter.h" />
+    <ClInclude Include="MiningClient.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="Transaction.h" />
+    <ClInclude Include="TransactionQueue.h" />
+    <ClInclude Include="TransactionReceipt.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="VerifiedBlock.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Account.cpp" />
+    <ClCompile Include="BasicGasPricer.cpp" />
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="BlockChain.cpp" />
+    <ClCompile Include="BlockChainSync.cpp" />
+    <ClCompile Include="BlockDetails.cpp" />
+    <ClCompile Include="BlockQueue.cpp" />
+    <ClCompile Include="ChainParams.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientBase.cpp" />
+    <ClCompile Include="ClientTest.cpp" />
+    <ClCompile Include="CommonNet.cpp" />
+    <ClCompile Include="Defaults.cpp" />
+    <ClCompile Include="EthereumHost.cpp" />
+    <ClCompile Include="EthereumPeer.cpp" />
+    <ClCompile Include="Executive.cpp" />
+    <ClCompile Include="ExtVM.cpp" />
+    <ClCompile Include="GasPricer.cpp" />
+    <ClCompile Include="GenericMiner.cpp" />
+    <ClCompile Include="GenesisInfo.cpp" />
+    <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="LogFilter.cpp" />
+    <ClCompile Include="MiningClient.cpp" />
+    <ClCompile Include="State.cpp" />
+    <ClCompile Include="Transaction.cpp" />
+    <ClCompile Include="TransactionQueue.cpp" />
+    <ClCompile Include="TransactionReceipt.cpp" />
+    <ClCompile Include="Utility.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

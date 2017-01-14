@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Account.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="All.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicGasPricer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockChain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockChainSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockDetails.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChainParams.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientTest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeSizeCache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonNet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Defaults.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EthereumHost.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EthereumPeer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Executive.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtVM.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GasPricer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericFarm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericMiner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GenesisInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LogFilter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MiningClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Transaction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TransactionQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TransactionReceipt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VerifiedBlock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Account.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicGasPricer.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockChain.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockChainSync.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockDetails.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockQueue.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChainParams.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientBase.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientTest.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonNet.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Defaults.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EthereumHost.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EthereumPeer.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Executive.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtVM.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GasPricer.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericMiner.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GenesisInfo.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LogFilter.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MiningClient.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Transaction.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransactionQueue.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransactionReceipt.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
