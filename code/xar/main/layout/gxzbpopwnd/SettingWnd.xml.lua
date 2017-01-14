@@ -26,6 +26,7 @@ function OnClickSureBtn(self)
 	if Helper:IsRealString(strPath) and Helper.tipUtil:QueryFileExists(strPath) then
 		Helper.tipUtil:SetRegValue("HKEY_CURRENT_USER", "Software\\gxzb", "DAGDir", strPath)
 	end
+	OnClickMachineBtn(self)
 end
 
 function OnClickCacheBtn(self)
@@ -44,7 +45,8 @@ function OnClickMachineBtn(self)
 	if Helper:IsRealString(strmachine) then
 		local strMachine = string.len(strmachine)
 		if strMachine <= 20 and strMachine >= 3 then
-			tUserConfig["strMachineName"] = strmachine
+			tUserConfig["tUserInfo"] = tUserConfig["tUserInfo"] or {}
+			tUserConfig["tUserInfo"]["strMachineName"] = strmachine
 			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 			tFunctionHelper.SetMachineNameChangeInfo()
 		end
@@ -142,8 +144,10 @@ function OnCreate(self)
 		editCache:SetText(cacheDir)
 		--OnChangeEditCache(editMachine)
 		
-		local machineName = tUserConfig["strMachineName"]
-		if not machineName then
+		local machineName
+		if tUserConfig["tUserInfo"] and tUserConfig["tUserInfo"]["strMachineName"] then
+			machineName = tUserConfig["strMachineName"]
+		else
 			machineName = Helper:QueryRegValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\gxzb\\PeerId")
 		end
 		if machineName then

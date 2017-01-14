@@ -23,3 +23,18 @@ function OnCreate( self )
 		self:SetTopMost(true)
 	end, 5000)
 end
+
+function OnRButtonUpXuanFu(self)
+	local tree = self:GetOwner()
+	local wnd = tree:GetBindHostWnd()
+	local curX, curY = Helper.tipUtil:GetCursorPos()
+	local menuTable = GXZBMenu.SettingMenu.menuTable
+	local menuFunTable = GXZBMenu.SettingMenu.menuFunTable
+	local userData = {}
+	Helper:CreateMenu(curX-50, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
+end
+
+function OnLButtonDbClickXuanFu(self, x, y)
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	objHostWnd:Show(1)
+end
