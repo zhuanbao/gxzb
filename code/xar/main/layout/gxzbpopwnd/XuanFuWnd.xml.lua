@@ -39,35 +39,41 @@ function OnLButtonDbClickXuanFu(self, x, y)
 	objHostWnd:Show(1)
 end
 
+local staypos = "null"
 function OnLButtonDownXuanFu(self)
-	--[[local caption = self:GetObject("tree:XuanFuWnd.Caption")
+	local caption = self:GetObject("tree:XuanFuWnd.Caption")
 	if caption and not caption:GetCaption() then
 		caption:SetCaption(true)
-	end]]--
+	end
+	staypos = "null"
 end
 
-local staypos = "null"
+
 function OnMouseMoveXuanFu(self, x, y)
+	--[[local l, t, r, b = self:GetObjPos()
+	if x < 0 or y < 0 or x > r-l or y > b-t then
+		return
+	end]]
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
 	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
 	local wndW, wndH = wndR - wndL, wndB - wndT
-	staypos = "null"
+	--FunctionObj.TipLog("OnMouseMoveXuanFu workleft = "..tostring(workleft)..", worktop = "..tostring(worktop)..", wndL = "..wndL..", wndT = "..wndT)
 	if wndL < workleft then
-		wndL = workleft
+		wndL = workleft - wndW/2
 		staypos = "left"
 	end
 	if wndR > workright then
-		wndL = workright - wndW
+		wndL = workright - wndW/2
 		staypos = "right"
 	end
-	if wndT < worktop then
-		wndT = worktop
+	if wndT <= worktop then
+		wndT = worktop - wndH/2
 		staypos = "top"
 	end
-	if wndB > workbottom then
-		wndT = workbottom - wndH
+	if wndB >= workbottom then
+		wndT = workbottom - wndH/2
 		staypos = "bottom"
 	end
 	--[[if staypos ~= "null" then
@@ -75,20 +81,21 @@ function OnMouseMoveXuanFu(self, x, y)
 		if caption and caption:GetCaption() then
 			caption:SetCaption(false)
 		end
-	end]]--
+	end]]
 	wnd:Move(wndL, wndT, wndW, wndH)
 end
 
 function OnMouseLeaveXuanFu(self, x, y)
-	--[[local tree = self:GetOwner()
+	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
 	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
 	local wndW, wndH = wndR - wndL, wndB - wndT
 	if staypos == "left" then
-		wnd:Move(wndL - wndW/2 , wndT, wndW, wndH)
+		wnd:Move(wndL - wndW*0.3 , wndT, wndW, wndH)
 	elseif staypos == "top" then
-		wnd:Move(wndL, wndT - wndH/2, wndW, wndH)
+		wnd:Move(wndL, wndT - wndH*0.3, wndW, wndH)
 	elseif staypos == "right" then
-		wnd:Move(wndL + wndW/2, wndT, wndW, wndH)
-	end]]--
+		wnd:Move(wndL + wndW*0.3, wndT, wndW, wndH)
+	end
+	staypos = "null"
 end
