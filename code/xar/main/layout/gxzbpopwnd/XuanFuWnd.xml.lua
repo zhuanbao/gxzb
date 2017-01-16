@@ -36,7 +36,7 @@ end
 
 function OnLButtonDbClickXuanFu(self, x, y)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
-	objHostWnd:Show(1)
+	objHostWnd:BringWindowToTop(true)
 end
 
 local staypos = "null"

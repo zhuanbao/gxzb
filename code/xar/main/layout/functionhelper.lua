@@ -789,12 +789,14 @@ end
 function ShowMainPanleByTray(objHostWnd)
 	local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 	if objHostWnd then
+		objHostWnd:BringWindowToTop(true)
+		--[[
 		objHostWnd:Show(5)
 		SetWndForeGround(objHostWnd)
 		local strState = objHostWnd:GetWindowState()
 		if tostring(strState) == "min" then
 			objHostWnd:BringWindowToTop(true)
-		end
+		end]]--
 		
 		-- local strHostWndName = "TipFilterRemindWnd.Instance"
 		-- local objPopupWnd = hostwndManager:GetHostWnd(strHostWndName)
