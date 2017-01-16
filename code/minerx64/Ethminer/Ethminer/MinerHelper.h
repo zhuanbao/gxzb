@@ -14,8 +14,6 @@
 //2:自动检测显卡设备，没有找到合适的显卡设备（排除了 interl显卡）
 
 
-#define APP_MINER_MAGIC 0x8888
-
 
 //消息
 //创建DAG相关
@@ -44,12 +42,27 @@ struct SOLUTION_SS
 
 inline void PostMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	static HWND hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
+	static HWND hUserWnd = NULL;
+	if (NULL == hUserWnd)
+	{
+		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
+	}
 	if (hUserWnd && ::IsWindow(hUserWnd)) {
 		PostMessageA(hUserWnd, Msg, wParam, lParam);
 	}
 }
 
+inline void SendMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	static HWND hUserWnd = NULL;
+	if (NULL == hUserWnd)
+	{
+		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
+	}
+	if (hUserWnd && ::IsWindow(hUserWnd)) {
+		SendMessageA(hUserWnd, Msg, wParam, lParam);
+	}
+}
 
 
 
@@ -88,6 +101,7 @@ inline void DeleteUselessDagFile(std::string &strCurDag, std::string &strNextDag
 		{
 			CHAR szLnkFileTmp[MAX_PATH] = { 0 };
 			PathCombineA(szLnkFileTmp, strDir.c_str(), fd.cFileName);
+			cout << "delete dag file = " << szLnkFileTmp << endl;
 			DeleteFileA(szLnkFileTmp);
 
 		}

@@ -621,10 +621,10 @@ private:
 						char sz_rate[1024] = { 0 };
 						sprintf(sz_rate, "%I64d", rate);
 						COPYDATASTRUCT cds = { 0 };
-						cds.dwData = APP_MINER_MAGIC;          // function identifier
+						cds.dwData = WP_SPEED;          // function identifier
 						cds.cbData = (int) sizeof(char) * ((int)strlen(sz_rate) + 1);  // size of data
 						cds.lpData = sz_rate;
-						PostMessageToUserWnd(WM_COPYDATA, (WPARAM)WP_SPEED, (LPARAM)(LPVOID)&cds);
+						SendMessageToUserWnd(WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
 					}	
 					else
 						minelog << "Getting work package...";
@@ -732,10 +732,10 @@ private:
 					strcpy(sol.sz_mixHash, toString(solution.mixHash).c_str());
 
 					COPYDATASTRUCT cds = { 0 };
-					cds.dwData = APP_MINER_MAGIC;          // function identifier
+					cds.dwData = WP_SOLUTION;          // function identifier
 					cds.cbData = (int) sizeof(sol);  // size of data
 					cds.lpData = &sol;
-					PostMessageToUserWnd(WM_COPYDATA, (WPARAM)WP_SOLUTION, (LPARAM)(LPVOID)&cds);
+					SendMessageToUserWnd(WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
 				}
 				else
 					cwarn << "FAILURE: GPU gave incorrect result!";

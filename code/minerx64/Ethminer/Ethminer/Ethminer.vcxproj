@@ -134,22 +134,30 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MinSpace</Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32_WINNT=0x0600;NOMINMAX;MINIUPNP_STATICLIB;ETH_JSONRPC;ETH_TRUE;DISABLE_BROKEN_UNIT_TESTS_UNTIL_WE_FIX_THEM;ETH_FATDB;ETH_ETHASHCL;ETH_HAVE_SECP256K1;ETH_MINIUPNPC;BUILDING_LIBCURL;HTTP_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\win64\include;..\..\deps;..\..\deps\jsoncpp\include;..\..\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4068;4996;4503;4267;4180;4290;4297;4244;4800</DisableSpecificWarnings>
+      <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
+      <DebugInformationFormat />
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
+      <OptimizeReferences>
+      </OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;libethashseal.lib;jsonrpccpp-client.lib;libboost_chrono-vc140-mt-s-1_62.lib;libboost_date_time-vc140-mt-s-1_62.lib;libethereum.lib;libboost_regex-vc140-mt-s-1_62.lib;libevm.lib;libethcore.lib;libevmcore.lib;p2p.lib;iphlpapi.lib;miniupnpc.lib;libdevcrypto.lib;libdevcore.lib;libboost_filesystem-vc140-mt-s-1_62.lib;libboost_random-vc140-mt-s-1_62.lib;libboost_system-vc140-mt-s-1_62.lib;libboost_thread-vc140-mt-s-1_62.lib;leveldb.lib;shlwapi.lib;libscrypt.lib;secp256k1.lib;libethash-cl.lib;libethash.lib;cryptopp.lib;OpenCl.lib;jsonrpccpp-common.lib;jsoncpp.lib;libcurl.lib;jsonrpccpp-server.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\PJLib\$(Configuration);..\..\win64\libboost;..\..\win64\libthird\$(Configuration)</AdditionalLibraryDirectories>

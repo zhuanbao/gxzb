@@ -4,4 +4,8 @@
     <LocalDebuggerCommandArguments>-F http://pool.ethfans.org:5555/0xC11422DF6dad71D4183e77dA0145fB77418A8891.ww19</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>-F http://guangdong-pool.ethfans.org:5555/0xC11422DF6dad71D4183e77dA0145fB77418A8891.wll12123e123_qeqwe123123aqwed</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
