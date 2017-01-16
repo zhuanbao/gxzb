@@ -23,9 +23,9 @@ function OnCreate(self)
 		local TextVersion = objtree:GetUIObject("AboutWnd.Content.VersionValue")
 		local TextDate = objtree:GetUIObject("AboutWnd.Content.DateValue")
 		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-		local strLastUTC = tUserConfig["nLastCommonUpdateUTC"]
+		local strLastUTC =  Helper.tipUtil:QueryRegValue("HKEY_LOCAL_MACHINE", "Software\\gxzb", "InstallTimes")
 		if not tonumber(strLastUTC) then
-			strLastUTC = Helper.tipUtil:QueryRegValue("HKEY_LOCAL_MACHINE", "Software\\gxzb", "InstallTimes")
+			strLastUTC = tUserConfig["nLastCommonUpdateUTC"]
 		end
 		local nLastUTC = tonumber(strLastUTC)
 		if nLastUTC then

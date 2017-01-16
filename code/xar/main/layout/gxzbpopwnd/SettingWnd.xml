@@ -12,7 +12,7 @@
 				<top>0</top>
 				<width>530</width>
 				<height>380</height>
-				<texture>setting-bkg</texture>
+				<texture>common-bkg</texture>
 			</attr>	
 			<children>
 				<obj id="SettingWnd.Caption" class="CaptionObject">
@@ -38,6 +38,44 @@
 								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
 							</eventlist>	
 						</obj>
+						<obj id="SettingWnd.Title" class="TextObject">
+							<attr>
+								<left>18</left>
+								<top>10</top>
+								<width>120</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>基本设置</text>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.HeadLine" class="LineObject">
+							<attr>
+								<left>8</left>
+								<top>78</top>
+								<width>father.width-16</width>
+								<height>1</height>
+								<srcpt>0, 0</srcpt>
+								<destpt>father.width, 0</destpt>
+								<color>DDDDDD</color>
+								<pen>pen.solid</pen>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.QiDong" class="TextObject">
+							<attr>
+								<left>61</left>
+								<top>91</top>
+								<width>80</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>启动</text>
+							</attr>
+						</obj>
 						<obj id="SettingWnd.CheckBox.Sysboot" class="CheckBox">
 							<attr>
 								<CheckHover>setting_check.hover</CheckHover>
@@ -54,6 +92,20 @@
 							<eventlist>
 								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSysBoot" />
 							</eventlist>
+						</obj>
+						
+						<obj id="SettingWnd.Model" class="TextObject">
+							<attr>
+								<left>61</left>
+								<top>282</top>
+								<width>120</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>赚宝模式</text>
+							</attr>
 						</obj>
 						<obj id="SettingWnd.Radio.AllSpeed" class="CheckBox">
 							<attr>
@@ -79,7 +131,7 @@
 								<Select>false</Select>
 								<Text>智能赚宝</Text>
 								<left>230</left>
-								<top>304</top>
+								<top>298</top>
 								<width>150</width>
 								<height>25</height>
 								<CheckHover>setting_radio.hover</CheckHover>
@@ -91,6 +143,20 @@
 							<eventlist>
 								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSuDu" />
 							</eventlist>
+						</obj>
+						
+						<obj id="SettingWnd.Machine" class="TextObject">
+							<attr>
+								<left>61</left>
+								<top>135</top>
+								<width>120</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>机器名称</text>
+							</attr>
 						</obj>
 						<obj id="SettingWnd.EditMachine.bkg" class="TextureObject">
 							<attr>
@@ -138,10 +204,49 @@
 							</eventlist>	
 						</obj>
 						
+						<obj id="SettingWnd.CacheText" class="TextObject">
+							<attr>
+								<left>61</left>
+								<top>196</top>
+								<width>120</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>缓存目录</text>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.CacheText2" class="TextObject">
+							<attr>
+								<left>206</left>
+								<top>168</top>
+								<width>249</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>使用指定的缓存目录</text>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.CacheText3" class="TextObject">
+							<attr>
+								<left>206</left>
+								<top>228</top>
+								<width>85</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>剩余空间</text>
+							</attr>
+						</obj>
 						<obj id="SettingWnd.EditCache.bkg" class="TextureObject">
 							<attr>
 								<left>206</left>
-								<top>190</top>
+								<top>195</top>
 								<width>230</width>
 								<height>28</height>
 								<texture>setting-edit-bkg</texture>
@@ -172,7 +277,7 @@
 								<TextFont>font.text16</TextFont>
 								<TextColor>DDDDDD</TextColor>
 								<left>436</left>
-								<top>190</top>
+								<top>195</top>
 								<width>88</width>
 								<height>26</height>
 								<NormalBkgID>setting-btn-normal</NormalBkgID>
@@ -186,8 +291,8 @@
 						</obj>
 						<obj id="SettingWnd.ShowFreeSpace" class="TextObject">
 							<attr>
-								<left>286</left>
-								<top>218</top>
+								<left>276</left>
+								<top>226</top>
 								<width>168</width>
 								<height>25</height>
 								<valign>center</valign>
