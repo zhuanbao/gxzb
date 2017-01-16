@@ -87,27 +87,27 @@ bool ethash_file_size(FILE* f, size_t* ret_size)
 //优先从注册表获取DAG保存路径 HKEY_CURRENT_USER\Software\Acer
 bool ethash_get_userset_dir(char* strbuf)
 {
+	bool bRet = false;
 	HKEY hKEY;
-	char* szPath = "Software\\Acer";
+	char* szPath = "Software\\gxzb";
 	if (ERROR_SUCCESS == RegOpenKeyExA(HKEY_CURRENT_USER, (CHAR*)szPath, 0, KEY_READ, &hKEY))
 	{
-		char dwValue[MAX_PATH];
+		char szValue[MAX_PATH];
 		DWORD dwSzType = REG_SZ;
-		DWORD dwSize = sizeof(dwValue);
+		DWORD dwSize = sizeof(szValue);
 
-		if (RegQueryValueExA(hKEY, "DAGDir", 0, &dwSzType, (LPBYTE)&dwValue, &dwSize) == ERROR_SUCCESS)
+		if (RegQueryValueExA(hKEY, "DAGDir", 0, &dwSzType, (LPBYTE)&szValue, &dwSize) == ERROR_SUCCESS)
 		{
 			if (dwSize > 0)
 			{
-				RegCloseKey(hKEY);
-				return true;
+				memcpy(strbuf, szValue, dwSize);
+				bRet = true;
 			}
-			RegCloseKey(hKEY);
-			return false;
 		}
 		RegCloseKey(hKEY);
+		return bRet;
 	}
-	return false;
+	return bRet;
 }
 
 bool ethash_get_default_dirname(char* strbuf, size_t buffsize)
