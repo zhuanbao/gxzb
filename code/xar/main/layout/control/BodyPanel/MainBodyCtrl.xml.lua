@@ -1,5 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local FunctionObj = XLGetGlobal("Global.FunctionHelper")
+local Helper =  XLGetGlobal("Helper")
 -----事件----
 
 
@@ -36,7 +37,12 @@ function InitPanelList(self, tPanelList)
 		objChild:SetVisible(false)
 		objChild:SetChildrenVisible(false)
 	end
-	
+	if FunctionObj.CheckIsBinded() then
+		local objButton= self:GetControlObject("MainPanel.Buttom.BindWeiXin")
+		if objButton then
+			objButton:SetText("解除绑定")
+		end
+	end
 	return true	
 end
 
@@ -140,12 +146,35 @@ function UpdateMachineName(self, tUserConfig)
 	return true
 end
 
+function UpdateSpeed(self, strSpeed)
+	local objPanelCenter= self:GetControlObject("MainPanel.Center")
+	if objPanelCenter == nil then
+		
+		TipLog("[UpdateSpeed] get objPanelCenter failed ")
+		return false
+	end
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateSpeed) == "function" then
+			objChild:UpdateSpeed(strSpeed)
+		end	
+	end
+	
+	return true
+end
+
 function OnClickBindWeiXin(self)
-	local Helper =  XLGetGlobal("Helper")
-	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
-	local maskWnd = Helper:CreateTransparentMask(wnd)
-	Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-	Helper:DestoryTransparentMask(wnd)
+	if FunctionObj.CheckIsBinded() then
+		local objHostWnd = FunctionObj.GetMainHostWnd()
+		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+		Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+		Helper:DestoryTransparentMask(objHostWnd)
+	else
+		FunctionObj.ClearBindInfo()
+		FunctionObj.StopWorking()
+		self:SetText("绑定微信")
+	end	
 end
 
 function OnClickHistoryIncome(self)
@@ -154,16 +183,10 @@ end
 
 function OnClickTakeCash(self)
 	--弹出绑定微信
-	local Helper =  XLGetGlobal("Helper")
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	if Helper then
-		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-		Helper:CreateModalWnd("GXZB.TiXianWnd", "GXZB.TiXianWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-		Helper:DestoryTransparentMask(objHostWnd)
-	else
-		--XLMessageBox("error helper is nil")
-	end
+	local objHostWnd = FunctionObj.GetMainHostWnd()
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.TiXianWnd", "GXZB.TiXianWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(objHostWnd)
 end
 
 

@@ -72,6 +72,7 @@ function CreateListener(objRootCtrl)
 	function OnMinerSpeed(tInfo)
 		local strSpeed = tInfo[1]
 		tFunctionHelper.TipLog("[OnMinerSpeed] strSpeed = " .. tostring(strSpeed))
+		tFunctionHelper.UpdateWorkSpeed(strSpeed)
 	end
 
 	function OnSolutionFind(tInfo)

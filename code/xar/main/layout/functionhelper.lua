@@ -2,6 +2,7 @@ local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local g_bShowWndByTray = false
 local gStatCount = 0
+local gCurrentWorkSpeed = 0
 local gnLastReportRunTmUTC = tipUtil:GetCurrentUTCTime()
 local gTimeoutTimerId = nil
 
@@ -178,7 +179,10 @@ function RegisterFunctionObject(self)
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
-	obj.UpdateSpeed2XuanFuUI = UpdateSpeed2XuanFuUI
+	--obj.UpdateSpeed2XuanFuUI = UpdateSpeed2XuanFuUI
+	obj.UpdateWorkSpeed = UpdateWorkSpeed
+	obj.GetMainHostWnd = GetMainHostWnd
+	obj.CheckIsBinded = CheckIsBinded
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -290,6 +294,45 @@ function CheckIsNewVersion(strNewVer, strCurVer)
 	return a>A or (a==A and (b>B or (b==B and (c>C or (c==C and d>D)))))
 end
 
+
+function FormatHashRate(nSpeed)
+	local nSize = 0
+	local strUnit = ""
+	if nSpeed >= 1000*1000*1000 then  
+		nSize = nSpeed/(1000*1000*1000)
+		strUnit = "GH"
+		if nSize > 99.999999 then
+			nSize = nSize/1000
+			strUnit = "TH"
+		end
+	elseif nSpeed >= 1000*1000 then  
+		nSize = nSpeed/(1000*1000)
+		strUnit = "MH"
+		if nSize > 99.999999 then
+			nSize = nSize/1000
+			strUnit = "GH"
+		end
+	elseif nSpeed >= 1000 then   
+		nSize = nSpeed/1000
+		strUnit = "KH"
+		if nSize > 99.999999 then
+			nSize = nSize/1000
+			strUnit = "MH"
+		end
+	else
+		nSize = nSpeed
+		strUnit = "H"
+		if nSize > 99.999999 then
+			nSize = nSize/1000
+			strUnit = "KH"
+		end
+	end
+	
+	local strHashRate = string.format("%.2f", nSize)
+	strHashRate = strHashRate..strUnit
+	
+	return strHashRate
+end
 
 function GetPeerID()
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId")
@@ -1417,13 +1460,33 @@ function SetMachineNameChangeInfo()
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 end
 
+function UpdateWorkSpeed(strSpeed)
+	TipLog("[QuerySvrForPushCalcInfo] strSpeed = " .. tostring(strSpeed))
+	local nSpeed = tonumber(strSpeed) or 0
+	gCurrentWorkSpeed = nSpeed
+	local strSpeed = FormatHashRate(nSpeed)
+	UpdateSpeed2MainBody(strSpeed)
+	UpdateSpeed2XuanFuUI(strSpeed)
+end
+
+function UpdateSpeed2MainBody(strSpeed)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("TipCtrl.MainWnd.MainBody")
+	objMainBodyCtrl:UpdateSpeed(strSpeed)
+end
+
 function UpdateSpeed2XuanFuUI(nSpeed)
 	local XuanFuWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
 	if XuanFuWnd and XuanFuWnd:GetVisible() then
 		local objtree = XuanFuWnd:GetBindUIObjectTree()
 		local textShowSpeed = objtree:GetUIObject("XuanFuWnd.ShowSpeed")
 		if textShowSpeed then
-			textShowSpeed:SetText(tostring(nSpeed).."H/S")
+			textShowSpeed:SetText(tostring(nSpeed).."/S")
 		end
 	end
 end
@@ -1537,5 +1600,15 @@ function SetUserBindInfo(tabBindInfo)
 	InitMinerInfoToServer()
 end
 
+function CheckIsBinded()
+	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	if tUserConfig["tUserInfo"]["bBind"] then
+		return true
+	end
+	return false
+end
 
 RegisterFunctionObject()

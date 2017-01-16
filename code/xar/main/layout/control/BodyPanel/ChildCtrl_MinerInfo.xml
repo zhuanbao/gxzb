@@ -6,6 +6,7 @@
 		<method_def>
 			<UpdateWeiXinInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateWeiXinInfo"/>
 			<UpdateMachineName file="ChildCtrl_MinerInfo.xml.lua" func="UpdateMachineName"/>
+			<UpdateSpeed file="ChildCtrl_MinerInfo.xml.lua" func="UpdateSpeed"/>
 		</method_def>
 		<event_def>
 			
@@ -87,7 +88,7 @@
 					<attr>
 						<left>16</left>
 						<top>father.height-30</top>
-						<width>130</width>
+						<width>150</width>
 						<height>20</height>
 						<text>当前速度：0H/S</text>
 						<halign>left</halign>

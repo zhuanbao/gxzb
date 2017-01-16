@@ -42,6 +42,15 @@ function UpdateMachineName(self, tUserConfig)
 	end
 end
 
+function UpdateSpeed(self, strSpeed)
+	local objSpeed= self:GetControlObject("ChildCtrl_MinerInfo.Speed")
+
+	if objSpeed ~= nil then
+		local strText = "机器名称：" .. strSpeed .. "/s"
+		objSpeed:SetText(strText)
+	end
+end
+
 
 function OnInitControl(self)
 	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")

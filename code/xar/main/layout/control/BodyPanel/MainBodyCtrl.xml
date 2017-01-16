@@ -11,6 +11,7 @@
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
 			<UpdateWeiXinInfo file="MainBodyCtrl.xml.lua" func="UpdateWeiXinInfo"/>
 			<UpdateMachineName file="MainBodyCtrl.xml.lua" func="UpdateMachineName"/>
+			<UpdateSpeed file="MainBodyCtrl.xml.lua" func="UpdateSpeed"/>
 		</method_def>
 		<event_def>
 			
