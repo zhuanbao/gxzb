@@ -1669,6 +1669,9 @@ function InitMachName()
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
+	if not tUserConfig["tUserInfo"] then
+		tUserConfig["tUserInfo"] = {}
+	end
 	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
 		tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
 		SaveConfigToFileByKey("tUserConfig")

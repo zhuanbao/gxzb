@@ -141,7 +141,7 @@ function OnCreate(self)
 	
 		local cacheDir = Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir")
 		if not Helper:IsRealString(cacheDir) then
-			cacheDir = "C:"
+			cacheDir = "C:\\"
 		end
 		editCache:SetText(cacheDir)
 		--OnChangeEditCache(editMachine)
