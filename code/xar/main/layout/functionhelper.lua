@@ -178,6 +178,8 @@ function RegisterFunctionObject(self)
 	obj.StartRunCountTimer = StartRunCountTimer
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
 	obj.InitMinerInfoToServer = InitMinerInfoToServer
+	obj.QueryClientInfo = QueryClientInfo
+	obj.UnBindClient = UnBindClient
 	obj.GetInstallSrc = GetInstallSrc
 	obj.SaveAllConfig = SaveAllConfig
 	obj.CheckPeerIDList = CheckPeerIDList
@@ -187,7 +189,6 @@ function RegisterFunctionObject(self)
 	obj.PopTipPre4Hour = PopTipPre4Hour
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
 	obj.SetMinerInfo = SetMinerInfo
-	--obj.UpdateSpeed2XuanFuUI = UpdateSpeed2XuanFuUI
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
 	obj.GetUserWorkID = GetUserWorkID
 	obj.GetMainHostWnd = GetMainHostWnd
@@ -1134,7 +1135,7 @@ function ReportAndExit()
 	local tStatInfo = {}
 		
 	SendRunTimeReport(0, true)
-	
+	UnBindClient()
 	tStatInfo.strEC = "exit"	
 	tStatInfo.strEA = GetInstallSrc() or ""
 	tStatInfo.Exit = true
@@ -1244,16 +1245,16 @@ end
 
 
 function QuerySvrForWorkID()
-	local strInterfaceName = "getQrcode"
+	local strInterfaceName = "getWorkerID"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
-	TipLog("[QuerySvrForQrcodeInfo] strReguestUrl = " .. strReguestUrl)
+	TipLog("[QuerySvrForWorkID] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
 function GetUserWorkID(fnCallBack)
-	local strUrl = QuerySvrForWorkID(nSceneID)
+	local strUrl = QuerySvrForWorkID()
 	strUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
@@ -1270,11 +1271,11 @@ function GetUserWorkID(fnCallBack)
 				local tabInfo = DeCodeJson(strContent)
 				if type(tabInfo) ~= "table" 
 					or tabInfo["rtn"] ~= 0 then
-					TipLog("[DownLoadTempQrcode] Parse Json failed.")
+					TipLog("[GetUserWorkID] Parse Json failed.")
 					fnCallBack(false,"解析信息失败")
 					return 
 				end
-				local strWorkID = tabInfo["workID"]
+				local strWorkID = tabInfo["workerID"]
 				strWorkID = "testtttasdoiweqwehjqwjekawe"
 				tUserConfig["tUserInfo"]["strWorkID"] = strWorkID
 				SaveConfigToFileByKey("tUserConfig")
@@ -1288,18 +1289,17 @@ function GetUserWorkID(fnCallBack)
 	end
 end
 
-function QuerySvrForLoginInfo(nSceneID)
-	local strInterfaceName = "login"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
-	strInterfaceParam = strInterfaceParam .. "&sceneID=" .. tostring(nSceneID)
+function QuerySvrForLoginInfo(strWorkerID)
+	local strInterfaceName = "bind"
+	local strInterfaceParam = "workerID=" .. Helper:UrlEncode(tostring(strWorkerID))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForLoginInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
-function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
-	local strBindResult = QuerySvrForLoginInfo(nSceneID)
+function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
+	local strBindResult = QuerySvrForLoginInfo(strWorkerID)
 	strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
 	NewAsynGetHttpContent(strBindResult, false
 	, function(nRet, strContent, respHeaders)
@@ -1310,7 +1310,7 @@ function CycleQuerySeverForBindResult(nSceneID, fnCallBack, nTimeoutInMS)
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 then
-				TipLog("[DownLoadTempQrcode] Parse Json failed.")
+				TipLog("[CycleQuerySeverForBindResult] Parse Json failed.")
 				fnCallBack(false,"解析登陆信息失败")
 				return 
 			end
@@ -1331,7 +1331,7 @@ end
 
 function QuerySvrForQrcodeInfo(strWorkID)
 	local strInterfaceName = "getQrcode"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID())).."&workerID="..Helper:UrlEncode(tostring(strWorkID))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForQrcodeInfo] strReguestUrl = " .. strReguestUrl)
@@ -1370,6 +1370,7 @@ function DownLoadTempQrcode(fnCallBack)
 							return 
 						end
 						tabInfo["qrcodePath"] = strDownLoadPath
+						tabInfo["workerID"] = strWorkID
 						fnCallBack(true,tabInfo)
 					end)
 				else
@@ -1420,7 +1421,7 @@ function SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
 				
 				if type(tabInfo) ~= "table" 
 					or tabInfo["rtn"] ~= 0 then
-					TipLog("[DownLoadTempQrcode] Parse Json failed.")
+					TipLog("[SendMinerInfoToServer] Parse Json failed.")
 					return 
 				end
 				if fnSuccess ~= nil then
@@ -1511,6 +1512,67 @@ function InitMinerInfoToServer()
 	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
 	SendMinerInfoToServer(QuerySvrForPushCalcInfo(0),1,function(tabInfo)
 		
+	end)
+end
+
+--查询客户端信息
+function QueryClientInfo(callback)
+	if type(callback) ~= "function" then
+		return
+	end
+	--callback(true, {balance = 345})
+	--if true then return end
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strAPIName = "getWorkerInfo"
+	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+				.."&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+				.. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	local strTarParam = MakeInterfaceMd5(strAPIName, strOgriParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strTarParam
+	TipLog("[QueryClientInfo] strReguestUrl = " .. strReguestUrl)
+	NewAsynGetHttpContent(strReguestUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[QueryClientInfo] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local tabInfo = DeCodeJson(strContent)
+			
+			if type(tabInfo) ~= "table" 
+				or tabInfo["rtn"] ~= 0 then
+				callback(false)
+				return 
+			end
+			callback(true, tabInfo)
+		else
+			callback(false)
+		end		
+	end)
+end
+
+--客户端解绑
+function UnBindClient()
+	local strOpenID = FetchValueByPath(tUserConfig, {"tUserInfo", "strOpenID"})
+	local strWorkID = FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
+	if not IsRealString(strWorkID) or not IsRealString(strOpenID) then
+		return
+	end
+	local strAPIName = "unbind"
+	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+				.."&workerID=" .. Helper:UrlEncode(tostring(strWorkID))
+				.. "&openID=" .. Helper:UrlEncode(tostring(strOpenID))
+	local strTarParam = MakeInterfaceMd5(strAPIName, strOgriParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strTarParam
+	TipLog("[UnBindClient] strReguestUrl = " .. strReguestUrl)
+	gStatCount = gStatCount + 1
+	tipAsynUtil:AsynSendHttpStat(strReguestUrl, function()
+		gStatCount = gStatCount - 1
+		if gStatCount == 0 and gForceExit then
+			ExitTipWnd()
+		end
 	end)
 end
 

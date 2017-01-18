@@ -56,10 +56,11 @@
 										<transparent>1</transparent>
 										<textcolor>444444</textcolor>
 										<font>font.text14</font>
-										<text>可提现12.05元</text>
+										<text></text>
 									</attr>
 									<eventlist>
 										<event name="OnFocusChange" file="TiXianWnd.xml.lua" func="OnFocusChangeEdit" />
+										<event name="OnChange" file="TiXianWnd.xml.lua" func="OnTextChangeEdit" />
 									</eventlist>
 								</obj>
 							</children>

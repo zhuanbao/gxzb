@@ -463,7 +463,7 @@ end
 function TryShowBindWeiXinWnd()
 	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
 	if not wnd:GetVisible() then
-		wnd:GetVisible()
+		wnd:SetVisible(true)
 		wnd:Show(5)
 		FunctionObj.SetWndForeGround(wnd)
 	end

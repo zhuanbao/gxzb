@@ -25,6 +25,11 @@ function OnClickBindWeiXin(self)
 	objHostWnd:EndDialog(0)
 	local Helper =  XLGetGlobal("Helper")
 	local wnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
+	if wnd then
+		wnd:BringWindowToTop(true)
+	else
+		return
+	end
 	local maskWnd = Helper:CreateTransparentMask(wnd)
 	Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
 	Helper:DestoryTransparentMask(wnd)

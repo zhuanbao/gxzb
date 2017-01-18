@@ -1,3 +1,7 @@
+local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local gBalance = 0
+local gHasChange = false
+
 function OnClickClose(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
@@ -8,12 +12,24 @@ function OnClickTiXianBtn(self)
 end
 
 function OnFocusChangeEdit(self, isFocus)
+	if gHasChange then
+		return
+	end
 	if isFocus then
 		self:SetIsNumber(true)
-		self:SetText("12.05")
+		self:SetText(tostring(gBalance))
 	else
 		self:SetIsNumber(false)
-		self:SetText("可提现12.05元")
+		self:SetText("可提现"..tostring(gBalance).."元")
+	end
+end
+
+function OnTextChangeEdit(self)
+	local text = self:GetText()
+	if text ~= tostring(gBalance) and text ~= "可提现"..tostring(gBalance).."元" then
+		gHasChange = true
+	else
+		gHasChange = false
 	end
 end
 
@@ -40,5 +56,37 @@ function OnCreate(self)
 		local parentWidth  = parentRight - parentLeft
 		local parentHeight = parentBottom - parentTop
 		self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
+		local editobj = objtree:GetUIObject("TiXianWnd.Caption.EditBkg")
+		local msgobj = objtree:GetUIObject("TiXianWnd.Caption.Msg")
+		local btnobj = objtree:GetUIObject("TiXianWnd.CkickTiXian")
+		editobj:SetEnable(false)
+		editobj:SetChildrenEnable(false)
+		btnobj:Show(false)
+		msgobj:SetText("正在努力加载中...")
+		local timerID = SetTimer(function(item, id) 
+			local text = msgobj:GetText()
+			if text == "正在努力加载中..." then
+				msgobj:SetText("正在努力加载中.")
+			elseif text == "正在努力加载中." then
+				msgobj:SetText("正在努力加载中..")
+			else
+				msgobj:SetText("正在努力加载中...")
+			end
+		end, 
+		1000)
+		tFunctionHelper.QueryClientInfo(function(bRet, tab)
+			KillTimer(timerID)
+			if not bRet or type(tab) ~= "table" or not tonumber(tab["balance"]) then
+				msgobj:SetText("很抱歉，加载失败")
+				return
+			end
+			gBalance = tab["balance"]
+			editobj:SetEnable(true)
+			local realeditobj = objtree:GetUIObject("TiXianWnd.Caption.Edit")
+			realeditobj:SetText("可提现"..tostring(gBalance).."元")
+			editobj:SetChildrenEnable(true)
+			btnobj:Show(true)
+			msgobj:SetText("今日还可以免费提现一次")
+		end)
 	end
 end
