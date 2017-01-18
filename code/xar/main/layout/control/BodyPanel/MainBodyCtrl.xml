@@ -12,6 +12,8 @@
 			<UpdateWeiXinInfo file="MainBodyCtrl.xml.lua" func="UpdateWeiXinInfo"/>
 			<UpdateMachineName file="MainBodyCtrl.xml.lua" func="UpdateMachineName"/>
 			<UpdateSpeed file="MainBodyCtrl.xml.lua" func="UpdateSpeed"/>
+			<UpdateBindButtonText file="MainBodyCtrl.xml.lua" func="UpdateBindButtonText"/>
+			<UpdateMinerInfo file="MainBodyCtrl.xml.lua" func="UpdateMinerInfo"/>
 		</method_def>
 		<event_def>
 			

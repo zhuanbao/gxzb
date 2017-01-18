@@ -83,6 +83,15 @@ function CreateListener(objRootCtrl)
 	function OnDagInit(tInfo)
 		local nState, nProgress = tInfo[1],tInfo[2]
 		tFunctionHelper.TipLog("[OnDagInit] OnDagInit = " .. tostring(nState) .. ", nProgress = " .. tostring(nProgress))
+		if nState == 0 then
+			tFunctionHelper.SetMinerInfo("检验数据中...")
+		elseif nState == 1 then
+			tFunctionHelper.SetMinerInfo("初始化新数据中...\r\n已经完成" .. nProgress .. "%")
+		elseif nState == 2 then
+			tFunctionHelper.SetMinerInfo("检验数据完成")
+		elseif nState == 3 then	
+			tFunctionHelper.SetMinerInfo("初始化数据失败")
+		end
 	end
 	
 	function OnCommandLine(tInfo)

@@ -128,6 +128,11 @@ function UpdateWeiXinInfo(self, tUserConfig)
 	return true
 end
 
+function UpdateBindButtonText(self, strText)
+	local objButton= self:GetControlObject("MainPanel.Buttom.BindWeiXin")
+	objButton:SetText(strText)
+end
+
 function UpdateMachineName(self, tUserConfig)
 	local objPanelCenter= self:GetControlObject("MainPanel.Center")
 	if objPanelCenter == nil then
@@ -164,15 +169,33 @@ function UpdateSpeed(self, strSpeed)
 	return true
 end
 
+function UpdateMinerInfo(self, strText)
+	local objPanelCenter= self:GetControlObject("MainPanel.Center")
+	if objPanelCenter == nil then
+		
+		TipLog("[UpdateMinerInfo] get objPanelCenter failed ")
+		return false
+	end
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateMinerInfo) == "function" then
+			objChild:UpdateMinerInfo(strText)
+		end	
+	end
+	
+	return true
+end
+
 function OnClickBindWeiXin(self)
-	if FunctionObj.CheckIsBinded() then
+	if not FunctionObj.CheckIsBinded() then
 		local objHostWnd = FunctionObj.GetMainHostWnd()
 		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
 		Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
 		Helper:DestoryTransparentMask(objHostWnd)
 	else
 		FunctionObj.ClearBindInfo()
-		FunctionObj.StopWorking()
+		FunctionObj.NotifyPause()
 		self:SetText("绑定微信")
 	end	
 end

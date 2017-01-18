@@ -10,24 +10,30 @@ function TipLog(strLog)
 end
 
 function OnClickStartMiner(self)
-
+	if not tFunctionHelper.CheckIsWorking() then
+		self:SetText("暂停赚宝")
+		tFunctionHelper.NotifyStart()
+	else
+		self:SetText("开启赚宝")
+		tFunctionHelper.NotifyPause()
+	end
 end
 
 function UpdateWeiXinInfo(self, tUserConfig)
-	local strImagePath = tUserConfig["tUserInfo"]["wxHeadImgPath"]
-	local objBitmap = objGraphicFac:CreateBitmap(strImagePath, "ARGB32")
-	if not objBitmap then
-		TipLog("[UpdateWeiXinInfo] create Head Img bitmap failed")
-		return false
-	end
 	local objHeadImg= self:GetControlObject("ChildCtrl_MinerInfo.UserInfo.HeadImg")
 	local objNickName= self:GetControlObject("ChildCtrl_MinerInfo.UserInfo.NickName")
-	
-	if objHeadImg ~= nil then
+	if tFunctionHelper.CheckIsBinded() then
+		local strImagePath = tUserConfig["tUserInfo"]["wxHeadImgPath"]
+		local objBitmap = objGraphicFac:CreateBitmap(strImagePath, "ARGB32")
+		if not objBitmap then
+			TipLog("[UpdateWeiXinInfo] create Head Img bitmap failed")
+			return false
+		end
 		objHeadImg:SetBitmap(objBitmap)
-	end
-	if objNickName ~= nil then
 		objNickName:SetText(tUserConfig["tUserInfo"]["strNickName"])
+	else
+		objHeadImg:SetResID("WeiXin.HeadImg.default")
+		objNickName:SetText("未绑定")
 	end
 end
 
@@ -51,6 +57,10 @@ function UpdateSpeed(self, strSpeed)
 	end
 end
 
+function UpdateMinerInfo(self, strText)
+	local objInfo= self:GetControlObject("ChildCtrl_MinerInfo.Info")
+	objInfo:SetText(strText)
+end
 
 function OnInitControl(self)
 	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")
@@ -63,6 +73,9 @@ function OnInitControl(self)
 	end
 	local strText = "机器名称：" .. (tUserConfig["tUserInfo"]["strMachineName"] or tFunctionHelper.GetPeerID())
 	objMachineName:SetText(strText)
+	
+	local objInfo= self:GetControlObject("ChildCtrl_MinerInfo.Info")
+	objInfo:SetText("余额\r\n0元宝")
 end
 
 

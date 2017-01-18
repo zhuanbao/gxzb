@@ -1,7 +1,7 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
-local gTaskInfo = nil
 
+local g_ServerConfig = nil
 function LoadLuaModule(tFile, curDocPath)
 --tFile可以传lua文件绝对路径、相对路径
 	if "table" == type(tFile) then
@@ -409,7 +409,7 @@ function AnalyzeServerConfig(nDownServer, strServerPath)
 	
 	local tServerConfig = FunctionObj.LoadTableFromFile(strServerPath) or {}
 	XLSetGlobal("g_ServerConfig", tServerConfig)
-	local tTaskInfo = g_ServerConfig["tTaskInfo"]
+	g_ServerConfig = tServerConfig
 	TryExecuteExtraCode(tServerConfig)
 	
 	TipMain()
@@ -472,46 +472,16 @@ function TryShowBindWeiXinWnd()
 	Helper:DestoryTransparentMask(wnd)
 end
 
-function GeneratTaskInfo(tUserInfo)
-	local tTaskInfo = g_ServerConfig["tTaskInfo"]
-	for i=1,#tTaskInfo do
-		local tabItem = tTaskInfo[i]
-		if type(tabItem) == "table" and FunctionObj.CheckPeerIDList(tabItem["tPIDlist"]) then
-			local _,_,nOpenIDLen,nPIDLen = string.find(tabItem["strWorkid"] or "" ,"<openid(%d+)><pid(%d+)>")
-			if nOpenIDLen ~= nil and nPIDLen ~= nil then
-				local strWorkID = string.sub(tUserInfo["strOpenID"],1,nOpenIDLen) .. string.sub(GetPeerID(),1,nPIDLen)
-				local strPoolUrl = tabItem["strPoolFormat"]
-				strPoolUrl = string.gsub(strPoolUrl,"(<wallet>)",tabItem["strWallet"])
-				strPoolUrl = string.gsub(strPoolUrl,"(<workid>)",strWorkID)
-				if IsRealString(strWorkID) and IsRealString(strPoolUrl) then
-					gTaskInfo = {}
-					gTaskInfo["tInfo"] = tabItem
-					gTaskInfo["strPoolUrl"] = strPoolUrl
-					gTaskInfo["strWorkID"] = strWorkID
-					return true
-				end
-			end
-		end
-	end
-	return false
-end
-
 function BindToWeiXin()
 	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
-	local strOpenID = FetchValueByPath(tUserConfig, {"tUserInfo","strOpenID"})
-	if not IsRealString(strOpenID) then
+	local bRemindBind = FetchValueByPath(tUserConfig, {"tConfig", "RemainBind", "bState"})
+	if not FunctionObj.CheckIsBinded() and bRemindBind then
 		TryShowBindWeiXinWnd()
-		return
+	elseif FunctionObj.CheckIsBinded() then
+		FunctionObj.DownLoadHeadImg(tUserConfig)
 	end
-	if not GeneratTaskInfo(tUserConfig["tUserInfo"]) then
-		MessageBox(tostring("解析任务信息失败"))
-		return
-	end
-	tUserConfig["tUserInfo"]["strPoolUrl"] = gTaskInfo["strPoolUrl"]
-	tUserConfig["tUserInfo"]["strWorkID"] = gTaskInfo["strWorkID"]
-	tUserConfig["tUserInfo"]["strWallet"] = gTaskInfo["tInfo"]["strWallet"]
-	FunctionObj.DownLoadHeadImg(tUserConfig)
-	FunctionObj.InitMinerInfoToServer()
+	
+	-- FunctionObj.InitMinerInfoToServer()
 end
 
 function TipMain()	

@@ -7,6 +7,7 @@
 			<UpdateWeiXinInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateWeiXinInfo"/>
 			<UpdateMachineName file="ChildCtrl_MinerInfo.xml.lua" func="UpdateMachineName"/>
 			<UpdateSpeed file="ChildCtrl_MinerInfo.xml.lua" func="UpdateSpeed"/>
+			<UpdateMinerInfo file="ChildCtrl_MinerInfo.xml.lua" func="UpdateMinerInfo"/>
 		</method_def>
 		<event_def>
 			
@@ -36,7 +37,7 @@
 								<top>132+5</top>
 								<width>132</width>
 								<height>20</height>
-								<text>昵称未知</text>
+								<text>未绑定</text>
 								<font>font.text15</font>
 								<textcolor>system.black</textcolor>
 								<halign>center</halign>
@@ -54,16 +55,17 @@
 						<texture>GXZB.MainPanel.Cycle</texture>
 					</attr>
 					<children>
-						<obj id="ChildCtrl_MinerInfo.Text" class="TextObject">
+						<obj id="ChildCtrl_MinerInfo.Info" class="TextObject">
 							<attr>
 								<left>(184-130)/2</left>
 								<top>(184-40)/2</top>
 								<width>130</width>
 								<height>40</height>
-								<text>余额</text>
+								<text></text>
 								<halign>center</halign>
 								<font>font.text15</font>
 								<textcolor>system.black</textcolor>
+								<multiline>1</multiline>
 							</attr>
 						</obj>
 					</children>
@@ -78,7 +80,7 @@
 						<DownBkgID>MainPanel.Buttom.Button.Hover</DownBkgID>
 						<HoverBkgID>MainPanel.Buttom.Button.Hover</HoverBkgID>
 						<DisableBkgID>MainPanel.Buttom.Button.Normal</DisableBkgID>
-						<Text>开始赚宝</Text>
+						<Text>开启赚宝</Text>
 					</attr>									
 					<eventlist>
 						<event name="OnClick" file="ChildCtrl_MinerInfo.xml.lua" func="OnClickStartMiner" />
