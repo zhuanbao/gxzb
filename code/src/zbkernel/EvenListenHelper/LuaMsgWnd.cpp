@@ -124,26 +124,21 @@ int LuaMsgWindow::DetachListener(DWORD userData1, const void* pfun)
 	return 0;
 }
 
-//wParam:0表示命令行，100表示速度，200答案
+
+//上报速度
+#define WP_SPEED		    100
+
+//上报找到答案
+#define WP_SOLUTION		    200
 LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
+	
 	TSAUTO();
 	USES_CONVERSION;
-	COPYDATASTRUCT * pcs = (COPYDATASTRUCT *)lParam;
-	if(wParam == 0)
-	{
-		LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
-		TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
-		if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
-		{
-			CComVariant vParam[1];
-			vParam[0] = (LPWSTR)pcszCommandLine;
 
-			DISPPARAMS params = { vParam, NULL, 1, 0 };
-			Fire_LuaEvent("OnCommandLine", &params);
-		}	
-	}
-	else if (wParam == 100)
+	COPYDATASTRUCT * pcs = (COPYDATASTRUCT *)lParam;
+	TSDEBUG4CXX("OnCopyData : dwData = "<<pcs->dwData);
+	if (pcs->dwData == WP_SPEED)
 	{
 		LPCSTR pcszMinerSpeed = (LPCSTR)pcs->lpData;
 		if(pcszMinerSpeed && strlen(pcszMinerSpeed) > 0)
@@ -157,7 +152,7 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 			Fire_LuaEvent("OnMinerSpeed", &params);
 		}	
 	}
-	else if (wParam == 200)
+	else if (pcs->dwData == WP_SOLUTION)
 	{
 		SOLUTION_SS* pss = (SOLUTION_SS*)pcs->lpData;
 		if (pss->sz_nonce && strlen(pss->sz_nonce) > 0)
@@ -177,6 +172,19 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 			DISPPARAMS params = { vParam, NULL, 3, 0 };
 			Fire_LuaEvent("OnSolutionFind", &params);
 		}
+	}
+	else
+	{
+		LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
+		TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
+		if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
+		{
+			CComVariant vParam[1];
+			vParam[0] = (LPWSTR)pcszCommandLine;
+
+			DISPPARAMS params = { vParam, NULL, 1, 0 };
+			Fire_LuaEvent("OnCommandLine", &params);
+		}	
 	}
 	return 0;
 }
