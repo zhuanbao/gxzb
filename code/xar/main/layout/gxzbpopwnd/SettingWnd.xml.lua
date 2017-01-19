@@ -59,12 +59,13 @@ function OnSelectSuDu(self, event, bcheck)
 	local r1 = self:GetObject("tree:SettingWnd.Radio.AllSpeed")
 	local r2 = self:GetObject("tree:SettingWnd.Radio.Zhineng")
 	local id = self:GetID()
+	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
 	if id == "SettingWnd.Radio.AllSpeed" then
 		r2:SetCheck(false, true)
-		tUserConfig["workmodel"] = 0
+		tUserConfig["tConfig"]["workmodel"] = 0
 	else
 		r1:SetCheck(false, true)
-		tUserConfig["workmodel"] = 1
+		tUserConfig["tConfig"]["workmodel"] = 1
 	end
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
@@ -156,7 +157,10 @@ function OnCreate(self)
 			editMachine:SetText(machineName)
 		end
 		
-		local model = tUserConfig["workmodel"]
+		local model = 0
+		if type(tUserConfig) == "table" and type(tUserConfig["tConfig"]) == "table" and type(tUserConfig["tConfig"]["workmodel"]) == "number" then
+			model = tUserConfig["tConfig"]["workmodel"]
+		end
 		--model=0全速， model=1智能，默认全速
 		if tonumber(model) == 1 then
 			radio2:SetCheck(true)

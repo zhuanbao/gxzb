@@ -1766,6 +1766,7 @@ function CheckIsBinded()
 end
 
 function ClearBindInfo()
+	UnBindClient()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
