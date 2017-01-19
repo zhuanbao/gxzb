@@ -57,52 +57,11 @@ function CreateListener(objRootCtrl)
 		function(key,...)	
 			tFunctionHelper.TipLog("[CreateListener] key: " .. tostring(key))
 			local tParam = {...}	
-			if tostring(key) == "OnMinerSpeed" then
-				OnMinerSpeed(tParam)
-			elseif tostring(key) == "OnSolutionFind" then
-				OnSolutionFind(tParam)
-			elseif tostring(key) == "OnDagInit" then
-				OnDagInit(tParam)
-			elseif tostring(key) == "OnCommandLine" then
+			if tostring(key) == "OnCommandLine" then
 				OnCommandLine(tParam)
 			end		
 		end
 	)
-	
-	function OnMinerSpeed(tInfo)
-		local strSpeed = tInfo[1]
-		tFunctionHelper.TipLog("[OnMinerSpeed] strSpeed = " .. tostring(strSpeed))
-		tFunctionHelper.UpdateWorkSpeed(strSpeed)
-	end
-
-	function OnSolutionFind(tInfo)
-		local strNonce, strHeaderHash, strMixHash = tInfo[1],tInfo[2],tInfo[3]
-		tFunctionHelper.TipLog("[OnSolutionFind] strNonce = " .. tostring(strNonce) .. ", strHeaderHash = " .. tostring(strHeaderHash) .. ", strMixHash = " .. tostring(strHeaderHash))
-	end
-	
-	function OnDagInit(tInfo)
-		local nState, nProgress = tInfo[1],tInfo[2]
-		tFunctionHelper.TipLog("[OnDagInit] OnDagInit = " .. tostring(nState) .. ", nProgress = " .. tostring(nProgress))
-		if nState == 0 then
-			tFunctionHelper.SetMinerInfo("检验数据中...")
-		elseif nState == 1 then
-			tFunctionHelper.SetMinerInfo("初始化新数据中...\r\n已经完成" .. nProgress .. "%")
-		elseif nState == 2 then
-			tFunctionHelper.SetMinerInfo("检验数据完成")
-		elseif nState == 3 then	
-			tFunctionHelper.SetMinerInfo("初始化数据失败")
-		end
-	end
-	
-	function OnCommandLine(tInfo)
-		local strCommand = tInfo[1]
-		if not IsRealString(strCommand) then
-			return
-		end
-		local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZBTipWnd.MainFrame")
-		objHostWnd:Show(4)
-		objHostWnd:BringWindowToTop(true)
-	end	
 end
 
 function IsRealString(AString)

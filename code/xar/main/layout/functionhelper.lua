@@ -1,5 +1,8 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
+local IPCUtil = XLGetObject("IPC.Util")
+local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+
 local g_bShowWndByTray = false
 local gStatCount = 0
 local gCurrentWorkSpeed = 0
@@ -13,6 +16,8 @@ local JsonFun = nil
 local g_strPoolUrl = nil
 local g_strSeverInterfacePrefix = "http://diamond.test.com/pc"
 local g_bWorking = false
+local g_QueryStateTimerId = nil
+
 local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
@@ -116,7 +121,6 @@ function TipConvStatistic(tStat)
 	
 	local iStatCount = gStatCount
 	if gForceExit and iStatCount > 0 and gTimeoutTimerId == nil then	--开启定时退出定时器
-		local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 		gTimeoutTimerId = timeMgr:SetTimer(function(Itm, id)
 			Itm:KillTimer(id)
 			ExitTipWnd()
@@ -542,7 +546,8 @@ function ReadAllConfigInfo()
 end
 
 function ExitTipWnd(statInfo)
-	SaveAllConfig()			
+	SaveAllConfig()		
+	NotifyQuit()
 	TipLog("************ Exit ************")
 	tipUtil:Exit("Exit")
 end
@@ -1766,7 +1771,6 @@ function CheckIsBinded()
 end
 
 function ClearBindInfo()
-	UnBindClient()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
@@ -1775,46 +1779,31 @@ end
 
 
 function NotifyPause()
-	local hWnd = tipUtil:FindWindow(g_WorkWndClass,nil)
-	if hWnd then
-		tipUtil:PostWndMessageByHandle(hWnd,WM_USER_PAUSE,0,0)
+	IPCUtil:StopWork()
+	if g_QueryStateTimerId then
+		timeMgr:KillTimer(g_QueryStateTimerId)
+		g_QueryStateTimerId = nil
 	end	
 	g_bWorking = false
 end
 
 function NotifyQuit()
-	local hWnd = tipUtil:FindWindow(g_WorkWndClass,nil)
-	if hWnd then
-		tipUtil:PostWndMessageByHandle(hWnd,WM_CLOSE,0,0)
+	IPCUtil:Quit()
+	if g_QueryStateTimerId then
+		timeMgr:KillTimer(g_QueryStateTimerId)
+		g_QueryStateTimerId = nil
 	end	
 	g_bWorking = false
 end
 
-local WM_USER_START = 0x400+100
-
-local WM_USER_PAUSE	= 0x400+101
-local WM_CLOSE	= 0x10
-
 function NotifyStart()
 	local function StartTask()
+		local strDir = GetModuleDir()
+		local strWorkExe = tipUtil:PathCombine(strDir,"Ethminer.exe")
+		local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
+		IPCUtil:StartWork(strCmdLine)
 		g_bWorking = true
-		local hWnd = tipUtil:FindWindow(g_WorkWndClass,nil)
-		if hWnd then
-			tipUtil:PostWndMessageByHandle(hWnd,WM_USER_START,0,0)
-		else
-			local strDir = GetModuleDir()
-			local strWorkExe = tipUtil:PathCombine(strDir,"Ethminer.exe")
-			local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
-			TipLog("[NotifyStart] strCmdLine = " .. strCmdLine)
-			tipAsynUtil:AsynCreateProcess("", strCmdLine, "", 32, 1, 
-			function (nRet, tProcDetail)
-				local hWnd = tipUtil:FindWindow(g_WorkWndClass,nil)
-				if not hWnd then
-					tipUtil:MsgBox("创建进程失败", "错误", 0x10)
-					return
-				end
-			end)
-		end
+		QueryWorkState()
 	end
 	if g_strPoolUrl then
 		StartTask()
@@ -1827,6 +1816,44 @@ function NotifyStart()
 			end
 		end)
 	end
+end
+
+local MING_CHECK_DAG = 1
+local MING_CALCULATE_DAG = 2
+local MING_MINING_SPEED = 3
+local MING_MINING_EEEOR = 4
+local MING_SOLUTION_FIND = 5
+
+local MING_DAG_CHECKING = 1
+local MING_DAG_SUNCCESS = 2
+local MING_DAG_FAIL = 3
+	
+function QueryWorkState()
+	if g_QueryStateTimerId == nil then
+		g_QueryStateTimerId = timeMgr:SetTimer(function(Itm, id)
+			local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
+			--TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
+			if nType == MING_CHECK_DAG then
+				if p1 == 1 then
+					SetMinerInfo("更新任务数据中...")
+				elseif p1 == MING_DAG_SUNCCESS then
+					SetMinerInfo("更新任务数据完成")
+				elseif p1 == MING_DAG_FAIL then
+					SetMinerInfo("更新任务数据失败")	
+				end
+			elseif nType == MING_CALCULATE_DAG then
+				if tonumber(p1) ~= nil then
+					SetMinerInfo("初始化新数据中...\r\n已经完成" .. tostring(p1) .. "%")
+				end
+			elseif nType == MING_MINING_SPEED then
+				if tonumber(p1) ~= nil then
+					UpdateWorkSpeed(tostring(p1))
+				end	
+			elseif nType == MING_MINING_EEEOR then
+				TipLog("[QueryWorkState] Work process error, error code = " .. tostring(p1))	
+			end
+		end, 1000)
+	end	
 end
 
 function CheckIsWorking()
