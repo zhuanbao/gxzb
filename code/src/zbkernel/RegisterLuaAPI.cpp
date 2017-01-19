@@ -2,11 +2,10 @@
 #include "RegisterLuaAPI.h"
 #include "LuaAPI/LuaAPIUtil.h"
 #include "LuaAPI/LuaAsynAPIUtil.h"
-//#include "LuaAPI/LuaGraphicUtil.h"
 #include "LuaAPI/LuaNotifyIcon.h"
 #include "EvenListenHelper/LuaListenPre.h"
 #include "EvenListenHelper/LuaPrefactory.h"
-
+#include "LuaAPI/LuaIPCUtil.h"
 
 CRegisterLuaAPI::CRegisterLuaAPI()
 {
@@ -32,7 +31,7 @@ BOOL CRegisterLuaAPI::Init(LPCTSTR lpCmdLine, LPVOID lpHookObj)
 	LuaNotifyIcon::RegisterSelf(hEnv);
 	LuaListenPreFactory::RegisterObj(hEnv);
 	LuaListenPre::RegisterClass(hEnv);
-
+	LuaIPCUtil::RegisterObj(hEnv);
 	XLLRT_ReleaseEnv(hEnv);
 	return TRUE;
 }

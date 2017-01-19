@@ -319,6 +319,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LuaAPI\LuaIPCUtil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaAPI\LuaIPCUtil.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaAPI\LuaNotifyIcon.cpp"
 				>
 			</File>
@@ -396,6 +404,10 @@
 			</File>
 			<File
 				RelativePath=".\Utility\HardDriveInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Utility\IPCInterface.h"
 				>
 			</File>
 			<File

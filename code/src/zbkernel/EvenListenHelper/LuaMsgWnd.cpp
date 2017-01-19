@@ -124,12 +124,6 @@ int LuaMsgWindow::DetachListener(DWORD userData1, const void* pfun)
 	return 0;
 }
 
-
-//上报速度
-#define WP_SPEED		    100
-
-//上报找到答案
-#define WP_SOLUTION		    200
 LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	
@@ -138,67 +132,16 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 
 	COPYDATASTRUCT * pcs = (COPYDATASTRUCT *)lParam;
 	TSDEBUG4CXX("OnCopyData : dwData = "<<pcs->dwData);
-	if (pcs->dwData == WP_SPEED)
+	LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
+	TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
+	if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
 	{
-		LPCSTR pcszMinerSpeed = (LPCSTR)pcs->lpData;
-		if(pcszMinerSpeed && strlen(pcszMinerSpeed) > 0)
-		{
-			std::wstring wstrSpeed;
-			AnsiStringToWideString(pcszMinerSpeed,wstrSpeed);
-			CComVariant vParam[1];
-			vParam[0] = (LPWSTR)wstrSpeed.c_str();
+		CComVariant vParam[1];
+		vParam[0] = (LPWSTR)pcszCommandLine;
 
-			DISPPARAMS params = { vParam, NULL, 1, 0 };
-			Fire_LuaEvent("OnMinerSpeed", &params);
-		}	
-	}
-	else if (pcs->dwData == WP_SOLUTION)
-	{
-		SOLUTION_SS* pss = (SOLUTION_SS*)pcs->lpData;
-		if (pss->sz_nonce && strlen(pss->sz_nonce) > 0)
-		{
-			std::wstring wstrNonce;
-			AnsiStringToWideString(pss->sz_nonce,wstrNonce);
-			std::wstring wstrHeaderHash;
-			AnsiStringToWideString(pss->sz_headerHash,wstrHeaderHash);
-
-			std::wstring wstrMixHash;
-			AnsiStringToWideString(pss->sz_mixHash,wstrMixHash);
-
-			CComVariant vParam[3];
-			vParam[0] = (LPWSTR)(wstrNonce.c_str());
-			vParam[1] = (LPWSTR)(wstrHeaderHash.c_str());
-			vParam[2] = (LPWSTR)(wstrMixHash.c_str());
-			DISPPARAMS params = { vParam, NULL, 3, 0 };
-			Fire_LuaEvent("OnSolutionFind", &params);
-		}
-	}
-	else
-	{
-		LPCWSTR pcszCommandLine = (LPCWSTR)pcs->lpData;
-		TSDEBUG4CXX(" commandline : "<<pcszCommandLine);	
-		if(pcszCommandLine && wcslen(pcszCommandLine) > 0)
-		{
-			CComVariant vParam[1];
-			vParam[0] = (LPWSTR)pcszCommandLine;
-
-			DISPPARAMS params = { vParam, NULL, 1, 0 };
-			Fire_LuaEvent("OnCommandLine", &params);
-		}	
-	}
-	return 0;
-}
-
-LRESULT LuaMsgWindow::OnDagInit(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
-{
-	TSAUTO();
-	USES_CONVERSION;
-	CComVariant vParam[2];
-	vParam[0] = CComVariant((UINT)wParam);
-	vParam[1] = CComVariant((UINT)lParam);
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnDagInit", &params);
-
+		DISPPARAMS params = { vParam, NULL, 1, 0 };
+		Fire_LuaEvent("OnCommandLine", &params);
+	}	
 	return 0;
 }
 
