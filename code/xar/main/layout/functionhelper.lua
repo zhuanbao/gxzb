@@ -1555,6 +1555,10 @@ end
 
 --客户端解绑
 function UnBindClient()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
 	local strOpenID = FetchValueByPath(tUserConfig, {"tUserInfo", "strOpenID"})
 	local strWorkID = FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
 	if not IsRealString(strWorkID) or not IsRealString(strOpenID) then
