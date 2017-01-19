@@ -183,7 +183,6 @@ function RegisterFunctionObject(self)
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
 	obj.InitMinerInfoToServer = InitMinerInfoToServer
 	obj.QueryClientInfo = QueryClientInfo
-	obj.UnBindClient = UnBindClient
 	obj.GetInstallSrc = GetInstallSrc
 	obj.SaveAllConfig = SaveAllConfig
 	obj.CheckPeerIDList = CheckPeerIDList
@@ -1140,7 +1139,6 @@ function ReportAndExit()
 	local tStatInfo = {}
 		
 	SendRunTimeReport(0, true)
-	UnBindClient()
 	tStatInfo.strEC = "exit"	
 	tStatInfo.strEA = GetInstallSrc() or ""
 	tStatInfo.Exit = true
@@ -1559,7 +1557,7 @@ function QueryClientInfo(callback)
 end
 
 --客户端解绑
-function UnBindClient()
+function GetUnBindUrl()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
@@ -1575,14 +1573,8 @@ function UnBindClient()
 				.. "&openID=" .. Helper:UrlEncode(tostring(strOpenID))
 	local strTarParam = MakeInterfaceMd5(strAPIName, strOgriParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strTarParam
-	TipLog("[UnBindClient] strReguestUrl = " .. strReguestUrl)
-	gStatCount = gStatCount + 1
-	tipAsynUtil:AsynSendHttpStat(strReguestUrl, function()
-		gStatCount = gStatCount - 1
-		if gStatCount == 0 and gForceExit then
-			ExitTipWnd()
-		end
-	end)
+	TipLog("[GetUnBindUrl] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
 end
 
 function SetMachineNameChangeInfo()
@@ -1771,6 +1763,7 @@ function CheckIsBinded()
 end
 
 function ClearBindInfo()
+	SendMinerInfoToServer(GetUnBindUrl(),3)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
