@@ -21,6 +21,12 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MsgWndIPC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MinerAux.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FarmClient.h">
@@ -29,10 +35,13 @@
     <ClInclude Include="MinerAux.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MsgWindow.h">
+    <ClInclude Include="MinerHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MinerHelper.h">
+    <ClInclude Include="MsgWndIPC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IPCInterface.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -168,12 +168,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MinerAux.cpp" />
+    <ClCompile Include="MsgWndIPC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FarmClient.h" />
+    <ClInclude Include="IPCInterface.h" />
     <ClInclude Include="MinerAux.h" />
     <ClInclude Include="MinerHelper.h" />
-    <ClInclude Include="MsgWindow.h" />
+    <ClInclude Include="MsgWndIPC.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

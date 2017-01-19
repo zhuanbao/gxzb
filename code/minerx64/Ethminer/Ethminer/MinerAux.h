@@ -21,6 +21,10 @@
  * @date 2014
  * CLI module for mining.
  */
+#if defined(_WIN32)
+#define _WINSOCKAPI_
+#include <windows.h>
+#endif // defined(_WIN32)
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <libdevcore/CommonJS.h>
@@ -39,7 +43,6 @@
 #endif // ETH_JSONRPC
 
 #include "cpp-ethereum/BuildInfo.h"
-#include "MinerHelper.h"
 
 // TODO - having using derivatives in header files is very poor style, and we need to fix these up.
 //
@@ -68,15 +71,7 @@ using namespace std;
 using namespace dev;
 using namespace dev::eth;
 
-bool isTrue(std::string const& _m)
-{
-	return _m == "on" || _m == "yes" || _m == "true" || _m == "1";
-}
 
-bool isFalse(std::string const& _m)
-{
-	return _m == "off" || _m == "no" || _m == "false" || _m == "0";
-}
 
 inline std::string credits()
 {
@@ -97,6 +92,7 @@ struct MiningChannel: public LogChannel
 };
 #define minelog clog(MiningChannel)
 
+
 class MinerCLI
 {
 public:
@@ -114,377 +110,33 @@ public:
 		NoProof::init();
 		BasicAuthority::init();
 	}
-
-	bool interpretOption(int& i, int argc, char** argv)
+	~MinerCLI()
 	{
-		string arg = argv[i];
-		if ((arg == "-F" || arg == "--farm") && i + 1 < argc)
-		{
-			mode = OperationMode::Farm;
-			m_farmURL = argv[++i];
-		}
-		else if (arg == "--farm-recheck" && i + 1 < argc)
-			try {
-				m_farmRecheckPeriod = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--opencl-platform" && i + 1 < argc)
-			try {
-				m_openclPlatform = stol(argv[++i]);
-				m_autoSelectDevices = false;
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--opencl-device" && i + 1 < argc)
-			try {
-				m_openclDevice = stol(argv[++i]);
-				m_miningThreads = 1;
-				m_autoSelectDevices = false;
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-#if ETH_ETHASHCL
-		else if (arg == "--cl-global-work" && i + 1 < argc)
-			try {
-				m_globalWorkSizeMultiplier = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--cl-local-work" && i + 1 < argc)
-			try {
-				m_localWorkSize = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--cl-ms-per-batch" && i + 1 < argc)
-			try {
-				m_msPerBatch = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-#endif // ETH_ETHASHCL
-		else if (arg == "--list-devices")
-			m_shouldListDevices = true;
-		else if (arg == "--allow-opencl-cpu")
-			m_clAllowCPU = true;
-		else if (arg == "--cl-extragpu-mem" && i + 1 < argc)
-			m_extraGPUMemory = 1000000 * stol(argv[++i]);
-		else if (arg == "--benchmark-warmup" && i + 1 < argc)
-			try {
-				m_benchmarkWarmup = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--benchmark-trial" && i + 1 < argc)
-			try {
-				m_benchmarkTrial = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "--benchmark-trials" && i + 1 < argc)
-			try {
-				m_benchmarkTrials = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		else if (arg == "-C" || arg == "--cpu")
-			m_minerType = "cpu";
-		else if (arg == "-G" || arg == "--opencl")
-			m_minerType = "opencl";
-		else if (arg == "--current-block" && i + 1 < argc)
-			m_currentBlock = stol(argv[++i]);
-		else if (arg == "--no-precompute")
-		{
-			m_precompute = false;
-		}
-		else if ((arg == "-D" || arg == "--create-dag") && i + 1 < argc)
-		{
-			string m = boost::to_lower_copy(string(argv[++i]));
-			mode = OperationMode::DAGInit;
-			try
-			{
-				m_initDAG = stol(m);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << m << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		}
-		else if ((arg == "-w" || arg == "--check-pow") && i + 4 < argc)
-		{
-			string m;
-			try
-			{
-				BlockHeader bi;
-				m = boost::to_lower_copy(string(argv[++i]));
-				h256 powHash(m);
-				m = boost::to_lower_copy(string(argv[++i]));
-				h256 seedHash;
-				if (m.size() == 64 || m.size() == 66)
-					seedHash = h256(m);
-				else
-					seedHash = EthashAux::seedHash(stol(m));
-				m = boost::to_lower_copy(string(argv[++i]));
-				bi.setDifficulty(u256(m));
-				auto boundary = Ethash::boundary(bi);
-				m = boost::to_lower_copy(string(argv[++i]));
-				Ethash::setNonce(bi, h64(m));
-				auto r = EthashAux::eval(seedHash, powHash, h64(m));
-				bool valid = r.value < boundary;
-				cout << (valid ? "VALID :-)" : "INVALID :-(") << endl;
-				cout << r.value << (valid ? " < " : " >= ") << boundary << endl;
-				cout << "  where " << boundary << " = 2^256 / " << bi.difficulty() << endl;
-				cout << "  and " << r.value << " = ethash(" << powHash << ", " << h64(m) << ")" << endl;
-				cout << "  with seed as " << seedHash << endl;
-				if (valid)
-					cout << "(mixHash = " << r.mixHash << ")" << endl;
-				cout << "SHA3( light(seed) ) = " << sha3(EthashAux::light(Ethash::seedHash(bi))->data()) << endl;
-				exit(0);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << m << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		}
-		else if (arg == "-M" || arg == "--benchmark")
-			mode = OperationMode::Benchmark;
-		else if ((arg == "-t" || arg == "--mining-threads") && i + 1 < argc)
-		{
-			try {
-				m_miningThreads = stol(argv[++i]);
-			}
-			catch (...)
-			{
-				cerr << "Bad " << arg << " option: " << argv[i] << endl;
-				BOOST_THROW_EXCEPTION(BadArgument());
-			}
-		}
-                else if (arg == "--disable-submit-hashrate")
-                        m_submitHashrate = false;
-		else
-			return false;
-		return true;
+		m_pjsonclient.reset();
+		m_prpc.reset();
+		m_pfarm.reset();
 	}
+	bool interpretOption(int& i, int argc, char** argv);
 
-	bool IsIntegratedGraphics(std::string strDevicesName)
-	{
-		transform(strDevicesName.begin(), strDevicesName.end(), strDevicesName.begin(), tolower);
-		if (strDevicesName.find("intel1") != std::string::npos)
-		{
-			return true;
-		}
-		return false;
-	}
+	bool IsIntegratedGraphics(std::string strDevicesName);
 	//先找最大Global_Men_Size的平台，再优先找平台中不带集显的平台优先，最后选排除集显后个数最多的
-	bool FilterGpuDevices(uint32_t& platformID, std::vector<uint32_t> &deviceID)
+	bool FilterGpuDevices(uint32_t& platformID, std::vector<uint32_t> &deviceID);
+
+	void listDevices()
 	{
-		std::vector<ethash_cl_miner::platform_device_info> v_pd_info = ethash_cl_miner::GetAllPlatformDeviceInfo(m_extraGPUMemory, m_currentBlock);
-		if (v_pd_info.size() > 0)
-		{
-			uint64_t max_global_men_size = 0;
-			std::set<uint32_t> set_platform_has_IG, set_platform_max_global_size;
-			std::map<uint32_t, std::vector<uint32_t>> platforms;
-			typedef std::map<uint32_t, std::vector<uint32_t>>::iterator c_iter;
-			for (ethash_cl_miner::platform_device_info const& pd_info : v_pd_info)
-			{
-				if (IsIntegratedGraphics(pd_info.name))
-				{
-					set_platform_has_IG.insert(pd_info.platformId);
-					continue;
-				}
-				if (pd_info.global_mem_size > max_global_men_size)
-				{
-					set_platform_max_global_size.clear();
-					set_platform_max_global_size.insert(pd_info.platformId);
-					max_global_men_size = pd_info.platformId;
-				}
-				else if (pd_info.global_mem_size == max_global_men_size)
-				{
-					set_platform_max_global_size.insert(pd_info.platformId);
-				}
-				c_iter it_pd = platforms.find(pd_info.platformId);
-				if (it_pd == platforms.end())
-				{
-					std::vector<uint32_t> devices;
-					devices.push_back(pd_info.deviceId);
-					platforms.insert(make_pair(pd_info.platformId, devices));
-				}
-				else
-				{
-					(it_pd->second).push_back(pd_info.deviceId);
-				}
-			}
-			if (set_platform_max_global_size.size()>0)
-			{
-				std::set<uint32_t> set_result;
-				for (uint32_t const& platform_max_global_size : set_platform_max_global_size)
-				{
-					if (set_platform_has_IG.find(platform_max_global_size) == set_platform_has_IG.end())
-					{
-						set_result.insert(platform_max_global_size);
-					}
-				}
-				if (set_result.empty())
-				{
-					set_result = set_platform_max_global_size;
-				}
-				unsigned device_num = 0;
-				uint32_t platformid = 0;
-				for (uint32_t const& result : set_result)
-				{
-					if (platforms[result].size() > device_num)
-					{
-						platformID = result;
-					}
-				}
-				deviceID = platforms[platformID];
-				return true;
-
-			}
-
-		}
-		return false;
+		EthashGPUMiner::listDevices();
+		exit(0);
 	}
+	void InitMinerParam();
 
-	void execute()
-	{
-		if (m_shouldListDevices)
-		{
-#if ETH_ETHASHCL
-			EthashGPUMiner::listDevices();
-#endif // ETH_ETHASHCL
+	bool InitFarmParam();
 
-			exit(0);
-		}
-
-		if (m_minerType == "cpu")
-		{
-			EthashCPUMiner::setNumInstances(m_miningThreads);
-			MsgWindow::SetCPUMaxThread(EthashCPUMiner::instances());
-		}
-		else if (m_minerType == "opencl")
-		{
-#if ETH_ETHASHCL
-			if (m_autoSelectDevices) {
-				m_v_deviceID.clear();
-				uint32_t platformID;
-				std::vector<uint32_t> deviceID;
-				if (!FilterGpuDevices(platformID, deviceID))
-				{
-					cout << "Auto select Devices failed, No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument" << endl;
-					exit(2);
-				}
-				m_openclPlatform = platformID;
-				m_v_deviceID = deviceID;
-			}
-			if (!EthashGPUMiner::configureGPU(
-					m_localWorkSize,
-					m_globalWorkSizeMultiplier,
-					m_msPerBatch,
-					m_openclPlatform,
-					m_openclDevice,
-					m_clAllowCPU,
-					m_extraGPUMemory,
-					m_currentBlock,
-					m_v_deviceID
-				))
-				exit(1);
-			EthashGPUMiner::setNumInstances(m_miningThreads);
-			MsgWindow::SetGPUParam(
-				m_localWorkSize,
-				m_globalWorkSizeMultiplier,
-				m_msPerBatch,
-				m_openclPlatform,
-				m_openclDevice,
-				m_clAllowCPU,
-				m_extraGPUMemory,
-				m_currentBlock,
-				m_v_deviceID
-			);
-#else
-			cerr << "Selected GPU mining without having compiled with -DETHASHCL=1" << endl;
-			exit(1);
-#endif // ETH_ETHASHCL
-		}
-		if (mode == OperationMode::DAGInit)
-			doInitDAG(m_initDAG);
-		else if (mode == OperationMode::Benchmark)
-			doBenchmark(m_minerType, m_benchmarkWarmup, m_benchmarkTrial, m_benchmarkTrials);
-		else if (mode == OperationMode::Farm)
-			doFarm(m_minerType, m_farmURL, m_farmRecheckPeriod);
-	}
-
-	static void streamHelp(ostream& _out)
-	{
-		_out
-#if ETH_JSONRPC
-			<< "Work farming mode:" << endl
-			<< "    -F,--farm <url>  Put into mining farm mode with the work server at URL (default: http://127.0.0.1:8545)" << endl
-			<< "    --farm-recheck <n>  Leave n ms between checks for changed work (default: 500)." << endl
-			<< "    --no-precompute  Don't precompute the next epoch's DAG." << endl
-#endif // ETH_JSONRPC
-			<< "Ethash verify mode:" << endl
-			<< "    -w,--check-pow <headerHash> <seedHash> <difficulty> <nonce>  Check PoW credentials for validity." << endl
-			<< endl
-			<< "Benchmarking mode:" << endl
-			<< "    -M,--benchmark  Benchmark for mining and exit; use with --cpu and --opencl." << endl
-			<< "    --benchmark-warmup <seconds>  Set the duration of warmup for the benchmark tests (default: 3)." << endl
-			<< "    --benchmark-trial <seconds>  Set the duration for each trial for the benchmark tests (default: 3)." << endl
-			<< "    --benchmark-trials <n>  Set the number of trials for the benchmark tests (default: 5)." << endl
-#if ETH_JSONRPC
-			<< "    --phone-home <on/off>  When benchmarking, publish results (default: on)" << endl
-#endif // ETH_JSONRPC
-			<< "DAG creation mode:" << endl
-			<< "    -D,--create-dag <number>  Create the DAG in preparation for mining on given block and exit." << endl
-			<< "Mining configuration:" << endl
-			<< "    -C,--cpu  When mining, use the CPU." << endl
-			<< "    -G,--opencl  When mining use the GPU via OpenCL." << endl
-			<< "    --opencl-platform <n>  When mining using -G/--opencl use OpenCL platform n (default: 0)." << endl
-			<< "    --opencl-device <n>  When mining using -G/--opencl use OpenCL device n (default: 0)." << endl
-			<< "    -t, --mining-threads <n> Limit number of CPU/GPU miners to n (default: use everything available on selected platform)" << endl
-			<< "    --allow-opencl-cpu Allows CPU to be considered as an OpenCL device if the OpenCL platform supports it." << endl
-			<< "    --list-devices List the detected OpenCL devices and exit." << endl
-			<< "    --current-block Let the miner know the current block number at configuration time. Will help determine DAG size and required GPU memory." << endl
-			<< "    --disable-submit-hashrate  When mining, don't submit hashrate to node." << endl
-#if ETH_ETHASHCL
-			<< "    --cl-extragpu-mem Set the memory (in MB) you believe your GPU requires for stuff other than mining. Windows rendering e.t.c.." << endl
-			<< "    --cl-local-work Set the OpenCL local work size. Default is " << toString(ethash_cl_miner::c_defaultLocalWorkSize) << endl
-			<< "    --cl-global-work Set the OpenCL global work size as a multiple of the local work size. Default is " << toString(ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier) << " * " << toString(ethash_cl_miner::c_defaultLocalWorkSize) << endl
-			<< "    --cl-ms-per-batch Set the OpenCL target milliseconds per batch (global workgroup size). Default is " << toString(ethash_cl_miner::c_defaultMSPerBatch) << ". If 0 is given then no autoadjustment of global work size will happen" << endl
-#endif // ETH_ETHASHCL
-			;
-	}
-
+	void StartMiningThread();
+	void StopFarmMining();
+	void StartFarmMining();
+	bool IsMining();
+	void SetCPUThreadCount(uint32_t num);
+	void SetGPUGWSMultiplier(unsigned multiplier);
 	enum class MinerType
 	{
 		CPU,
@@ -495,266 +147,10 @@ public:
 	bool shouldPrecompute() const { return m_precompute; }
 
 private:
-	void doInitDAG(unsigned _n)
-	{
-		h256 seedHash = EthashAux::seedHash(_n);
-		cout << "Initializing DAG for epoch beginning #" << (_n / 30000 * 30000) << " (seedhash " << seedHash.abridged() << "). This will take a while." << endl;
-		EthashAux::full(seedHash, true);
-		exit(0);
-	}
-
-	void doBenchmark(std::string _m, unsigned _warmupDuration = 15, unsigned _trialDuration = 3, unsigned _trials = 5)
-	{
-		BlockHeader genesis;
-		genesis.setDifficulty(1 << 18);
-		cdebug << Ethash::boundary(genesis);
-
-		GenericFarm<EthashProofOfWork> f;
-		map<string, GenericFarm<EthashProofOfWork>::SealerDescriptor> sealers;
-		sealers["cpu"] = GenericFarm<EthashProofOfWork>::SealerDescriptor{&EthashCPUMiner::instances, [](GenericMiner<EthashProofOfWork>::ConstructionInfo ci){ return new EthashCPUMiner(ci); }};
-#if ETH_ETHASHCL
-		sealers["opencl"] = GenericFarm<EthashProofOfWork>::SealerDescriptor{&EthashGPUMiner::instances, [](GenericMiner<EthashProofOfWork>::ConstructionInfo ci){ return new EthashGPUMiner(ci); }};
-#endif // ETH_ETHASHCL
-		f.setSealers(sealers);
-		f.onSolutionFound([&](EthashProofOfWork::Solution) { return false; });
-
-		string platformInfo =
-			_m == "cpu" ? EthashCPUMiner::platformInfo() :
-#if ETH_ETHASHCL
-			_m == "opencl" ? EthashGPUMiner::platformInfo() :
-#endif // ETH_ETHASHCL
-			"";
-		cout << "Benchmarking on platform: " << platformInfo << endl;
-
-		cout << "Preparing DAG..." << endl;
-		Ethash::ensurePrecomputed(0);
-
-		genesis.setDifficulty(u256(1) << 63);
-		f.setWork(genesis);
-		f.start(_m);
-
-		map<u256, WorkingProgress> results;
-		u256 mean = 0;
-		u256 innerMean = 0;
-		for (unsigned i = 0; i <= _trials; ++i)
-		{
-			if (!i)
-				cout << "Warming up..." << endl;
-			else
-				cout << "Trial " << i << "... " << flush;
-			this_thread::sleep_for(chrono::seconds(i ? _trialDuration : _warmupDuration));
-
-			auto mp = f.miningProgress();
-			f.resetMiningProgress();
-			if (!i)
-				continue;
-			auto rate = mp.rate();
-
-			cout << rate << endl;
-			results[rate] = mp;
-			mean += rate;
-		}
-		f.stop();
-		int j = -1;
-		for (auto const& r: results)
-			if (++j > 0 && j < (int)_trials - 1)
-				innerMean += r.second.rate();
-		innerMean /= (_trials - 2);
-		cout << "min/mean/max: " << results.begin()->second.rate() << "/" << (mean / _trials) << "/" << results.rbegin()->second.rate() << " H/s" << endl;
-		cout << "inner mean: " << innerMean << " H/s" << endl;
-		exit(0);
-	}
 
 	// dummy struct for special exception.
 	struct NoWork {};
-	void doFarm(std::string _m, string const& _remote, unsigned _recheckPeriod)
-	{
-		map<string, GenericFarm<EthashProofOfWork>::SealerDescriptor> sealers;
-		//note:
-		//using FarmFace = GenericFarmFace<PoW>;
-		//using ConstructionInfo = std::pair<FarmFace*, unsigned>;
-		sealers["cpu"] = GenericFarm<EthashProofOfWork>::SealerDescriptor{&EthashCPUMiner::instances, [](GenericMiner<EthashProofOfWork>::ConstructionInfo ci){ return new EthashCPUMiner(ci); }};
-#if ETH_ETHASHCL
-		sealers["opencl"] = GenericFarm<EthashProofOfWork>::SealerDescriptor{&EthashGPUMiner::instances, [](GenericMiner<EthashProofOfWork>::ConstructionInfo ci){ return new EthashGPUMiner(ci); }};
-#endif // ETH_ETHASHCL
-		(void)_m;
-		(void)_remote;
-		(void)_recheckPeriod;
-#if ETH_JSONRPC
-		jsonrpc::HttpClient client(_remote);
-
-		h256 id = h256::random();
-		::FarmClient rpc(client);
-		GenericFarm<EthashProofOfWork> f;
-		f.setSealers(sealers);
-		f.start(_m);
-
-		EthashProofOfWork::WorkPackage current;
-		EthashAux::FullType dag;
-		while (true)
-			try
-		{
-			bool completed = false;
-			EthashProofOfWork::Solution solution;
-			f.onSolutionFound([&](EthashProofOfWork::Solution sol)
-			{
-				solution = sol;
-				completed = true;
-				return true;
-			});
-			MsgWindow::WaitPauseEvent(&f, _m, [&]()
-			{
-				current.reset();
-		    });
-				while (!completed)
-				{
-					auto mp = f.miningProgress();
-					f.resetMiningProgress();
-					if (current)
-					{
-						if (IsDebug())
-						{
-							minelog << "Mining on PoWhash" << current.headerHash.hex();
-							minelog << mp;
-						}
-						uint64_t rate = (uint64_t)mp.rate();
-						char sz_rate[1024] = { 0 };
-						sprintf(sz_rate, "%I64d", rate);
-						COPYDATASTRUCT cds = { 0 };
-						cds.dwData = WP_SPEED;          // function identifier
-						cds.cbData = (int) sizeof(char) * ((int)strlen(sz_rate) + 1);  // size of data
-						cds.lpData = sz_rate;
-						SendMessageToUserWnd(WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
-					}	
-					else
-						minelog << "Getting work package...";
-
-					if (m_submitHashrate)
-					{
-						auto rate = mp.rate();
-						try
-						{
-							rpc.eth_submitHashrate(toJS((u256)rate), "0x" + id.hex());
-						}
-						catch (jsonrpc::JsonRpcException const& _e)
-						{
-							cwarn << "Failed to submit hashrate.";
-							cwarn << boost::diagnostic_information(_e);
-						}
-					}
-
-					Json::Value v = rpc.eth_getWork();
-					if (v[0].asString().empty())
-						throw NoWork();
-					h256 hh(v[0].asString());
-					h256 newSeedHash(v[1].asString());
-					if (current.seedHash != newSeedHash)
-						minelog << "Grabbing DAG for" << newSeedHash.hex();
-					std::function<EthashAux::FullType()> fnCreatDag = [&](){
-						PostMessageToUserWnd(WM_USER_DAG, DAG_START_CREATE, 0);
-						EthashAux::FullType ret = EthashAux::full(newSeedHash, true, [&](unsigned _pc)
-						{
-							if (IsDebug())
-							{
-								minelog << "Creating DAG. " << _pc << "% done...";
-							}
-							PostMessageToUserWnd(WM_USER_DAG, DAG_CREATE_PROGRESS, _pc);
-							return 0;
-						});
-						if (ret)
-						{
-							PostMessageToUserWnd(WM_USER_DAG, DAG_CREATE_SUCCESS, 0);
-						} 
-						else
-						{
-							PostMessageToUserWnd(WM_USER_DAG, DAG_CREATE_FAIL, 0);
-						}
-						return ret;
-					};
-					if (!(dag = fnCreatDag()))
-						BOOST_THROW_EXCEPTION(DAGCreationFailure());
-					if (m_precompute)
-						//先清空下旧的，只保留2个，当前的和下一块
-						if (!m_clear_adg_once)
-						{
-							m_clear_adg_once = true;
-							new thread([=]() {
-								char * szcurdagpath = EthashAux::getdagpathbyseedhash(newSeedHash);
-								char * sznextdagpath = EthashAux::getdagpathbyseedhash(sha3(newSeedHash));
-								if (!szcurdagpath || !sznextdagpath)
-								{
-									return;
-								}
-								std::string strCurDag = szcurdagpath;
-								std::string strNextDag = sznextdagpath;
-								free(szcurdagpath);
-								free(sznextdagpath);
-								szcurdagpath = NULL;
-								sznextdagpath = NULL;
-								DeleteUselessDagFile(strCurDag, strNextDag);
-							});
-						}
-						
-						EthashAux::computeFull(sha3(newSeedHash), true);
-						
-					if (hh != current.headerHash)
-					{
-						current.headerHash = hh;
-						current.seedHash = newSeedHash;
-						current.boundary = h256(fromHex(v[2].asString()), h256::AlignRight);
-						minelog << "Got work package:";
-						minelog << "  Header-hash:" << current.headerHash.hex();
-						minelog << "  Seedhash:" << current.seedHash.hex();
-						minelog << "  Target: " << h256(current.boundary).hex();
-						f.setWork(current);
-					}
-					this_thread::sleep_for(chrono::milliseconds(_recheckPeriod));
-				}
-				cnote << "Solution found; Submitting to" << _remote << "...";
-				cnote << "  Nonce:" << solution.nonce.hex();
-				cnote << "  Mixhash:" << solution.mixHash.hex();
-				cnote << "  Header-hash:" << current.headerHash.hex();
-				cnote << "  Seedhash:" << current.seedHash.hex();
-				cnote << "  Target: " << h256(current.boundary).hex();
-				cnote << "  Ethash: " << h256(EthashAux::eval(current.seedHash, current.headerHash, solution.nonce).value).hex();
-				if (EthashAux::eval(current.seedHash, current.headerHash, solution.nonce).value < current.boundary)
-				{
-					bool ok = rpc.eth_submitWork("0x" + toString(solution.nonce), "0x" + toString(current.headerHash), "0x" + toString(solution.mixHash));
-					if (ok)
-						cnote << "B-) Submitted and accepted.";
-					else
-						cwarn << ":-( Not accepted.";
-
-					SOLUTION_SS sol;
-					ZeroMemory(&sol, sizeof(SOLUTION_SS));
-					strcpy(sol.sz_nonce, toString(solution.nonce).c_str());
-					strcpy(sol.sz_headerHash, toString(current.headerHash).c_str());
-					strcpy(sol.sz_mixHash, toString(solution.mixHash).c_str());
-
-					COPYDATASTRUCT cds = { 0 };
-					cds.dwData = WP_SOLUTION;          // function identifier
-					cds.cbData = (int) sizeof(sol);  // size of data
-					cds.lpData = &sol;
-					SendMessageToUserWnd(WM_COPYDATA, NULL, (LPARAM)(LPVOID)&cds);
-				}
-				else
-					cwarn << "FAILURE: GPU gave incorrect result!";
-				current.reset();
-			}
-			catch (jsonrpc::JsonRpcException&)
-			{
-				for (auto i = 3; --i; this_thread::sleep_for(chrono::seconds(1)))
-					cerr << "JSON-RPC problem. Probably couldn't connect. Retrying in " << i << "... \r";
-				cerr << endl;
-			}
-			catch (NoWork&)
-			{
-				this_thread::sleep_for(chrono::milliseconds(100));
-			}
-
-#endif // ETH_JSONRPC
-		exit(0);
-	}
+	void doFarm();
 
 	/// Operating mode.
 	OperationMode mode;
@@ -768,11 +164,10 @@ private:
 	bool m_shouldListDevices = false;
 	bool m_autoSelectDevices = true;
 	bool m_clAllowCPU = false;
-#if ETH_ETHASHCL
 	unsigned m_globalWorkSizeMultiplier = ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier;
 	unsigned m_localWorkSize = ethash_cl_miner::c_defaultLocalWorkSize;
 	unsigned m_msPerBatch = ethash_cl_miner::c_defaultMSPerBatch;
-#endif // ETH_ETHASHCL
+
 	uint64_t m_currentBlock = 0;
 	// default value is 350MB of GPU memory for other stuff (windows system rendering, e.t.c.)
 	unsigned m_extraGPUMemory = 350000000;
@@ -780,12 +175,13 @@ private:
 	/// DAG initialisation param.
 	unsigned m_initDAG = 0;
 
-	/// Benchmarking params
-	unsigned m_benchmarkWarmup = 3;
-	unsigned m_benchmarkTrial = 3;
-	unsigned m_benchmarkTrials = 5;
-
 	/// Farm params
+	//
+	unique_ptr<jsonrpc::HttpClient> m_pjsonclient = nullptr;
+	unique_ptr<::FarmClient> m_prpc = nullptr;
+	unique_ptr<GenericFarm<EthashProofOfWork>> m_pfarm = nullptr;
+	map<string, GenericFarm<EthashProofOfWork>::SealerDescriptor> m_sealers;
+	//
 	string m_farmURL = "http://127.0.0.1:8545";
 	unsigned m_farmRecheckPeriod = 500;
 	bool m_precompute = true;
@@ -793,4 +189,6 @@ private:
 
 	///
 	bool m_clear_adg_once = false;
+
+	
 };

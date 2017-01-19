@@ -37,7 +37,9 @@ char g_szDagPath[256] = { 0 };
 
 #include <tchar.h>
 #include "MinerAux.h"
-#include "MinerHelper.h"
+//#include "MinerHelper.h"
+#include "MsgWndIPC.h"
+#include <libethashseal/EthashGPUMiner.h>
 
 using namespace std;
 using namespace dev;
@@ -45,22 +47,6 @@ using namespace dev::eth;
 using namespace boost::algorithm;
 
 #undef RETURN
-
-void help()
-{
-	cout
-		<< "Usage ethminer [OPTIONS]" << endl
-		<< "Options:" << endl << endl;
-	MinerCLI::streamHelp(cout);
-	cout
-		<< "General Options:" << endl
-		<< "    -v,--verbosity <0 - 9>  Set the log verbosity from 0 to 9 (default: 8)." << endl
-		<< "    -V,--version  Show the version and exit." << endl
-		<< "    -h,--help  Show this help message and exit." << endl
-		;
-	exit(0);
-}
-
 void version()
 {
 	cout << "ethminer version " << dev::Version << endl;
@@ -94,39 +80,72 @@ void setDefaultOrCLocale()
 int main(int argc, char** argv)
 {
 	setDefaultOrCLocale();
-	if (MsgWindow::HandleSingleton()) {
+	if (argc == 2)
+	{
+		string arg = argv[2];
+		if (arg == "--list-devices")
+		{
+			EthashGPUMiner::listDevices();
+			exit(0);
+		}
+	}
+	if (MsgWndIPC::Instance()->HandleSingleton()) {
 		exit(0);
 		return 0;
 	}
-	unique_ptr<thread> threadMiner;
-	MinerCLI m(MinerCLI::OperationMode::Farm);
-	threadMiner.reset(new thread([&]() {
-		setThreadName("workertd");
-		for (int i = 1; i < argc; ++i)
-		{
-			string arg = argv[i];
-			if (m.interpretOption(i, argc, argv))
-			{
-			}
-			else if ((arg == "-v" || arg == "--verbosity") && i + 1 < argc)
-				g_logVerbosity = atoi(argv[++i]);
-			else if (arg == "-h" || arg == "--help")
-				help();
-			else if (arg == "-V" || arg == "--version")
-				version();
-			else
-			{
-				cerr << "Invalid argument: " << arg << endl;
-				exit(-1);
-			}
-		}
 
-		m.execute();
-	}));
-	//消息窗口已经存在 或 只有1个命令行时不用创建消息窗口
-	if (argc > 2)
+	MinerCLI m(MinerCLI::OperationMode::Farm);
+	for (int i = 1; i < argc; ++i)
 	{
-		MsgWindow::Create();
+		string arg = argv[i];
+		if (m.interpretOption(i, argc, argv))
+		{
+		}
+		else if ((arg == "-v" || arg == "--verbosity") && i + 1 < argc)
+			g_logVerbosity = atoi(argv[++i]);
+		else if (arg == "-V" || arg == "--version")
+			version();
+		else
+		{
+			cerr << "Invalid argument: " << arg << endl;
+			exit(-1);
+		}
 	}
+	if (MsgWndIPC::Instance()->Create(&m))
+	{
+		MsgWndIPC::Instance()->RunMsgLoop();
+	}
+	exit(0);
+
+
+	//unique_ptr<thread> threadMiner;
+	//MinerCLI m(MinerCLI::OperationMode::Farm);
+	//threadMiner.reset(new thread([&]() {
+	//	setThreadName("workertd");
+	//	for (int i = 1; i < argc; ++i)
+	//	{
+	//		string arg = argv[i];
+	//		if (m.interpretOption(i, argc, argv))
+	//		{
+	//		}
+	//		else if ((arg == "-v" || arg == "--verbosity") && i + 1 < argc)
+	//			g_logVerbosity = atoi(argv[++i]);
+	//		else if (arg == "-V" || arg == "--version")
+	//			version();
+	//		else
+	//		{
+	//			cerr << "Invalid argument: " << arg << endl;
+	//			exit(-1);
+	//		}
+	//	}
+
+	//	m.execute();
+	//}));
+
+	////消息窗口已经存在 或 只有1个命令行时不用创建消息窗口
+	//if (argc > 2)
+	//{
+	//	MsgWindow::RunMsgLoop();
+	//}
 	return 0;
 }

@@ -1,68 +1,67 @@
 #pragma once
 #include <tchar.h>
 #include <vector>
-#include <Windows.h>
 #include <thread>
 #include <iostream>
 #include <shlobj.h>
 #include <Shlwapi.h>
-#include "MsgWindow.h"
-
+#include <iostream>
+using namespace std;
 //进程退出码 exitcode
 //-1:参数错误
 //1:没有找到合适的显卡设备，显存不够
 //2:自动检测显卡设备，没有找到合适的显卡设备（排除了 interl显卡）
 
-
-
-//消息
-//创建DAG相关
-#define WM_USER_DAG		WM_USER+701
-//通过wParam指定DAG消息类型
-#define DAG_START_CREATE 0
-#define DAG_CREATE_PROGRESS 1
-#define DAG_CREATE_SUCCESS 2
-#define DAG_CREATE_FAIL 3
-
-
-//WM_COPYDATA 通过wParam指定消息类型
-//上报速度
-#define WP_SPEED		    100
-
-//上报找到答案
-#define WP_SOLUTION		    200
-
-struct SOLUTION_SS
-{
-	char sz_nonce[MAX_PATH];
-	char sz_headerHash[MAX_PATH];
-	char sz_mixHash[MAX_PATH];
-
-};
-
-inline void PostMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	static HWND hUserWnd = NULL;
-	if (NULL == hUserWnd)
-	{
-		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
-	}
-	if (hUserWnd && ::IsWindow(hUserWnd)) {
-		PostMessageA(hUserWnd, Msg, wParam, lParam);
-	}
-}
-
-inline void SendMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	static HWND hUserWnd = NULL;
-	if (NULL == hUserWnd)
-	{
-		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
-	}
-	if (hUserWnd && ::IsWindow(hUserWnd)) {
-		SendMessageA(hUserWnd, Msg, wParam, lParam);
-	}
-}
+//
+//
+////消息
+////创建DAG相关
+//#define WM_USER_DAG		WM_USER+701
+////通过wParam指定DAG消息类型
+//#define DAG_START_CREATE 0
+//#define DAG_CREATE_PROGRESS 1
+//#define DAG_CREATE_SUCCESS 2
+//#define DAG_CREATE_FAIL 3
+//
+//
+////WM_COPYDATA 通过wParam指定消息类型
+////上报速度
+//#define WP_SPEED		    100
+//
+////上报找到答案
+//#define WP_SOLUTION		    200
+//
+//struct SOLUTION_SS
+//{
+//	char sz_nonce[MAX_PATH];
+//	char sz_headerHash[MAX_PATH];
+//	char sz_mixHash[MAX_PATH];
+//
+//};
+//
+//inline void PostMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
+//{
+//	static HWND hUserWnd = NULL;
+//	if (NULL == hUserWnd)
+//	{
+//		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
+//	}
+//	if (hUserWnd && ::IsWindow(hUserWnd)) {
+//		PostMessageA(hUserWnd, Msg, wParam, lParam);
+//	}
+//}
+//
+//inline void SendMessageToUserWnd(UINT Msg, WPARAM wParam, LPARAM lParam)
+//{
+//	static HWND hUserWnd = NULL;
+//	if (NULL == hUserWnd)
+//	{
+//		hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);
+//	}
+//	if (hUserWnd && ::IsWindow(hUserWnd)) {
+//		SendMessageA(hUserWnd, Msg, wParam, lParam);
+//	}
+//}
 
 
 
@@ -125,3 +124,23 @@ inline bool IsDebug()
 #endif
 }
 
+inline BOOL AllowMessageToRecv(UINT uiMsg, BOOL bAllowed)
+{
+	BOOL bSuc = FALSE;
+	TCHAR szUser32DllFilePath[MAX_PATH] = { 0 };
+	if (SUCCEEDED(::SHGetFolderPath(NULL, CSIDL_SYSTEM, NULL, 0, szUser32DllFilePath))
+		&& ::PathAppend(szUser32DllFilePath, _T("user32.dll"))) {
+		if (::PathFileExists(szUser32DllFilePath) && !::PathIsDirectory(szUser32DllFilePath)) {
+			HMODULE hUser32Dll = ::LoadLibrary(szUser32DllFilePath);
+			if (hUser32Dll) {
+				typedef BOOL(__stdcall *PFN_ChangeWindowMessageFilter)(UINT, DWORD);
+				PFN_ChangeWindowMessageFilter pfnChangeWindowMessageFilter = (PFN_ChangeWindowMessageFilter)::GetProcAddress(hUser32Dll, "ChangeWindowMessageFilter");
+				if (pfnChangeWindowMessageFilter) {
+					bSuc = (*pfnChangeWindowMessageFilter)(uiMsg, (bAllowed ? 1 : 2)); // 1 - MSGFLT_ADD; 2 - MSGFLT_REMOVE
+				}
+				::FreeLibrary(hUser32Dll);
+			}
+		}
+	}
+	return bSuc;
+};
