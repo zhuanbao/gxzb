@@ -1,5 +1,6 @@
 #include "MsgWndIPC.h"
 #include "MinerHelper.h"
+#include "MinerHelper.h"
 
 UINT_PTR g_uiTimerID = 110;
 UINT g_uiTimerCycleInMs = 1000;
@@ -34,9 +35,12 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam == g_uiTimerID)
 			{
-				::KillTimer(hWnd, g_uiTimerID);
-				MsgWndIPC::Instance()->UpdateMineState();
-				::SetTimer(hWnd, g_uiTimerID, g_uiTimerCycleInMs, NULL);
+				if (!MsgWndIPC::Instance()->FollowParentProcessExit())
+				{
+					::KillTimer(hWnd, g_uiTimerID);
+					MsgWndIPC::Instance()->UpdateMineState();
+					::SetTimer(hWnd, g_uiTimerID, g_uiTimerCycleInMs, NULL);
+				}
 			}
 		}
 		break;
@@ -91,6 +95,8 @@ bool MsgWndIPC::Create(MinerCLI* pMinerCLI)
 	{
 		return false;
 	}
+	m_hParentProcess = GetParentProcessHandle();
+	::SetTimer(m_hWnd, g_uiTimerID, g_uiTimerCycleInMs, NULL);
 	StartMining();
 	return true;
 }
@@ -249,3 +255,15 @@ void MsgWndIPC::ReadPipeData()
 	}
 }
 
+
+bool MsgWndIPC::FollowParentProcessExit()
+{
+	if (m_hParentProcess && WAIT_OBJECT_0 == ::WaitForSingleObject(m_hParentProcess, 0))
+	{
+		CloseHandle(m_hParentProcess);
+		m_hParentProcess = NULL;
+		SendMessageA(m_hWnd, WM_EXIT, 0, 0);
+		return true;
+	}
+	return false;
+}

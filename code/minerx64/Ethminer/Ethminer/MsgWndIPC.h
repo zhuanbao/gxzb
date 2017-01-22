@@ -54,7 +54,10 @@ public:
 	void WaitForConnectPipe();
 	void WritePipeData(byte*data,UINT len);
 	void ReadPipeData();
+
+	bool FollowParentProcessExit();
 private:
+	HANDLE m_hParentProcess;
 	HANDLE m_hMutex;
 	HWND m_hWnd;
 	HANDLE m_hEvent;

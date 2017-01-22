@@ -444,7 +444,7 @@ void MinerCLI::doFarm()
 			if (!(dag = fnCreatDag()))
 				BOOST_THROW_EXCEPTION(DAGCreationFailure());
 			if (m_precompute)
-				//先清空下旧的，只保留2个，当前的和下一块
+			{//先清空下旧的，只保留2个，当前的和下一块
 				if (!m_clear_adg_once)
 				{
 					m_clear_adg_once = true;
@@ -465,8 +465,8 @@ void MinerCLI::doFarm()
 					});
 				}
 
-			EthashAux::computeFull(sha3(newSeedHash), true);
-
+				EthashAux::computeFull(sha3(newSeedHash), true);
+			}
 			if (hh != current.headerHash)
 			{
 				current.headerHash = hh;

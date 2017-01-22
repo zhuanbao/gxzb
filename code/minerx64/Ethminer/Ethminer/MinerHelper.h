@@ -6,6 +6,7 @@
 #include <shlobj.h>
 #include <Shlwapi.h>
 #include <iostream>
+#include <Tlhelp32.h>
 using namespace std;
 //进程退出码 exitcode
 //-1:参数错误
@@ -63,8 +64,33 @@ using namespace std;
 //	}
 //}
 
-
-
+inline HANDLE GetParentProcessHandle()
+{
+	HANDLE hParent = NULL;
+	DWORD dwParentPID = 0;
+	HANDLE hProcessSnapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+	if (INVALID_HANDLE_VALUE != hProcessSnapshot)
+	{
+		DWORD dwCurPID = GetCurrentProcessId();
+		PROCESSENTRY32 pe = { sizeof(pe) };
+		int nProcessNumbers = 0;
+		for (BOOL bEnumResult = ::Process32First(hProcessSnapshot, &pe);
+			bEnumResult; bEnumResult = ::Process32Next(hProcessSnapshot, &pe))
+		{
+			if (pe.th32ProcessID == dwCurPID)
+			{
+				dwParentPID = pe.th32ParentProcessID;
+				break;
+			}
+		}
+		CloseHandle(hProcessSnapshot);
+	}
+	if (dwParentPID > 0)
+	{
+		hParent = OpenProcess(PROCESS_VM_READ | SYNCHRONIZE, FALSE, dwParentPID);
+	}
+	return hParent;
+}
 inline std::string GetUpperPath(const std::string strPath)
 {
 	size_t nPos = strPath.rfind("\\");
