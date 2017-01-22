@@ -15,8 +15,13 @@ local g_bIsUpdating = false
 local JsonFun = nil
 local g_strPoolUrl = nil
 local g_strSeverInterfacePrefix = "http://diamond.test.com/pc"
+
+-- 工作中用到的
 local g_bWorking = false
-local g_QueryStateTimerId = nil
+local g_WorkingTimerId = nil
+local g_WorkingCounter = 30
+local g_PreWorkState = 0
+local g_WorkModel = 1 -- 默认智能
 
 local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
@@ -1773,20 +1778,24 @@ end
 
 function NotifyPause()
 	IPCUtil:StopWork()
-	if g_QueryStateTimerId then
-		timeMgr:KillTimer(g_QueryStateTimerId)
-		g_QueryStateTimerId = nil
+	if g_WorkingTimerId then
+		timeMgr:KillTimer(g_WorkingTimerId)
+		g_WorkingTimerId = nil
 	end	
 	g_bWorking = false
+	g_PreWorkState = 0
+	g_WorkModel = 1
 end
 
 function NotifyQuit()
 	IPCUtil:Quit()
-	if g_QueryStateTimerId then
-		timeMgr:KillTimer(g_QueryStateTimerId)
-		g_QueryStateTimerId = nil
+	if g_WorkingTimerId then
+		timeMgr:KillTimer(g_WorkingTimerId)
+		g_WorkingTimerId = nil
 	end	
 	g_bWorking = false
+	g_PreWorkState = 0
+	g_WorkModel = 1
 end
 
 function NotifyStart()
@@ -1796,7 +1805,7 @@ function NotifyStart()
 		local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
 		IPCUtil:StartWork(strCmdLine)
 		g_bWorking = true
-		QueryWorkState()
+		WorkingTimerHandle()
 	end
 	if g_strPoolUrl then
 		StartTask()
@@ -1822,29 +1831,69 @@ local MING_DAG_SUNCCESS = 2
 local MING_DAG_FAIL = 3
 	
 function QueryWorkState()
-	if g_QueryStateTimerId == nil then
-		g_QueryStateTimerId = timeMgr:SetTimer(function(Itm, id)
-			local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
-			--TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
-			if nType == MING_CHECK_DAG then
-				if p1 == 1 then
-					SetMinerInfo("更新任务数据中...")
-				elseif p1 == MING_DAG_SUNCCESS then
-					SetMinerInfo("更新任务数据完成")
-				elseif p1 == MING_DAG_FAIL then
-					SetMinerInfo("更新任务数据失败")	
+	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
+	--TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
+	if nType == MING_CHECK_DAG then
+		g_PreWorkState = MING_CHECK_DAG
+		if p1 == 1 then
+			SetMinerInfo("更新任务数据中...")
+		elseif p1 == MING_DAG_SUNCCESS then
+			SetMinerInfo("更新任务数据完成")
+		elseif p1 == MING_DAG_FAIL then
+			SetMinerInfo("更新任务数据失败")	
+		end
+		return true
+	elseif nType == MING_CALCULATE_DAG then
+		g_PreWorkState = MING_CALCULATE_DAG
+		if tonumber(p1) ~= nil then
+			SetMinerInfo("初始化新数据中...\r\n已经完成" .. tostring(p1) .. "%")
+		end
+		return true
+	elseif nType == MING_MINING_SPEED then
+		g_PreWorkState = MING_MINING_SPEED
+		if tonumber(p1) ~= nil then
+			UpdateWorkSpeed(tostring(p1))
+		end	
+		return true
+	elseif nType == MING_MINING_EEEOR then
+		g_PreWorkState = MING_MINING_EEEOR
+		TipLog("[QueryWorkState] Work process error, error code = " .. tostring(p1))
+		return false
+	elseif nType == MING_SOLUTION_FIND then
+		g_PreWorkState = MING_SOLUTION_FIND
+		TipLog("[QueryWorkState] solution find ")	
+		return true
+	end
+	return false
+end
+
+function ChangeWorkModel()
+	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
+	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "workmodel"})
+	if nWorkModel ~= g_WorkModel then
+		if nWorkModel == 0 then
+			IPCUtil:ControlSpeed(90)
+		else
+			IPCUtil:ControlSpeed(10)
+		end	
+		g_WorkModel = nWorkModel
+	end
+end
+
+function WorkingTimerHandle()
+	local nConuter = 0
+	if g_WorkingTimerId == nil then
+		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
+			if not QueryWorkState() and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
+				if nConuter > g_WorkingCounter then
+					
 				end
-			elseif nType == MING_CALCULATE_DAG then
-				if tonumber(p1) ~= nil then
-					SetMinerInfo("初始化新数据中...\r\n已经完成" .. tostring(p1) .. "%")
-				end
-			elseif nType == MING_MINING_SPEED then
-				if tonumber(p1) ~= nil then
-					UpdateWorkSpeed(tostring(p1))
-				end	
-			elseif nType == MING_MINING_EEEOR then
-				TipLog("[QueryWorkState] Work process error, error code = " .. tostring(p1))	
+			else
+				nConuter = 0
 			end
+			nConuter = nConuter + 1
+			--智能限速
+			ChangeWorkModel()
 		end, 1000)
 	end	
 end
