@@ -1,14 +1,8 @@
 <xlue>
 	<objtreetemplate id="GXZB.XuanFuWndTree" class="ObjectTreeTemplate">
-		<attr>
-			<left>0</left>
-			<top>0</top>
-			<width>75</width>
-			<height>75</height>
-		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
-				<left>0</left>
+				<left>75</left>
 				<top>0</top>
 				<width>75</width>
 				<height>75</height>
@@ -54,8 +48,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>75</width>
-            <height>75</height>
+            <width>225</width>
+            <height>150</height>
             
             <topmost>1</topmost>
             <visible>1</visible>
