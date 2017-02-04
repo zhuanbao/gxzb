@@ -76,11 +76,11 @@ function OnCreate(self)
 		1000)
 		tFunctionHelper.QueryClientInfo(function(bRet, tab)
 			KillTimer(timerID)
-			if not bRet or type(tab) ~= "table" or not tonumber(tab["balance"]) then
+			if not bRet or type(tab) ~= "table" or type(tab["data"]) ~= "table" or not tonumber(tab["data"]["balance"]) then
 				msgobj:SetText("很抱歉，加载失败")
 				return
 			end
-			gBalance = tab["balance"]
+			gBalance = tab["data"]["balance"]
 			editobj:SetEnable(true)
 			local realeditobj = objtree:GetUIObject("TiXianWnd.Caption.Edit")
 			realeditobj:SetText("可提现"..tostring(gBalance).."元")

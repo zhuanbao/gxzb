@@ -14,7 +14,7 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
 local g_strPoolUrl = nil
-local g_strSeverInterfacePrefix = "http://diamond.test.com/pc"
+local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
 local g_bWorking = false
@@ -1263,7 +1263,7 @@ end
 
 function GetUserWorkID(fnCallBack)
 	local strUrl = QuerySvrForWorkID()
-	strUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
+	--strUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
@@ -1272,19 +1272,20 @@ function GetUserWorkID(fnCallBack)
 	if not IsRealString(strWorkID) then
 		NewAsynGetHttpContent(strUrl, false
 		, function(nRet, strContent, respHeaders)
-			TipLog("[CycleQuerySeverForBindResult] nRet:"..tostring(nRet)
+			TipLog("[GetUserWorkID] nRet:"..tostring(nRet)
 					.." strContent:"..tostring(strContent))
 					
 			if 0 == nRet then
 				local tabInfo = DeCodeJson(strContent)
 				if type(tabInfo) ~= "table" 
-					or tabInfo["rtn"] ~= 0 then
+					or tabInfo["rtn"] ~= 0
+					or type(tabInfo["data"]) ~= "table" then
 					TipLog("[GetUserWorkID] Parse Json failed.")
 					fnCallBack(false,"解析信息失败")
 					return 
 				end
-				local strWorkID = tabInfo["workerID"]
-				strWorkID = "testtttasdoiweqwehjqwjekawe"
+				local strWorkID = tabInfo["data"]["workerID"]
+				--strWorkID = "testtttasdoiweqwehjqwjekawe"
 				tUserConfig["tUserInfo"]["strWorkID"] = strWorkID
 				SaveConfigToFileByKey("tUserConfig")
 				fnCallBack(true,strWorkID)
@@ -1308,8 +1309,8 @@ end
 
 function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
 	local strBindResult = QuerySvrForLoginInfo(strWorkerID)
-	strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
-	NewAsynGetHttpContent(strBindResult, false
+	--strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
+	NewAsynGetHttpContent(strBindResult.."&rd="..tostring(tipUtil:GetCurrentUTCTime()), false
 	, function(nRet, strContent, respHeaders)
 		TipLog("[CycleQuerySeverForBindResult] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
@@ -1317,7 +1318,8 @@ function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 then
+				or tabInfo["rtn"] ~= 0 
+				or type(tabInfo["data"]) ~= "table" then
 				TipLog("[CycleQuerySeverForBindResult] Parse Json failed.")
 				fnCallBack(false,"解析登陆信息失败")
 				return 
@@ -1326,7 +1328,7 @@ function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
 		else
 			fnCallBack(false,"获取绑定二维码信息失败，请检测网络")
 		end		
-	end,nTimeoutInMS)
+	end,nil)
 end
 
 
@@ -1351,7 +1353,7 @@ function DownLoadTempQrcode(fnCallBack)
 		if bWorkID then
 			local strQrcodeUrl = QuerySvrForQrcodeInfo(strWorkID)
 			TipLog("[DownLoadTempQrcode] strQrcodeUrl = " .. strQrcodeUrl)
-			strQrcodeUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
+			--strQrcodeUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
 			NewAsynGetHttpContent(strQrcodeUrl, false
 			, function(nRet, strContent, respHeaders)
 				TipLog("[DownLoadTempQrcode] nRet:"..tostring(nRet)
@@ -1361,13 +1363,19 @@ function DownLoadTempQrcode(fnCallBack)
 					local tabInfo = DeCodeJson(strContent)
 					if type(tabInfo) ~= "table" 
 						or tabInfo["rtn"] ~= 0 
-						or not IsRealString(tabInfo["qrcodeUrl"])
-						or tonumber(tabInfo["sceneID"]) == nil then
+						or type(tabInfo["data"]) ~= "table" 
+						or not IsRealString(tabInfo["data"]["qrcodeUrl"])
+						or tonumber(tabInfo["data"]["sceneID"]) == nil then
 						TipLog("[DownLoadTempQrcode] Parse Json failed.")
 						fnCallBack(false,"解析二维码信息失败")
 						return 
 					end
-					local strQrcodeUrl = tabInfo["qrcodeUrl"]
+					local strQrcodeUrl = tabInfo["data"]["qrcodeUrl"]
+					local expire = tonumber(tabInfo["data"]["expire"])
+					if type(expire) ~= "number" then
+						expire = 60*1000
+					end
+					TipLog("[DownLoadTempQrcode] strQrcodeUrl = "..tostring(strQrcodeUrl)..", expire = "..tostring(expire))
 					local strQrcodePath = GetResSavePath("tmpqrcode.jpg")
 					NewAsynGetHttpFile(strQrcodeUrl, strQrcodePath, false, function(bRet, strDownLoadPath)
 						TipLog("[DownLoadTempQrcode] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
@@ -1377,10 +1385,10 @@ function DownLoadTempQrcode(fnCallBack)
 							fnCallBack(false,"下载二维码图片失败")
 							return 
 						end
-						tabInfo["qrcodePath"] = strDownLoadPath
-						tabInfo["workerID"] = strWorkID
+						tabInfo["data"]["qrcodePath"] = strDownLoadPath
+						tabInfo["data"]["workerID"] = strWorkID
 						fnCallBack(true,tabInfo)
-					end)
+					end, expire)
 				else
 					fnCallBack(false,"获取绑定二维码信息失败，请检测网络")
 				end		
@@ -1550,7 +1558,8 @@ function QueryClientInfo(callback)
 			local tabInfo = DeCodeJson(strContent)
 			
 			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 then
+				or tabInfo["rtn"] ~= 0 
+				or type(tabInfo["data"]) ~= "table" then
 				callback(false)
 				return 
 			end
@@ -1748,8 +1757,9 @@ function SetUserBindInfo(tabBindInfo)
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
-	tUserConfig["tUserInfo"]["wxHeadImgUrl"] = tabBindInfo["wxHeadImgUrl"]
-	tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["wxName"]
+	tUserConfig["tUserInfo"]["wxHeadImgUrl"] = tabBindInfo["data"]["wxHeadImgUrl"]
+	tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["data"]["wxName"]
+	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["openID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
 	DownLoadHeadImg(tUserConfig)

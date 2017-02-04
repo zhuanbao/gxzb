@@ -58,7 +58,7 @@ function OnCreate( self )
 				return
 			end
 			local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
-			local objBitmap = objGraphicFac:CreateBitmap(info["qrcodePath"], "ARGB32")
+			local objBitmap = objGraphicFac:CreateBitmap(info["data"]["qrcodePath"], "ARGB32")
 			if not objBitmap then
 				return
 			end
@@ -72,7 +72,7 @@ function OnCreate( self )
 			local textTipObject = objtree:GetUIObject("BindWeiXin2WeiMaWnd.Caption.Tip")
 			
 			local nCnt = 0
-			local nTotalTime = info["expire"]/1000
+			local nTotalTime = info["data"]["expire"]/1000
 			local strText = "请扫描以下二维码进行微信绑定，二维码剩余有效期 " .. nTotalTime .. "秒"
 			textTipObject:SetText(tostring(strText))
 				
@@ -82,7 +82,9 @@ function OnCreate( self )
 			if type(tServerInterfaceCfg) ~= "table" then
 				tServerInterfaceCfg = {}
 			end
-			local nAskBindPeriod = info["interval"] or tServerInterfaceCfg["nAskBindPeriod"] or 10
+			--info["data"]["interval"]
+			local nAskBindPeriod = tServerInterfaceCfg["nAskBindPeriod"] or 10
+			
 			--TEST 
 			local bAsking = false
 			
@@ -105,7 +107,7 @@ function OnCreate( self )
 					TipLog("CycleQuerySeverForBindResult cycle")
 					bAsking = true
 					nCnt = 0
-					FunctionObj.CycleQuerySeverForBindResult(info["workerID"], function(bRet,info)
+					FunctionObj.CycleQuerySeverForBindResult(info["data"]["workerID"], function(bRet,info)
 						if gClosedDialog then
 							return
 						end
@@ -120,7 +122,8 @@ function OnCreate( self )
 						textObject:SetText("恭喜您，绑定成功")
 						textObject:SetVisible(true)
 						imgObject:SetVisible(false)
-						--self:EndDialog(0)
+						self:EndDialog(0)
+						gClosedDialog = true
 					end, nAskBindPeriod)
 				end
 				nCnt = nCnt + 1
