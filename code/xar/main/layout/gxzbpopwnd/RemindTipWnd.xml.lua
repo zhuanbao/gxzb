@@ -28,8 +28,10 @@ function OnShowWindow(self, bShow)
 		
 		local TextContent = objtree:GetUIObject("RemindTipWnd.Content")
 		local nMoneyCount = tUserConfig["nMoneyPer4Hour"] or 0
-		if tonumber(nMoneyCount) then
+		if tonumber(nMoneyCount) and nMoneyCount > 0 then
 			TextContent:SetText("你很努力哟， 又赚取了"..tostring(nMoneyCount).."个\n元宝， 加油！")
+		else
+			self:Show(0)
 		end
 		SetOnceTimer(function(item, id)
 			self:Show(0)

@@ -776,7 +776,10 @@ end
 
 function PopTipPre4Hour()
 	SetTimer(function(item, id)
-		ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+		if tUserConfig["nMoneyPer4Hour"] and tonumber(tUserConfig["nMoneyPer4Hour"]) and tonumber(tUserConfig["nMoneyPer4Hour"]) > 0 then
+			ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+		end
 	end, 4*3600*1000)
 end
 

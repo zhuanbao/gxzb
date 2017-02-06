@@ -6,7 +6,7 @@
 		<children>
 			<obj id="openkuaikan" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
-					<Text>开机启动赚宝</Text>
+					<Text>开机自动赚宝</Text>
 					<Icon>setting_check.icon</Icon>
 					<IconWidth>13</IconWidth>
 					<IconHeight>13</IconHeight>
