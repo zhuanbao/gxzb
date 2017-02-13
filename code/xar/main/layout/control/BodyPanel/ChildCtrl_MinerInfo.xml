@@ -29,6 +29,7 @@
 								<width>132</width>
 								<height>132</height>
 								<image>WeiXin.HeadImg.default</image>
+								<drawmode>1</drawmode>
 							</attr>
 						</obj>
 						<obj id="ChildCtrl_MinerInfo.UserInfo.NickName" class="TextObject">
