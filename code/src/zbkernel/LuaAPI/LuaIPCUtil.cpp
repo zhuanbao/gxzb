@@ -17,6 +17,18 @@ LuaIPCUtil::LuaIPCUtil(void)
 
 LuaIPCUtil::~LuaIPCUtil(void)
 {
+	if (m_hPipeThread)
+	{
+		CloseHandle(m_hPipeThread);
+	}
+	if (m_hWorkProcess)
+	{
+		CloseHandle(m_hWorkProcess);
+	}
+	if (m_hConsoleRedirect)
+	{
+		CloseHandle(m_hConsoleRedirect);
+	}
 }
 
 XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] = 
@@ -33,6 +45,7 @@ XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] =
 
 HANDLE LuaIPCUtil::m_hPipeThread  = NULL;
 HANDLE LuaIPCUtil::m_hWorkProcess  = NULL;
+HANDLE LuaIPCUtil::m_hConsoleRedirect  = NULL;
 
 LuaIPCUtil* __stdcall LuaIPCUtil::Instance(void *)
 {
@@ -143,6 +156,7 @@ UINT WINAPI PipeProc(PVOID pArg)
 	return 0;
 }
 
+#define REDIRECTPATH DEFAULT_LOGFILE_PATH"\\WorkRedirect.txt"
 int LuaIPCUtil::StartWork(lua_State* pLuaState)
 {
 	long lRet = 0;
@@ -156,8 +170,14 @@ int LuaIPCUtil::StartWork(lua_State* pLuaState)
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 		ZeroMemory( &si, sizeof(si) );
-		si.cb = sizeof(si);					
-
+		si.cb = sizeof(si);	
+		GetStartupInfo(&si);
+		if (!ISTSDEBUGVALID())
+		{
+			//日志可打印 则显示控制台窗口
+			si.dwFlags =STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;  
+			si.wShowWindow =SW_HIDE;//隐藏控制台窗口 
+		}
 		ZeroMemory( &pi, sizeof(pi) );
 		// Start the child process. 
 		if(CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, FALSE, NULL, NULL, NULL,&si,	&pi ))
@@ -172,7 +192,8 @@ int LuaIPCUtil::StartWork(lua_State* pLuaState)
 	}
 	else
 	{
-		SendMessageA(hWnd,WM_USER_START,0,0);
+		//SendMessageA(hWnd,WM_USER_START,0,0);
+		PostMessageA(hWnd,WM_USER_START,0,0);
 		lRet = 1;
 	}
 	if (lRet && (NULL == m_hPipeThread || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hPipeThread, 0)))
@@ -193,7 +214,8 @@ int LuaIPCUtil::StopWork(lua_State* pLuaState)
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
 	if (hWnd)
 	{
-		SendMessageA(hWnd,WM_USER_PAUSE,0,0);
+		//SendMessageA(hWnd,WM_USER_PAUSE,0,0);
+		PostMessageA(hWnd,WM_USER_PAUSE,0,0);
 	}
 	return 0;
 }
@@ -204,7 +226,8 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
 	if (hWnd)
 	{
-		SendMessageA(hWnd,WM_EXIT,0,0);
+		//SendMessageA(hWnd,WM_EXIT,0,0);
+		PostMessageA(hWnd,WM_EXIT,0,0);
 	}
 	return 0;
 }

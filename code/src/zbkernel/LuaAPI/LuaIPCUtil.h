@@ -28,6 +28,7 @@ private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 	static HANDLE m_hPipeThread;
 	static HANDLE m_hWorkProcess;
+	static HANDLE m_hConsoleRedirect;
 };
 
 
