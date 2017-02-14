@@ -146,7 +146,11 @@ inline bool IsDebug()
 #if defined _DEBUG
 	return true;
 #else
-	return true;
+	if (::PathFileExistsA("C:\\GXZB_CONFIG\\GXZB.ini"))
+	{
+		return true;
+	}
+	return false;
 #endif
 }
 

@@ -134,7 +134,7 @@
       <FunctionLevelLinking>
       </FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32_WINNT=0x0600;NOMINMAX;MINIUPNP_STATICLIB;ETH_TRUE;DISABLE_BROKEN_UNIT_TESTS_UNTIL_WE_FIX_THEM;ETH_FATDB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_WIN32_WINNT=0x0600;NOMINMAX;MINIUPNP_STATICLIB;ETH_TRUE;DISABLE_BROKEN_UNIT_TESTS_UNTIL_WE_FIX_THEM;ETH_FATDB;ETHASH_PRINT_CRITICAL_OUTPUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AssemblerListingLocation>$(Configuration)/</AssemblerListingLocation>
       <CompileAs>CompileAsC</CompileAs>

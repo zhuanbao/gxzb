@@ -472,10 +472,13 @@ void MinerCLI::doFarm()
 				current.headerHash = hh;
 				current.seedHash = newSeedHash;
 				current.boundary = h256(fromHex(v[2].asString()), h256::AlignRight);
-				minelog << "Got work package:";
-				minelog << "  Header-hash:" << current.headerHash.hex();
-				minelog << "  Seedhash:" << current.seedHash.hex();
-				minelog << "  Target: " << h256(current.boundary).hex();
+				if (IsDebug())
+				{
+					minelog << "Got work package:";
+					minelog << "  Header-hash:" << current.headerHash.hex();
+					minelog << "  Seedhash:" << current.seedHash.hex();
+					minelog << "  Target: " << h256(current.boundary).hex();
+				}
 				m_pfarm->setWork(current);
 			}
 			this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));

@@ -53,6 +53,7 @@ enum ethash_io_rc ethash_io_prepare(
 	if (!force_create) {
 		// try to open the file
 		f = ethash_fopen(tmpfile, "rb+");
+		ETHASH_CRITICAL("enter check dag");
 		if (f) {
 			size_t found_size;
 			if (!ethash_file_size(f, &found_size)) {
@@ -80,6 +81,7 @@ enum ethash_io_rc ethash_io_prepare(
 				goto free_memo;
 			}
 			ret = ETHASH_IO_MEMO_MATCH;
+			ETHASH_CRITICAL("ETHASH_IO_MEMO_MATCH");
 			goto set_file;
 		}
 	}
