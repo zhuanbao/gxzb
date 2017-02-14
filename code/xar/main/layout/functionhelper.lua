@@ -373,6 +373,13 @@ function GetPeerID()
 	return string.upper(strRandPeerID)
 end
 
+function GetMachineID()
+	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\machineid")
+	if IsRealString(strGUID) then
+		return string.upper(strPeerID)
+	end
+end
+
 --渠道
 function GetInstallSrc()
 	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\InstallSource")
@@ -1258,6 +1265,10 @@ end
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strGUID = GetMachineID()
+	if IsRealString(strGUID) then
+		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
+	end	
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForWorkID] strReguestUrl = " .. strReguestUrl)
@@ -1344,7 +1355,11 @@ end
 
 function QuerySvrForQrcodeInfo(strWorkID)
 	local strInterfaceName = "getQrcode"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID())).."&workerID="..Helper:UrlEncode(tostring(strWorkID))
+	local strInterfaceParam = "workerID="..Helper:UrlEncode(tostring(strWorkID)) .. "&peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strGUID = GetMachineID()
+	if IsRealString(strGUID) then
+		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
+	end	
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForQrcodeInfo] strReguestUrl = " .. strReguestUrl)
@@ -1464,7 +1479,9 @@ function QuerySvrForReportClientInfo()
 	local strInterfaceName = "reportClientConf"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
+	end	
 	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strMachineName"]))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
@@ -1500,7 +1517,9 @@ function QuerySvrForReportPoolInfo()
 	local strInterfaceName = "registeCalc"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(GetHostName(g_strPoolUrl))))
 	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strWallet"])))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -1518,7 +1537,9 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	local strInterfaceName = "pushCalc"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nSpeed)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
@@ -1845,7 +1866,7 @@ local MING_DAG_FAIL = 3
 	
 function QueryWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
-	--TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
+	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
 	if nType == MING_CHECK_DAG then
 		g_PreWorkState = MING_CHECK_DAG
 		if p1 == 1 then
@@ -1881,7 +1902,7 @@ function QueryWorkState()
 end
 
 function ChangeWorkModel()
-	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "workmodel"})
 	if nWorkModel ~= g_WorkModel then
 		if nWorkModel == 0 then
@@ -1899,7 +1920,7 @@ function WorkingTimerHandle()
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 			if not QueryWorkState() and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
 				if nConuter > g_WorkingCounter then
-					
+					--30秒没响应 是否要杀进程
 				end
 			else
 				nConuter = 0

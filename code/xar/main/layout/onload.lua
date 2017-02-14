@@ -478,7 +478,14 @@ function BindToWeiXin()
 	if not FunctionObj.CheckIsBinded() and bRemindBind then
 		TryShowBindWeiXinWnd()
 	elseif FunctionObj.CheckIsBinded() then
-		FunctionObj.DownLoadHeadImg(tUserConfig)
+		--启动时需要检查是否已经解除了绑定
+		FunctionObj.QueryClientInfo(function(bRet, tab)
+			if not bRet or type(tab) ~= "table" or type(tab["data"]) ~= "table" or not tonumber(tab["data"]["status"]) ~= 2 then
+				FunctionObj.TipLog("[BindToWeiXin] client unbind")
+				return
+			end
+			FunctionObj.DownLoadHeadImg(tUserConfig)
+		end)
 	end
 	
 	-- FunctionObj.InitMinerInfoToServer()
