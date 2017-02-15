@@ -3,6 +3,7 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 local g_tPanelCtrlList = {
 	"ChildCtrl_MinerInfo",
+	"LinePanel",
 }
 
 ----方法----

@@ -188,6 +188,7 @@ function UpdateMinerInfo(self, strText)
 end
 
 function OnClickBindWeiXin(self)
+	ShowMainPanel(self)
 	if not FunctionObj.CheckIsBinded() then
 		local objHostWnd = FunctionObj.GetMainHostWnd()
 		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
@@ -201,10 +202,28 @@ function OnClickBindWeiXin(self)
 end
 
 function OnClickHistoryIncome(self)
-	
+	local objmain = self:GetOwnerControl()
+	if objmain then
+		objmain:ChangePanel("LinePanel")
+		local lineobj = objmain:GetObject("MainBody_LinePanel:LinePanel.LineChart")
+		if lineobj then
+			local attr = lineobj:GetAttribute()
+			attr.currentpanel = 1
+			attr.Data = {{1, 1000}, {2, 1000}, {3, 1000}, {4, 1000}, {5, 0}}
+			lineobj:Update()
+		end
+	end
+end
+
+function ShowMainPanel(self)
+	local objmain = self:GetOwnerControl()
+	if objmain then
+		objmain:ChangePanel("ChildCtrl_MinerInfo")
+	end
 end
 
 function OnClickTakeCash(self)
+	ShowMainPanel(self)
 	--弹出绑定微信
 	local objHostWnd = FunctionObj.GetMainHostWnd()
 	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
