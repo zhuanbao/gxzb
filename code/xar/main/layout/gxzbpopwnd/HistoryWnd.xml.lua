@@ -37,13 +37,13 @@ function Update(self, fnConvert)
 	local w, h = r - l, b - t
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 	--显示纵坐标刻度
-	for i = 1, #attr.Data do
+	--[[for i = 1, #attr.Data do
 		if type(attr.Data[i]) == "table" then
 			local ytmp = h*i/#attr.Data
 			if ytmp <= h then
 				local yreal = h - ytmp
 				local newTextObject = objFactory:CreateUIObject("", "TextObject")
-				newTextObject:SetText(tostring(ymax*i/#attr.Data))
+				newTextObject:SetText(tostring(math.abs(ymax*i/#attr.Data)))
 				linepanel:AddChild(newTextObject)
 				newTextObject:SetObjPos(-50, yreal-8, 0, yreal+8)
 				newTextObject:SetVAlign("center")
@@ -52,6 +52,18 @@ function Update(self, fnConvert)
 				newTextObject:SetTextFont("font.text10")
 			end
 		end
+	end]]
+	for i = 1, 5 do
+		local ytmp = h*i/5
+		local yreal = h - ytmp
+		local newTextObject = objFactory:CreateUIObject("", "TextObject")
+		newTextObject:SetText(tostring(math.abs(ymax*i/5)))
+		linepanel:AddChild(newTextObject)
+		newTextObject:SetObjPos(-50, yreal-8, 0, yreal+8)
+		newTextObject:SetVAlign("center")
+		newTextObject:SetHAlign("center")
+		newTextObject:SetTextColorResID("system.black")
+		newTextObject:SetTextFont("font.text10")
 	end
 	--显示横坐标刻度
 	for i = 1, 3 do
@@ -112,7 +124,7 @@ function OnClickHourBtn(self)
 		return
 	end
 	attr.currentpanel = 1
-	attr.Data = {{1, 1000}, {2, 1800}, {3, 9000}, {4, 4000}, {5, 5000}}
+	attr.Data = {{1, 1000}, {2, 1800}, {3, 9000}, {4, 4000}, {5, 5000}, {6, 1200}, {7, 500}, {8, 2100}, {9, 1700}, {10, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
 	lineobj:Update()
 end
 
