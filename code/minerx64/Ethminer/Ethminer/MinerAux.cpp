@@ -194,7 +194,7 @@ bool MinerCLI::FilterGpuDevices(uint32_t& platformID, std::vector<uint32_t> &dev
 			{
 				set_platform_max_global_size.clear();
 				set_platform_max_global_size.insert(pd_info.platformId);
-				max_global_men_size = pd_info.platformId;
+				max_global_men_size = pd_info.global_mem_size;
 			}
 			else if (pd_info.global_mem_size == max_global_men_size)
 			{
@@ -232,7 +232,9 @@ bool MinerCLI::FilterGpuDevices(uint32_t& platformID, std::vector<uint32_t> &dev
 			{
 				if (platforms[result].size() > device_num)
 				{
+					device_num = platforms[result].size();
 					platformID = result;
+
 				}
 			}
 			deviceID = platforms[platformID];
@@ -403,11 +405,14 @@ void MinerCLI::doFarm()
 			if (current.seedHash != newSeedHash)
 				minelog << "Grabbing DAG for" << newSeedHash.hex();
 			std::function<EthashAux::FullType()> fnCreatDag = [&]() {
-				MineCheckDAG mc;
-				mc.uSize = sizeof(MineCheckDAG);
-				mc.uType = MineMsgType::MING_CHECK_DAG;
-				mc.uState = DAGState::MING_DAG_CHECKING;
-				MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
+				if (!m_has_executed)
+				{
+					MineCheckDAG mc;
+					mc.uSize = sizeof(MineCheckDAG);
+					mc.uType = MineMsgType::MING_CHECK_DAG;
+					mc.uState = DAGState::MING_DAG_CHECKING;
+					MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
+				}
 				EthashAux::FullType ret = EthashAux::full(newSeedHash, true, [&](unsigned _pc)
 				{
 					if (IsDebug())
@@ -423,21 +428,24 @@ void MinerCLI::doFarm()
 					MsgWndIPC::Instance()->WaitWorkEvent();
 					return 0;
 				});
-				if (ret)
+				if (!m_has_executed)
 				{
-					MineCheckDAG mc;
-					mc.uSize = sizeof(MineCheckDAG);
-					mc.uType = MineMsgType::MING_CHECK_DAG;
-					mc.uState = DAGState::MING_DAG_SUNCCESS;
-					MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
-				}
-				else
-				{
-					MineCheckDAG mc;
-					mc.uSize = sizeof(MineCheckDAG);
-					mc.uType = MineMsgType::MING_CHECK_DAG;
-					mc.uState = DAGState::MING_DAG_FAIL;
-					MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
+					if (ret)
+					{
+						MineCheckDAG mc;
+						mc.uSize = sizeof(MineCheckDAG);
+						mc.uType = MineMsgType::MING_CHECK_DAG;
+						mc.uState = DAGState::MING_DAG_SUNCCESS;
+						MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
+					}
+					else
+					{
+						MineCheckDAG mc;
+						mc.uSize = sizeof(MineCheckDAG);
+						mc.uType = MineMsgType::MING_CHECK_DAG;
+						mc.uState = DAGState::MING_DAG_FAIL;
+						MsgWndIPC::Instance()->WritePipeData((byte*)&mc, sizeof(MineCheckDAG));
+					}
 				}
 				return ret;
 			};
@@ -445,9 +453,8 @@ void MinerCLI::doFarm()
 				BOOST_THROW_EXCEPTION(DAGCreationFailure());
 			if (m_precompute)
 			{//先清空下旧的，只保留2个，当前的和下一块
-				if (!m_clear_adg_once)
+				if (!m_has_executed)
 				{
-					m_clear_adg_once = true;
 					new thread([=]() {
 						char * szcurdagpath = EthashAux::getdagpathbyseedhash(newSeedHash);
 						char * sznextdagpath = EthashAux::getdagpathbyseedhash(sha3(newSeedHash));
@@ -481,6 +488,7 @@ void MinerCLI::doFarm()
 				}
 				m_pfarm->setWork(current);
 			}
+			m_has_executed = true;
 			this_thread::sleep_for(chrono::milliseconds(m_farmRecheckPeriod));
 		}
 		cnote << "Solution found; Submitting to" << m_farmURL << "...";

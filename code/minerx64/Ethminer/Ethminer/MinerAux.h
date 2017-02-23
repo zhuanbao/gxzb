@@ -188,7 +188,7 @@ private:
 	bool m_submitHashrate = true;
 
 	///
-	bool m_clear_adg_once = false;
+	bool m_has_executed = false;
 
 	
 };

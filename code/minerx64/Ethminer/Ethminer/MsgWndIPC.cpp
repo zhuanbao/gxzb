@@ -13,6 +13,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		{
 			MsgWndIPC::Instance()->StopMining();
 			MsgWndIPC::Instance()->CloseSingletonMutex();
+			TerminateProcess(GetCurrentProcess(), (UINT)0);
+			msgwndlog << "get exit message";
 			::PostQuitMessage(0);
 		}
 		break;
@@ -191,11 +193,17 @@ void MsgWndIPC::UpdateMineState()
 
 void MsgWndIPC::WaitForConnectPipe()
 {
-	msgwndlog << "wait for connect pip";
+	if (IsDebug())
+	{
+		msgwndlog << "wait for connect pip";
+	}
 	m_bConnectPipe = ConnectNamedPipe(m_hPipe, NULL) ?TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
 	if (m_bConnectPipe)
 	{
-		msgwndlog << "connect pip success";
+		if (IsDebug())
+		{
+			msgwndlog << "connect pip success";
+		}
 	}
 }
 
@@ -267,3 +275,39 @@ bool MsgWndIPC::FollowParentProcessExit()
 	}
 	return false;
 }
+
+//ÅÅ³ýintelÆ½Ì¨cpu
+//http://www.cnblogs.com/mikewolf2002/archive/2012/09/05/2671261.html
+//cl_uint numPlatforms;
+//std::string platformVendor;
+//status = clGetPlatformIDs(0, NULL, &numPlatforms);
+//if (status != CL_SUCCESS)
+//{
+//	return 0;
+//}
+//if (0 < numPlatforms)
+//{
+//	cl_platform_id* platforms = new cl_platform_id[numPlatforms];
+//	status = clGetPlatformIDs(numPlatforms, platforms, NULL);
+//
+//	char platformName[100];
+//	for (unsigned i = 0; i < numPlatforms; ++i)
+//	{
+//		status = clGetPlatformInfo(platforms[i],
+//			CL_PLATFORM_VENDOR,
+//			sizeof(platformName),
+//			platformName,
+//			NULL);
+//
+//		platform = platforms[i];
+//		platformVendor.assign(platformName);
+//
+//		if (!strcmp(platformName, "Advanced Micro Devices, Inc."))
+//		{
+//			break;
+//		}
+//	}
+//
+//	std::cout << "Platform found : " << platformName << "\n";
+//	delete[] platforms;
+//}

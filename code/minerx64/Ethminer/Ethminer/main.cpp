@@ -115,6 +115,7 @@ int main(int argc, char** argv)
 	{
 		MsgWndIPC::Instance()->RunMsgLoop();
 	}
+	msgwndlog << "exit process";
 	exit(0);
 
 
