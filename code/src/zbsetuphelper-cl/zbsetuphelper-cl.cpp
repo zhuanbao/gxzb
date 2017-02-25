@@ -68,7 +68,7 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 			_device.getInfo(CL_DEVICE_GLOBAL_MEM_SIZE, &result);
 			transform(name.begin(), name.end(), name.begin(),  toupper);   
 			//必须是非Intel的GPU设备， 排除集显, 显存必须大于等于2G
-			if (name.find("intel") == string::npos && nType == CL_DEVICE_TYPE_GPU && result >= 2147483648){
+			if (name.find("intel") == string::npos && nType == CL_DEVICE_TYPE_GPU && result >= 3221225472){
 				//if (result >= 2147483648 && result > maxRet) {
 				if (result > maxRet) {
 					maxRet = result;
