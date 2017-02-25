@@ -250,7 +250,7 @@ int LuaIPCUtil::QueryWorkState(lua_State* pLuaState)
 		UINT uType = *((UINT*)(szBuffer)+1);
 		switch (uType)
 		{
-		case  MING_CHECK_DAG:
+		case MING_CHECK_DAG:
 			{
 				if (uReadSize == sizeof(MineCheckDAG))
 				{

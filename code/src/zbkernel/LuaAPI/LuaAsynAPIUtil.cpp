@@ -37,6 +37,8 @@ XLLRTGlobalAPI  LuaAsynUtil::s_functionlist[] =
 
 	{"AsynGetFolders", AsynGetFolders},
 
+	{"AsynWaitForSingleObject", AsynWaitForSingleObject},
+
 	{NULL, NULL}
 };
 
@@ -866,6 +868,55 @@ int LuaAsynUtil::AsynGetFolders( lua_State* pLuaState )
 			GetFoldersData *pData = new GetFoldersData(pLuaState, bstrDir.m_str);
 			_beginthreadex(NULL, 0, GetFoldersProc, pData, 0, NULL);
 		}
+	}
+	return 0;
+}
+
+CWaitObjData::CWaitObjData(HANDLE hProcess, DWORD dwTimeout, lua_State* pState, LONG lRefFn) : m_callInfo(pState, lRefFn)
+{
+	m_hProcess = hProcess;
+	m_dwTimeout = dwTimeout;
+}
+
+void CWaitObjData::Work()
+{
+	DWORD dwRet = WaitForSingleObject(m_hProcess, m_dwTimeout);
+	TSDEBUG4CXX(L"[AsynWaitForSingleObject] WaitForSingleObject = " << dwRet);
+	if (dwRet == WAIT_FAILED)
+	{
+		g_wndMsg.PostMessage(WM_WAITOBJECTFINISH, GetLastError(), (LPARAM) this);
+	}
+	else
+	{
+		g_wndMsg.PostMessage(WM_WAITOBJECTFINISH, 0, (LPARAM) this);
+	}
+}
+
+UINT WINAPI WaitObjProc(PVOID pArg)
+{
+	CWaitObjData* pData = (CWaitObjData*) pArg;
+	pData->Work();
+	return 0;
+}
+
+int LuaAsynUtil::AsynWaitForSingleObject(lua_State* pLuaState)
+{
+	TSTRACEAUTO();
+	HANDLE hProcess = (HANDLE)lua_touserdata(pLuaState, 2);
+	DWORD dwTimeout;
+	if (lua_isnil(pLuaState, 3))
+	{
+		dwTimeout = INFINITE;
+	}
+	else
+	{
+		dwTimeout = (DWORD)lua_tonumber(pLuaState, 3);
+	}
+	TSDEBUG4CXX(L"[AsynWaitForSingleObject] dwTimeout = " << dwTimeout << L", hProcess = " << hProcess);
+	if (lua_isfunction(pLuaState, 4))
+	{
+		CWaitObjData* pData = new CWaitObjData(hProcess, dwTimeout, pLuaState, luaL_ref(pLuaState, LUA_REGISTRYINDEX));
+		_beginthreadex(NULL, 0, WaitObjProc, pData, 0, NULL);
 	}
 	return 0;
 }

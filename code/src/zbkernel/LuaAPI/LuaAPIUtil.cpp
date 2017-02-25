@@ -77,7 +77,8 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetCursorWndHandle", GetCursorWndHandle},
 	{"GetFocusWnd", GetFocusWnd},
 	{"GetKeyState", FGetKeyState},
-
+	
+	{"GetProcessExitCode", GetProcessExitCode},
 	//нд╪Ч
 	{"GetMD5Value", GetMD5Value},
 	{"GetStringMD5", GetStringMD5},
@@ -2263,6 +2264,30 @@ int LuaAPIUtil::FGetKeyState(lua_State* pLuaState)
 	return 1;
 }
 
+int LuaAPIUtil::GetProcessExitCode(lua_State* pLuaState)
+{
+	LuaAPIUtil** ppUtil = (LuaAPIUtil **)luaL_checkudata(pLuaState, 1, API_UTIL_CLASS);
+	if (ppUtil == NULL)
+	{
+		return 0;
+	}
+	HANDLE hProcess = (HANDLE)lua_touserdata(pLuaState, 2);
+	if (hProcess != NULL)
+	{
+		DWORD dwExitCode = -1;
+		if(GetExitCodeProcess(hProcess,&dwExitCode))
+		{
+			lua_pushinteger(pLuaState, dwExitCode);
+			return 1;
+		}
+		else
+		{
+			TSDEBUG4CXX(L"GetProcessExitCode fail, error = " << ::GetLastError());
+		}
+	}
+	return 0;
+}
+
 long LuaAPIUtil::ShellExecHelper(HWND hWnd, const char* lpOperation, const char* lpFile, const char* lpParameters, const char* lpDirectory, const char* lpShowCmd, int iShowCmd)
 {
 	CComBSTR bstrOperation;
@@ -3585,13 +3610,16 @@ int LuaAPIUtil::FGetAllSystemInfo(lua_State* pLuaState)
 			lua_settable(pLuaState, -3);
 		}
 		// system bits
-		BOOL bWow64Process = FALSE;
+		lua_pushstring(pLuaState, "BitNumbers");
+		lua_pushinteger(pLuaState,  IsWow64() ? 64 : (unsigned(~0) > 0xFFFF ? 32 : 16));
+		lua_settable(pLuaState, -3);
+		/*BOOL bWow64Process = FALSE;
 		if ( IsWow64())
 		{
 			lua_pushstring(pLuaState, "BitNumbers");
 			lua_pushinteger(pLuaState, bWow64Process ? 64 : (unsigned(~0) > 0xFFFF ? 32 : 16));
 			lua_settable(pLuaState, -3);
-		}
+		}*/
 		// cpu information
 		{
 			lua_pushstring(pLuaState, "CPU");
