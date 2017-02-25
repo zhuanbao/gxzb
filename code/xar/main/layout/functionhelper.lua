@@ -27,6 +27,8 @@ local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
 	[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
+	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
+	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
 }
 
 local g_tConfigFileStruct = {
@@ -153,6 +155,7 @@ function RegisterFunctionObject(self)
 	obj.RegSetValue = RegSetValue
 	obj.RegDeleteValue = RegDeleteValue
 	obj.GetPeerID = GetPeerID
+	obj.GetSystemBits = GetSystemBits
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGXZBMinorVer = GetGXZBMinorVer
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
@@ -195,6 +198,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
+	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
 	obj.SetMinerInfo = SetMinerInfo
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
@@ -245,6 +249,19 @@ function GetTimeStamp()
 	return strStamp 
 end
 
+function GetSystemBits()
+	local iBits = 0
+	if type(tipUtil.GetAllSystemInfo) == "function" then
+		local tabSystemInfo =  tipUtil:GetAllSystemInfo()
+		if type(tabSystemInfo) == "table" then
+			iBits = tabSystemInfo["BitNumbers"]
+			if type(iBits) ~= "number" then
+				iBits = 0
+			end
+		end
+	end
+	return iBits
+end
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
@@ -1848,7 +1865,7 @@ function NotifyStart()
 			if bTask then
 				StartTask()
 			else
-				tipUtil:MsgBox(str, "获取任务失败", 0x10)
+				MessageBox("获取任务失败")
 			end
 		end)
 	end
@@ -1900,7 +1917,12 @@ function QueryWorkState()
 	end
 	return false
 end
-
+--[[
+--智能模式下 
+--a)当前为低速状态切换为高速态条件（60秒内无输入且当前为非全屏状态）+10%
+	且每隔20秒再加10%(前提是继续满足条件，最大为90%)
+  b)当前为高速状态切换为低速态条件(60秒内有输入或者当前为全屏状态)速度降低到10%
+--]]
 function ChangeWorkModel()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "workmodel"})
@@ -1921,6 +1943,7 @@ function WorkingTimerHandle()
 			if not QueryWorkState() and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
 				if nConuter > g_WorkingCounter then
 					--30秒没响应 是否要杀进程
+					UpdateWorkSpeed(tostring(0))
 				end
 			else
 				nConuter = 0

@@ -491,6 +491,10 @@ function BindToWeiXin()
 	-- FunctionObj.InitMinerInfoToServer()
 end
 
+function CheckMachineSuitable()
+	return FunctionObj.GetSystemBits() == 64
+end
+
 function TipMain()	
 	
 	CreateMainTipWnd()
@@ -503,8 +507,9 @@ function TipMain()
 		MessageBox(tostring("解析服务器配置失败"))
 		return
 	end
+	
 	FunctionObj.InitMachName()
-	FunctionObj.CreatePopupTipWnd()
+	--FunctionObj.CreatePopupTipWnd()
 	SaveConfigInTimer()
 	BindToWeiXin()
 	--4小时1次提醒
@@ -518,8 +523,14 @@ function PreTipMain()
 	LoadDynamicFont()
 	FunctionObj.StartRunCountTimer()
 	SendStartupReport(false)
-
+	
+	FunctionObj.CreatePopupTipWnd()
+	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()	
+	if not CheckMachineSuitable() then
+		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		return
+	end
 	FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
 end
 

@@ -1,0 +1,163 @@
+<xlue>
+	<objtreetemplate id="GXZB.MachineCheckWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>480</width>
+			<height>220</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>480</width>
+				<height>220</height>
+				<texture>common-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="MachineCheckWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="MachineCheckWnd.TitleBar" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>30</height>
+							</attr>
+							<children>
+								<obj id="MachineCheckWnd.Close.Btn" class="TipAddin.Button">
+									<attr>
+										<left>father.width-25</left>
+										<top>9</top>
+										<width>12</width>
+										<height>12</height>
+										<NormalBkgID>GXZB.BtnClose.Normal</NormalBkgID>
+										<DownBkgID>GXZB.BtnClose.Down</DownBkgID>
+										<HoverBkgID>GXZB.BtnClose.Hover</HoverBkgID>
+										<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickClose" />
+									</eventlist>	
+								</obj>
+								<obj id="MachineCheckWnd.Title.Text" class="TextObject">
+									<attr>
+										<left>18</left>
+										<top>5</top>
+										<width>70</width>
+										<height>20</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text16</font>
+										<text>共享赚宝</text>
+
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="MachineCheckWnd.Content" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>30</top>
+								<width>father.width</width>
+								<height>father.height-30</height>
+							</attr>
+							<children>
+								<obj id="MachineCheckWnd.Content.Warning" class="ImageObject">
+									<attr>
+										<left>68</left>
+										<top>30</top>
+										<width>50</width>
+										<height>50</height>
+										<image>logo-mid</image>
+									</attr>
+								</obj>
+								<obj id="MachineCheckWnd.Content.Text" class="TextObject">
+									<attr>
+										<left>(father.width-300)/2</left>
+										<top>35</top>
+										<width>300</width>
+										<height>40</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text18</font>
+										<text>软件检测到本设备不支持赚宝</text>
+									</attr>
+								</obj>
+								<obj id="MachineCheckWnd.Content.ExitBtn" class="TipAddin.Button">
+									<attr>
+										<Text>退出</Text>
+										<TextFont>font.text16</TextFont>
+										<TextColor>DDDDDD</TextColor>
+										<left>(father.width-73)/2</left>
+										<top>120</top>
+										<width>73</width>
+										<height>30</height>
+										<NormalBkgID>setting-btn-normal</NormalBkgID>
+										<DownBkgID>setting-btn-normal</DownBkgID>
+										<HoverBkgID>setting-btn-hover</HoverBkgID>
+										<DisableBkgID>setting-btn-hover</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickExit" />
+									</eventlist>	
+								</obj>
+								<obj id="MachineCheckWnd.Content.Share" class="TextObject">
+									<attr>
+										<left>father.width-100</left>
+										<top>100+50</top>
+										<width>70</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>C4C400</textcolor>
+										<font>font.text13</font>
+										<text>分享赚分成</text>
+									</attr>
+									<eventlist>
+										<event name="OnLButtonUp" file="MachineCheckWnd.xml.lua" func="OnClickShare" />
+										<event name="OnMouseLeave" file="MachineCheckWnd.xml.lua" func="OnMouseLeaveShare" />
+										<event name="OnMouseEnter" file="MachineCheckWnd.xml.lua" func="OnMouseEnterShare" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.MachineCheckWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>480</width>
+			<height>220</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnShowWindow" file="MachineCheckWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>
