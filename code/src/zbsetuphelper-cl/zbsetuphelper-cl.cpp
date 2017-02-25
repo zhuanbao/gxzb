@@ -83,18 +83,18 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow)
 {
-	unsigned int i = 0xFFFFFFFF, j = 0xFFFFFFFF;
-	GetBestPlatform(i, j);
-	if (i != 0xFFFFFFFF && j != 0xFFFFFFFF){
-		return 0;
+	if (LoadLibraryA("opencl.dll") == NULL){
+		return 1;
 	}
 	else{
-		if (LoadLibraryA("opencl.dll") == NULL){
-			return 1;
+		unsigned int i = 0xFFFFFFFF, j = 0xFFFFFFFF;
+		GetBestPlatform(i, j);
+		if (i != 0xFFFFFFFF && j != 0xFFFFFFFF){
+			return 0;
 		}
 		else{
 			return 2;
-		}	
+		}
 	}
 }
 
