@@ -12,6 +12,7 @@
 		<font id="font.text15.arial.bold" height="15" facename="Arial" weight="bold" /> 		
 		<font id="font.text16" height="16" facename="defaultfont" /> 
 		<font id="font.text16.Arial" height="16" facename="Arial" /> 
+		<font id="font.text17" height="17" facename="defaultfont" /> 
 		<font id="font.text18" height="18" facename="defaultfont" /> 
 		<font id="font.text18.bold" height="18" facename="defaultfont" weight="bold" /> 
 		<font id="微软雅黑.18" height="18" facename="defaultfont" /> 

@@ -23,5 +23,6 @@
 		<texture id="GXZB.Config.Down"   image="bitmap\GXZB.Caption.Config.Hover.png" />
 		
 		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
+		
 	</resource>
 </XLUE>

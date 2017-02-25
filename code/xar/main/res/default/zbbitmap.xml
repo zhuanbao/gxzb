@@ -42,6 +42,7 @@
 			<bitmap id="bitmap.menu.arrow.disable"      imagelist="imagelist.menu.icon" index="4" />
 			
 		<bitmap id="bitmap.menu.arrow.normal"  path="zbbitmap\menu\bitmap.menu.submenu.arrow.png" />
+		<bitmap id="GXZB.Share.QRcode" path="zbbitmap\shareqrcode.jpg"/>
 		
 		<texture id="texture.menu.splitter" type="ThreeInOneH" image="zbbitmap\menu\texture.menu.splitter.png" />
 		<imagelist id="imagelist.menu.setting_check" splitter="1" varyblock="1" image="zbbitmap\menu\setting_check.png"/>
