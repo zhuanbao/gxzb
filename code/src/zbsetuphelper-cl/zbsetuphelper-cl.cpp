@@ -81,34 +81,20 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 	}	
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow)
 {
 	unsigned int i = 0xFFFFFFFF, j = 0xFFFFFFFF;
 	GetBestPlatform(i, j);
 	if (i != 0xFFFFFFFF && j != 0xFFFFFFFF){
-		cout<<"i = "<<i<<", j = "<<j<<endl;
 		return 0;
 	}
 	else{
-		cout<<"null"<<endl;
-		/*char szPath[MAX_PATH+1] = {0};
-		GetModuleFileNameA(NULL, szPath, MAX_PATH);
-		cout<<szPath<<endl;
-		char* pTail = (char*)strrchr(szPath, '\\');
-		if (pTail == NULL){
-			 pTail = strrchr(szPath, '/');
+		if (LoadLibraryA("opencl.dll") == NULL){
+			return 1;
 		}
-		if (pTail != NULL){
-			++pTail;
-			while (*pTail != '\0'){
-				*pTail = '\0';
-				++pTail;
-			}
-			strcat(szPath, "error");
-			cout<<szPath<<endl;
-			CreateFileA(szPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		}*/
-		return 1;
+		else{
+			return 2;
+		}	
 	}
 }
 
