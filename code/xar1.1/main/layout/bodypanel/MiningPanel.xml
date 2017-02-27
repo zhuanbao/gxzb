@@ -1,0 +1,92 @@
+<xlue>
+	<control class="MiningPanel">
+		<attr_def>
+			<attr name="bHasInit" type="bool"/>
+		</attr_def>
+		<method_def>
+			
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="MiningPanel.Panel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width - 14</left>
+								<top>15</top>
+								<width>30</width>
+								<height>30</height>
+								<NormalBkgID>GXZB.MiningPanel.StopMing</NormalBkgID>
+								<DownBkgID>GXZB.MiningPanel.StopMing</DownBkgID>
+								<HoverBkgID>GXZB.MiningPanel.StopMing</HoverBkgID>
+								<DisableBkgID>GXZB.MiningPanel.StopMing</DisableBkgID>
+								<Visible>false</Visible>
+							</attr>									
+							<eventlist>
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
+							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.StartBtn" class="ImageObject">
+							<attr>
+								<left>(father.width-192)/2</left>
+								<top>80</top>
+								<width>192</width>
+								<height>192</height>
+								<image>GXZB.MiningPanel.StartMining</image>
+								<valign>center</valign>
+								<halign>center</halign>
+								<zorder>50</zorder>
+								<drawmode>1</drawmode>
+								<antialias>2</antialias>
+							</attr>
+						</obj>
+						<obj id="MiningPanel.Panel.Info" class="TextObject">
+							<attr>
+								<left>1</left>
+								<top>310</top>
+								<width>father.width - 2</width>
+								<height>24</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text13</font>
+								<multiline>1</multiline>
+								<text>您的金库有0个元宝</text>
+							</attr>
+						</obj>
+						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
+							<attr>
+								<left>(father.width-80)/2</left>
+								<top>356</top>
+								<width>80</width>
+								<height>24</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>绑定微信账号</Text>
+								<Font>font.yahei13.underline</Font>
+								<TextColor>system.black</TextColor>
+								<TextHoverColor>system.black</TextHoverColor>
+								<Underline>false</Underline>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickBindWeiXin" />
+							</eventlist>
+						</obj>
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnInitControl" file="MiningPanel.xml.lua" func="OnInitControl" />
+			</eventlist>
+		</objtemplate>
+	</control>	
+</xlue>

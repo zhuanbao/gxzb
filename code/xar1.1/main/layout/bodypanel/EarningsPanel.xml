@@ -1,0 +1,31 @@
+<xlue>
+	<control class="EarningsPanel">
+		<attr_def>
+			<attr name="bHasInit" type="bool"/>
+		</attr_def>
+		<method_def>
+			
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="EarningsPanel.Panel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnInitControl" file="EarningsPanel.xml.lua" func="OnInitControl" />
+			</eventlist>
+		</objtemplate>
+	</control>	
+</xlue>

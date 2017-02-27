@@ -1,0 +1,129 @@
+<xlue>
+	<objtreetemplate id="GXZB.TiXianWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>520</width>
+			<height>282</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>520</width>
+				<height>282</height>
+				<texture>tixian-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="TiXianWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="TiXianWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-25</left>
+								<top>9</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="TiXianWnd.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+						<obj id="TiXianWnd.Caption.EditBkg" class="TextureObject">
+							<attr>
+								<left>160</left>
+								<top>80</top>
+								<width>296</width>
+								<height>26</height>
+								<texture>tixian-edit</texture>
+							</attr>	
+							<children>
+								<obj id = "TiXianWnd.Caption.Edit" class = "EditObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+										<transparent>1</transparent>
+										<textcolor>444444</textcolor>
+										<font>font.text14</font>
+										<text></text>
+									</attr>
+									<eventlist>
+										<event name="OnFocusChange" file="TiXianWnd.xml.lua" func="OnFocusChangeEdit" />
+										<event name="OnChange" file="TiXianWnd.xml.lua" func="OnTextChangeEdit" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+						<obj id = "TiXianWnd.Caption.Msg" class = "TextObject">
+							<attr>
+								<left>73</left>
+								<top>125</top>
+								<width>father.width-73</width>
+								<height>36</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>333333</textcolor>
+								<font>font.text14</font>
+								<text>今日还可以免费提现一次</text>
+							</attr>
+						</obj>
+						<obj id="TiXianWnd.CkickTiXian" class="TipAddin.Button">
+							<attr>
+								<left>175</left>
+								<top>178</top>
+								<width>168</width>
+								<height>38</height>
+								<NormalBkgID>tixian-btn-normal</NormalBkgID>
+								<DownBkgID>tixian-btn-normal</DownBkgID>
+								<HoverBkgID>tixian-btn-hover</HoverBkgID>
+								<DisableBkgID>tixian-btn-hover</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="TiXianWnd.xml.lua" func="OnClickTiXianBtn" />
+							</eventlist>	
+						</obj>
+					</children>
+					<eventlist>
+						<event name="OnLButtonDown" file="TiXianWnd.xml.lua" func="OnLButtonDownCaption" />
+					</eventlist>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.TiXianWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>520</width>
+            <height>282</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="TiXianWnd.xml.lua" func="OnCreate" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

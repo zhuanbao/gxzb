@@ -1,0 +1,142 @@
+<xlue>
+	<control class="MainBodyCtrl">
+		<attr_def>
+			<attr name="CurCtrlName" type="string"></attr>
+		</attr_def>
+		<method_def>
+			<ChangePanel file="MainBodyCtrl.xml.lua" func="ChangePanel"/>
+			<InitPanelList file="MainBodyCtrl.xml.lua" func="InitPanelList"/>
+			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
+			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
+			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="MainBody.Panel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="MainBody.Panel.Center" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-100</height>
+							</attr>
+						</obj>
+						<obj id="MainBody.Panel.Buttom" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>father.height-100</top>
+								<width>father.width</width>
+								<height>100</height>
+							</attr>
+							<children>
+								<obj id="MainPanel.Buttom.Earnings.Btn" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 28*3)/4</left>
+										<top>(father.height-55)</top>
+										<width>28</width>
+										<height>28</height>
+										<NormalBkgID>GXZB.MainPanel.Earnings</NormalBkgID>
+										<DownBkgID>GXZB.MainPanel.Earnings</DownBkgID>
+										<HoverBkgID>GXZB.MainPanel.Earnings</HoverBkgID>
+										<DisableBkgID>GXZB.MainPanel.Earnings</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickEarningsPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Earnings.Text" class="TextObject">
+									<attr>
+										<left>(father.width - 28*3)/4</left>
+										<top>(father.height-55)+30</top>
+										<width>28</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text11</font>
+										<text>收益</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickEarningsPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Mining.Btn" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 28*3)/4*2+28</left>
+										<top>(father.height-55)</top>
+										<width>28</width>
+										<height>28</height>
+										<NormalBkgID>GXZB.MainPanel.Mining</NormalBkgID>
+										<DownBkgID>GXZB.MainPanel.Mining</DownBkgID>
+										<HoverBkgID>GXZB.MainPanel.Mining</HoverBkgID>
+										<DisableBkgID>GXZB.MainPanel.Mining</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickMiningPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Mining.Text" class="TextObject">
+									<attr>
+										<left>(father.width - 28*3)/4*2+28</left>
+										<top>(father.height-55)+30</top>
+										<width>28</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text11</font>
+										<text>赚宝</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickMiningPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.TakeCash.Btn" class="TipAddin.Button">
+									<attr>
+										<left>(father.width - 28*3)/4*3+28*2</left>
+										<top>(father.height-55)</top>
+										<width>28</width>
+										<height>28</height>
+										<NormalBkgID>GXZB.MainPanel.TakeCash</NormalBkgID>
+										<DownBkgID>GXZB.MainPanel.TakeCash</DownBkgID>
+										<HoverBkgID>GXZB.MainPanel.TakeCash</HoverBkgID>
+										<DisableBkgID>GXZB.MainPanel.TakeCash</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickTakeCashPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.TakeCash.Text" class="TextObject">
+									<attr>
+										<left>(father.width - 28*3)/4*3+28*2</left>
+										<top>(father.height-55)+30</top>
+										<width>28</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text11</font>
+										<text>提现</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickTakeCashPanel" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>						
+			</children>
+		</objtemplate>
+	</control>
+</xlue>

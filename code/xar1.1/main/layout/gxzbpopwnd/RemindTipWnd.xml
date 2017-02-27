@@ -1,0 +1,107 @@
+<xlue>
+	<objtreetemplate id="GXZB.RemindTipWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>360</width>
+			<height>132</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>360</width>
+				<height>132</height>
+				<texture>common-bkg</texture>
+			</attr>	
+			<children>
+				<obj id="RemindTipWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="RemindTipWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-25</left>
+								<top>9</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="RemindTipWnd.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+						<obj id="RemindTipWnd.Title" class="TextObject">
+							<attr>
+								<left>18</left>
+								<top>10</top>
+								<width>70</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>恭喜你</text>
+							</attr>
+						</obj>
+						<obj id="RemindTipWnd.Logo" class="ImageObject">
+							<attr>
+								<left>28</left>
+								<top>50</top>
+								<width>50</width>
+								<height>50</height>
+								<image>logo-mid</image>
+							</attr>
+						</obj>
+						<obj id="RemindTipWnd.Content" class="TextObject">
+							<attr>
+								<left>100</left>
+								<top>48</top>
+								<width>215</width>
+								<height>40</height>
+								<multiline>1</multiline>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text14</font>
+								<text></text>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.RemindTipWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>360</width>
+			<height>132</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnShowWindow" file="RemindTipWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>
