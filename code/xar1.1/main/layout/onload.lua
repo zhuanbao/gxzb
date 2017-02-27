@@ -34,8 +34,9 @@ local File = {
 "luacode\\objectbase.lua",
 "luacode\\helper.lua",
 "luacode\\helper_token.lua",
-"menu\\SettingMenu.lua",
 "functionhelper.lua",
+"menu\\SettingMenu.lua",
+"menu\\XuanFuMenu.lua",
 }
 LoadLuaModule(File, __document)
 
@@ -514,6 +515,7 @@ function TipMain()
 	--BindToWeiXin()
 	--4小时1次提醒
 	FunctionObj.PopTipPre4Hour()
+	
 	--显示悬浮框
 	FunctionObj.ShowPopupWndByName("GXZB.XuanFuWnd.Instance", true)
 	--ShowPopWndByCommand()
@@ -528,8 +530,8 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()	
 	if not CheckMachineSuitable() then
-		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-		return
+		--FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		--return
 	end
 	FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
 end

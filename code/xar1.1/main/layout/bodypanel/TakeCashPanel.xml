@@ -11,7 +11,7 @@
 		</event_def>
 		<objtemplate>
 			<children>
-				<obj id="TakeCashPanel.Panel" class="LayoutObject">
+				<obj id="TakeCashPanel.Panel" class="CaptionObject">
 					<attr>
 						<left>0</left>
 						<top>0</top>
@@ -182,6 +182,7 @@
 			</children>
 			<eventlist>
 				<event name="OnInitControl" file="TakeCashPanel.xml.lua" func="OnInitControl" />
+				<event name="OnLButtonDown" file="TakeCashPanel.xml.lua" func="OnLButtonDownCtrl" />
 			</eventlist>
 		</objtemplate>
 	</control>	

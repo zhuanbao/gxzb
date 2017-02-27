@@ -63,22 +63,22 @@ function OnCreate(self)
 		--查询更新
 		TextBig:SetVisible(false)
 		BtnUpdate:Show(false)
-		TextVersion:SetVisible(false)
+		--TextVersion:SetVisible(false)
 		BtnSure:SetText("取消")
 		TextMain:SetText("正在为你检查更新，请稍后...")
 		
 		local function ShowNoUpdate()
 			--已经是最新
 			TextMain:SetText("你的共享赚宝已经是最新版本，无需更新")
-			TextVersion:SetText("版本："..tFunctionHelper.GetGXZBVersion() or "1.0.0.1")
-			TextVersion:SetVisible(true)
+			--TextVersion:SetText("版本："..tFunctionHelper.GetGXZBVersion() or "1.0.0.1")
+			--TextVersion:SetVisible(true)
 			BtnSure:SetText("确定")
 		end
 		
 		local function ShowReadyUpdate(strContent)
 			--发现新版本
 			TextBig:SetVisible(true)
-			TextVersion:SetVisible(false)
+			--TextVersion:SetVisible(false)
 			BtnUpdate:Show(true)
 			BtnSure:Show(false)
 			TextMain:SetText(strContent)

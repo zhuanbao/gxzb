@@ -65,15 +65,15 @@
 						</obj>
 						<obj id="SettingWnd.QiDong" class="TextObject">
 							<attr>
-								<left>61</left>
+								<left>31</left>
 								<top>91</top>
-								<width>80</width>
+								<width>120</width>
 								<height>20</height>
 								<valign>center</valign>
 								<halign>left</halign>
 								<textcolor>DDDDDD</textcolor>
 								<font>font.text16</font>
-								<text>启动</text>
+								<text>开机启动</text>
 							</attr>
 						</obj>
 						<obj id="SettingWnd.CheckBox.Sysboot" class="CheckBox">
@@ -81,7 +81,7 @@
 								<CheckHover>setting_check.hover</CheckHover>
 								<Select>true</Select>
 								<Text>开机自动赚宝</Text>
-								<left>230</left>
+								<left>200</left>
 								<width>150</width>
 								<top>88</top>
 								<CheckNormal>setting_check.normal</CheckNormal>
@@ -96,8 +96,8 @@
 						
 						<obj id="SettingWnd.Model" class="TextObject">
 							<attr>
-								<left>61</left>
-								<top>282</top>
+								<left>31</left>
+								<top>292</top>
 								<width>120</width>
 								<height>20</height>
 								<valign>center</valign>
@@ -112,9 +112,9 @@
 								<Type>radio</Type>
 								<Select>true</Select>
 								<Text>全速赚宝</Text>
-								<left>230</left>
-								<top>270</top>
-								<width>150</width>
+								<left>200</left>
+								<top>290</top>
+								<width>100</width>
 								<height>25</height>
 								<CheckHover>setting_radio.hover</CheckHover>
 								<CheckNormal>setting_radio.hover</CheckNormal>
@@ -130,9 +130,9 @@
 								<Type>radio</Type>
 								<Select>false</Select>
 								<Text>智能赚宝</Text>
-								<left>230</left>
-								<top>298</top>
-								<width>150</width>
+								<left>300</left>
+								<top>290</top>
+								<width>100</width>
 								<height>25</height>
 								<CheckHover>setting_radio.hover</CheckHover>
 								<CheckNormal>setting_radio.hover</CheckNormal>
@@ -145,9 +145,79 @@
 							</eventlist>
 						</obj>
 						
+						<obj id="SettingWnd.XuanFu" class="TextObject">
+							<attr>
+								<left>31</left>
+								<top>270</top>
+								<width>120</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text16</font>
+								<text>悬浮窗显示位置</text>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.Radio.AllShowXuanFu" class="CheckBox">
+							<attr>
+								<Type>radio</Type>
+								<Select>true</Select>
+								<Text>始终显示</Text>
+								<left>200</left>
+								<top>270</top>
+								<width>100</width>
+								<height>25</height>
+								<CheckHover>setting_radio.hover</CheckHover>
+								<CheckNormal>setting_radio.hover</CheckNormal>
+								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+								<UnCheckHover>setting_radio.normal</UnCheckHover>
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
+							</eventlist>
+						</obj>
+						<obj id="SettingWnd.Radio.AllHideXuanFu" class="CheckBox">
+							<attr>
+								<Type>radio</Type>
+								<Select>false</Select>
+								<Text>始终隐藏</Text>
+								<left>300</left>
+								<top>270</top>
+								<width>100</width>
+								<height>25</height>
+								<CheckHover>setting_radio.hover</CheckHover>
+								<CheckNormal>setting_radio.hover</CheckNormal>
+								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+								<UnCheckHover>setting_radio.normal</UnCheckHover>
+
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
+							</eventlist>
+						</obj>
+						<obj id="SettingWnd.Radio.WorkShowXuanFu" class="CheckBox">
+							<attr>
+								<Type>radio</Type>
+								<Select>false</Select>
+								<Text>仅赚宝时显示</Text>
+								<left>400</left>
+								<top>270</top>
+								<width>150</width>
+								<height>25</height>
+								<CheckHover>setting_radio.hover</CheckHover>
+								<CheckNormal>setting_radio.hover</CheckNormal>
+								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+								<UnCheckHover>setting_radio.normal</UnCheckHover>
+
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
+							</eventlist>
+						</obj>
+						
 						<obj id="SettingWnd.Machine" class="TextObject">
 							<attr>
-								<left>61</left>
+								<left>31</left>
 								<top>135</top>
 								<width>120</width>
 								<height>20</height>
@@ -155,12 +225,12 @@
 								<halign>left</halign>
 								<textcolor>DDDDDD</textcolor>
 								<font>font.text16</font>
-								<text>机器名称</text>
+								<text>设备标识ID</text>
 							</attr>
 						</obj>
 						<obj id="SettingWnd.EditMachine.bkg" class="TextureObject">
 							<attr>
-								<left>206</left>
+								<left>176</left>
 								<top>134</top>
 								<width>230</width>
 								<height>28</height>
@@ -185,7 +255,7 @@
 								</obj>
 							</children>
 						</obj>
-						<obj id="SettingWnd.EditMachine.Btn" class="TipAddin.Button">
+						<!--obj id="SettingWnd.EditMachine.Btn" class="TipAddin.Button">
 							<attr>
 								<Text>修改名称</Text>
 								<TextFont>font.text16</TextFont>
@@ -202,11 +272,11 @@
 							<eventlist>
 								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickMachineBtn" />
 							</eventlist>	
-						</obj>
+						</obj-->
 						
 						<obj id="SettingWnd.CacheText" class="TextObject">
 							<attr>
-								<left>61</left>
+								<left>31</left>
 								<top>196</top>
 								<width>120</width>
 								<height>20</height>
@@ -219,7 +289,7 @@
 						</obj>
 						<obj id="SettingWnd.CacheText2" class="TextObject">
 							<attr>
-								<left>206</left>
+								<left>176</left>
 								<top>168</top>
 								<width>249</width>
 								<height>20</height>
@@ -232,7 +302,7 @@
 						</obj>
 						<obj id="SettingWnd.CacheText3" class="TextObject">
 							<attr>
-								<left>206</left>
+								<left>176</left>
 								<top>228</top>
 								<width>85</width>
 								<height>20</height>
@@ -245,7 +315,7 @@
 						</obj>
 						<obj id="SettingWnd.EditCache.bkg" class="TextureObject">
 							<attr>
-								<left>206</left>
+								<left>176</left>
 								<top>195</top>
 								<width>230</width>
 								<height>28</height>
@@ -276,7 +346,7 @@
 								<Text>选择目录</Text>
 								<TextFont>font.text16</TextFont>
 								<TextColor>DDDDDD</TextColor>
-								<left>436</left>
+								<left>406</left>
 								<top>195</top>
 								<width>88</width>
 								<height>26</height>
@@ -291,7 +361,7 @@
 						</obj>
 						<obj id="SettingWnd.ShowFreeSpace" class="TextObject">
 							<attr>
-								<left>276</left>
+								<left>246</left>
 								<top>226</top>
 								<width>168</width>
 								<height>25</height>

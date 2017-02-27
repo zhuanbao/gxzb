@@ -70,6 +70,28 @@ function OnSelectSuDu(self, event, bcheck)
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
+function OnSelectXuanFu(self, event, bcheck)
+	local r1 = self:GetObject("tree:SettingWnd.Radio.AllShowXuanFu")
+	local r2 = self:GetObject("tree:SettingWnd.Radio.AllHideXuanFu")
+	local r3 = self:GetObject("tree:SettingWnd.Radio.WorkShowXuanFu")
+	local id = self:GetID()
+	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
+	if id == "SettingWnd.Radio.AllShowXuanFu" then
+		r2:SetCheck(false, true)
+		r3:SetCheck(false, true)
+		tUserConfig["tConfig"]["showball"] = 0
+	elseif id == "SettingWnd.Radio.AllHideXuanFu" then
+		r1:SetCheck(false, true)
+		r3:SetCheck(false, true)
+		tUserConfig["tConfig"]["showball"] = 1
+	else
+		r1:SetCheck(false, true)
+		r2:SetCheck(false, true)
+		tUserConfig["tConfig"]["showball"] = 2
+	end
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
 function OnFocusChangeEdit(self, isFocus)
 	if isFocus then
 		self:SetSelAll(true)
@@ -134,6 +156,10 @@ function OnCreate(self)
 		local radio1 = objtree:GetUIObject("SettingWnd.Radio.AllSpeed")
 		local radio2 = objtree:GetUIObject("SettingWnd.Radio.Zhineng")
 		
+		local radioXuanFu1 = objtree:GetUIObject("SettingWnd.Radio.AllShowXuanFu")
+		local radioXuanFu2 = objtree:GetUIObject("SettingWnd.Radio.AllHideXuanFu")
+		local radioXuanFu3 = objtree:GetUIObject("SettingWnd.Radio.WorkShowXuanFu")
+		
 		if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
 			chkboxKaiji:SetCheck(true, false)
 		else
@@ -166,6 +192,18 @@ function OnCreate(self)
 			radio2:SetCheck(true)
 		else
 			radio1:SetCheck(true)
+		end
+		
+		local showbal = 0
+		if type(tUserConfig) == "table" and type(tUserConfig["tConfig"]) == "table" and type(tUserConfig["tConfig"]["showball"]) == "number" then
+			model = tUserConfig["tConfig"]["showball"]
+		end
+		if model == 1 then
+			radioXuanFu2:SetCheck(true)
+		elseif model == 2 then
+			radioXuanFu3:SetCheck(true)
+		else
+			radioXuanFu1:SetCheck(true)
 		end
 	end
 end

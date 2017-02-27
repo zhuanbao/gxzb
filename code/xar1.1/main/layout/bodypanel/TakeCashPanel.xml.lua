@@ -3,7 +3,7 @@ local gBalance = 0
 local gHasChange = false
 
 function OnClickTakeCash(self)
-	local editobj = self:GetObject("tree:TiXianWnd.Caption.Edit")
+	local editobj = self:GetObject("control:TakeCashPanel.Panel.Edit")
 	local strMsg = "输入了错误的金额"
 	if editobj then
 		local strText = editobj:GetText()
@@ -29,7 +29,7 @@ function OnClickTakeCash(self)
 		end
 	end
 	if strMsg ~= "ok" then
-		local msgobj = self:GetObject("tree:TiXianWnd.Caption.Msg")
+		local msgobj = self:GetObject("control:TakeCashPanel.Panel.ForbadeTakeDesc")
 		if msgobj then
 			msgobj:SetTextColorResID("system.red")
 			msgobj:SetText(strMsg)
@@ -51,7 +51,7 @@ function OnFocusChangeEdit(self, isFocus)
 end
 
 function OnTextChangeEdit(self)
-	local msgobj = self:GetObject("tree:TiXianWnd.Caption.Msg")
+	local msgobj = self:GetObject("control:TakeCashPanel.Panel.ForbadeTakeDesc")
 	if msgobj then
 		msgobj:SetTextColorResID("333333")
 		msgobj:SetText("今日还可以免费提现一次")
@@ -82,10 +82,11 @@ function OnTextChangeEdit(self)
 	end
 end
 
-function OnLButtonDownCaption(self, x, y)
-	local edit = self:GetObject("tree:TiXianWnd.Caption.Edit")
+function OnLButtonDownCtrl(self, x, y)
+	local edit = self:GetObject("TakeCashPanel.Panel.Edit")
+	local l, t, r, b = self:GetAbsPos()
 	local editL, editT, editR, editB = edit:GetAbsPos()
-	if x > editL and x < editR and y > editT and y < editB then
+	if x > editL-l and x < editR-l and y > editT-t and y < editB-t then
 		edit:SetFocus(true)
 	else
 		edit:SetFocus(false)
@@ -93,4 +94,37 @@ function OnLButtonDownCaption(self, x, y)
 end
 
 function OnInitControl(self)
+	local editobj = self:GetObject("TakeCashPanel.Panel.EditBkg")
+	local msgobj = self:GetObject("TakeCashPanel.Panel.ForbadeTakeDesc")
+	local btnobj = self:GetObject("TakeCashPanel.Panel.Take")
+	editobj:SetEnable(false)
+	editobj:SetChildrenEnable(false)
+	btnobj:Show(false)
+	msgobj:SetText("正在努力加载中...")
+	local timerID = SetTimer(function(item, id) 
+		local text = msgobj:GetText()
+		if text == "正在努力加载中..." then
+			msgobj:SetText("正在努力加载中.")
+		elseif text == "正在努力加载中." then
+			msgobj:SetText("正在努力加载中..")
+		else
+			msgobj:SetText("正在努力加载中...")
+		end
+	end, 
+	1000)
+	tFunctionHelper.QueryClientInfo(function(bRet, tab)
+		KillTimer(timerID)
+		if not bRet or type(tab) ~= "table" or type(tab["data"]) ~= "table" or not tonumber(tab["data"]["balance"]) then
+			--msgobj:SetText("很抱歉，加载失败")
+			--return
+			tab = {["data"] = {["balance"] = 8888,},}
+		end
+		gBalance = tab["data"]["balance"]
+		editobj:SetEnable(true)
+		local realeditobj = self:GetObject("TakeCashPanel.Panel.Edit")
+		realeditobj:SetText("可提现"..tostring(gBalance).."元")
+		editobj:SetChildrenEnable(true)
+		btnobj:Show(true)
+		msgobj:SetText("今日还可以免费提现一次")
+	end)
 end

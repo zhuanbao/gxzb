@@ -107,7 +107,7 @@
 								<Text>确定</Text>
 								<TextFont>font.text16</TextFont>
 								<TextColor>DDDDDD</TextColor>
-								<left>father.width-141</left>
+								<left>(father.width-73)/2</left>
 								<top>father.height-50</top>
 								<width>73</width>
 								<height>30</height>
@@ -125,7 +125,7 @@
 								<Text>一键升级</Text>
 								<TextFont>font.text16</TextFont>
 								<TextColor>DDDDDD</TextColor>
-								<left>father.width-266</left>
+								<left>(father.width-153)/2</left>
 								<top>father.height-65</top>
 								<width>153</width>
 								<height>49</height>

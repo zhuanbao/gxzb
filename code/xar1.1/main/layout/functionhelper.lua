@@ -1640,7 +1640,7 @@ function SetMachineNameChangeInfo()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	objMainBodyCtrl:UpdateMachineName(tUserConfig)
+	--objMainBodyCtrl:UpdateMachineName(tUserConfig)
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 end
 

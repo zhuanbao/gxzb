@@ -181,24 +181,6 @@ function UpdateMinerInfo(self, strText)
 	return true
 end
 
-function OnClickEarningsPanel(self)
-	--[[
-	ShowMainPanel(self)
-	if not FunctionObj.CheckIsBinded() then
-		local objHostWnd = FunctionObj.GetMainHostWnd()
-		local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-		Helper:CreateModalWnd("GXZB.BindWeiXin2WeiMaWnd", "GXZB.BindWeiXin2WeiMaWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-		Helper:DestoryTransparentMask(objHostWnd)
-	else
-		FunctionObj.ClearBindInfo()
-		FunctionObj.NotifyPause()
-		self:SetText("绑定微信")
-	end	
-	--]]
-	local OwnerCtrl = self:GetOwnerControl()
-	ChangePanel(OwnerCtrl,"EarningsPanel")
-end
-
 function OnClickMiningPanel(self)
 	--[[
 	local objmain = self:GetOwnerControl()
@@ -238,17 +220,22 @@ end
 function ShowMainPanel(self)
 	local objmain = self:GetOwnerControl()
 	if objmain then
-		objmain:ChangePanel("ChildCtrl_MinerInfo")
+		objmain:ChangePanel("MiningPanel")
 	end
 end
 
-function OnClickTakeCash(self)
-	ShowMainPanel(self)
-	--弹出绑定微信
-	local objHostWnd = FunctionObj.GetMainHostWnd()
-	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-	Helper:CreateModalWnd("GXZB.TiXianWnd", "GXZB.TiXianWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-	Helper:DestoryTransparentMask(objHostWnd)
+function OnClickEarningsPanel(self)
+	local objmain = self:GetOwnerControl()
+	if objmain then
+		objmain:ChangePanel("EarningsPanel")
+		local barobj = objmain:GetObject("MainBody_EarningsPanel:EarningsPanel.BarChart")
+		if barobj then
+			local attr = barobj:GetAttribute()
+			attr.currentpanel = 1
+			attr.Data = {{1, 1000}, {2, 1800}, {4, 9000}, {3, 4000}, {6, 5000}, {5, 1200}, {8, 500}, {7, 2100}, {10, 1700}, {9, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
+			barobj:Update()
+		end
+	end
 end
 
 

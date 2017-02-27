@@ -1,0 +1,24 @@
+<XLUE>
+	<resource>
+		<texture id="bindweixin-bkg" image="popwndbitmap\bindweixin-bkg.png" />
+		<texture id="bindweixin-bkg2" image="popwndbitmap\bindweixin-bkg2.png" />
+		<texture id="bindweixin-btn-normal" image="popwndbitmap\bindweixin-btn-normal.png" />
+		<texture id="bindweixin-btn-hover" image="popwndbitmap\bindweixin-btn-hover.png" />
+		
+		<texture id="tixian-bkg" image="popwndbitmap\tixian-bkg.png" />
+		<texture id="tixian-btn-normal" image="popwndbitmap\tixian-btn-normal.png" />
+		<texture id="tixian-btn-hover" image="popwndbitmap\tixian-btn-hover.png" />
+		<texture id="tixian-edit" image="popwndbitmap\tixian-edit.png" />
+		
+		<texture id="setting-bkg" image="popwndbitmap\setting-bkg.png" />
+		<texture id="setting-btn-normal" image="popwndbitmap\setting-btn-normal.png" />
+		<texture id="setting-btn-hover" image="popwndbitmap\setting-btn-hover.png" />
+		<texture id="setting-edit-bkg" image="popwndbitmap\setting-edit-bkg.png" />
+		
+		<texture id="common-bkg" image="popwndbitmap\common-bkg.png" />
+		<bitmap id="logo-mid" path="popwndbitmap\logo-mid.png" />
+		
+		<texture id="xuanfu-bkg" image="popwndbitmap\xuanfu-bkg.png" />
+		<bitmap id="GXZB.Share.QRcode" path="popwndbitmap\shareqrcode.jpg"/>
+	</resource>
+</XLUE>

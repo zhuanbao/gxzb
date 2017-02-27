@@ -21,8 +21,8 @@ function OnRButtonUpXuanFu(self)
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd()
 	local curX, curY = Helper.tipUtil:GetCursorPos()
-	local menuTable = GXZBMenu.SettingMenu.menuTable
-	local menuFunTable = GXZBMenu.SettingMenu.menuFunTable
+	local menuTable = GXZBMenu.XuanFuMenu.menuTable
+	local menuFunTable = GXZBMenu.XuanFuMenu.menuFunTable
 	local userData = {}
 	Helper:CreateMenu(curX-50, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
