@@ -1,4 +1,5 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tipAsynUtil = XLGetObject("API.AsynUtil")
 local g_tNewVersionInfo = nil
 
 function OnClickClose(self)
@@ -12,16 +13,16 @@ function ManualUpdate(tNewVersionInfo)
 		tFunctionHelper.TipLog("[ManualUpdate] CheckIsUpdating failed,another thread is updating!")
 		return
 	end
-	local strCurVersion = GetGXZBVersion()
+	local strCurVersion = tFunctionHelper.GetGXZBVersion()
 	local strNewVersion = tNewVersionInfo.strVersion		
 	if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
 		or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
-		tFunctionHelper.TipLog("[ManualUpdate] strCurVersion is nil or is not New Version")
-		return
+		--tFunctionHelper.TipLog("[ManualUpdate] strCurVersion is nil or is not New Version")
+		--return
 	end
 	
 	tFunctionHelper.SetIsUpdating(true)
-	DownLoadNewVersion(tNewVersionInfo, function(strRealPath) 
+	--[[tFunctionHelper.DownLoadNewVersion(tNewVersionInfo, function(strRealPath) 
 		tFunctionHelper.SetIsUpdating(false)
 	
 		if not Helper:IsRealString(strRealPath) then
@@ -29,15 +30,83 @@ function ManualUpdate(tNewVersionInfo)
 		end
 		tFunctionHelper.SaveCommonUpdateUTC()
 		Helper.tipUtil:ShellExecute(0, "open", strRealPath, "", 0, "SW_SHOWNORMAL")
+	end)]]
+	local strUrl = "http://1.198.5.17/dlied1.qq.com/bns/mannual/bns_setup_220365434_220365504_201702131910_signed.exe?mkey=58b50538fa31befb&f=8f5d&c=0&p=.exe"
+	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strUrl)
+	if not string.find(strFileName, "%.exe$") then
+		strFileName = strFileName..".exe"
+	end
+	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
+	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
+	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
+		--XLMessageBox(tostring(nRet).."\n"..tostring(savepath).."\n"..tostring(ulProgress).."\n"..tostring(ulProgressMax))
 	end)
 end
 
 function OnClickUpdateBtn(self)
-	OnClickClose(self)
+	--OnClickClose(self)
 	if not g_tNewVersionInfo then 
 		return 
 	end
-	ManualUpdate(g_tNewVersionInfo)
+	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
+	local TextMain = self:GetObject("tree:UpdateWnd.Content.TextMain")
+	local BtnUpdate = self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn")
+	local progress = self:GetObject("tree:UpdateWnd.Progress.bkg")
+	local progrBar = self:GetObject("tree:UpdateWnd.Progress.bar")
+	local progrText = self:GetObject("tree:UpdateWnd.Progress.text")
+	TextMain:SetVisible(false)
+	BtnUpdate:Show(false)
+	progress:SetVisible(true)
+	progress:SetChildrenVisible(true)
+	
+	if tFunctionHelper.CheckIsUpdating() then
+		tFunctionHelper.TipLog("[ManualUpdate] CheckIsUpdating failed,another thread is updating!")
+		return
+	end
+	local strCurVersion = tFunctionHelper.GetGXZBVersion()
+	local strNewVersion = g_tNewVersionInfo.strVersion		
+	if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
+		or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
+		tFunctionHelper.TipLog("[ManualUpdate] strCurVersion is nil or is not New Version")
+		return
+	end
+	
+	tFunctionHelper.SetIsUpdating(true)
+	local strUrl = "http://1.198.5.17/dlied1.qq.com/bns/mannual/bns_setup_220365434_220365504_201702131910_signed.exe?mkey=58b50538fa31befb&f=8f5d&c=0&p=.exe"
+	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strUrl)
+	if not string.find(strFileName, "%.exe$") then
+		strFileName = strFileName..".exe"
+	end
+	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
+	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
+	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
+		--XLMessageBox(tostring(nRet).."\n"..tostring(savepath).."\n"..tostring(ulProgress).."\n"..tostring(ulProgressMax))
+		if nRet == -2 and type(ulProgress) == "number" and type(ulProgressMax) == "number" and ulProgress < ulProgressMax and ulProgress > 0 then
+			local rate = ulProgress/ulProgressMax
+			local rateText = tostring(math.floor(rate*100)).."/%"
+			local l, t, r, b = progrBar:GetObjPos()
+			local fl, ft, fr, fb = progress:GetObjPos()
+			local w = fr - fl - 2
+			progrBar:SetObjPos(l, t, l + w*rate, b)
+			progrText:SetText("正在安装"..rateText)
+		elseif nRet == 0  then
+			
+		end
+	end)
+end
+
+function GetPacketSavePath(strURL)
+	if not Helper:IsRealString(strURL) then
+		return 
+	end
+	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strURL)
+	if not string.find(strFileName, "%.exe$") then
+		strFileName = strFileName..".exe"
+	end
+	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
+	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
+
+	return strSavePath
 end
 
 function OnCreate(self)
@@ -73,11 +142,14 @@ function OnCreate(self)
 			--TextVersion:SetText("版本："..tFunctionHelper.GetGXZBVersion() or "1.0.0.1")
 			--TextVersion:SetVisible(true)
 			BtnSure:SetText("确定")
+			
+			Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, {["parentWnd"] = self, ["Text"] = "没别的，就是想谈个框"})
 		end
 		
-		local function ShowReadyUpdate(strContent)
+		local function ShowReadyUpdate(strVersion, strContent)
 			--发现新版本
 			TextBig:SetVisible(true)
+			TextBig:SetText("发现共享赚宝新版本"..tostring(strVersion))
 			--TextVersion:SetVisible(false)
 			BtnUpdate:Show(true)
 			BtnSure:Show(false)
@@ -114,14 +186,13 @@ function OnCreate(self)
 				ShowNoUpdate(objRootCtrl)
 				return
 			end
-			
 			local strSavePath = GetPacketSavePath(strPacketURL)
 			if Helper:IsRealString(tNewVersionInfo.strMD5) 
 				and tFunctionHelper.CheckMD5(strSavePath, tNewVersionInfo.strMD5) then
 				ShowInstallPanel(objRootCtrl, strSavePath, tNewVersionInfo)
 				return
 			end
-			ShowReadyUpdate(tNewVersionInfo["strContent"] or "修改已知bug")
+			ShowReadyUpdate(tNewVersionInfo["strVersion"] or "V3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
 			g_tNewVersionInfo = tNewVersionInfo
 		end
 		tFunctionHelper.DownLoadServerConfig(InitMainWnd)

@@ -1,0 +1,154 @@
+<xlue>
+<objtreetemplate id="MessageBoxWndTree" class="ObjectTreeTemplate">
+	<obj id="PanelCaption" class="CaptionObject">
+		<attr>
+			<height>150</height>
+			<top>0</top>
+			<left>0</left>
+			<width>430</width>
+		</attr>
+		<children>
+		<obj id="TitleBar" class="FillObject">
+			<attr>
+				<srccolor>1F253D</srccolor>
+				<destcolor>1F253D</destcolor>
+				<left>0</left>
+				<top>0</top>
+				<width>father.width</width>
+				<height>28</height>
+				<srcpt>0,0</srcpt>
+				<destpt>father.width,28</destpt>
+			</attr>
+			<children>
+			<obj id="close" class="TipAddin.Button">
+				<attr>
+					<top>5</top>
+					<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+					<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+					<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+					<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+					<height>12</height>
+					<left>father.width-30</left>
+					<width>12</width>
+				</attr>
+				<eventlist>
+					<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
+				</eventlist>
+			</obj>
+			<obj id="titlehead" class="TextObject">
+				<attr>
+					<textcolor>system.white</textcolor>
+					<text></text>
+					<left>12</left>
+					<halign>left</halign>
+					<top>0</top>
+					<font>font.text13</font>
+					<height>father.height</height>
+					<width>90</width>
+					<valign>center</valign>
+				</attr>
+			</obj>
+			</children>
+		</obj>
+		<obj id="MainPanel" class="FillObject">
+			<attr>
+				<srccolor>666666</srccolor>
+				<destcolor>666666</destcolor>
+				<left>0</left>
+				<top>28</top>
+				<width>father.width</width>
+				<height>father.height-28</height>
+				<srcpt>0,28</srcpt>
+				<destpt>father.width,father.height</destpt>
+			</attr>
+			<children>
+			<obj id="MainText" class="TextObject">
+				<attr>
+					<textcolor>system.white</textcolor>
+					<wordellipsis>1</wordellipsis>
+					<valign>left</valign>
+					<left>100</left>
+					<multiline>1</multiline>
+					<top>36</top>
+					<font>font.text12</font>
+					<height>father.height-36</height>
+					<text>确定要删除文件</text>
+					<halign>left</halign>
+					<width>father.width-56</width>
+				</attr>
+			</obj>
+			<obj id="yes" class="TipAddin.Button">
+				<attr>
+					<top>father.height-37</top>
+					<NormalBkgID>setting-btn-normal</NormalBkgID>
+					<DownBkgID>setting-btn-normal</DownBkgID>
+					<HoverBkgID>setting-btn-hover</HoverBkgID>
+					<DisableBkgID>setting-btn-hover</DisableBkgID>
+					<height>25</height>
+					<left>father.width-170</left>
+					<width>73</width>
+					<Text>可以</Text>
+					<TextFont>font.text16</TextFont>
+					<TextColor>DDDDDD</TextColor>
+
+				</attr>
+				<eventlist>
+					<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
+				</eventlist>
+			</obj>
+			<obj id="no" class="TipAddin.Button">
+				<attr>
+					<top>father.height-37</top>
+					<NormalBkgID>setting-btn-normal</NormalBkgID>
+					<DownBkgID>setting-btn-normal</DownBkgID>
+					<HoverBkgID>setting-btn-hover</HoverBkgID>
+					<DisableBkgID>setting-btn-hover</DisableBkgID>
+					<height>25</height>
+					<left>father.width-87</left>
+					<width>73</width>
+					<Text>不行</Text>
+					<TextFont>font.text16</TextFont>
+					<TextColor>DDDDDD</TextColor>
+				</attr>
+				<eventlist>
+					<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
+				</eventlist>
+			</obj>
+			<obj id="MainIcon" class="ImageObject">
+				<attr>
+					<top>28</top>
+					<image>logo-mid</image>
+					<height>50</height>
+					<left>20</left>
+					<width>50</width>
+				</attr>
+			</obj>
+			</children>
+		</obj>
+		</children>
+	</obj>
+</objtreetemplate>
+
+ <hostwndtemplate id="MessageBoxWnd" class="ModalHostWnd">
+	<attr>
+		<layered>1</layered>
+		<left>0</left>
+		<top>0</top>
+		<width>430</width>
+		<height>150</height>
+		
+		<topmost>0</topmost>
+		<visible>1</visible>
+		<enable>1</enable>
+		<maxbox>1</maxbox>
+		<minbox>1</minbox>
+		<minwidth>50</minwidth>
+		<minheight>50</minheight>
+		<sysmenu>0</sysmenu>
+		<appwindow>0</appwindow>
+	</attr>
+	 <eventlist>
+		<event name="OnCreate" file="MessageBox.xml.lua" func="OnCreate"/>
+	</eventlist>
+</hostwndtemplate>
+</xlue>

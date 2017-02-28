@@ -120,6 +120,39 @@
 								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickClose" />
 							</eventlist>	
 						</obj>
+						<obj id="UpdateWnd.Progress.bkg" class="TextureObject">
+							<attr>
+								<left>(father.width-260)/2</left>
+								<top>father.height-50</top>
+								<width>260</width>
+								<height>10</height>
+								<texture></texture>
+								<visible>0</visible>
+							</attr>
+							<children>
+								<obj id="UpdateWnd.Progress.bar" class="TextureObject">
+									<attr>
+										<left>1</left>
+										<top>1</top>
+										<width>father.width-2</width>
+										<height>father.height-2</height>
+										<texture>GXZB.TakeCashPanel.EditBkg</texture>
+										<visible>0</visible>
+									</attr>
+								</obj>
+								<obj id="UpdateWnd.Progress.text" class="TextObject">
+									<attr>
+										<left>(father.width-100)/2</left>
+										<top>father.height+15</top>
+										<width>100</width>
+										<height>20</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<visible>0</visible>
+									</attr>
+								</obj>
+							</children>
+						</obj>
 						<obj id="UpdateWnd.OneKeyUpdate.Btn" class="TipAddin.Button">
 							<attr>
 								<Text>一键升级</Text>

@@ -227,40 +227,6 @@ function SendStartupReport(bShowWnd)
 	FunctionObj.TipConvStatistic(tStatInfo)
 end
 
-function DownLoadNewVersion(tNewVersionInfo, fnCallBack)
-	local strPacketURL = tNewVersionInfo.strPacketURL
-	local strMD5 = tNewVersionInfo.strMD5
-	if not IsRealString(strPacketURL) then
-		return
-	end
-	
-	local strFileName = FunctionObj.GetFileSaveNameFromUrl(strPacketURL)
-	if not string.find(strFileName, "%.exe$") then
-		strFileName = strFileName..".exe"
-	end
-	local strSaveDir = tipUtil:GetSystemTempPath()
-	local strSavePath = tipUtil:PathCombine(strSaveDir, strFileName)
-	
-	local strStamp = FunctionObj.GetTimeStamp()
-	local strURLFix = strPacketURL..strStamp
-	
-	FunctionObj.DownLoadFileWithCheck(strURLFix, strSavePath, strMD5
-	, function(bRet, strRealPath)
-		FunctionObj.TipLog("[DownLoadNewVersion] strOpenLink:"..tostring(strPacketURL)
-		        .."  bRet:"..tostring(bRet).."  strRealPath:"..tostring(strRealPath))
-				
-		if 0 == bRet then
-			fnCallBack(strRealPath, tNewVersionInfo)
-			return
-		end
-		
-		if 1 == bRet then	--安装包已经存在
-			fnCallBack(strSavePath, tNewVersionInfo)
-			return
-		end
-	end)	
-end
-
 function CheckCondition(tForceUpdate)
 	if not tForceUpdate or #tForceUpdate < 1 then
 		Helper:LOG("tForceUpdate is nil or wrong style!")
@@ -339,7 +305,7 @@ function TryForceUpdate(tServerConfig)
 	end
 	
 	FunctionObj.SetIsUpdating(true)
-	DownLoadNewVersion(versionInfo, function(strRealPath) 
+	FunctionObj.DownLoadNewVersion(versionInfo, function(strRealPath) 
 		FunctionObj.SetIsUpdating(false)
 	
 		if not IsRealString(strRealPath) then

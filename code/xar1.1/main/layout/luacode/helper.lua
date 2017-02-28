@@ -374,8 +374,8 @@ function Helper:CreateTransparentMask(targetWnd, colorStr)
 	maskWnd:Move(left, top, right - left, bottom - top)
 	
 	local rootFillObj = maskWndTree:GetRootObject()
-	rootFillObj:SetDestColor(colorStr or "RGBA(0,0,0,128)")
-	rootFillObj:SetSrcColor(colorStr or "RGBA(0,0,0,128)")
+	rootFillObj:SetDestColor(colorStr or "RGBA(0,0,0,60)")
+	rootFillObj:SetSrcColor(colorStr or "RGBA(0,0,0,60)")
 	
 	return maskWnd, maskWndTree
 end

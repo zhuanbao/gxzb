@@ -211,6 +211,7 @@ function RegisterFunctionObject(self)
 	obj.CheckIsWorking = CheckIsWorking
 	obj.GeneratTaskInfo = GeneratTaskInfo
 	obj.ClearBindInfo = ClearBindInfo
+	obj.DownLoadNewVersion = DownLoadNewVersion
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -237,6 +238,41 @@ function MessageBox(str)
 	end
 	
 	tipUtil:MsgBox(str, "错误", 0x10)
+end
+
+
+function DownLoadNewVersion(tNewVersionInfo, fnCallBack)
+	local strPacketURL = tNewVersionInfo.strPacketURL
+	local strMD5 = tNewVersionInfo.strMD5
+	if not IsRealString(strPacketURL) then
+		return
+	end
+	
+	local strFileName = GetFileSaveNameFromUrl(strPacketURL)
+	if not string.find(strFileName, "%.exe$") then
+		strFileName = strFileName..".exe"
+	end
+	local strSaveDir = tipUtil:GetSystemTempPath()
+	local strSavePath = tipUtil:PathCombine(strSaveDir, strFileName)
+	
+	local strStamp = GetTimeStamp()
+	local strURLFix = strPacketURL..strStamp
+	
+	DownLoadFileWithCheck(strURLFix, strSavePath, strMD5
+	, function(bRet, strRealPath)
+		TipLog("[DownLoadNewVersion] strOpenLink:"..tostring(strPacketURL)
+		        .."  bRet:"..tostring(bRet).."  strRealPath:"..tostring(strRealPath))
+				
+		if 0 == bRet then
+			fnCallBack(strRealPath, tNewVersionInfo)
+			return
+		end
+		
+		if 1 == bRet then	--安装包已经存在
+			fnCallBack(strSavePath, tNewVersionInfo)
+			return
+		end
+	end)	
 end
 
 
