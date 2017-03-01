@@ -22,28 +22,28 @@ function OnClickStartMining(self)
 end
 
 function OnClickBindWeiXin(self)
-	
+	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
 end
 
 
 function OnInitControl(self)
-	local objMachineName= self:GetControlObject("ChildCtrl_MinerInfo.MachineName")
-	if not objMachineName then
-		return
-	end
-	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	if type(tUserConfig["tUserInfo"]) ~= "table" then
-		tUserConfig["tUserInfo"] = {}
-	end
-	local strText = "机器名称：" .. (tUserConfig["tUserInfo"]["strMachineName"] or tFunctionHelper.GetPeerID())
-	objMachineName:SetText(strText)
-	
-	local objInfo= self:GetControlObject("ChildCtrl_MinerInfo.Info")
-	objInfo:SetText("余额\r\n0元宝")
+
 end
 
+function ChangeBindEntryVisible(self, bVisible)
+	local ObjBindWeiXinEntry = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+	ObjBindWeiXinEntry:Show(bVisible)
+end
 
-
+function OnVisibleChange(self, bVisible)
+	if bVisible then
+		if not tFunctionHelper.CheckIsBinded() then
+			ChangeBindEntryVisible(self,true)
+		else
+			ChangeBindEntryVisible(self,false)
+		end
+	end
+end
 
 
 

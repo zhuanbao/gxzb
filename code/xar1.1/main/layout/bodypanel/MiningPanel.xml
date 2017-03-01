@@ -4,7 +4,7 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			
+			<ChangeBindEntryVisible file="MiningPanel.xml.lua" func="ChangeBindEntryVisible"/>
 		</method_def>
 		<event_def>
 			
@@ -76,6 +76,7 @@
 								<TextColor>system.black</TextColor>
 								<TextHoverColor>system.black</TextHoverColor>
 								<Underline>false</Underline>
+								<Show>false</Show>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickBindWeiXin" />
@@ -86,6 +87,7 @@
 			</children>
 			<eventlist>
 				<event name="OnInitControl" file="MiningPanel.xml.lua" func="OnInitControl" />
+				<event name="OnVisibleChange" file="MiningPanel.xml.lua" func="OnVisibleChange" />
 			</eventlist>
 		</objtemplate>
 	</control>	

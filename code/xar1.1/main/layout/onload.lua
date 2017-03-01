@@ -427,35 +427,10 @@ function ShowPopWndByCommand()
 	TryShowSysBootRemind(cmdString)
 end
 
-function TryShowBindWeiXinWnd()
-	local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-	if not wnd:GetVisible() then
-		wnd:SetVisible(true)
-		wnd:Show(5)
-		FunctionObj.SetWndForeGround(wnd)
+function CheckMachineBindState()
+	if FunctionObj.CheckIsGettedWorkID() then
+		FunctionObj.QueryClientInfo(0)
 	end
-	local maskWnd = Helper:CreateTransparentMask(wnd)
-	Helper:CreateModalWnd("GXZB.BindWeiXinWnd", "GXZB.BindWeiXinWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-	Helper:DestoryTransparentMask(wnd)
-end
-
-function BindToWeiXin()
-	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
-	local bRemindBind = FetchValueByPath(tUserConfig, {"tConfig", "RemainBind", "bState"})
-	if not FunctionObj.CheckIsBinded() and bRemindBind then
-		TryShowBindWeiXinWnd()
-	elseif FunctionObj.CheckIsBinded() then
-		--启动时需要检查是否已经解除了绑定
-		FunctionObj.QueryClientInfo(function(bRet, tab)
-			if not bRet or type(tab) ~= "table" or type(tab["data"]) ~= "table" or not tonumber(tab["data"]["status"]) ~= 2 then
-				FunctionObj.TipLog("[BindToWeiXin] client unbind")
-				return
-			end
-			FunctionObj.DownLoadHeadImg(tUserConfig)
-		end)
-	end
-	
-	-- FunctionObj.InitMinerInfoToServer()
 end
 
 function CheckMachineSuitable()
@@ -476,9 +451,8 @@ function TipMain()
 	end
 	
 	FunctionObj.InitMachName()
-	--FunctionObj.CreatePopupTipWnd()
 	SaveConfigInTimer()
-	--BindToWeiXin()
+	CheckMachineBindState()
 	--4小时1次提醒
 	FunctionObj.PopTipPre4Hour()
 	
@@ -496,8 +470,8 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()	
 	if not CheckMachineSuitable() then
-		--FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-		--return
+		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		return
 	end
 	FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
 end

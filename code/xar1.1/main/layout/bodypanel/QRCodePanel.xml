@@ -28,7 +28,7 @@
 								<valign>center</valign>
 								<halign>center</halign>
 								<textcolor>DDDDDD</textcolor>
-								<font>font.text22</font>
+								<font>font.text19</font>
 								<text>绑定微信账号</text>
 							</attr>
 						</obj>
@@ -41,7 +41,7 @@
 								<valign>center</valign>
 								<halign>center</halign>
 								<textcolor>DDDDDD</textcolor>
-								<font>font.text22</font>
+								<font>font.text19</font>
 								<text>实时查询收益与元宝提现</text>
 							</attr>
 						</obj>
@@ -51,7 +51,7 @@
 								<top>107</top>
 								<width>172</width>
 								<height>172</height>
-								<texture></texture>
+								<texture>GXZB.QRCodePanel.QRCodeBkg</texture>
 							</attr>
 							<children>
 								<obj id="QRCodePanel.Panel.QRCode.TmpCode" class="ImageObject">
@@ -60,10 +60,9 @@
 										<top>5</top>
 										<width>162</width>
 										<height>162</height>
-										<image></image>
+										<image>GXZB.QRCodePanel.QRCode.Default</image>
 										<valign>center</valign>
 										<halign>center</halign>
-										<zorder>50</zorder>
 										<drawmode>1</drawmode>
 										<antialias>2</antialias>
 									</attr>
@@ -74,6 +73,7 @@
 										<top>5</top>
 										<width>162</width>
 										<height>162</height>
+										<!--visible>false</visible-->
 									</attr>
 									<children>
 										<obj id="QRCodePanel.Panel.QRCode.Failed.Desc" class="TextObject">
@@ -87,6 +87,7 @@
 												<textcolor>DDDDDD</textcolor>
 												<font>font.text13</font>
 												<text>二维码生成失败</text>
+												<!--visible>false</visible-->
 											</attr>
 										</obj>
 										<obj id="QRCodePanel.Panel.QRCode.Failed.Refresh" class="TextLinkEx">
@@ -101,6 +102,8 @@
 												<Font>font.yahei13.underline</Font>
 												<TextColor>system.black</TextColor>
 												<TextHoverColor>system.black</TextHoverColor>
+												<Underline>false</Underline>
+												<!--Show>false</Show-->
 											</attr>
 											<eventlist>
 												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
@@ -115,8 +118,21 @@
 										<top>5</top>
 										<width>162</width>
 										<height>162</height>
+										<!--visible>false</visible-->
 									</attr>
 									<children>
+										<obj id="QRCodePanel.Panel.QRCode.Expire.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
 										<obj id="QRCodePanel.Panel.QRCode.Expire.Desc" class="TextObject">
 											<attr>
 												<left>1</left>
@@ -125,9 +141,10 @@
 												<height>16</height>
 												<valign>center</valign>
 												<halign>center</halign>
-												<textcolor>DDDDDD</textcolor>
+												<textcolor>system.white</textcolor>
 												<font>font.text13</font>
 												<text>二维码已过期</text>
+												<!--visible>false</visible-->
 											</attr>
 										</obj>
 										<obj id="QRCodePanel.Panel.QRCode.Expire.Refresh" class="TextLinkEx">
@@ -138,10 +155,12 @@
 												<height>16</height>
 												<HAlign>center</HAlign>
 												<VAlign>center</VAlign>
-												<Text>请刷新</Text>
+												<Text>重新绑定</Text>
 												<Font>font.yahei13.underline</Font>
-												<TextColor>system.black</TextColor>
-												<TextHoverColor>system.black</TextHoverColor>
+												<TextColor>system.white</TextColor>
+												<TextHoverColor>system.white</TextHoverColor>
+												<Underline>false</Underline>
+												<!--Show>false</Show-->
 											</attr>
 											<eventlist>
 												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
@@ -156,12 +175,25 @@
 										<top>5</top>
 										<width>162</width>
 										<height>162</height>
+										<!--visible>false</visible-->
 									</attr>
 									<children>
+										<obj id="QRCodePanel.Panel.QRCode.Success.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
 										<obj id="QRCodePanel.Panel.QRCode.Success.Desc" class="TextObject">
 											<attr>
 												<left>1</left>
-												<top>188</top>
+												<top>(father.height-16)/2</top>
 												<width>father.width - 2</width>
 												<height>16</height>
 												<valign>center</valign>
@@ -169,6 +201,7 @@
 												<textcolor>DDDDDD</textcolor>
 												<font>font.text13</font>
 												<text>绑定成功</text>
+												<!--visible>false</visible-->
 											</attr>
 										</obj>
 									</children>
@@ -181,10 +214,12 @@
 								<top>305</top>
 								<width>160</width>
 								<height>46</height>
-								<NormalBkgID>GXZB.QRCodePanel.BegainMining</NormalBkgID>
-								<DownBkgID>GXZB.QRCodePanel.BegainMining</DownBkgID>
-								<HoverBkgID>GXZB.QRCodePanel.BegainMining</HoverBkgID>
-								<DisableBkgID>GXZB.QRCodePanel.BegainMining</DisableBkgID>
+								<NormalBkgID>GXZB.Panel.Button</NormalBkgID>
+								<DownBkgID>GXZB.Panel.Button</DownBkgID>
+								<HoverBkgID>GXZB.Panel.Button</HoverBkgID>
+								<DisableBkgID>GXZB.Panel.Button</DisableBkgID>
+								<TextFont>font.text18</TextFont>
+								<Text>开始赚宝</Text>
 								<Visible>false</Visible>
 							</attr>									
 							<eventlist>
@@ -194,7 +229,7 @@
 						<obj id="QRCodePanel.Panel.ActiveTime" class="TextObject">
 							<attr>
 								<left>10</left>
-								<top>308</top>
+								<top>300</top>
 								<width>father.width - 10</width>
 								<height>16</height>
 								<valign>center</valign>
@@ -202,20 +237,22 @@
 								<textcolor>DDDDDD</textcolor>
 								<font>font.text13</font>
 								<text>二维码有效时间0秒</text>
+								<visible>false</visible>
 							</attr>
 						</obj>
 						<obj id="QRCodePanel.Panel.UnBind" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>
-								<top>308</top>
+								<top>360</top>
 								<width>80</width>
 								<height>16</height>
 								<HAlign>center</HAlign>
 								<VAlign>center</VAlign>
 								<Text>暂不绑定</Text>
-								<Font>font.yahei13.underline</Font>
-								<TextColor>system.black</TextColor>
+								<Font>font.yahei13</Font>
+								<TextColor>system.gray</TextColor>
 								<TextHoverColor>system.black</TextHoverColor>
+								<Show>true</Show>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickUnBindWeiXin" />
@@ -226,6 +263,7 @@
 			</children>
 			<eventlist>
 				<event name="OnInitControl" file="QRCodePanel.xml.lua" func="OnInitControl" />
+				<event name="OnVisibleChange" file="QRCodePanel.xml.lua" func="OnVisibleChange" />
 			</eventlist>
 		</objtemplate>
 	</control>	

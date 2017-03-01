@@ -13,17 +13,24 @@ local gbLoadCfgSucc = false
 local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
+
 local g_strPoolUrl = nil
+local g_strWallet = nil
 local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
 local g_bWorking = false
 local g_WorkingTimerId = nil
-local g_WorkingCounter = 30
+--local g_WorkingFailCounter = 30  --30秒无状态就表示失败
 local g_PreWorkState = 0
 local g_WorkModel = 1 -- 默认智能
 
-local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
+--服务端信息
+local g_SpeedSum = 0 
+local g_PerSpeed = 0
+local g_Balance = 0
+
+--local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
 	[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
@@ -194,7 +201,6 @@ function RegisterFunctionObject(self)
 	obj.GetInstallSrc = GetInstallSrc
 	obj.SaveAllConfig = SaveAllConfig
 	obj.CheckPeerIDList = CheckPeerIDList
-	obj.DownLoadHeadImg = DownLoadHeadImg
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
@@ -204,15 +210,30 @@ function RegisterFunctionObject(self)
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
 	obj.GetUserWorkID = GetUserWorkID
 	obj.GetMainHostWnd = GetMainHostWnd
+	obj.ChangeMainBodyPanel = ChangeMainBodyPanel
 	obj.CheckIsBinded = CheckIsBinded
+	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
+	obj.UpdateUserBalance = UpdateUserBalance
 	obj.NotifyPause = NotifyPause
 	obj.NotifyQuit = NotifyQuit
 	obj.NotifyStart = NotifyStart
 	obj.CheckIsWorking = CheckIsWorking
 	obj.GeneratTaskInfo = GeneratTaskInfo
-	obj.ClearBindInfo = ClearBindInfo
+	obj.UnBindingClientFromClient = UnBindingClientFromClient
+	obj.UnBindingClientFromServer = UnBindingClientFromServer
 	obj.DownLoadNewVersion = DownLoadNewVersion
 	XLSetGlobal("Global.FunctionHelper", obj)
+end
+
+function ChangeMainBodyPanel(strPanelName)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:ChangePanel(strPanelName)
 end
 
 function SaveCommonUpdateUTC()
@@ -1351,7 +1372,6 @@ function GetUserWorkID(fnCallBack)
 					return 
 				end
 				local strWorkID = tabInfo["data"]["workerID"]
-				--strWorkID = "testtttasdoiweqwehjqwjekawe"
 				tUserConfig["tUserInfo"]["strWorkID"] = strWorkID
 				SaveConfigToFileByKey("tUserConfig")
 				fnCallBack(true,strWorkID)
@@ -1364,19 +1384,25 @@ function GetUserWorkID(fnCallBack)
 	end
 end
 
-function QuerySvrForLoginInfo(strWorkerID)
+function QuerySvrForLoginInfo()
+	--这里保证workID不位空
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
 	local strInterfaceName = "bind"
-	local strInterfaceParam = "workerID=" .. Helper:UrlEncode(tostring(strWorkerID))
+	local strInterfaceParam = "workerID=" .. Helper:UrlEncode(tostring(strWorkID))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForLoginInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
-function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
-	local strBindResult = QuerySvrForLoginInfo(strWorkerID)
-	--strBindResult = "http://cloud.v.xunlei.com/temp/login.dat"
-	NewAsynGetHttpContent(strBindResult.."&rd="..tostring(tipUtil:GetCurrentUTCTime()), false
+function CycleQuerySeverForBindResult(fnCallBack, nTimeoutInMS)
+	local strBindResult = QuerySvrForLoginInfo()
+	strBindResult = strBindResult.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	NewAsynGetHttpContent(strBindResult, false
 	, function(nRet, strContent, respHeaders)
 		TipLog("[CycleQuerySeverForBindResult] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
@@ -1394,7 +1420,7 @@ function CycleQuerySeverForBindResult(strWorkerID, fnCallBack, nTimeoutInMS)
 		else
 			fnCallBack(false,"获取绑定二维码信息失败，请检测网络")
 		end		
-	end,nil)
+	end,nTimeoutInMS)
 end
 
 
@@ -1422,8 +1448,8 @@ function DownLoadTempQrcode(fnCallBack)
 	GetUserWorkID(function(bWorkID,strWorkID)
 		if bWorkID then
 			local strQrcodeUrl = QuerySvrForQrcodeInfo(strWorkID)
+			strQrcodeUrl = strQrcodeUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 			TipLog("[DownLoadTempQrcode] strQrcodeUrl = " .. strQrcodeUrl)
-			--strQrcodeUrl = "http://cloud.v.xunlei.com/temp/qrcode.dat"
 			NewAsynGetHttpContent(strQrcodeUrl, false
 			, function(nRet, strContent, respHeaders)
 				TipLog("[DownLoadTempQrcode] nRet:"..tostring(nRet)
@@ -1456,7 +1482,7 @@ function DownLoadTempQrcode(fnCallBack)
 							return 
 						end
 						tabInfo["data"]["qrcodePath"] = strDownLoadPath
-						tabInfo["data"]["workerID"] = strWorkID
+						--tabInfo["data"]["workerID"] = strWorkID
 						fnCallBack(true,tabInfo)
 					end, expire)
 				else
@@ -1573,7 +1599,7 @@ function QuerySvrForReportPoolInfo()
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(GetHostName(g_strPoolUrl))))
-	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strWallet"])))
+	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_strWallet)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
@@ -1602,28 +1628,18 @@ end
 function InitMinerInfoToServer()
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+	--[[
 	SendMinerInfoToServer(QuerySvrForPushCalcInfo(0),1,function(tabInfo)
 		
 	end)
+	--]]
+	QueryClientInfo(0)
 end
 
---查询客户端信息
-function QueryClientInfo(callback)
-	if type(callback) ~= "function" then
-		return
-	end
-	--callback(true, {balance = 345})
-	--if true then return end
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	if type(tUserConfig["tUserInfo"]) ~= "table" then
-		tUserConfig["tUserInfo"] = {}
-	end
-	local strAPIName = "getWorkerInfo"
-	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
-				.."&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-				.. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
-	local strTarParam = MakeInterfaceMd5(strAPIName, strOgriParam)
-	local strReguestUrl =  g_strSeverInterfacePrefix .. strTarParam
+--上报并且查询客户端信息
+function QueryClientInfo(nMiningSpeed)
+	local strReguestUrl = QuerySvrForPushCalcInfo(nMiningSpeed)
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[QueryClientInfo] strReguestUrl = " .. strReguestUrl)
 	NewAsynGetHttpContent(strReguestUrl, false
 	, function(nRet, strContent, respHeaders)
@@ -1636,12 +1652,23 @@ function QueryClientInfo(callback)
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 
 				or type(tabInfo["data"]) ~= "table" then
-				callback(false)
+				TipLog("[QueryClientInfo] parse info error.")
 				return 
 			end
-			callback(true, tabInfo)
+			if tabInfo["data"]["status"] ~= 1 then
+				if CheckIsBinded() then
+					UnBindingClientFromServer()
+				end	
+			end
+			if tonumber(tabInfo["data"]["balance"]) ~= nil then
+				g_Balance = tabInfo["data"]["balance"]
+				UpdateUserBalance()
+			end
+			if tonumber(tabInfo["data"]["speed"]) ~= nil then
+				g_PerSpeed = tabInfo["data"]["speed"]
+			end
 		else
-			callback(false)
+			TipLog("[QueryClientInfo] query sever failed.")
 		end		
 	end)
 end
@@ -1668,15 +1695,6 @@ function GetUnBindUrl()
 end
 
 function SetMachineNameChangeInfo()
-	local wnd = GetMainHostWnd()
-	if not wnd then
-		return
-	end
-	local objtree = wnd:GetBindUIObjectTree()
-	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
-	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	--objMainBodyCtrl:UpdateMachineName(tUserConfig)
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 end
 
@@ -1688,7 +1706,7 @@ function SetMinerInfo(strText)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	objMainBodyCtrl:UpdateMinerInfo(strText)
+	--设置工作进程状态信息
 end
 
 function UpdateWorkSpeed(strSpeed)
@@ -1696,19 +1714,7 @@ function UpdateWorkSpeed(strSpeed)
 	local nSpeed = tonumber(strSpeed) or 0
 	gCurrentWorkSpeed = nSpeed
 	local strSpeed = FormatHashRate(nSpeed)
-	UpdateSpeed2MainBody(strSpeed)
 	UpdateSpeed2XuanFuUI(strSpeed)
-end
-
-function UpdateSpeed2MainBody(strSpeed)
-	local wnd = GetMainHostWnd()
-	if not wnd then
-		return
-	end
-	local objtree = wnd:GetBindUIObjectTree()
-	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
-	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	objMainBodyCtrl:UpdateSpeed(strSpeed)
 end
 
 function UpdateSpeed2XuanFuUI(nSpeed)
@@ -1720,39 +1726,6 @@ function UpdateSpeed2XuanFuUI(nSpeed)
 			textShowSpeed:SetText(tostring(nSpeed).."/S")
 		end
 	end
-end
-
-function SetUIWeiXinInfo()
-	local wnd = GetMainHostWnd()
-	if not wnd then
-		return
-	end
-	local objtree = wnd:GetBindUIObjectTree()
-	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
-	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	objMainBodyCtrl:UpdateWeiXinInfo(tUserConfig)
-end
-
-function DownLoadHeadImg(tUserConfig)
-	if IsRealString(tUserConfig["tUserInfo"]["wxHeadImgPath"]) 
-		and tipUtil:QueryFileExists(tUserConfig["tUserInfo"]["wxHeadImgPath"]) then
-		SetUIWeiXinInfo()
-		return
-	end	
-	local strHeadImgUrl = tUserConfig["tUserInfo"]["wxHeadImgUrl"]
-	local strHeadImgPath = GetResSavePath("wxheadimg.jpg")
-	NewAsynGetHttpFile(strHeadImgUrl, strHeadImgPath, false, function(bRet, strDownLoadPath)
-		TipLog("[DownLoadHeadImg] NewAsynGetHttpFile:bRet = " .. tostring(bRet) 
-				.. ", strHeadImgUrl = " .. tostring(strHeadImgUrl) .. ", strDownLoadPath = " .. tostring(strDownLoadPath))
-		if 0 ~= bRet then
-			TipLog("[DownLoadHeadImg] DownLoad failed")
-			return 
-		end
-		tUserConfig["tUserInfo"]["wxHeadImgPath"] = strDownLoadPath
-		SaveConfigToFileByKey("tUserConfig")
-		SetUIWeiXinInfo()
-	end)
 end
 
 function InitMachName()
@@ -1806,6 +1779,7 @@ function GeneratTaskInfo(fnCallBack)
 					strPoolUrl = string.gsub(strPoolUrl,"(<workid>)",strWorkID)
 					if IsRealString(strWorkID) and IsRealString(strPoolUrl) then
 						g_strPoolUrl = strPoolUrl
+						g_strWallet = tabItem["strWallet"]
 						InitMinerInfoToServer()
 						fnCallBack(true)
 					end
@@ -1817,29 +1791,17 @@ function GeneratTaskInfo(fnCallBack)
 	end)	
 end
 
-function UpdateBindButtonText(strText)
-	local wnd = GetMainHostWnd()
-	if not wnd then
-		return
-	end
-	local objtree = wnd:GetBindUIObjectTree()
-	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
-	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	objMainBodyCtrl:UpdateBindButtonText(strText)
-end
-
 function SetUserBindInfo(tabBindInfo)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
-	tUserConfig["tUserInfo"]["wxHeadImgUrl"] = tabBindInfo["data"]["wxHeadImgUrl"]
+	tUserConfig["tUserInfo"]["strHeadImgUrl"] = tabBindInfo["data"]["wxHeadImgUrl"]
 	tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["data"]["wxName"]
-	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["openID"]
+	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
-	DownLoadHeadImg(tUserConfig)
-	UpdateBindButtonText("解除绑定")
+	--UpdateBindButtonText("解除绑定")
 end
 
 function CheckIsBinded()
@@ -1853,15 +1815,93 @@ function CheckIsBinded()
 	return false
 end
 
-function ClearBindInfo()
+function CheckIsGettedWorkID()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	if IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
+		return true
+	end
+	return false
+end
+
+--解绑三步
+--[[
+1.清空绑定数据
+2.退出挖矿
+3.更新UI
+--]]
+function ChangeBindWeiXinEntryVisible(bVisible)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local ObjMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	if ObjMiningPanel then
+		ObjMiningPanel:ChangeBindEntryVisible(bVisible)
+	end
+end
+
+function UnBindingClientFromClient()
 	SendMinerInfoToServer(GetUnBindUrl(),3)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	--[[
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	for strKey, strValue in pairs(tUserConfig["tUserInfo"]) do
+		if strKey ~= "strWorkID" then
+			tUserConfig["tUserInfo"][strKey] = nil
+		end
+	end
+	--]]
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
-	SetUIWeiXinInfo()
+	if CheckIsWorking() then
+		NotifyQuit()
+	end
+	ChangeBindWeiXinEntryVisible(false)
+end
+
+function UnBindingClientFromServer()
+	--不用再发统计了
+	--SendMinerInfoToServer(GetUnBindUrl(),3)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	--[[
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	for strKey, strValue in pairs(tUserConfig["tUserInfo"]) do
+		if strKey ~= "strWorkID" then
+			tUserConfig["tUserInfo"][strKey] = nil
+		end
+	end
+	--]]
+	tUserConfig["tUserInfo"] = nil
+	SaveConfigToFileByKey("tUserConfig")
+	if CheckIsWorking() then
+		NotifyQuit()
+	end
+	ChangeBindWeiXinEntryVisible(false)
+end
+
+function UpdateUserBalance(nBalance)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateUserBalance(nBalance)
 end
 
 
+------------
 function NotifyPause()
 	IPCUtil:StopWork()
 	if g_WorkingTimerId then
@@ -1889,8 +1929,8 @@ function NotifyStart()
 		local strDir = GetModuleDir()
 		local strWorkExe = tipUtil:PathCombine(strDir,"Ethminer.exe")
 		local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
-		IPCUtil:StartWork(strCmdLine)
 		g_bWorking = true
+		IPCUtil:StartWork(strCmdLine)
 		WorkingTimerHandle()
 	end
 	if g_strPoolUrl then
@@ -1938,7 +1978,8 @@ function QueryWorkState()
 	elseif nType == MING_MINING_SPEED then
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
-			UpdateWorkSpeed(tostring(p1))
+			g_SpeedSum = g_SpeedSum + p1
+			--UpdateWorkSpeed(p1*g_PerSpeed)
 		end	
 		return true
 	elseif nType == MING_MINING_EEEOR then
@@ -1972,21 +2013,42 @@ function ChangeWorkModel()
 end
 
 function WorkingTimerHandle()
-	local nConuter = 0
+	local interval = 1
+	local tServerInterfaceCfg = g_ServerConfig["tServerInterfaceCfg"]
+	if type(tServerInterfaceCfg) ~= "table" then
+		tServerInterfaceCfg = {}
+	end
+	local nReportConuter = 1
+	local nReportCalcInterval = tServerInterfaceCfg["nReportCalcInterval"] or 60
+	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
+	
+	local nWorkModelConuter = 1
+	local nWorkModelInterval = math.ceil(5/interval)
+	
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
-			if not QueryWorkState() and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
-				if nConuter > g_WorkingCounter then
-					--30秒没响应 是否要杀进程
-					UpdateWorkSpeed(tostring(0))
+			local bQuery = QueryWorkState()
+			if nReportConuter >= nReportCalcInterval then
+				if not bQuery and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
+					--借用上报算力的间隔来，检测工作进程是否没有响应了
+					--nReportCalcInterval秒没响应 是否要杀进程
+					--UpdateWorkSpeed(tostring(0))
 				end
+				local nAverageSpeed = math.floor(g_SpeedSum/nReportConuter)
+				g_SpeedSum = 0
+				nReportConuter = 1
+				QueryClientInfo(nAverageSpeed)
 			else
-				nConuter = 0
-			end
-			nConuter = nConuter + 1
+				nReportConuter = nReportConuter + 1
+			end	
 			--智能限速
-			ChangeWorkModel()
-		end, 1000)
+			if nWorkModelConuter > nWorkModelInterval then
+				--ChangeWorkModel()
+				nWorkModelConuter = 1
+			else
+				nWorkModelConuter = nWorkModelConuter + 1
+			end
+		end, interval*1000)
 	end	
 end
 

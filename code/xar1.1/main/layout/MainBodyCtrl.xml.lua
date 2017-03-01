@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local FunctionObj = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local Helper =  XLGetGlobal("Helper")
 -----事件----
 
@@ -104,10 +104,9 @@ function GetChildObjByCtrlName(self, strCtrlName)
 	return objCurPanel
 end
 
-function UpdateWeiXinInfo(self, tUserConfig)
+function UpdateUserBalance(self, nBalance)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
-		
 		TipLog("[UpdateWeiXinInfo] get objPanelCenter failed ")
 		return false
 	end
@@ -115,104 +114,21 @@ function UpdateWeiXinInfo(self, tUserConfig)
 	local nChildCnt = objPanelCenter:GetChildCount()
 	for i=0,nChildCnt-1 do
 		local objChild = objPanelCenter:GetChildByIndex(i)
-		if objChild and type(objChild.UpdateWeiXinInfo) == "function" then
-			objChild:UpdateWeiXinInfo(tUserConfig)
+		if objChild and type(objChild.UpdateUserBalance) == "function" then
+			objChild:UpdateUserBalance(nBalance)
 		end	
 	end
 	return true
 end
 
-function UpdateBindButtonText(self, strText)
-	local objButton= self:GetControlObject("MainPanel.Buttom.BindWeiXin")
-	objButton:SetText(strText)
-end
 
-function UpdateMachineName(self, tUserConfig)
-	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
-	if objPanelCenter == nil then
-		
-		TipLog("[UpdateMachineName] get objPanelCenter failed ")
-		return false
-	end
-	local nChildCnt = objPanelCenter:GetChildCount()
-	for i=0,nChildCnt-1 do
-		local objChild = objPanelCenter:GetChildByIndex(i)
-		if objChild and type(objChild.UpdateMachineName) == "function" then
-			objChild:UpdateMachineName(tUserConfig)
-		end	
-	end
-	
-	return true
-end
-
-function UpdateSpeed(self, strSpeed)
-	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
-	if objPanelCenter == nil then
-		
-		TipLog("[UpdateSpeed] get objPanelCenter failed ")
-		return false
-	end
-	local nChildCnt = objPanelCenter:GetChildCount()
-	for i=0,nChildCnt-1 do
-		local objChild = objPanelCenter:GetChildByIndex(i)
-		if objChild and type(objChild.UpdateSpeed) == "function" then
-			objChild:UpdateSpeed(strSpeed)
-		end	
-	end
-	
-	return true
-end
-
-function UpdateMinerInfo(self, strText)
-	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
-	if objPanelCenter == nil then
-		
-		TipLog("[UpdateMinerInfo] get objPanelCenter failed ")
-		return false
-	end
-	local nChildCnt = objPanelCenter:GetChildCount()
-	for i=0,nChildCnt-1 do
-		local objChild = objPanelCenter:GetChildByIndex(i)
-		if objChild and type(objChild.UpdateMinerInfo) == "function" then
-			objChild:UpdateMinerInfo(strText)
-		end	
-	end
-	
-	return true
-end
 
 function OnClickMiningPanel(self)
-	--[[
-	local objmain = self:GetOwnerControl()
-	if objmain then
-		objmain:ChangePanel("LinePanel")
-		local lineobj = objmain:GetObject("MainBody_LinePanel:LinePanel.LineChart")
-		if lineobj then
-			local attr = lineobj:GetAttribute()
-			attr.currentpanel = 1
-			attr.Data = {{1, 1000}, {2, 1000}, {3, 1000}, {4, 1000}, {5, 0}}
-			lineobj:Update()
-		end
-	end
-	--]]
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"MiningPanel")
 end
 
 function OnClickTakeCashPanel(self)
-	--[[
-	local objmain = self:GetOwnerControl()
-	if objmain then
-		objmain:ChangePanel("LinePanel")
-		local lineobj = objmain:GetObject("MainBody_LinePanel:LinePanel.LineChart")
-		if lineobj then
-			local attr = lineobj:GetAttribute()
-			attr.currentpanel = 1
-			attr.Data = {{1, 1000}, {2, 1000}, {3, 1000}, {4, 1000}, {5, 0}}
-			lineobj:Update()
-		end
-	end
-	--]]
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"TakeCashPanel")
 end

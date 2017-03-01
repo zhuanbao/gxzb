@@ -9,6 +9,7 @@
 			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
 			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+			<UpdateUserBalance file="MainBodyCtrl.xml.lua" func="UpdateUserBalance"/>
 		</method_def>
 		<event_def>
 			
