@@ -2,6 +2,7 @@
 	<resource>
 		<font id="default.font.underline" height="12" facename="宋体" underline="1"/>
 		<font id="font.underline" height="12" facename="微软雅黑" underline="1"/>
+		<font id="font.yahei13" height="13" facename="微软雅黑"/>
 		<font id="font.yahei13.underline" height="13" facename="微软雅黑" underline="1"/> 
 		<font id="font.yahei12.underline" height="12" facename="微软雅黑" underline="1"/> 
 		
