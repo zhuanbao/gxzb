@@ -32,7 +32,6 @@ function InitPanelList(self, tPanelList)
 			TipLog("[InitPanelList] CreateUIObject failed, strCtrlName:"..tostring(strCtrlName))
 			return false
 		end
-		
 		objPanelCenter:AddChild(objChild)
 		objChild:SetVisible(false)
 		objChild:SetChildrenVisible(false)
@@ -71,10 +70,11 @@ function ChangePanel(self, strNewCtrlName)
 		objCurPanel:SetVisible(false)
 		objCurPanel:SetChildrenVisible(false)
 	end
-	
+
+	objNewPanel:SetObjPos(0, 0, "father.width", "father.height")
 	objNewPanel:SetVisible(true)
 	objNewPanel:SetChildrenVisible(true)
-	objNewPanel:SetObjPos(0, 0, "father.width", "father.height")
+	
 	
 	if type(objNewPanel.OnShowPanel) == "function" then
 		objNewPanel:OnShowPanel(true)

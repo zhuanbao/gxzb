@@ -6,6 +6,7 @@
 		</attr_def>
 		<method_def>
 			<Update file="EarningsPanel.xml.lua" func="LineChartUpdate"/>
+			<OnShowPanel file="EarningsPanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<objtemplate>
 			<children>

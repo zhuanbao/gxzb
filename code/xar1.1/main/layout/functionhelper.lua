@@ -198,8 +198,11 @@ function RegisterFunctionObject(self)
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
 	obj.InitMinerInfoToServer = InitMinerInfoToServer
 	obj.QueryClientInfo = QueryClientInfo
+	obj.TakeCashToServer = TakeCashToServer
 	obj.GetInstallSrc = GetInstallSrc
 	obj.SaveAllConfig = SaveAllConfig
+	obj.GetCurrentServerTime = GetCurrentServerTime
+	obj.CheckIsAnotherDay = CheckIsAnotherDay
 	obj.CheckPeerIDList = CheckPeerIDList
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
@@ -468,8 +471,8 @@ end
 function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutInMS)
 	local bHasAlreadyCallback = false
 	local timerID = nil
-	
-	if string.find(strUrl, "^https://") == nil then
+	if false then
+	--if string.find(strUrl, "^https://") == nil then
 		tipAsynUtil:AsynGetHttpFile(strUrl, strSavePath, bDelete, 
 			function (nRet, strTargetFilePath, strHeaders)
 				if timerID ~= nil then
@@ -561,6 +564,60 @@ function SetIsUpdating(bIsUpdating)
 	end
 end
 
+function SplitStringBySeperator(strToSplit, strSeperator)
+	local tResult = {}
+	
+	if type(strToSplit) == "string" and type(strSeperator) == "string" then
+		local nSepStartPos = 0
+		local nSepEndPos = 0
+		local nLastSepStartPos = 0
+		local nLastSepEndPos = 0
+		while true do
+			nLastSepStartPos = nSepStartPos
+			nLastSepEndPos = nSepEndPos
+			nSepStartPos, nSepEndPos = string.find(strToSplit, strSeperator, nLastSepEndPos + 1)
+			if type(nSepStartPos) ~= "number" or type(nSepEndPos) ~= "number" then
+				tResult[#tResult + 1] = string.sub(strToSplit, nLastSepEndPos + 1, -1)
+				break
+			end
+			tResult[#tResult + 1] = string.sub(strToSplit, nLastSepEndPos + 1, nSepStartPos - 1)
+		end
+	end
+
+	return tResult
+end
+
+function ExtractHttpHeaders(strHttpHeaders)
+	local tResult = {}
+	
+	local tHeaderSet = SplitStringBySeperator(strHttpHeaders, "\r\n")
+	for i = 1, #tHeaderSet do
+		local tHeader = SplitStringBySeperator(tHeaderSet[i], ": ")
+		if #tHeader == 2 
+			and type(tHeader[1]) == "string" and tHeader[1] ~= "" 
+			and type(tHeader[2]) == "string" and tHeader[2] ~= "" 
+			then
+			tResult[tHeader[1]] = tHeader[2]
+		end
+	end
+	
+	return tResult
+end
+
+function UpdateTimeCalibration(nLocalUTCInSec, nSvrUTCInSec)
+	local nDefaultUTCInSec = tipUtil:GetCurrentUTCTime() or 0
+	local nNewLocalUTCInSec = nDefaultUTCInSec
+	local nNewSvrUTCInSec = nDefaultUTCInSec
+	if type(nLocalUTCInSec) == "number" and type(nSvrUTCInSec) == "number" then
+		nNewLocalUTCInSec = nLocalUTCInSec
+		nNewSvrUTCInSec = nSvrUTCInSec
+	end
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tStandardTime"] = {}
+	tUserConfig["tStandardTime"]["nLocalTime"] = nNewLocalUTCInSec
+	tUserConfig["tStandardTime"]["nServerTime"] = nNewSvrUTCInSec
+	SaveConfigToFileByKey("tUserConfig")
+end
 
 function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -580,18 +637,60 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	local strStamp = GetTimeStamp()
 	local strURLFix = strConfigURL..strStamp
 	local nTime = tonumber(nTimeInMs) or 5*1000
-		
+	local nBeginLocalUTCInSec = tipUtil:GetCurrentUTCTime() or 0	
 	NewAsynGetHttpFile(strURLFix, strSavePath, false
-	, function(bRet, strRealPath)
+	, function(bRet, strRealPath, strHttpHeaders)
 		TipLog("[DownLoadServerConfig] bRet:"..tostring(bRet)
-				.." strRealPath:"..tostring(strRealPath))
-				
+				..", strRealPath:"..tostring(strRealPath)
+				.. ", strHttpHeaders = " .. tostring(strHttpHeaders))
+		local nEndLocalUTCInSec = tipUtil:GetCurrentUTCTime() or 0
+		local nAvgLocalUTCInSec = math.floor((nBeginLocalUTCInSec + nEndLocalUTCInSec) / 2)
+		local tHttpHeaders = ExtractHttpHeaders(strHttpHeaders)	
+		if type(tHttpHeaders["Date"]) == "string" then
+			local nSvrUTCInSec = tipUtil:InternetTimeToUTCTime(tHttpHeaders["Date"])
+			if nAvgLocalUTCInSec ~= 0 
+				and type(nSvrUTCInSec) == "number" and nSvrUTCInSec ~= 0 
+				then
+				UpdateTimeCalibration(nAvgLocalUTCInSec, nSvrUTCInSec)
+			end
+		end
 		if 0 == bRet then
 			fnCallBack(0, strSavePath)
 		else
 			fnCallBack(bRet)
 		end		
 	end, nTime)
+end
+
+function GetTimeCalibration()
+	local nDefaultUTCInSec = tipUtil:GetCurrentUTCTime() or 0
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local tTime = tUserConfig["tStandardTime"] or {}
+	local nLocalTimeUTCInSec = tTime["nLocalTime"] or nDefaultUTCInSec
+	local nSvrTimeUTCInSec = tTime["nServerTime"] or nDefaultUTCInSec
+	if tTime["ignore"] == 1 then
+		nLocalTimeUTCInSec = 0
+		nSvrTimeUTCInSec = 0
+	end
+	
+	return nLocalTimeUTCInSec, nSvrTimeUTCInSec
+end
+
+function GetCurrentServerTime()
+	local nCurLocalUTCInSec = tipUtil:GetCurrentUTCTime() or 0
+	local nLocalUTCInSec, nSvrUTCInSec = GetTimeCalibration()
+	local nCurSvrUTCInSec = nCurLocalUTCInSec + (nSvrUTCInSec - nLocalUTCInSec)
+	return nCurSvrUTCInSec
+end
+
+function CheckIsAnotherDay(nLastTime, nCurrentTime)
+	local bRet = false
+	local nLYear, nLMonth, nLDay, nLHour, nLMinute, nLSecond = tipUtil:FormatCrtTime(nLastTime)
+	local nCYear, nCMonth, nCDay, nCHour, nCMinute, nCSecond = tipUtil:FormatCrtTime(nCurrentTime)
+	if nLYear ~= nCYear or nLMonth ~= nCMonth or nLDay ~= nCDay then
+		bRet = true
+	end
+	return bRet
 end
 
 function SaveAllConfig()
@@ -1625,6 +1724,50 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	return strReguestUrl
 end
 
+function QuerySvrForTakeCashInfo(nMoney)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "pushCalc"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
+	strInterfaceParam = strInterfaceParam .. "&cash=" .. Helper:UrlEncode((tostring(nMoney)))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForTakeCashInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+--提现接口
+function TakeCashToServer(nMoney, fnCallBack)
+	local strReguestUrl = QuerySvrForTakeCashInfo(nMoney)
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	TipLog("[TakeCashToServer] strReguestUrl = " .. strReguestUrl)
+	NewAsynGetHttpContent(strReguestUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[TakeCashToServer] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local tabInfo = DeCodeJson(strContent)	
+			if type(tabInfo) ~= "table" then
+				TipLog("[QueryClientInfo] parse info error.")
+				fnCallBack(false)
+				return
+			end
+			fnCallBack(true, tabInfo)
+		else
+			TipLog("[TakeCashToServer] get content failed.")
+			fnCallBack(false)
+		end	
+	end)
+end
+
+--挖矿信息
 function InitMinerInfoToServer()
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
@@ -1662,7 +1805,7 @@ function QueryClientInfo(nMiningSpeed)
 			end
 			if tonumber(tabInfo["data"]["balance"]) ~= nil then
 				g_Balance = tabInfo["data"]["balance"]
-				UpdateUserBalance()
+				UpdateUserBalance(g_Balance)
 			end
 			if tonumber(tabInfo["data"]["speed"]) ~= nil then
 				g_PerSpeed = tabInfo["data"]["speed"]
@@ -1897,6 +2040,12 @@ function UpdateUserBalance(nBalance)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	--for test
+	--[[
+	if nBalance ==  0 then
+		nBalance = 9999999
+	end
+	--]]
 	objMainBodyCtrl:UpdateUserBalance(nBalance)
 end
 

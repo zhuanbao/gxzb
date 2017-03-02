@@ -136,7 +136,9 @@ function OnClickDayBtnLineChart(self)
 	lineobj:Update()
 end
 
-
+function OnShowPanel(self, bShow)
+	
+end
 
 
 

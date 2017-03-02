@@ -4,7 +4,7 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			
+			<OnShowPanel file="QRCodePanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<event_def>
 			

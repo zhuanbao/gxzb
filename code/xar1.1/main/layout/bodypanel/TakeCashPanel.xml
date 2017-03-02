@@ -4,7 +4,8 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			
+			<UpdateUserBalance file="TakeCashPanel.xml.lua" func="UpdateUserBalance"/>
+			<OnShowPanel file="TakeCashPanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<event_def>
 			
@@ -73,11 +74,12 @@
 												<textcolor>444444</textcolor>
 												<font>font.text14</font>
 												<number>1</number>
-												<text></text>
+												<text>可提现0元</text>
+												<enable>0</enable>
 											</attr>
 											<eventlist>
-												<event name="OnFocusChange" file="TakeCashPanel.xml.lua" func="OnFocusChangeEdit" />
-												<event name="OnChange" file="TakeCashPanel.xml.lua" func="OnTextChangeEdit" />
+												<event name="OnFocusChange" file="TakeCashPanel.xml.lua" func="OnEditFocusChange" />
+												<event name="OnChange" file="TakeCashPanel.xml.lua" func="OnEditTextChange" />
 											</eventlist>
 										</obj>
 									</children>
@@ -86,9 +88,9 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.Amount" class="LayoutObject">
 							<attr>
-								<left>113</left>
+								<left>114+1</left>
 								<top>136</top>
-								<width>father.width-2</width>
+								<width>father.width-114-2</width>
 								<height>16</height>
 							</attr>
 							<children>
@@ -96,7 +98,7 @@
 									<attr>
 										<left>0</left>
 										<top>0</top>
-										<width>68</width>
+										<width>66</width>
 										<height>16</height>
 										<valign>center</valign>
 										<halign>left</halign>
@@ -107,25 +109,26 @@
 								</obj>
 								<obj id="TakeCashPanel.Panel.Amount.Num" class="TextObject">
 									<attr>
-										<left>68</left>
+										<left>66+1</left>
 										<top>0</top>
-										<width>30</width>
+										<width>father.width-(66+1)-(41+1)</width>
 										<height>16</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>DDDDDD</textcolor>
+										<textcolor>E5961C</textcolor>
 										<font>font.text13</font>
-										<text>1888</text>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
 									</attr>
 								</obj>
 								<obj id="TakeCashPanel.Panel.Amount.Unit" class="TextObject">
 									<attr>
-										<left>68+30</left>
+										<left>father.width-(41+1)</left>
 										<top>0</top>
-										<width>42</width>
+										<width>41</width>
 										<height>16</height>
-										<valign>left</valign>
-										<halign>center</halign>
+										<valign>center</valign>
+										<halign>right</halign>
 										<textcolor>DDDDDD</textcolor>
 										<font>font.text13</font>
 										<text>个元宝</text>
@@ -145,12 +148,13 @@
 								<DisableBkgID>GXZB.Panel.Button</DisableBkgID>
 								<Visible>true</Visible>
 								<Text>提现</Text>
+								<Enable>false</Enable>
 							</attr>									
 							<eventlist>
 								<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickTakeCash" />
 							</eventlist>
 						</obj>
-						<obj id="TakeCashPanel.Panel.ForbadeTakeDesc" class="TextObject">
+						<obj id="TakeCashPanel.Panel.MsgToUser" class="TextObject">
 							<attr>
 								<left>1</left>
 								<top>250</top>
@@ -161,6 +165,7 @@
 								<textcolor>DDDDDD</textcolor>
 								<font>font.text13</font>
 								<text>今天已提现，请明天再来~</text>
+								<visible>0</visible>
 							</attr>
 						</obj>
 						<obj id="QRCodePanel.Panel.TakeRule" class="TextObject">
@@ -182,7 +187,8 @@
 			</children>
 			<eventlist>
 				<event name="OnInitControl" file="TakeCashPanel.xml.lua" func="OnInitControl" />
-				<event name="OnLButtonDown" file="TakeCashPanel.xml.lua" func="OnLButtonDownCtrl" />
+				<event name="OnVisibleChange" file="TakeCashPanel.xml.lua" func="OnVisibleChange" />
+				<event name="OnLButtonDown" file="TakeCashPanel.xml.lua" func="OnLButtonDownPanel" />
 			</eventlist>
 		</objtemplate>
 	</control>	

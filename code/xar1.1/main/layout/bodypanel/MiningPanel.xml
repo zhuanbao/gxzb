@@ -5,6 +5,8 @@
 		</attr_def>
 		<method_def>
 			<ChangeBindEntryVisible file="MiningPanel.xml.lua" func="ChangeBindEntryVisible"/>
+			<UpdateUserBalance file="MiningPanel.xml.lua" func="UpdateUserBalance"/>
+			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<event_def>
 			
@@ -49,19 +51,55 @@
 								<antialias>2</antialias>
 							</attr>
 						</obj>
-						<obj id="MiningPanel.Panel.Info" class="TextObject">
+						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
 							<attr>
-								<left>1</left>
+								<left>5</left>
 								<top>310</top>
-								<width>father.width - 2</width>
+								<width>father.width-10</width>
 								<height>24</height>
-								<valign>center</valign>
-								<halign>center</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text13</font>
-								<multiline>1</multiline>
-								<text>您的金库有0个元宝</text>
 							</attr>
+							<children>
+								<obj id="MiningPanel.Panel.Amount.Description" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>66</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text13</font>
+										<text>您的金库有</text>
+									</attr>
+								</obj>
+								<obj id="MiningPanel.Panel.Amount.Num" class="TextObject">
+									<attr>
+										<left>66+1</left>
+										<top>0</top>
+										<width>father.width-(66+1)-(41+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>E5961C</textcolor>
+										<font>font.text13</font>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+								<obj id="MiningPanel.Panel.Amount.Unit" class="TextObject">
+									<attr>
+										<left>father.width-(41+1)</left>
+										<top>0</top>
+										<width>41</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>right</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text13</font>
+										<text>个元宝</text>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>

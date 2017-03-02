@@ -157,6 +157,7 @@ function OnInitControl(self)
 end
 
 function OnVisibleChange(self, bVisible)
+	--[[
 	gBinding = bVisible
 	if bVisible then
 		GetQRCodeFromServer(self)
@@ -164,9 +165,18 @@ function OnVisibleChange(self, bVisible)
 		ResetGlobalParam()
 		ResetUIVisible(self)
 	end
+	--]]
 end
 
-
+function OnShowPanel(self, bShow)
+	gBinding = bShow
+	if bShow then
+		GetQRCodeFromServer(self)
+	else
+		ResetGlobalParam()
+		ResetUIVisible(self)
+	end
+end
 
 
 
