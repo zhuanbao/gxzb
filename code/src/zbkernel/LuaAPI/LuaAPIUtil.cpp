@@ -127,6 +127,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetCurrentUTCTime", GetCurrentUTCTime},
 	{"DateTime2Seconds", DateTime2Seconds},
 	{"Seconds2DateTime", Seconds2DateTime},
+	{"InternetTimeToUTCTime", InternetTimeToUTCTime},
 
 	//»¥³âÁ¿º¯Êý
 	{"CreateMutex", CreateNamedMutex},
@@ -2881,6 +2882,48 @@ int LuaAPIUtil::Seconds2DateTime(lua_State* pLuaState)
 		lua_pushnumber(pLuaState, nWeekDate);
 		return 7;
 	}
+	return 0;
+}
+
+#include <WinInet.h>
+#pragma comment(lib, "WinInet.lib")
+int LuaAPIUtil::InternetTimeToUTCTime(lua_State* pLuaState)
+{
+	LuaAPIUtil** ppTipWndUtil = (LuaAPIUtil **)luaL_checkudata(pLuaState, 1, API_UTIL_CLASS);
+	if (ppTipWndUtil != NULL)
+	{
+		if (lua_isstring(pLuaState, 2))
+		{
+			const char *szInetTime = luaL_checkstring(pLuaState, 2);
+			if (szInetTime)
+			{
+				std::wstring strInetTimeW = ultra::_UTF2T(szInetTime);
+
+				::SYSTEMTIME stSince1601;
+				ULONGLONG ftSince1601 = 0;
+
+				::SYSTEMTIME st1970 = {0};
+				st1970.wYear = 1970;
+				st1970.wMonth = 1;
+				st1970.wDay = 1;
+				st1970.wHour = 0;
+				st1970.wMinute = 0;
+				st1970.wSecond = 0;
+				st1970.wMilliseconds = 0;
+				ULONGLONG ft1970 = 0;
+
+				if (   ::InternetTimeToSystemTimeW(strInetTimeW.c_str(), &stSince1601, 0)
+					&& ::SystemTimeToFileTime(&stSince1601, (FILETIME *)&ftSince1601)
+					&& ::SystemTimeToFileTime(&st1970, (FILETIME *)&ft1970))
+				{
+					LONGLONG ftSince1970 = ftSince1601 - ft1970;
+					lua_pushnumber(pLuaState, (lua_Number)(ftSince1970 / 10000000));
+					return 1;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 

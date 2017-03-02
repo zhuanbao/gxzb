@@ -153,7 +153,7 @@ public:
 	static int GetCurrentUTCTime(lua_State* pLuaState);
 	static int DateTime2Seconds(lua_State* pLuaState);
 	static int Seconds2DateTime(lua_State* pLuaState);
-
+	static int InternetTimeToUTCTime(lua_State* pLuaState);
 	//»¥³âÁ¿º¯Êý
 	static int CreateNamedMutex(lua_State* pLuaState);
 	static int CloseNamedMutex(lua_State* pLuaState);
