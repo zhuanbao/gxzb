@@ -164,6 +164,7 @@ function RegisterFunctionObject(self)
 	obj.RegDeleteValue = RegDeleteValue
 	obj.GetPeerID = GetPeerID
 	obj.GetSystemBits = GetSystemBits
+	obj.FormatByteUnit = FormatByteUnit
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGXZBMinorVer = GetGXZBMinorVer
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
@@ -201,6 +202,7 @@ function RegisterFunctionObject(self)
 	obj.QueryClientInfo = QueryClientInfo
 	obj.TakeCashToServer = TakeCashToServer
 	obj.GetInstallSrc = GetInstallSrc
+	obj.GetExePath = GetExePath
 	obj.SaveAllConfig = SaveAllConfig
 	obj.GetCurrentServerTime = GetCurrentServerTime
 	obj.CheckIsAnotherDay = CheckIsAnotherDay
@@ -436,6 +438,45 @@ function FormatHashRate(nSpeed)
 	return strHashRate
 end
 
+function FormatByteUnit(nFileSizeInByte, nPrecision)
+	if nPrecision == nil then
+		nPrecision = 0
+	end
+	local strPrecision = "%." .. tostring(nPrecision) .. "f"
+	local strFileSize = ""
+	if tonumber(nFileSizeInByte) == nil then
+		return strFileSize
+	end
+
+	local nSize = 0
+	local strUnit = ""
+	if  nFileSizeInByte >= 1024*1024*1024*1024 then
+		nSize = nFileSizeInByte/(1024*1024*1024*1024)
+		strUnit = "TB"
+		
+	elseif nFileSizeInByte >= 1024*1024*1024 then  
+		nSize = nFileSizeInByte/(1024*1024*1024)
+		strUnit = "GB"
+		
+	elseif nFileSizeInByte >= 1024*1024 then  
+		nSize = nFileSizeInByte/(1024*1024)
+		strUnit = "MB"
+		
+	elseif nFileSizeInByte >= 1024 then   
+		nSize = nFileSizeInByte/1024
+		strUnit = "KB"
+		
+	else
+		nSize = nFileSizeInByte
+		strUnit = "B"
+	end
+	
+	strFileSize = string.format(strPrecision, nSize)
+	strFileSize = strFileSize..strUnit
+	
+	return strFileSize
+end
+
 function GetPeerID()
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId")
 	if IsRealString(strPeerID) then
@@ -468,6 +509,14 @@ function GetInstallSrc()
 	return ""
 end
 
+function GetExePath()
+	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\Path")
+	if not IsRealString(strExePath) then
+		return tostring(strExePath)
+	else
+		return tipUtil:GetModuleExeName()
+	end
+end
 
 function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutInMS)
 	local bHasAlreadyCallback = false
@@ -2042,7 +2091,7 @@ function UpdateUserBalance(nBalance)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	--for test
-	--[[
+	---[[
 	if nBalance ==  0 then
 		nBalance = 9999999
 	end
@@ -2106,7 +2155,7 @@ local MING_DAG_CHECKING = 1
 local MING_DAG_SUNCCESS = 2
 local MING_DAG_FAIL = 3
 	
-function QueryWorkState()
+function QueryAndUpdateWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
 	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
 	if nType == MING_CHECK_DAG then
@@ -2177,7 +2226,7 @@ function WorkingTimerHandle()
 	
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
-			local bQuery = QueryWorkState()
+			local bQuery = QueryAndUpdateWorkState()
 			if nReportConuter >= nReportCalcInterval then
 				if not bQuery and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
 					--借用上报算力的间隔来，检测工作进程是否没有响应了

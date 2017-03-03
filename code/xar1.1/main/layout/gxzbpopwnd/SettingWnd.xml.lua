@@ -1,146 +1,210 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
-local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+--local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb"
+local strDAGRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir"
+local g_nDagCacheMinSize = 4*1024*1024*1024
 
-function OnClickClose(self)
+local g_AutoRunState = false
+local g_nWorkModel = 0
+local g_SuspendedWndState = 0
+
+
+function CheckIsAutoRun()
+	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
+	if Helper:IsRealString(strValue) then
+		return true
+	end
+	return false
+end
+
+function SetAutoRun()
+	local strExePath = tFunctionHelper.GetExePath()
+	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding"
+	Helper:SetRegValue(strAutoRunRegPath, strValue)
+end
+
+function GetDagCache()
+	local strValue = Helper:QueryRegValue(strDAGRegPath) or ""
+	return strValue
+end
+
+function SaveSettingConfig(objTree)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if g_AutoRunState and not CheckIsAutoRun() then
+		SetAutoRun()
+	elseif not g_AutoRunState and CheckIsAutoRun() then
+		tFunctionHelper.RegDeleteValue(strAutoRunRegPath)
+	end
+	
+	local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
+	local strMachineName = ObjEditMachineID:GetText(strMachineName)
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	tUserConfig["tUserInfo"]["strMachineName"] = strMachineName
+	
+	local ObjEditDagCache = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Edit")
+	local strNewDagCachePath = ObjEditDagCache:GetText(strMachineName)
+	local strCurrentDagCachePath = GetDagCache()
+	if string.lower(strCurrentDagCachePath) ~= string.lower(strNewDagCachePath) then
+		Helper:SetRegValue(strDAGRegPath, strNewDagCachePath)
+	end
+	
+	if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
+		tUserConfig["tConfig"]["WorkModel"] = {}
+	end
+	tUserConfig["tConfig"]["WorkModel"]["nState"] = g_nWorkModel
+
+	if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
+		tUserConfig["tConfig"]["SuspendedWnd"] = {}
+	end
+	tUserConfig["tConfig"]["SuspendedWnd"]["nState"] = g_SuspendedWndState
+	
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
+function DestoryDialog(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:EndDialog(0)
 end
 
-function OnSelectSysBoot(self, event, bSelect)
+function OnClickCloseDialog(self)
+	DestoryDialog(self)
+end
+
+function OnSelectAutoRun(self, event, bSelect)
 	if bSelect then
-		local strExePath = Helper.tipUtil:QueryRegValue("HKEY_LOCAL_MACHINE", "Software\\gxzb", "Path")
-		if not Helper:IsRealString(strExePath) or not Helper.tipUtil:QueryFileExists(strExePath) then
-			return
-		end
-		Helper.tipUtil:SetRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", "gxzb", "\""..strExePath.."\" /sstartfrom sysboot /embedding")
+		g_AutoRunState = true
 	else
-		Helper.tipUtil:DeleteRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb")
+		g_AutoRunState = false
+	end	
+end
+
+function SetEditTextState(self, bFocus)
+	if bFocus then
+		--self:SetSelAll(true)
+		--self:SetNoCaret(false)
+	else
+		--self:SetSelAll(false)
+		--self:SetNoCaret(true)
 	end
 end
 
-function OnClickSureBtn(self)
-	OnClickClose(self)
-	local editCache = self:GetObject("tree:SettingWnd.EditCache")
-	local strPath = editCache:GetText()
-	if Helper:IsRealString(strPath) and Helper.tipUtil:QueryFileExists(strPath) then
-		Helper.tipUtil:SetRegValue("HKEY_CURRENT_USER", "Software\\gxzb", "DAGDir", strPath)
-	end
-	OnClickMachineBtn(self)
+function OnMachineEditFocusChange(self, bFocus)
+	SetEditTextState(self, bFocus)
 end
 
-function OnClickCacheBtn(self)
-	local editCache = self:GetObject("tree:SettingWnd.EditCache")
-	local strPath = editCache:GetText()
+function OnDagCacheEditFocusChange(self, bFocus)
+	SetEditTextState(self, bFocus)
+end
+
+function OnDagCacheEditTextChange(self)
+	local bRet = false
+	local strInfo = "无效路径"
+	local strText = self:GetText()
+	local ObjDagCacheInfo = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Info")
+	local ObjBtnConfirm = self:GetObject("tree:SettingWnd.Buttom.Confirm")
+	if Helper:IsRealString(strText) and Helper.tipUtil:QueryFileExists(strText) then
+		local nBytes = Helper.tipUtil:GetDiskFreeSpace(strText)
+		if type(nBytes) == "number" then
+			local strSize = tFunctionHelper.FormatByteUnit(nBytes)
+			if nBytes >= g_nDagCacheMinSize then
+				bRet = true
+				strInfo = "剩余空间".. strSize .. ",更改后需重启生效"
+			else
+				strInfo = "剩余空间" .. strSize ..",该磁盘剩余空间小于4G，请重新选择！"
+			end	
+		end
+	end
+	if not bRet then
+		ObjBtnConfirm:Enable(false)
+		ObjDagCacheInfo:SetTextColorResID("system.red")
+	else	
+		ObjBtnConfirm:Enable(true)
+		ObjDagCacheInfo:SetTextColorResID("DDDDDD")
+	end
+	ObjDagCacheInfo:SetText(strInfo)
+end
+
+function OnClickChangeDir(self)
+	local editDagCache = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Edit")
+	local strPath = editDagCache:GetText()
 	if not Helper:IsRealString(strPath) or not Helper.tipUtil:QueryFileExists(strPath) then
 		strPath = "C:\\"
 	end
 	local strNewPath = Helper.tipUtil:FolderDialog("目录选择", strPath)
 	if Helper:IsRealString(strNewPath) and Helper.tipUtil:QueryFileExists(strNewPath) then
-		editCache:SetText(strNewPath)
+		editDagCache:SetText(strNewPath)
 	end
 end
 
-function OnClickMachineBtn(self)
-	local editMachine = self:GetObject("tree:SettingWnd.EditMachine")
-	local strmachine = editMachine:GetText()
-	if Helper:IsRealString(strmachine) then
-		local strMachine = string.len(strmachine)
-		if strMachine <= 20 and strMachine >= 3 then
-			tUserConfig["tUserInfo"] = tUserConfig["tUserInfo"] or {}
-			tUserConfig["tUserInfo"]["strMachineName"] = strmachine
-			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-			tFunctionHelper.SetMachineNameChangeInfo()
-		end
-	end
+function OnClickConfirm(self)
+	local objTree = self:GetOwner()
+	SaveSettingConfig(objTree)
+	DestoryDialog(self)
 end
 
-function OnSelectSuDu(self, event, bcheck)
-	local r1 = self:GetObject("tree:SettingWnd.Radio.AllSpeed")
-	local r2 = self:GetObject("tree:SettingWnd.Radio.Zhineng")
-	local id = self:GetID()
-	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
-	if id == "SettingWnd.Radio.AllSpeed" then
-		r2:SetCheck(false, true)
-		tUserConfig["tConfig"]["workmodel"] = 0
+function OnClickCancel(self)
+	DestoryDialog(self)
+end
+
+function OnSelectSWndRadio(self, event, bCheck)
+	local ObjRadioShow = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Show")
+	local ObjRadioHide = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Hide")
+	local ObjRadioShowAtMining = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.ShowAtMining")
+	local strCurrentID = self:GetID()
+	if strCurrentID == "SettingWnd.Content.SuspendedWnd.Show" then
+		ObjRadioHide:SetCheck(false, true)
+		ObjRadioShowAtMining:SetCheck(false, true)
+		g_SuspendedWndState = 0
+	elseif strCurrentID == "SettingWnd.Content.SuspendedWnd.Hide" then
+		ObjRadioShow:SetCheck(false, true)
+		ObjRadioShowAtMining:SetCheck(false, true)
+		g_SuspendedWndState = 1
 	else
-		r1:SetCheck(false, true)
-		tUserConfig["tConfig"]["workmodel"] = 1
+		ObjRadioShow:SetCheck(false, true)
+		ObjRadioHide:SetCheck(false, true)
+		g_SuspendedWndState = 2
 	end
-	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
-function OnSelectXuanFu(self, event, bcheck)
-	local r1 = self:GetObject("tree:SettingWnd.Radio.AllShowXuanFu")
-	local r2 = self:GetObject("tree:SettingWnd.Radio.AllHideXuanFu")
-	local r3 = self:GetObject("tree:SettingWnd.Radio.WorkShowXuanFu")
-	local id = self:GetID()
-	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
-	if id == "SettingWnd.Radio.AllShowXuanFu" then
-		r2:SetCheck(false, true)
-		r3:SetCheck(false, true)
-		tUserConfig["tConfig"]["showball"] = 0
-	elseif id == "SettingWnd.Radio.AllHideXuanFu" then
-		r1:SetCheck(false, true)
-		r3:SetCheck(false, true)
-		tUserConfig["tConfig"]["showball"] = 1
+function OnSelectWorkModelRadio(self, event, bCheck)
+	local ObjRadioFull = self:GetObject("tree:SettingWnd.Content.WorkModel.Full")
+	local ObjRadioIntelligent = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Intelligent")
+	local strCurrentID = self:GetID()
+	if strCurrentID == "SettingWnd.Content.WorkModel.Full" then
+		ObjRadioIntelligent:SetCheck(false, true)
+		g_nWorkModel = 0
 	else
-		r1:SetCheck(false, true)
-		r2:SetCheck(false, true)
-		tUserConfig["tConfig"]["showball"] = 2
-	end
-	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-end
-
-function OnFocusChangeEdit(self, isFocus)
-	if isFocus then
-		self:SetSelAll(true)
-		self:SetNoCaret(false)
-	else
-		self:SetSelAll(false)
-		self:SetNoCaret(true)
+		ObjRadioFull:SetCheck(false, true)
+		g_nWorkModel = 1
 	end
 end
 
-function OnChangeEditCache(self)
-	local textDAGDir = self:GetText()
-	local freeSpace = self:GetObject("tree:SettingWnd.ShowFreeSpace")
-	--XLMessageBox(tostring(textDAGDir))
-	if Helper:IsRealString(textDAGDir) and Helper.tipUtil:QueryFileExists(textDAGDir) then
-		local FreeBiyes = Helper.tipUtil:GetDiskFreeSpace(textDAGDir)
-		--XLMessageBox(tostring(p1/1073741824))
-		if type(FreeBiyes) == "number" then
-			local n1, n2 = math.modf(FreeBiyes/1073741824)
-			freeSpace:SetTextColorResID("DDDDDD")
-			freeSpace:SetText(tostring(n1).."."..math.floor(n2*100).."GB")
-		end
-	else
-		freeSpace:SetText("无效路径")
-		freeSpace:SetTextColorResID("system.red")
-	end
-end
-
-local function SetEditFocus(edit, x, y)
-	local editL, editT, editR, editB = edit:GetAbsPos()
+function SetSettingWndEditFocus(ObjEdit, x, y)
+	local editL, editT, editR, editB = ObjEdit:GetAbsPos()
 	if x > editL and x < editR and y > editT and y < editB then
-		edit:SetFocus(true)
+		ObjEdit:SetFocus(true)
 	else
-		edit:SetFocus(false)
+		ObjEdit:SetFocus(false)
 	end
 end
 
 function OnLButtonDownCaption(self, x, y)
-	local editMachine = self:GetObject("tree:SettingWnd.EditMachine")
-	local editCache = self:GetObject("tree:SettingWnd.EditCache")
-	SetEditFocus(editMachine, x, y)
-	SetEditFocus(editCache, x, y)
+	local editMachineID = self:GetObject("tree:SettingWnd.Content.MachineIDArea.Edit")
+	local editDagCache = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Edit")
+	SetSettingWndEditFocus(editMachineID, x, y)
+	SetSettingWndEditFocus(editDagCache, x, y)
 end
 
+
 function OnCreate(self)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local userData = self:GetUserData()
 	if userData and userData.parentWnd then
-		local objtree = self:GetBindUIObjectTree()
-		local objRootLayout = objtree:GetUIObject("root")
+		local objTree = self:GetBindUIObjectTree()
+		local objRootLayout = objTree:GetUIObject("root")
 		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
 		local nLayoutWidth  = nLayoutR - nLayoutL
 		local nLayoutHeight = nLayoutB - nLayoutT
@@ -149,61 +213,70 @@ function OnCreate(self)
 		local parentWidth  = parentRight - parentLeft
 		local parentHeight = parentBottom - parentTop
 		self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
-		local chkboxKaiji = objtree:GetUIObject("SettingWnd.CheckBox.Sysboot")
-		local editMachine = objtree:GetUIObject("SettingWnd.EditMachine")
-		local editCache = objtree:GetUIObject("SettingWnd.EditCache")
-		local freeSpace = objtree:GetUIObject("SettingWnd.ShowFreeSpace")
-		local radio1 = objtree:GetUIObject("SettingWnd.Radio.AllSpeed")
-		local radio2 = objtree:GetUIObject("SettingWnd.Radio.Zhineng")
 		
-		local radioXuanFu1 = objtree:GetUIObject("SettingWnd.Radio.AllShowXuanFu")
-		local radioXuanFu2 = objtree:GetUIObject("SettingWnd.Radio.AllHideXuanFu")
-		local radioXuanFu3 = objtree:GetUIObject("SettingWnd.Radio.WorkShowXuanFu")
+		local ObjCheckBoxAutoRun = objTree:GetUIObject("SettingWnd.Content.AutoRunArea.CheckAutoRun")
 		
-		if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
-			chkboxKaiji:SetCheck(true, false)
+		local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
+		
+		local ObjEditDagCache = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Edit")
+		
+		local ObjTextCacheInfo = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Info")
+		
+		local ObjRadioShow = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Show")
+		local ObjRadioHide = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Hide")
+		local ObjRadioShowAtMining = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.ShowAtMining")
+		
+		local ObjRadioFull = objTree:GetUIObject("SettingWnd.Content.WorkModel.Full")
+		local ObjRadioIntelligent = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Intelligent")
+
+		g_AutoRunState = CheckIsAutoRun()
+		if CheckIsAutoRun() then
+			ObjCheckBoxAutoRun:SetCheck(true, false)
 		else
-			chkboxKaiji:SetCheck(false, false)
+			ObjCheckBoxAutoRun:SetCheck(false, false)
 		end
-	
-		local cacheDir = Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir")
-		if not Helper:IsRealString(cacheDir) then
-			cacheDir = "C:\\"
+		if type(tUserConfig["tUserInfo"]) ~= "table" then
+			tUserConfig["tUserInfo"] = {}
 		end
-		editCache:SetText(cacheDir)
-		--OnChangeEditCache(editMachine)
+		local strMachineName = tUserConfig["tUserInfo"]["strMachineName"]
+		if Helper:IsRealString(strMachineName) then 
+			ObjEditMachineID:SetText(strMachineName)
+		end 
 		
-		local machineName
-		if tUserConfig["tUserInfo"] and tUserConfig["tUserInfo"]["strMachineName"] then
-			machineName = tUserConfig["tUserInfo"]["strMachineName"]
-		else
-			machineName = Helper:QueryRegValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\gxzb\\PeerId")
-		end
-		if machineName then
-			editMachine:SetText(machineName)
-		end
-		
-		local model = 0
-		if type(tUserConfig) == "table" and type(tUserConfig["tConfig"]) == "table" and type(tUserConfig["tConfig"]["workmodel"]) == "number" then
-			model = tUserConfig["tConfig"]["workmodel"]
-		end
-		--model=0全速， model=1智能，默认全速
-		if tonumber(model) == 1 then
-			radio2:SetCheck(true)
-		else
-			radio1:SetCheck(true)
+		local strDagCachePath = GetDagCache()
+		if Helper:IsRealString(strDagCachePath)then
+			ObjEditDagCache:SetText(strDagCachePath)
+			local strInfo = "无效路径"
+			if Helper.tipUtil:QueryFileExists(strDagCachePath) then
+				local nBytes = Helper.tipUtil:GetDiskFreeSpace(strDagCachePath)
+				if type(nBytes) == "number" then
+					local strSize = tFunctionHelper.FormatByteUnit(nBytes)
+					strInfo = "剩余空间".. strSize .. ",更改后需重启生效"
+				end
+			end
+			ObjTextCacheInfo:SetText(strInfo)
 		end
 		
-		local showbal = 0
-		if type(tUserConfig) == "table" and type(tUserConfig["tConfig"]) == "table" and type(tUserConfig["tConfig"]["showball"]) == "number" then
-			model = tUserConfig["tConfig"]["showball"]
+		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
+			tUserConfig["tConfig"]["WorkModel"] = {}
 		end
-		if model == 1 then
-			radioXuanFu2:SetCheck(true)
-		elseif model == 2 then
-			radioXuanFu3:SetCheck(true)
+		g_SuspendedWndState = tUserConfig["tConfig"]["WorkModel"]["nState"] or 0
+		if g_SuspendedWndState == 0 then
+			ObjRadioShow:SetCheck(true, false)
+		elseif g_SuspendedWndState == 1 then
+			ObjRadioHide:SetCheck(true, false)
 		else
-			radioXuanFu1:SetCheck(true)
+			ObjRadioShowAtMining:SetCheck(true, false)
+		end
+		
+		if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
+			tUserConfig["tConfig"]["SuspendedWnd"] = {}
+		end
+		g_SuspendedWndState = tUserConfig["tConfig"]["SuspendedWnd"]["nState"] or 0
+		if g_SuspendedWndState == 0 then
+			ObjRadioFull:SetCheck(true, false)
+		else
+			ObjRadioIntelligent:SetCheck(true, false)
 		end
 	end
 end

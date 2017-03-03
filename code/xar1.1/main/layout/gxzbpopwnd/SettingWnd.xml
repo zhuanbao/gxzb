@@ -3,15 +3,15 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>530</width>
-			<height>380</height>
+			<width>645</width>
+			<height>396</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>530</width>
-				<height>380</height>
+				<width>645</width>
+				<height>396</height>
 				<texture>common-bkg</texture>
 			</attr>	
 			<children>
@@ -23,391 +23,416 @@
 						<height>father.height</height>
 					</attr>
 					<children>
-						<obj id="SettingWnd.Caption.CloseBtn" class="TipAddin.Button">
+						<obj id="SettingWnd.TitleBar" class="LayoutObject">
 							<attr>
-								<left>father.width-25</left>
-								<top>9</top>
-								<width>12</width>
-								<height>12</height>
-								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>30</height>
 							</attr>
-							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
-							</eventlist>	
-						</obj>
-						<obj id="SettingWnd.Title" class="TextObject">
-							<attr>
-								<left>18</left>
-								<top>10</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>基本设置</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.HeadLine" class="LineObject">
-							<attr>
-								<left>8</left>
-								<top>78</top>
-								<width>father.width-16</width>
-								<height>1</height>
-								<srcpt>0, 0</srcpt>
-								<destpt>father.width, 0</destpt>
-								<color>DDDDDD</color>
-								<pen>pen.solid</pen>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.QiDong" class="TextObject">
-							<attr>
-								<left>31</left>
-								<top>91</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>开机启动</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.CheckBox.Sysboot" class="CheckBox">
-							<attr>
-								<CheckHover>setting_check.hover</CheckHover>
-								<Select>true</Select>
-								<Text>开机自动赚宝</Text>
-								<left>200</left>
-								<width>150</width>
-								<top>88</top>
-								<CheckNormal>setting_check.normal</CheckNormal>
-								<UnCheckNormal>setting_uncheck.normal</UnCheckNormal>
-								<height>25</height>
-								<UnCheckHover>setting_uncheck.hover</UnCheckHover>
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSysBoot" />
-							</eventlist>
-						</obj>
-						
-						<obj id="SettingWnd.Model" class="TextObject">
-							<attr>
-								<left>31</left>
-								<top>292</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>赚宝模式</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.Radio.AllSpeed" class="CheckBox">
-							<attr>
-								<Type>radio</Type>
-								<Select>true</Select>
-								<Text>全速赚宝</Text>
-								<left>200</left>
-								<top>290</top>
-								<width>100</width>
-								<height>25</height>
-								<CheckHover>setting_radio.hover</CheckHover>
-								<CheckNormal>setting_radio.hover</CheckNormal>
-								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-								<UnCheckHover>setting_radio.normal</UnCheckHover>
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSuDu" />
-							</eventlist>
-						</obj>
-						<obj id="SettingWnd.Radio.Zhineng" class="CheckBox">
-							<attr>
-								<Type>radio</Type>
-								<Select>false</Select>
-								<Text>智能赚宝</Text>
-								<left>300</left>
-								<top>290</top>
-								<width>100</width>
-								<height>25</height>
-								<CheckHover>setting_radio.hover</CheckHover>
-								<CheckNormal>setting_radio.hover</CheckNormal>
-								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-								<UnCheckHover>setting_radio.normal</UnCheckHover>
-
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSuDu" />
-							</eventlist>
-						</obj>
-						
-						<obj id="SettingWnd.XuanFu" class="TextObject">
-							<attr>
-								<left>31</left>
-								<top>270</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>悬浮窗显示位置</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.Radio.AllShowXuanFu" class="CheckBox">
-							<attr>
-								<Type>radio</Type>
-								<Select>true</Select>
-								<Text>始终显示</Text>
-								<left>200</left>
-								<top>270</top>
-								<width>100</width>
-								<height>25</height>
-								<CheckHover>setting_radio.hover</CheckHover>
-								<CheckNormal>setting_radio.hover</CheckNormal>
-								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-								<UnCheckHover>setting_radio.normal</UnCheckHover>
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
-							</eventlist>
-						</obj>
-						<obj id="SettingWnd.Radio.AllHideXuanFu" class="CheckBox">
-							<attr>
-								<Type>radio</Type>
-								<Select>false</Select>
-								<Text>始终隐藏</Text>
-								<left>300</left>
-								<top>270</top>
-								<width>100</width>
-								<height>25</height>
-								<CheckHover>setting_radio.hover</CheckHover>
-								<CheckNormal>setting_radio.hover</CheckNormal>
-								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-								<UnCheckHover>setting_radio.normal</UnCheckHover>
-
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
-							</eventlist>
-						</obj>
-						<obj id="SettingWnd.Radio.WorkShowXuanFu" class="CheckBox">
-							<attr>
-								<Type>radio</Type>
-								<Select>false</Select>
-								<Text>仅赚宝时显示</Text>
-								<left>400</left>
-								<top>270</top>
-								<width>150</width>
-								<height>25</height>
-								<CheckHover>setting_radio.hover</CheckHover>
-								<CheckNormal>setting_radio.hover</CheckNormal>
-								<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-								<UnCheckHover>setting_radio.normal</UnCheckHover>
-
-							</attr>
-							<eventlist>
-								<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectXuanFu" />
-							</eventlist>
-						</obj>
-						
-						<obj id="SettingWnd.Machine" class="TextObject">
-							<attr>
-								<left>31</left>
-								<top>135</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>设备标识ID</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.EditMachine.bkg" class="TextureObject">
-							<attr>
-								<left>176</left>
-								<top>134</top>
-								<width>230</width>
-								<height>28</height>
-								<texture>setting-edit-bkg</texture>
-							</attr>	
 							<children>
-								<obj id = "SettingWnd.EditMachine" class = "EditObject">
+								<obj id="SettingWnd.TitleBar.Logo" class="ImageObject">
 									<attr>
-										<left>0</left>
+										<left>16</left>
+										<top>5</top>
+										<width>20</width>
+										<height>20</height>
+										<image>GXZB.Caption.Logo</image>
+									</attr>
+								</obj>
+								<obj id="SettingWnd.TitleBar.Title" class="TextObject">
+									<attr>
+										<left>29+16</left>
 										<top>0</top>
-										<width>father.width</width>
+										<width>200</width>
 										<height>father.height</height>
-										<transparent>1</transparent>
-										<viewinset>2, 2, 2, 2</viewinset>
-										<textcolor>444444</textcolor>
-										<font>font.text16</font>
-										<text></text>
+										<text>共享赚宝</text>
+										<textcolor>system.black</textcolor>
+										<font>font.default12</font>
+										<valign>center</valign>
+									</attr>
+								</obj>
+								<obj id="SettingWnd.TitleBar.CloseBtn" class="TipAddin.Button">
+									<attr>
+										<left>father.width-25</left>
+										<top>8</top>
+										<width>14</width>
+										<height>14</height>
+										<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+										<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+										<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+										<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
 									</attr>
 									<eventlist>
-										<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnFocusChangeEdit" />
-									</eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCloseDialog" />
+									</eventlist>	
+								</obj>
+								
+							</children>
+						</obj>
+						<obj id="SettingWnd.Content" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>30+30</top>
+								<width>father.width</width>
+								<height>father.height-30-30-70</height>
+							</attr>
+							<children>
+								<obj id="SettingWnd.Content.AutoRunArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>38</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.AutoRunArea.SettingName" class="TextObject">
+											<attr>
+												<left>110</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>DDDDDD</textcolor>
+												<font>font.text16</font>
+												<text>开机启动</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.AutoRunArea.CheckAutoRun" class="CheckBox">
+											<attr>
+												<left>110+120+5</left>
+												<top>5</top>
+												<width>150</width>
+												<height>25</height>
+												<CheckNormal>setting_check.normal</CheckNormal>
+												<CheckHover>setting_check.hover</CheckHover>
+												<UnCheckNormal>setting_uncheck.normal</UnCheckNormal>
+												<UnCheckHover>setting_uncheck.hover</UnCheckHover>
+												<Select>false</Select>
+												<Text>开机启动赚宝</Text>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.MachineIDArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>38+34+5</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.MachineIDArea.SettingName" class="TextObject">
+											<attr>
+												<left>110</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>DDDDDD</textcolor>
+												<font>font.text16</font>
+												<text>设备标识ID</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.MachineIDArea.EditBkg" class="TextureObject">
+											<attr>
+												<left>110+120+5</left>
+												<top>0</top>
+												<width>230</width>
+												<height>34</height>
+												<texture>setting-edit-bkg</texture>
+											</attr>	
+											<children>
+												<obj id="SettingWnd.Content.MachineIDArea.Edit" class="EditObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+														<transparent>1</transparent>
+														<viewinset>2, 5, 2, 2</viewinset>
+														<textcolor>444444</textcolor>
+														<font>font.text16</font>
+														<text></text>
+													</attr>
+													<eventlist>
+														<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnMachineEditFocusChange" />
+													</eventlist>
+												</obj>
+											</children>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.DagCacheArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>38+34+5+34+5</top>
+										<width>father.width-2</width>
+										<height>34+22</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.DagCacheArea.SettingName" class="TextObject">
+											<attr>
+												<left>110</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>DDDDDD</textcolor>
+												<font>font.text16</font>
+												<text>缓存目录</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.DagCacheArea.EditBkg" class="TextureObject">
+											<attr>
+												<left>110+120+5</left>
+												<top>0</top>
+												<width>230</width>
+												<height>34</height>
+												<texture>setting-edit-bkg</texture>
+											</attr>	
+											<children>
+												<obj id="SettingWnd.Content.DagCacheArea.Edit" class="EditObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+														<transparent>1</transparent>
+														<viewinset>2, 5, 2, 2</viewinset>
+														<textcolor>444444</textcolor>
+														<font>font.text16</font>
+														<text></text>
+													</attr>
+													<eventlist>
+														<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnDagCacheEditFocusChange" />
+														<event name="OnChange" file="SettingWnd.xml.lua" func="OnDagCacheEditTextChange" />
+													</eventlist>
+												</obj>
+											</children>
+										</obj>
+										<obj id="SettingWnd.Content.DagCacheArea.ChangeDir" class="TipAddin.Button">
+											<attr>
+												<left>110+120+5+230</left>
+												<top>0</top>
+												<width>70</width>
+												<height>34</height>
+												<NormalBkgID>setting-btn-normal</NormalBkgID>
+												<DownBkgID>setting-btn-normal</DownBkgID>
+												<HoverBkgID>setting-btn-hover</HoverBkgID>
+												<DisableBkgID>setting-btn-hover</DisableBkgID>
+												<Text>更改目录</Text>
+												<TextFont>font.text16</TextFont>
+												<TextColor>DDDDDD</TextColor>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickChangeDir" />
+											</eventlist>	
+										</obj>
+										<obj id="SettingWnd.Content.DagCacheArea.Info" class="TextObject">
+											<attr>
+												<left>110+120+5</left>
+												<top>34+5</top>
+												<width>250</width>
+												<height>17</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>system.gray</textcolor>
+												<font>font.text13</font>
+												<text>剩余空间4G,更改后需重启生效</text>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.SuspendedWnd" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>38+34+5+34+5+34+22+5</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.SuspendedWnd.SettingName" class="TextObject">
+											<attr>
+												<left>110</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>DDDDDD</textcolor>
+												<font>font.text16</font>
+												<text>悬浮窗显示位置</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.SuspendedWnd.Show" class="CheckBox">
+											<attr>
+												<left>110+120+5</left>
+												<top>7</top>
+												<width>90</width>
+												<height>20</height>
+												<Type>radio</Type>
+												<Select>false</Select>
+												<Text>始终显示</Text>
+												<CheckHover>setting_radio.hover</CheckHover>
+												<CheckNormal>setting_radio.hover</CheckNormal>
+												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+												<UnCheckHover>setting_radio.normal</UnCheckHover>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.SuspendedWnd.Hide" class="CheckBox">
+											<attr>
+												<left>110+120+5+90+5</left>
+												<top>7</top>
+												<width>90</width>
+												<height>20</height>
+												<Type>radio</Type>
+												<Select>false</Select>
+												<Text>始终隐藏</Text>
+												<CheckHover>setting_radio.hover</CheckHover>
+												<CheckNormal>setting_radio.hover</CheckNormal>
+												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+												<UnCheckHover>setting_radio.normal</UnCheckHover>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.SuspendedWnd.ShowAtMining" class="CheckBox">
+											<attr>
+												<left>110+120+5+90+5+90+5</left>
+												<top>7</top>
+												<width>110</width>
+												<height>20</height>
+												<Type>radio</Type>
+												<Select>false</Select>
+												<Text>仅赚宝时显示</Text>
+												<CheckHover>setting_radio.hover</CheckHover>
+												<CheckNormal>setting_radio.hover</CheckNormal>
+												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+												<UnCheckHover>setting_radio.normal</UnCheckHover>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.WorkModel" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>38+34+5+34+5+34+22+5+34+5</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.WorkModel.SettingName" class="TextObject">
+											<attr>
+												<left>110</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>DDDDDD</textcolor>
+												<font>font.text16</font>
+												<text>赚宝模式</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.WorkModel.Full" class="CheckBox">
+											<attr>
+												<left>110+120+5</left>
+												<top>7</top>
+												<width>90</width>
+												<height>20</height>
+												<Type>radio</Type>
+												<Select>false</Select>
+												<Text>全速赚宝</Text>
+												<CheckHover>setting_radio.hover</CheckHover>
+												<CheckNormal>setting_radio.hover</CheckNormal>
+												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+												<UnCheckHover>setting_radio.normal</UnCheckHover>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectWorkModelRadio" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.SuspendedWnd.Intelligent" class="CheckBox">
+											<attr>
+												<left>110+120+5+90+5</left>
+												<top>7</top>
+												<width>90</width>
+												<height>20</height>
+												<Type>radio</Type>
+												<Select>false</Select>
+												<Text>智能赚宝</Text>
+												<CheckHover>setting_radio.hover</CheckHover>
+												<CheckNormal>setting_radio.hover</CheckNormal>
+												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
+												<UnCheckHover>setting_radio.normal</UnCheckHover>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectWorkModelRadio" />
+											</eventlist>
+										</obj>
+									</children>
 								</obj>
 							</children>
 						</obj>
-						<!--obj id="SettingWnd.EditMachine.Btn" class="TipAddin.Button">
+						<obj id="SettingWnd.Buttom" class="LayoutObject">
 							<attr>
-								<Text>修改名称</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>436</left>
-								<top>134</top>
-								<width>88</width>
-								<height>26</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
+								<left>0</left>
+								<top>father.height-70</top>
+								<width>father.width</width>
+								<height>70</height>
 							</attr>
-							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickMachineBtn" />
-							</eventlist>	
-						</obj-->
-						
-						<obj id="SettingWnd.CacheText" class="TextObject">
-							<attr>
-								<left>31</left>
-								<top>196</top>
-								<width>120</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>缓存目录</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.CacheText2" class="TextObject">
-							<attr>
-								<left>176</left>
-								<top>168</top>
-								<width>249</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>使用指定的缓存目录</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.CacheText3" class="TextObject">
-							<attr>
-								<left>176</left>
-								<top>228</top>
-								<width>85</width>
-								<height>20</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>剩余空间</text>
-							</attr>
-						</obj>
-						<obj id="SettingWnd.EditCache.bkg" class="TextureObject">
-							<attr>
-								<left>176</left>
-								<top>195</top>
-								<width>230</width>
-								<height>28</height>
-								<texture>setting-edit-bkg</texture>
-							</attr>	
 							<children>
-								<obj id = "SettingWnd.EditCache" class = "EditObject">
+								<obj id="SettingWnd.Buttom.Confirm" class="TipAddin.Button">
 									<attr>
-										<left>0</left>
-										<top>0</top>
-										<width>father.width</width>
-										<height>father.height</height>
-										<transparent>1</transparent>
-										<viewinset>2, 2, 2, 2</viewinset>
-										<textcolor>444444</textcolor>
-										<font>font.text16</font>
-										<text></text>
+										<left>422</left>
+										<top>19</top>
+										<width>98</width>
+										<height>33</height>
+										<Text>确定</Text>
+										<TextFont>font.text16</TextFont>
+										<TextColor>DDDDDD</TextColor>
+										<NormalBkgID>setting-btn-normal</NormalBkgID>
+										<DownBkgID>setting-btn-normal</DownBkgID>
+										<HoverBkgID>setting-btn-hover</HoverBkgID>
+										<DisableBkgID>setting-btn-hover</DisableBkgID>
 									</attr>
 									<eventlist>
-										<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnFocusChangeEdit" />
-										<event name="OnChange" file="SettingWnd.xml.lua" func="OnChangeEditCache" />
-									</eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickConfirm" />
+									</eventlist>	
+								</obj>
+								<obj id="SettingWnd.Buttom.Cancel" class="TipAddin.Button">
+									<attr>
+										<left>422+98+12</left>
+										<top>19</top>
+										<width>98</width>
+										<height>33</height>
+										<Text>取消</Text>
+										<TextFont>font.text16</TextFont>
+										<TextColor>DDDDDD</TextColor>
+										<NormalBkgID>setting-btn-normal</NormalBkgID>
+										<DownBkgID>setting-btn-normal</DownBkgID>
+										<HoverBkgID>setting-btn-hover</HoverBkgID>
+										<DisableBkgID>setting-btn-hover</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCancel" />
+									</eventlist>	
 								</obj>
 							</children>
-						</obj>
-						<obj id="SettingWnd.EditCache.Btn" class="TipAddin.Button">
-							<attr>
-								<Text>选择目录</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>406</left>
-								<top>195</top>
-								<width>88</width>
-								<height>26</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCacheBtn" />
-							</eventlist>	
-						</obj>
-						<obj id="SettingWnd.ShowFreeSpace" class="TextObject">
-							<attr>
-								<left>246</left>
-								<top>226</top>
-								<width>168</width>
-								<height>25</height>
-								<valign>center</valign>
-								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
-								<text>12.6GB</text>
-							</attr>
-						</obj>
-						
-						<obj id="SettingWnd.Sure.Btn" class="TipAddin.Button">
-							<attr>
-								<Text>确定</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>343</left>
-								<top>340</top>
-								<width>73</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickSureBtn" />
-							</eventlist>	
-						</obj>
-						<obj id="SettingWnd.Cancel.Btn" class="TipAddin.Button">
-							<attr>
-								<Text>取消</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>437</left>
-								<top>340</top>
-								<width>73</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
-							</eventlist>	
 						</obj>
 					</children>
 					<eventlist>
@@ -423,8 +448,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>530</width>
-            <height>380</height>
+            <width>645</width>
+            <height>396</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
