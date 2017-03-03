@@ -457,7 +457,7 @@ function TipMain()
 	FunctionObj.PopTipPre4Hour()
 	
 	--显示悬浮框
-	FunctionObj.ShowPopupWndByName("GXZB.XuanFuWnd.Instance", true)
+	FunctionObj.ShowPopupWndByName("GXZB.XuanFuNewWnd.Instance", true)
 	--ShowPopWndByCommand()
 end
 
@@ -470,8 +470,8 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()	
 	if not CheckMachineSuitable() then
-		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-		return
+		--FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		--return
 	end
 	FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
 end

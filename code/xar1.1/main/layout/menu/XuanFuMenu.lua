@@ -18,7 +18,7 @@ function menuFunTable.OnSelect_mainui(self)
 end
 
 function menuFunTable.OnSelect_hideball(self)
-	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuNewWnd.Instance")
 	if objHostWnd then
 		if objHostWnd:GetVisible() then
 			objHostWnd:Show(0)

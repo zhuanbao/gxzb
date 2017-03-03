@@ -24,7 +24,7 @@ function OnRButtonUpXuanFu(self)
 	local menuTable = GXZBMenu.XuanFuMenu.menuTable
 	local menuFunTable = GXZBMenu.XuanFuMenu.menuFunTable
 	local userData = {}
-	Helper:CreateMenu(curX-50, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
+	Helper:CreateMenu(curX, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
 
 function OnLButtonDbClickXuanFu(self, x, y)

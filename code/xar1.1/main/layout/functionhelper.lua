@@ -33,7 +33,8 @@ local g_Balance = 0
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
-	[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
+	--[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
+	[2] = {"GXZB.XuanFuNewWnd", "GXZB.XuanFuNewWndTree"},
 	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
 	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
 }
@@ -1861,10 +1862,10 @@ function UpdateWorkSpeed(strSpeed)
 end
 
 function UpdateSpeed2XuanFuUI(nSpeed)
-	local XuanFuWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuWnd.Instance")
+	local XuanFuWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuNewWnd.Instance")
 	if XuanFuWnd and XuanFuWnd:GetVisible() then
 		local objtree = XuanFuWnd:GetBindUIObjectTree()
-		local textShowSpeed = objtree:GetUIObject("XuanFuWnd.ShowSpeed")
+		local textShowSpeed = objtree:GetUIObject("XuanFuNewWnd.ShowSpeed")
 		if textShowSpeed then
 			textShowSpeed:SetText(tostring(nSpeed).."/S")
 		end
