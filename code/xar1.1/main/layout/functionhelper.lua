@@ -33,8 +33,7 @@ local g_Balance = 0
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
-	--[2] = {"GXZB.XuanFuWnd", "GXZB.XuanFuWndTree"},
-	[2] = {"GXZB.XuanFuNewWnd", "GXZB.XuanFuNewWndTree"},
+	[2] = {"GXZB.SuspendWnd", "GXZB.SuspendWndTree"},
 	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
 	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
 }
@@ -1963,14 +1962,14 @@ function UpdateWorkSpeed(strSpeed)
 	local nSpeed = tonumber(strSpeed) or 0
 	gCurrentWorkSpeed = nSpeed
 	local strSpeed = FormatHashRate(nSpeed)
-	UpdateSpeed2XuanFuUI(strSpeed)
+	UpdateSpeed2SuspendUI(strSpeed)
 end
 
-function UpdateSpeed2XuanFuUI(nSpeed)
-	local XuanFuWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuNewWnd.Instance")
-	if XuanFuWnd and XuanFuWnd:GetVisible() then
-		local objtree = XuanFuWnd:GetBindUIObjectTree()
-		local textShowSpeed = objtree:GetUIObject("XuanFuNewWnd.ShowSpeed")
+function UpdateSpeed2SuspendUI(nSpeed)
+	local SuspendWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
+	if SuspendWnd and SuspendWnd:GetVisible() then
+		local objtree = SuspendWnd:GetBindUIObjectTree()
+		local textShowSpeed = objtree:GetUIObject("SuspendWnd.ShowSpeed")
 		if textShowSpeed then
 			textShowSpeed:SetText(tostring(nSpeed).."/S")
 		end

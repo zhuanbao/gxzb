@@ -36,7 +36,7 @@ local File = {
 "luacode\\helper_token.lua",
 "functionhelper.lua",
 "menu\\SettingMenu.lua",
-"menu\\XuanFuMenu.lua",
+"menu\\SuspendMenu.lua",
 }
 LoadLuaModule(File, __document)
 
@@ -457,7 +457,7 @@ function TipMain()
 	FunctionObj.PopTipPre4Hour()
 	
 	--显示悬浮框
-	FunctionObj.ShowPopupWndByName("GXZB.XuanFuNewWnd.Instance", true)
+	FunctionObj.ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
 	--ShowPopWndByCommand()
 end
 

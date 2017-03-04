@@ -1,5 +1,5 @@
 <xlue>
-	<objtreetemplate id="GXZB.XuanFuWndTree" class="ObjectTreeTemplate">
+	<objtreetemplate id="GXZB.OldSuspendWndTree" class="ObjectTreeTemplate">
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>75</left>
@@ -9,7 +9,7 @@
 				<texture>xuanfu-bkg</texture>
 			</attr>	
 			<children>
-				<obj id="XuanFuWnd.Caption" class="CaptionObject">
+				<obj id="OldSuspendWnd.Caption" class="CaptionObject">
 					<attr>
 						<left>0</left>
 						<top>0</top>
@@ -17,7 +17,7 @@
 						<height>father.height</height>
 					</attr>
 					<children>
-						<obj id="XuanFuWnd.ShowSpeed" class="TextObject">
+						<obj id="OldSuspendWnd.ShowSpeed" class="TextObject">
 							<attr>
 								<left>0</left>
 								<top>40</top>
@@ -34,16 +34,16 @@
 				</obj>
 			</children>
 			<eventlist>
-				<event name="OnRButtonUp" file="XuanFuWnd.xml.lua" func="OnRButtonUpXuanFu"/>
-				<event name="OnLButtonDbClick" file="XuanFuWnd.xml.lua" func="OnLButtonDbClickXuanFu"/>
-				<event name="OnMouseMove" file="XuanFuWnd.xml.lua" func="OnMouseMoveXuanFu"/>
-				<event name="OnLButtonDown" file="XuanFuWnd.xml.lua" func="OnLButtonDownXuanFu"/>
-				<event name="OnMouseLeave" file="XuanFuWnd.xml.lua" func="OnMouseLeaveXuanFu"/>
+				<event name="OnRButtonUp" file="OldSuspendWnd.xml.lua" func="OnRButtonUpOldSuspend"/>
+				<event name="OnLButtonDbClick" file="OldSuspendWnd.xml.lua" func="OnLButtonDbClickOldSuspend"/>
+				<event name="OnMouseMove" file="OldSuspendWnd.xml.lua" func="OnMouseMoveOldSuspend"/>
+				<event name="OnLButtonDown" file="OldSuspendWnd.xml.lua" func="OnLButtonDownOldSuspend"/>
+				<event name="OnMouseLeave" file="OldSuspendWnd.xml.lua" func="OnMouseLeaveOldSuspend"/>
 			</eventlist>
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.XuanFuWnd" class="FrameHostWnd">
+    <hostwndtemplate id="GXZB.OldSuspendWnd" class="FrameHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
@@ -64,7 +64,7 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-             <event name="OnCreate" file="XuanFuWnd.xml.lua" func="OnCreate"/>
+             <event name="OnCreate" file="OldSuspendWnd.xml.lua" func="OnCreate"/>
         </eventlist>
     </hostwndtemplate>
 </xlue>

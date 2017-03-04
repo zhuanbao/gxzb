@@ -17,17 +17,17 @@ function OnCreate( self )
 	end, 5000)
 end
 
-function OnRButtonUpXuanFu(self)
+function OnRButtonUpSuspend(self)
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd()
 	local curX, curY = Helper.tipUtil:GetCursorPos()
-	local menuTable = GXZBMenu.XuanFuMenu.menuTable
-	local menuFunTable = GXZBMenu.XuanFuMenu.menuFunTable
+	local menuTable = GXZBMenu.SuspendMenu.menuTable
+	local menuFunTable = GXZBMenu.SuspendMenu.menuFunTable
 	local userData = {}
 	Helper:CreateMenu(curX, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
 
-function OnLButtonDbClickXuanFu(self, x, y)
+function OnLButtonDbClickSuspend(self, x, y)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:BringWindowToTop(true)
 end

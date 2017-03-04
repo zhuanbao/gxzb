@@ -17,17 +17,17 @@ function OnCreate( self )
 	end, 5000)
 end
 
-function OnRButtonUpXuanFu(self)
+function OnRButtonUpSuspend(self)
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd()
 	local curX, curY = Helper.tipUtil:GetCursorPos()
-	local menuTable = GXZBMenu.XuanFuMenu.menuTable
-	local menuFunTable = GXZBMenu.XuanFuMenu.menuFunTable
+	local menuTable = GXZBMenu.SuspendMenu.menuTable
+	local menuFunTable = GXZBMenu.SuspendMenu.menuFunTable
 	local userData = {}
 	Helper:CreateMenu(curX, curY+10, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
 
-function OnLButtonDbClickXuanFu(self, x, y)
+function OnLButtonDbClickSuspend(self, x, y)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:BringWindowToTop(true)
 end
@@ -41,7 +41,7 @@ function MoveWithAnimi(obj, xOffset, yOffset)
 		return
 		--gPosAnim:ForceStop()
 	end
-	local caption = obj:GetObject("tree:XuanFuWnd.Caption")
+	local caption = obj:GetObject("tree:SuspendWnd.Caption")
 	if caption and not caption:GetCaption() then
 		caption:SetCaption(false)
 	end
@@ -69,8 +69,8 @@ function MoveWithAnimi(obj, xOffset, yOffset)
 end
 
 local staypos = "null"
-function OnLButtonDownXuanFu(self)
-	local caption = self:GetObject("tree:XuanFuWnd.Caption")
+function OnLButtonDownSuspend(self)
+	local caption = self:GetObject("tree:SuspendWnd.Caption")
 	if caption and not caption:GetCaption() then
 		caption:SetCaption(true)
 	end
@@ -80,7 +80,7 @@ function OnLButtonDownXuanFu(self)
 	staypos = "null"
 end
 
-function OnMouseMoveXuanFu(self, x, y)
+function OnMouseMoveSuspend(self, x, y)
 	--[[local l, t, r, b = self:GetObjPos()
 	if x < 0 or y < 0 or x > r-l or y > b-t then
 		return
@@ -93,7 +93,7 @@ function OnMouseMoveXuanFu(self, x, y)
 	wndR = wndR - 75
 	wndB = wndB - 75
 	local wndW, wndH = wndR - wndL, wndB - wndT
-	--FunctionObj.TipLog("OnMouseMoveXuanFu workleft = "..tostring(workleft)..", worktop = "..tostring(worktop)..", wndL = "..wndL..", wndT = "..wndT)
+	--FunctionObj.TipLog("OnMouseMoveSuspend workleft = "..tostring(workleft)..", worktop = "..tostring(worktop)..", wndL = "..wndL..", wndT = "..wndT)
 	local xoffset, yoffset = 0, 0
 	if wndL < workleft then
 		xoffset = workleft - wndW/2 - wndL
@@ -112,7 +112,7 @@ function OnMouseMoveXuanFu(self, x, y)
 		staypos = "bottom"
 	end
 	--[[if staypos ~= "null" then
-		local caption = self:GetObject("tree:XuanFuWnd.Caption")
+		local caption = self:GetObject("tree:SuspendWnd.Caption")
 		if caption and caption:GetCaption() then
 			caption:SetCaption(false)
 		end
@@ -124,7 +124,7 @@ function OnMouseMoveXuanFu(self, x, y)
 end
 
 local timeridLeave = nil
-function OnMouseLeaveXuanFu(self, x, y)
+function OnMouseLeaveSuspend(self, x, y)
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
 	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()

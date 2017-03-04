@@ -18,7 +18,7 @@ function menuFunTable.OnSelect_mainui(self)
 end
 
 function menuFunTable.OnSelect_hideball(self)
-	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.XuanFuNewWnd.Instance")
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
 	if objHostWnd then
 		if objHostWnd:GetVisible() then
 			objHostWnd:Show(0)
@@ -62,6 +62,6 @@ local menuTable = {
 {id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting_check.normal") end},
 }
 
-GXZBMenu.XuanFuMenu = {}
-GXZBMenu.XuanFuMenu.menuTable = menuTable
-GXZBMenu.XuanFuMenu.menuFunTable = menuFunTable
+GXZBMenu.SuspendMenu = {}
+GXZBMenu.SuspendMenu.menuTable = menuTable
+GXZBMenu.SuspendMenu.menuFunTable = menuFunTable

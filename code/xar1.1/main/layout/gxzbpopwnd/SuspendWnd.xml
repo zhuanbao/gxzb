@@ -1,5 +1,5 @@
 <xlue>
-	<control class="XuanFuCtrl">
+	<control class="SuspendCtrl">
 		<objtemplate>
 			<children>
 				<obj id="bkg" class="LayoutObject">
@@ -28,7 +28,7 @@
 								<texture>xuanfu-bkg</texture>
 							</attr>
 							<children>
-								<obj id="XuanFuNewWnd.ShowSpeed" class="TextObject">
+								<obj id="SuspendWnd.ShowSpeed" class="TextObject">
 									<attr>
 										<left>0</left>
 										<top>40</top>
@@ -47,19 +47,19 @@
 				</obj>
 			</children>
 			<eventlist>
-				<event name="OnLButtonDown" file="XuanFuNewWnd.xml.lua" func="OnLButtonDown" />
-				<event name="OnLButtonUp" file="XuanFuNewWnd.xml.lua" func="OnLButtonUp" />
-				<event name="OnMouseMove" file="XuanFuNewWnd.xml.lua" func="OnMouseMove" />
-				<event name="OnMouseLeave" file="XuanFuNewWnd.xml.lua" func="OnMouseLeave" />
-				<event name="OnLButtonDbClick" file="XuanFuNewWnd.xml.lua" func="OnLButtonDbClickXuanFu" />
-				<!--event name="OnMouseHover" file="XuanFuNewWnd.xml.lua" func="OnMouseHover" /-->
-				<event name="OnRButtonUp" file="XuanFuNewWnd.xml.lua" func="OnRButtonUpXuanFu" />
+				<event name="OnLButtonDown" file="SuspendWnd.xml.lua" func="OnLButtonDown" />
+				<event name="OnLButtonUp" file="SuspendWnd.xml.lua" func="OnLButtonUp" />
+				<event name="OnMouseMove" file="SuspendWnd.xml.lua" func="OnMouseMove" />
+				<event name="OnMouseLeave" file="SuspendWnd.xml.lua" func="OnMouseLeave" />
+				<event name="OnLButtonDbClick" file="SuspendWnd.xml.lua" func="OnLButtonDbClickSuspend" />
+				<!--event name="OnMouseHover" file="SuspendWnd.xml.lua" func="OnMouseHover" /-->
+				<event name="OnRButtonUp" file="SuspendWnd.xml.lua" func="OnRButtonUpSuspend" />
 			</eventlist>
 		</objtemplate>
 	</control>
 	
-	<objtreetemplate id="GXZB.XuanFuNewWndTree" class="ObjectTreeTemplate">
-		<obj id="root" class="XuanFuCtrl">
+	<objtreetemplate id="GXZB.SuspendWndTree" class="ObjectTreeTemplate">
+		<obj id="root" class="SuspendCtrl">
 			<attr>
 				<left>0</left>
 				<top>0</top>
@@ -69,7 +69,7 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.XuanFuNewWnd" class="FrameHostWnd">
+    <hostwndtemplate id="GXZB.SuspendWnd" class="FrameHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
@@ -90,7 +90,7 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-             <event name="OnCreate" file="XuanFuNewWnd.xml.lua" func="OnCreate"/>
+             <event name="OnCreate" file="SuspendWnd.xml.lua" func="OnCreate"/>
         </eventlist>
     </hostwndtemplate>
 </xlue>
