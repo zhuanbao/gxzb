@@ -472,7 +472,7 @@ function PreTipMain()
 	FunctionObj.CreatePopupTipWnd()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()	
-	if CheckMachineSuitable() then
+	if not CheckMachineSuitable() then
 		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		return
 	end
