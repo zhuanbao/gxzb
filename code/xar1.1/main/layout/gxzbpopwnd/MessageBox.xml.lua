@@ -38,6 +38,9 @@ function OnCreate(self)
 				MainText:SetText(userData.Text)
 			end
 		end
+		if type(userData.ChangeUI) == "function" then
+			userData.ChangeUI(self)
+		end
 	end
 end
 

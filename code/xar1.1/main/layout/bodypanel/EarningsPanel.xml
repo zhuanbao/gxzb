@@ -139,14 +139,14 @@
 								<left>0</left>
 								<top>0</top>
 								<width>2</width>
-								<height>father.height</height>
+								<height>father.height-30</height>
 								<srccolor>system.black</srccolor>
 							</attr>
 						</obj>
 						<obj id="xline" class="FillObject">
 							<attr>
 								<left>0</left>
-								<top>father.height-2</top>
+								<top>father.height-30-2</top>
 								<width>father.width</width>
 								<height>2</height>
 								<srccolor>system.black</srccolor>
@@ -157,8 +157,20 @@
 								<left>0</left>
 								<top>0</top>
 								<width>father.width</width>
-								<height>father.height</height>
+								<height>father.height-30</height>
 								<zorder>99999</zorder>
+							</attr>
+						</obj>
+						<obj id="BottomText" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>father.height</top>
+								<width>father.width</width>
+								<height>20</height>
+								<halign>center</halign>
+								<valign>center</valign>
+								<textcolor>system.black</textcolor>
+								<font>font.text14</font>
 							</attr>
 						</obj>
 					</children>
@@ -166,6 +178,43 @@
 			</children>
 		</objtemplate>
 	</control>
+	
+	<!--鼠标停留时显示tips-->
+	<control class="BarChartTips">
+		<method_def>
+			<SetText file="EarningsPanel.xml.lua" func="SetText"/>
+			<ChangeColor file="EarningsPanel.xml.lua" func="ChangeColor"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="bkg" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<image>charttips-bkg</image>
+					</attr>
+					<children>
+						<obj id="text" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<halign>center</halign>
+								<valign>center</valign>
+								<textcolor>system.white</textcolor>
+								<font>font.text12</font>
+								<multiline>1</multiline>
+							</attr>
+						</obj>	
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
 	<!--柱形图面板-->
 	<control class="EarningsPanel">
 		<objtemplate>
@@ -218,14 +267,17 @@
 						<obj id="EarningsPanel.BarChart" class="BarChart">
 							<attr>
 								<left>50</left>
-								<top>30+10</top>
+								<top>30+40</top>
 								<width>father.width-50-10</width>
-								<height>father.height-80</height>
+								<height>father.height-100</height>
 							</attr>	
 						</obj>
 					</children>
 				</obj>
 			</children>
+			<eventlist>
+				<event name="OnVisibleChange" file="EarningsPanel.xml.lua" func="OnVisibleChange" />
+			</eventlist>
 		</objtemplate>
 	</control>
 </xlue>

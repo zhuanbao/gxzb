@@ -155,6 +155,10 @@ function BarChartUpdate(self, fnConvert)
 	--[[table.sort(attr.Data, function(t1, t2)
 		return t1[1] < t2[1]
 	end)]]
+	local bottomText = self:GetObject("BottomText")
+	if bottomText then
+		bottomText:SetText("您的金库有"..(attr.Data["balance"] or 0).."个元宝")
+	end
 	local barchartpanel = self:GetObject("barchartpanel")
 	barchartpanel:RemoveAllChild()
 	local ymax = 0
@@ -168,7 +172,7 @@ function BarChartUpdate(self, fnConvert)
 	if ymax == 0 then
 		return
 	end
-	local l, t, r, b = self:GetObjPos()
+	local l, t, r, b = barchartpanel:GetObjPos()
 	--减去横纵坐标的宽度
 	local w, h = r - l -2, b - t - 2
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
@@ -201,7 +205,8 @@ function BarChartUpdate(self, fnConvert)
 		newTextObject:SetTextColorResID("system.black")
 		newTextObject:SetTextFont("font.text10")
 	end
-	local itemw = w/(#attr.Data*2-1)
+	--间隔宽度是柱子的一半
+	local itemw = w/(#attr.Data*3-1)
 	if itemw < 2 then
 		itemw = 2
 	end
@@ -219,7 +224,7 @@ function BarChartUpdate(self, fnConvert)
 	--将数据转换为坐标系中的点
 	local function ConvertData2Point(xindex, ydata)
 		--local xreal = (#attr.Data == 1 and 0 or w*(xindex-1)/(#attr.Data)) + 2
-		local xreal = (#attr.Data == 1 and 0 or 2*(xindex-1)*itemw) + 2 
+		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*3)) + 2 
 		local yreal = h - h*ydata/ymax
 		return math.floor(xreal), math.floor(yreal)
 	end
@@ -230,22 +235,55 @@ function BarChartUpdate(self, fnConvert)
 				local newFillObject = objFactory:CreateUIObject("", "FillObject")
 				barchartpanel:AddChild(newFillObject)
 				local xsrc, ysrc = ConvertData2Point(i, dat[2])
-				local l, t, r, b = xsrc, ysrc, xsrc+itemw, h
+				local l, t, r, b = xsrc, ysrc, xsrc+itemw*2, h
 				if #attr.Data == i then
 					r = w+2
 				end
 				if t == b then
 					t = b - 1
 				end
-				if i == 1 or xsrc + itemw/2 - xstart > 60 then
-					xstart = xsrc + itemw/2
+				if i == 1 or xsrc + itemw - xstart > 60 then
+					xstart = xsrc + itemw
 					Drawxline(xstart, attr.Data[i][1])
 				end
 				newFillObject:SetSrcColor(attr.ColumnColorSrc)
-				--newFillObject:SetDestColor(attr.ColumnColorDest)
+				newFillObject:SetDestColor(attr.ColumnColorSrc)
 				newFillObject:SetSrcPt(0, 0)
 				newFillObject:SetDestPt(r-l, b-t)
 				newFillObject:SetObjPos(l, t, r, b)
+				newFillObject:AttachListener("OnMouseEnter", false, 
+				function(self, x, y)
+					local tips = barchartpanel:GetObject("tips")
+					if not tips then
+						tips = objFactory:CreateUIObject("tips", "BarChartTips")
+						barchartpanel:AddChild(tips)
+					end
+					tips:SetText(""..dat[2].."\n"..dat[1])
+					local scal = 1-dat[2]/ymax
+					if scal <= 0.4 then
+						scal = 0.4
+					end
+					local fa = XLGetObject("Xunlei.XLGraphic.Factory.Object")
+					local cl = fa:CreateColor(0, 0, scal*255, 255)
+					newFillObject:SetSrcColor(cl)
+					newFillObject:SetDestColor(cl)
+					tips:ChangeColor(cl)
+					tips:SetObjPos(l + itemw - 30, t - 30, l + itemw + 30, t-1)
+					tips:SetVisible(true)
+					tips:SetChildrenVisible(true)
+				end)
+				
+				newFillObject:AttachListener("OnMouseLeave", false, 
+				function(self)
+					newFillObject:SetSrcColor(attr.ColumnColorSrc)
+					newFillObject:SetDestColor(attr.ColumnColorSrc)
+					local tips = barchartpanel:GetObject("tips")
+					if tips then
+						tips:SetVisible(false)
+						tips:SetChildrenVisible(false)
+					end
+				end)
+				
 				--newFillObject:SetFillType("Line")
 			end
 		end
@@ -253,15 +291,47 @@ function BarChartUpdate(self, fnConvert)
 	DrawBar()
 end
 
+function ChangeColor(self, cl)
+	local image = self:GetObject("bkg")
+	if image and cl then
+		local bitmap = image:GetBitmap()
+		bitmap:Fill(cl)
+		image:SetBitmap(bitmap)
+	end
+end
+
+function SetText(self, text)
+	local textobj = self:GetObject("text")
+	if textobj then
+		textobj:SetText(text)
+	end
+end
+
+function OnVisibleChange(self, bVisible)
+	if not bVisible then return end
+	local btn = self:GetObject("EarningsPanel.HourBtn")
+	if btn then
+		btn:FireExtEvent("OnClick", 0, 0)
+	end
+end
+
 function OnClickHourBtnBarChart(self)
 	local barobj = self:GetObject("control:EarningsPanel.BarChart")
 	local attr = barobj:GetAttribute()
-	if attr.currentpanel ~= 2 then
+	if attr.currentpanel == 1 then
 		return
 	end
 	attr.currentpanel = 1
-	attr.Data = {{1, 1000}, {2, 1800}, {4, 9000}, {3, 4000}, {6, 5000}, {5, 1200}, {8, 500}, {7, 2100}, {10, 1700}, {9, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
-	barobj:Update()
+	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
+		if bRet and type(tabInfo) == "table" then
+			attr.Data = tabInfo
+		else
+			--请求失败
+			attr.Data = {balance=8976, {1, 1000}, {2, 1800}, {4, 9000}, {3, 4000}, {6, 5000}, {5, 1200}, {8, 500}, {7, 2100}, {10, 1700}, {9, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
+			
+		end
+		barobj:Update()
+	end)
 end
 
 function OnClickDayBtnBarChart(self)
@@ -271,6 +341,13 @@ function OnClickDayBtnBarChart(self)
 		return
 	end
 	attr.currentpanel = 2
-	attr.Data = {{11, 7002}, {12, 3003}, {13, 6580}, {14, 1021}, {15, 9000}}
-	barobj:Update()
+	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
+		if bRet and type(tabInfo) == "table" then
+			attr.Data = tabInfo
+		else
+			--请求失败
+			attr.Data = {balance=6666, {11, 7002}, {12, 3003}, {13, 6580}, {14, 1021}, {15, 9000}}
+		end
+		barobj:Update()
+	end)
 end

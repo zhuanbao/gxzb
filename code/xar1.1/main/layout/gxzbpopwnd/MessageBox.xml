@@ -2,129 +2,114 @@
 <objtreetemplate id="MessageBoxWndTree" class="ObjectTreeTemplate">
 	<obj id="PanelCaption" class="CaptionObject">
 		<attr>
-			<height>150</height>
 			<top>0</top>
 			<left>0</left>
-			<width>430</width>
+			<width>470</width>
+			<height>270</height>
 		</attr>
 		<children>
-		<obj id="TitleBar" class="FillObject">
-			<attr>
-				<srccolor>1F253D</srccolor>
-				<destcolor>1F253D</destcolor>
-				<left>0</left>
-				<top>0</top>
-				<width>father.width</width>
-				<height>28</height>
-				<srcpt>0,0</srcpt>
-				<destpt>father.width,28</destpt>
-			</attr>
-			<children>
-			<obj id="close" class="TipAddin.Button">
+			<obj id="root" class="TextureObject">
 				<attr>
-					<top>5</top>
-					<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-					<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-					<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-					<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-					<height>12</height>
-					<left>father.width-30</left>
-					<width>12</width>
-				</attr>
-				<eventlist>
-					<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
-				</eventlist>
-			</obj>
-			<obj id="titlehead" class="TextObject">
-				<attr>
-					<textcolor>system.white</textcolor>
-					<text></text>
-					<left>12</left>
-					<halign>left</halign>
+					<left>0</left>
 					<top>0</top>
-					<font>font.text13</font>
+					<width>father.width</width>
 					<height>father.height</height>
-					<width>90</width>
-					<valign>center</valign>
-				</attr>
-			</obj>
-			</children>
-		</obj>
-		<obj id="MainPanel" class="FillObject">
-			<attr>
-				<srccolor>666666</srccolor>
-				<destcolor>666666</destcolor>
-				<left>0</left>
-				<top>28</top>
-				<width>father.width</width>
-				<height>father.height-28</height>
-				<srcpt>0,28</srcpt>
-				<destpt>father.width,father.height</destpt>
-			</attr>
-			<children>
-			<obj id="MainText" class="TextObject">
-				<attr>
-					<textcolor>system.white</textcolor>
-					<wordellipsis>1</wordellipsis>
-					<valign>left</valign>
-					<left>100</left>
-					<multiline>1</multiline>
-					<top>36</top>
-					<font>font.text12</font>
-					<height>father.height-36</height>
-					<text>确定要删除文件</text>
-					<halign>left</halign>
-					<width>father.width-56</width>
-				</attr>
-			</obj>
-			<obj id="yes" class="TipAddin.Button">
-				<attr>
-					<top>father.height-37</top>
-					<NormalBkgID>setting-btn-normal</NormalBkgID>
-					<DownBkgID>setting-btn-normal</DownBkgID>
-					<HoverBkgID>setting-btn-hover</HoverBkgID>
-					<DisableBkgID>setting-btn-hover</DisableBkgID>
-					<height>25</height>
-					<left>father.width-170</left>
-					<width>73</width>
-					<Text>可以</Text>
-					<TextFont>font.text16</TextFont>
-					<TextColor>DDDDDD</TextColor>
+					<texture>common-bkg</texture>
+				</attr>	
+				<children>
+					<obj id="close" class="TipAddin.Button">
+						<attr>
+							<left>father.width-30</left>
+							<top>5</top>
+							<height>12</height>
+							<width>12</width>
+							<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+							<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+							<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+							<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+						</attr>
+						<eventlist>
+							<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
+						</eventlist>
+					</obj>
+					<obj id="titlehead" class="TextObject">
+						<attr>
+							<left>12</left>
+							<top>0</top>
+							<height>28</height>
+							<width>90</width>
+							<textcolor>system.white</textcolor>
+							<text></text>
+							<halign>left</halign>
+							<font>font.text13</font>
+							<valign>center</valign>
+						</attr>
+					</obj>
 
-				</attr>
-				<eventlist>
-					<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
-				</eventlist>
+					<obj id="MainText" class="TextObject">
+						<attr>
+							<left>173</left>
+							<top>120</top>
+							<width>father.width-200</width>
+							<height>father.height-36</height>
+							<multiline>1</multiline>
+							<font>font.text14</font>
+							<text></text>
+							<halign>left</halign>
+							<textcolor>system.white</textcolor>
+							<wordellipsis>1</wordellipsis>
+							<valign>left</valign>
+							
+						</attr>
+					</obj>
+					<obj id="yes" class="TipAddin.Button">
+						<attr>
+							<left>159</left>
+							<top>198</top>
+							<height>25</height>
+							<width>73</width>
+							<NormalBkgID>setting-btn-normal</NormalBkgID>
+							<DownBkgID>setting-btn-normal</DownBkgID>
+							<HoverBkgID>setting-btn-hover</HoverBkgID>
+							<DisableBkgID>setting-btn-hover</DisableBkgID>
+							<Text>可以</Text>
+							<TextFont>font.text16</TextFont>
+							<TextColor>DDDDDD</TextColor>
+
+						</attr>
+						<eventlist>
+							<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
+						</eventlist>
+					</obj>
+					<obj id="no" class="TipAddin.Button">
+						<attr>
+							<left>241</left>
+							<top>198</top>
+							<height>25</height>
+							<width>73</width>
+							<NormalBkgID>setting-btn-normal</NormalBkgID>
+							<DownBkgID>setting-btn-normal</DownBkgID>
+							<HoverBkgID>setting-btn-hover</HoverBkgID>
+							<DisableBkgID>setting-btn-hover</DisableBkgID>
+							<Text>不行</Text>
+							<TextFont>font.text16</TextFont>
+							<TextColor>DDDDDD</TextColor>
+						</attr>
+						<eventlist>
+							<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
+						</eventlist>
+					</obj>
+					<obj id="MainIcon" class="ImageObject">
+						<attr>
+							<left>110</left>
+							<top>110</top>
+							<height>50</height>
+							<width>50</width>
+							<image>logo-mid</image>
+						</attr>
+					</obj>
+				</children>
 			</obj>
-			<obj id="no" class="TipAddin.Button">
-				<attr>
-					<top>father.height-37</top>
-					<NormalBkgID>setting-btn-normal</NormalBkgID>
-					<DownBkgID>setting-btn-normal</DownBkgID>
-					<HoverBkgID>setting-btn-hover</HoverBkgID>
-					<DisableBkgID>setting-btn-hover</DisableBkgID>
-					<height>25</height>
-					<left>father.width-87</left>
-					<width>73</width>
-					<Text>不行</Text>
-					<TextFont>font.text16</TextFont>
-					<TextColor>DDDDDD</TextColor>
-				</attr>
-				<eventlist>
-					<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
-				</eventlist>
-			</obj>
-			<obj id="MainIcon" class="ImageObject">
-				<attr>
-					<top>28</top>
-					<image>logo-mid</image>
-					<height>50</height>
-					<left>20</left>
-					<width>50</width>
-				</attr>
-			</obj>
-			</children>
-		</obj>
 		</children>
 	</obj>
 </objtreetemplate>

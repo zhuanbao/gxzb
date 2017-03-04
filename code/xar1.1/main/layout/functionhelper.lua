@@ -201,6 +201,7 @@ function RegisterFunctionObject(self)
 	obj.InitMinerInfoToServer = InitMinerInfoToServer
 	obj.QueryClientInfo = QueryClientInfo
 	obj.TakeCashToServer = TakeCashToServer
+	obj.GetHistoryToServer = GetHistoryToServer
 	obj.GetInstallSrc = GetInstallSrc
 	obj.GetExePath = GetExePath
 	obj.SaveAllConfig = SaveAllConfig
@@ -228,6 +229,8 @@ function RegisterFunctionObject(self)
 	obj.UnBindingClientFromClient = UnBindingClientFromClient
 	obj.UnBindingClientFromServer = UnBindingClientFromServer
 	obj.DownLoadNewVersion = DownLoadNewVersion
+	obj.GetUserCurrentBalance = GetUserCurrentBalance
+	obj.GetClientCurrentState = GetClientCurrentState
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -1805,13 +1808,56 @@ function TakeCashToServer(nMoney, fnCallBack)
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
 			if type(tabInfo) ~= "table" then
-				TipLog("[QueryClientInfo] parse info error.")
+				TipLog("[TakeCashToServer] parse info error.")
 				fnCallBack(false)
 				return
 			end
 			fnCallBack(true, tabInfo)
 		else
 			TipLog("[TakeCashToServer] get content failed.")
+			fnCallBack(false)
+		end	
+	end)
+end
+
+function QuerySvrForGetHistoryInfo(ntype)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "getHistory"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
+	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(ntype)))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForGetHistoryInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+--查询收益接口,ntype = 0 最近24小时，1 最近1个月
+function GetHistoryToServer(ntype, fnCallBack)
+	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
+	NewAsynGetHttpContent(strReguestUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[GetHistoryToServer] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			local tabInfo = DeCodeJson(strContent)	
+			if type(tabInfo) ~= "table" then
+				TipLog("[GetHistoryToServer] parse info error.")
+				fnCallBack(false)
+				return
+			end
+			fnCallBack(true, tabInfo)
+		else
+			TipLog("[GetHistoryToServer] get content failed.")
 			fnCallBack(false)
 		end	
 	end)
@@ -1864,6 +1910,16 @@ function QueryClientInfo(nMiningSpeed)
 			TipLog("[QueryClientInfo] query sever failed.")
 		end		
 	end)
+end
+
+--获取当前余额
+function GetUserCurrentBalance()
+	return g_Balance
+end
+
+--获取客户端状态
+function GetClientCurrentState()
+	return g_PreWorkState
 end
 
 --客户端解绑

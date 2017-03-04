@@ -144,13 +144,6 @@ function OnClickEarningsPanel(self)
 	local objmain = self:GetOwnerControl()
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")
-		local barobj = objmain:GetObject("MainBody_EarningsPanel:EarningsPanel.BarChart")
-		if barobj then
-			local attr = barobj:GetAttribute()
-			attr.currentpanel = 1
-			attr.Data = {{1, 1000}, {2, 1800}, {4, 9000}, {3, 4000}, {6, 5000}, {5, 1200}, {8, 500}, {7, 2100}, {10, 1700}, {9, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
-			barobj:Update()
-		end
 	end
 end
 
