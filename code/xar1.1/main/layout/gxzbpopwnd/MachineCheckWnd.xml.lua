@@ -17,14 +17,6 @@ function OnClickExit(self)
 	ExitAndReport(self)
 end
 
-function OnMouseLeaveShare(self)
-	self:SetCursorID("IDC_ARROW")
-end
-
-function OnMouseEnterShare(self)
-	self:SetCursorID("IDC_HAND")
-end
-
 function OnClickShare(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()

@@ -2138,6 +2138,7 @@ function UnBindingClientFromClient()
 	--]]
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
+	ChangeClientTitle("共享赚宝(未绑定)")
 	if CheckIsWorking() then
 		NotifyQuit()
 	end

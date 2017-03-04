@@ -134,7 +134,11 @@ function OnLButtonDownPanel(self, x, y)
 end
 
 function OnClickUnBindWeiXin(self)
-
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+	objHostWnd:Show(1)
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.UnBindWnd", "GXZB.UnBindWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
+	Helper:DestoryTransparentMask(objHostWnd)
 end
 
 function OnInitControl(self)

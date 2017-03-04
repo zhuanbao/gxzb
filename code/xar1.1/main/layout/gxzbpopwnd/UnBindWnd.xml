@@ -1,5 +1,5 @@
 <xlue>
-	<objtreetemplate id="GXZB.MachineCheckWndTree" class="ObjectTreeTemplate">
+	<objtreetemplate id="GXZB.UnBindWndTree" class="ObjectTreeTemplate">
 		<attr>
 			<left>0</left>
 			<top>0</top>
@@ -15,7 +15,7 @@
 				<texture>common-bkg</texture>
 			</attr>	
 			<children>
-				<obj id="MachineCheckWnd.Caption" class="CaptionObject">
+				<obj id="UnBindWnd.Caption" class="CaptionObject">
 					<attr>
 						<left>0</left>
 						<top>0</top>
@@ -23,7 +23,7 @@
 						<height>father.height</height>
 					</attr>
 					<children>
-						<obj id="MachineCheckWnd.TitleBar" class="LayoutObject">
+						<obj id="UnBindWnd.TitleBar" class="LayoutObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
@@ -31,7 +31,7 @@
 								<height>30</height>
 							</attr>
 							<children>
-								<obj id="MachineCheckWnd.TitleBar.Logo" class="ImageObject">
+								<obj id="UnBindWnd.TitleBar.Logo" class="ImageObject">
 									<attr>
 										<left>10</left>
 										<top>5</top>
@@ -40,19 +40,19 @@
 										<image>GXZB.Caption.Logo</image>
 									</attr>
 								</obj>
-								<obj id="MachineCheckWnd.TitleBar.Title" class="TextObject">
+								<obj id="UnBindWnd.TitleBar.Title" class="TextObject">
 									<attr>
 										<left>10+20+5</left>
 										<top>0</top>
 										<width>200</width>
 										<height>father.height</height>
-										<text>共享赚宝</text>
+										<text>解除绑定</text>
 										<textcolor>system.black</textcolor>
 										<font>font.default12</font>
 										<valign>center</valign>
 									</attr>
 								</obj>
-								<obj id="MachineCheckWnd.TitleBar.CloseBtn" class="TipAddin.Button">
+								<obj id="UnBindWnd.TitleBar.CloseBtn" class="TipAddin.Button">
 									<attr>
 										<left>father.width-25</left>
 										<top>8</top>
@@ -64,12 +64,12 @@
 										<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
 									</attr>
 									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickClose" />
+										<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickCloseDialog" />
 									</eventlist>	
 								</obj>
 							</children>
 						</obj>
-						<obj id="MachineCheckWnd.Content" class="LayoutObject">
+						<obj id="UnBindWnd.Content" class="LayoutObject">
 							<attr>
 								<left>0</left>
 								<top>30</top>
@@ -77,36 +77,39 @@
 								<height>father.height-30</height>
 							</attr>
 							<children>
-								<obj id="MachineCheckWnd.Content.Warning" class="ImageObject">
+								<obj id="UnBindWnd.Content.Warning" class="ImageObject">
 									<attr>
-										<left>95</left>
-										<top>65</top>
+										<left>78</left>
+										<top>55</top>
 										<width>35</width>
 										<height>35</height>
 										<image>logo-mid</image>
 										<drawmode>1</drawmode>
 									</attr>
 								</obj>
-								<obj id="MachineCheckWnd.Content.Text" class="TextObject">
+								<obj id="UnBindWnd.Content.Text" class="TextObject">
 									<attr>
-										<left>95+35+10</left>
-										<top>65+5</top>
-										<width>300</width>
-										<height>24</height>
-										<valign>center</valign>
+										<left>78+35+10</left>
+										<top>55+5</top>
+										<width>280</width>
+										<height>80</height>
+										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>DDDDDD</textcolor>
-										<font>font.text18</font>
-										<text>软件检测到本设备不支持赚宝</text>
+										<font>font.text16</font>
+										<multiline>1</multiline>
+										<text>当前绑定微信账号是（**）。
+										解除绑定后，赚宝收益无法提现，除非
+										您重新绑定。确定解绑吗？</text>
 									</attr>
 								</obj>
-								<obj id="MachineCheckWnd.Content.ExitBtn" class="TipAddin.Button">
+								<obj id="UnBindWnd.Content.UnBind" class="TipAddin.Button">
 									<attr>
-										<Text>退出</Text>
+										<Text>解绑</Text>
 										<TextFont>font.text16</TextFont>
 										<TextColor>DDDDDD</TextColor>
-										<left>(father.width-73)/2</left>
-										<top>164</top>
+										<left>(father.width-90*2-15)/2</left>
+										<top>55+5+80+20</top>
 										<width>90</width>
 										<height>30</height>
 										<NormalBkgID>setting-btn-normal</NormalBkgID>
@@ -115,26 +118,26 @@
 										<DisableBkgID>setting-btn-hover</DisableBkgID>
 									</attr>
 									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickExit" />
+										<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickUnBind" />
 									</eventlist>	
 								</obj>
-								<obj id="MachineCheckWnd.Content.Share" class="TextLinkEx">
+								<obj id="UnBindWnd.Content.Cancel" class="TipAddin.Button">
 									<attr>
-										<left>father.width-73-18</left>
-										<top>father.height-18-18</top>
-										<width>77</width>
-										<height>18</height>
-										<HAlign>center</HAlign>
-										<VAlign>center</VAlign>
-										<Text>分享赚分成></Text>
-										<Font>font.text13</Font>
-										<TextColor>C4C400</TextColor>
-										<TextHoverColor>C4C400</TextHoverColor>
-										<Underline>false</Underline>
+										<Text>取消</Text>
+										<TextFont>font.text16</TextFont>
+										<TextColor>DDDDDD</TextColor>
+										<left>(father.width-90*2-15)/2+90+15</left>
+										<top>55+5+80+20</top>
+										<width>90</width>
+										<height>30</height>
+										<NormalBkgID>setting-btn-normal</NormalBkgID>
+										<DownBkgID>setting-btn-normal</DownBkgID>
+										<HoverBkgID>setting-btn-hover</HoverBkgID>
+										<DisableBkgID>setting-btn-hover</DisableBkgID>
 									</attr>
 									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickShare" />
-									</eventlist>
+										<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickCancel" />
+									</eventlist>	
 								</obj>
 							</children>
 						</obj>
@@ -144,13 +147,13 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.MachineCheckWnd" class="FrameHostWnd">
+    <hostwndtemplate id="GXZB.UnBindWnd" class="ModalHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
             <width>500</width>
-			<height>280</height>
+            <height>280</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
@@ -165,7 +168,7 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-			<event name="OnShowWindow" file="MachineCheckWnd.xml.lua" func="OnShowWindow" />
+			<event name="OnCreate" file="UnBindWnd.xml.lua" func="OnCreate" />
         </eventlist>
     </hostwndtemplate>
 </xlue>
