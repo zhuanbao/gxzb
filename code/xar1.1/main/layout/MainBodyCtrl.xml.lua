@@ -130,7 +130,11 @@ end
 
 function OnClickTakeCashPanel(self)
 	local OwnerCtrl = self:GetOwnerControl()
-	ChangePanel(OwnerCtrl,"TakeCashPanel")
+	local strPanel = "TakeCashPanel"
+	if not tFunctionHelper.CheckIsBinded() then
+		strPanel = "QRCodePanel"
+	end
+	ChangePanel(OwnerCtrl,strPanel)
 end
 
 function ShowMainPanel(self)

@@ -217,6 +217,7 @@ function RegisterFunctionObject(self)
 	obj.GetUserWorkID = GetUserWorkID
 	obj.GetMainHostWnd = GetMainHostWnd
 	obj.ChangeMainBodyPanel = ChangeMainBodyPanel
+	obj.ChangeClientTitle = ChangeClientTitle
 	obj.CheckIsBinded = CheckIsBinded
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.UpdateUserBalance = UpdateUserBalance
@@ -230,6 +231,8 @@ function RegisterFunctionObject(self)
 	obj.DownLoadNewVersion = DownLoadNewVersion
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
 	obj.GetClientCurrentState = GetClientCurrentState
+	obj.CheckShouldRemindBind = CheckShouldRemindBind
+	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -242,6 +245,31 @@ function ChangeMainBodyPanel(strPanelName)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	objMainBodyCtrl:ChangePanel(strPanelName)
+end
+
+function ChangeClientTitle(strTitle)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objTitleCtrl = objRootCtrl:GetControlObject("WndPanel.Title")
+	objTitleCtrl:ChangeTitle(strTitle)
+end
+
+function CheckShouldRemindBind()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if tUserConfig["nLastRemindBindUTC"] ~= nil then
+		return false
+	end
+	return true
+end
+
+function SaveLastRemindBindUTC()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["nLastRemindBindUTC"] = GetCurrentServerTime()
+	SaveConfigToFileByKey("tUserConfig")
 end
 
 function SaveCommonUpdateUTC()
@@ -1561,8 +1589,7 @@ function CycleQuerySeverForBindResult(fnCallBack, nTimeoutInMS)
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 
-				or type(tabInfo["data"]) ~= "table" then
+				or tabInfo["rtn"] ~= 0 then
 				TipLog("[CycleQuerySeverForBindResult] Parse Json failed.")
 				fnCallBack(false,"解析登陆信息失败")
 				return 
@@ -1893,6 +1920,7 @@ function QueryClientInfo(nMiningSpeed)
 				TipLog("[QueryClientInfo] parse info error.")
 				return 
 			end
+			-- 绑定 未绑定 解绑 是否 status 不一样
 			if tabInfo["data"]["status"] ~= 1 then
 				if CheckIsBinded() then
 					UnBindingClientFromServer()
@@ -2049,6 +2077,7 @@ function SetUserBindInfo(tabBindInfo)
 	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
+	ChangeClientTitle("共享赚宝")
 	--UpdateBindButtonText("解除绑定")
 end
 
@@ -2131,6 +2160,7 @@ function UnBindingClientFromServer()
 	--]]
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
+	ChangeClientTitle("共享赚宝(未绑定)")
 	if CheckIsWorking() then
 		NotifyQuit()
 	end

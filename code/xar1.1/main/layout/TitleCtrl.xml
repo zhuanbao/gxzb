@@ -4,7 +4,7 @@
 		
 		</attr_def>
 		<method_def>
-
+			<ChangeTitle file="TitleCtrl.xml.lua" func="ChangeTitle"/>
 		</method_def>
 		<event_def>
 			

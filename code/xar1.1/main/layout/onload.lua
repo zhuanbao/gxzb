@@ -452,6 +452,9 @@ function TipMain()
 	
 	FunctionObj.InitMachName()
 	SaveConfigInTimer()
+	if not FunctionObj.CheckIsBinded() then
+		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
+	end
 	CheckMachineBindState()
 	--4小时1次提醒
 	FunctionObj.PopTipPre4Hour()

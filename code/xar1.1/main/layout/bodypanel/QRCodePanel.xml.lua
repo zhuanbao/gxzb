@@ -6,10 +6,13 @@ local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
 
 local gBinding = false
 local gQRTimeoutId = nil
+local gChangePanelTimeoutId = nil
+local gMinTakeCashBalance = 10000
 local tabCtrl = {
-	"QRCodePanel.Panel.QRCode.Failed",
+	"QRCodePanel.Panel.QRCode.GenFailed",
 	"QRCodePanel.Panel.QRCode.Success",
 	"QRCodePanel.Panel.QRCode.Expire",
+	"QRCodePanel.Panel.QRCode.BindFailed",
 }
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
@@ -21,6 +24,10 @@ function ResetGlobalParam()
 	if gQRTimeoutId ~= nil then
 		timerManager:KillTimer(gQRTimeoutId)
 		gQRTimeoutId = nil
+	end
+	if gChangePanelTimeoutId ~= nil then
+		timerManager:KillTimer(gChangePanelTimeoutId)
+		gChangePanelTimeoutId = nil
 	end
 end
 
@@ -37,14 +44,39 @@ function ShowCtrl(OwnerCtrl,strCtrlID)
 	end	
 end
 
+function AutoJumpToPanel(OwnerCtrl)
+	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
+	local strPanle = "MiningPanel"
+	local strInfo = "秒后跳转到赚宝界面"
+	if tFunctionHelper.GetUserCurrentBalance() >= gMinTakeCashBalance then
+		strPanle = "TakeCashPanel"
+		strInfo = "秒后开始提现"
+	end
+	local nTotalTime = 3
+	local strText = nTotalTime .. strInfo
+	textActiveTime:SetText(strText)
+	textActiveTime:SetVisible(true)
+	gChangePanelTimeoutId = timerManager:SetTimer(function(Itm, id)
+		if nTotalTime <= 0 and gBinding then
+			ResetGlobalParam()
+			tFunctionHelper.ChangeMainBodyPanel(strPanle)
+			return
+		end
+		nTotalTime = nTotalTime - 1
+		local strText = nTotalTime .. strInfo
+		textActiveTime:SetText(strText)
+		end, 1000)
+end
+
 function UpdateBindSuccessUI(OwnerCtrl)
 	ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Success")
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	textActiveTime:SetVisible(false)
-	local ObjBtnBegainMining= OwnerCtrl:GetControlObject("QRCodePanel.Panel.BegainMining")
-	ObjBtnBegainMining:Show(true) 
+	--local ObjBtnBegainMining= OwnerCtrl:GetControlObject("QRCodePanel.Panel.BegainMining")
+	--ObjBtnBegainMining:Show(true) 
 	local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
 	ObjTextLinkUnBind:Show(false)
+	AutoJumpToPanel(OwnerCtrl)
 end
 
 function ResetUIVisible(OwnerCtrl)
@@ -53,8 +85,8 @@ function ResetUIVisible(OwnerCtrl)
 	ShowCtrl(OwnerCtrl, nil)
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	textActiveTime:SetVisible(false)
-	local ObjBtnBegainMining= OwnerCtrl:GetControlObject("QRCodePanel.Panel.BegainMining")
-	ObjBtnBegainMining:Show(false) 
+	--local ObjBtnBegainMining= OwnerCtrl:GetControlObject("QRCodePanel.Panel.BegainMining")
+	--ObjBtnBegainMining:Show(false) 
 	local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
 	ObjTextLinkUnBind:Show(true)
 end
@@ -66,7 +98,7 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 	local ObjBitmap = objGraphicFac:CreateBitmap(tabInfo["data"]["qrcodePath"], "ARGB32")
 	if not ObjBitmap then
 		ResetGlobalParam()
-		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Failed")
+		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
 		return
 	end
 	local ImgTmpCode= OwnerCtrl:GetControlObject("QRCodePanel.Panel.QRCode.TmpCode")
@@ -98,19 +130,23 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 			bQuerying = true
 			TipLog("Cycle query sever for bind result in.")
 			nTimerCounter = 0
-			tFunctionHelper.CycleQuerySeverForBindResult(function(bRet,info)
+			tFunctionHelper.CycleQuerySeverForBindResult(function(bRet,tabBindInfo)
 				if not gBinding or not bQuerying then
 					return
 				end
 				if not bRet then
 					TipLog("Cycle query  sever for bind result return false")
 					bQuerying = false
+					ResetGlobalParam()
+					ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
 					return 
 				end
-				ResetGlobalParam()
-				tFunctionHelper.SetUserBindInfo(info)
+				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
+					ResetGlobalParam()
+					tFunctionHelper.SetUserBindInfo(tabBindInfo)
+					UpdateBindSuccessUI(OwnerCtrl)
+				end	
 				bQuerying = false
-				UpdateBindSuccessUI(OwnerCtrl)
 			end)
 		end
 		nTimerCounter = nTimerCounter + 1
@@ -126,7 +162,7 @@ function GetQRCodeFromServer(OwnerCtrl)
 	tFunctionHelper.DownLoadTempQrcode(function(bRet,info)
 		if not bRet then
 			TipLog("Download temp qrcode failed.")
-			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Failed")
+			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
 			return
 		end
 		HandleInfoData(OwnerCtrl, info)

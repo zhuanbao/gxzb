@@ -34,8 +34,12 @@ function InitMainBodyCtrl(objRootCtrl)
 	if not bSucc then
 		return false
 	end
-	
-	local bSucc = objMainBodyCtrl:ChangePanel("MiningPanel")
+	local strPanel = "MiningPanel"
+	if tFunctionHelper.CheckShouldRemindBind() then
+		strPanel = "QRCodePanel"
+		tFunctionHelper.SaveLastRemindBindUTC()
+	end
+	local bSucc = objMainBodyCtrl:ChangePanel(strPanel)
 	if not bSucc then
 		return false
 	end

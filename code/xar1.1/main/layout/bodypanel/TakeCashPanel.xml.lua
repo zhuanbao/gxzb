@@ -1,5 +1,6 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local gCanTakeMoney = 0
+local gBalance = 0
 --提现错误码
 local NOENOUGHMONEY = 401
 local EXCEEDINGTAKETIME = 402
@@ -24,12 +25,12 @@ function OnClickTakeCash(self)
 	--local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	tFunctionHelper.TakeCashToServer(nTakeMoney,function(bRet, tabInfo)
 		--for test
-		--[[
+		---[[
 		bRet = true
 		tabInfo = {}
 		tabInfo["rtn"] = 0
 		tabInfo["data"] = {}
-		tabInfo["data"]["balance"]  = 8798
+		tabInfo["data"]["balance"]  = 87980
 		--]]
 		if not bRet then
 			SetMsgToUser(OwnerCtrl, "连接服务器失败，请重试")
@@ -82,19 +83,40 @@ function OnEditFocusChange(self, isFocus)
 	ObjBtnTake:Enable(bTakeEnable)
 end
 
+local g_strLastInput = "" 
 function OnEditTextChange(self)
 	local bTakeEnable = false
 	local ObjBtnTake = self:GetObject("control:TakeCashPanel.Panel.Take")
 	local strText = self:GetText()
 	if tonumber(strText) ~= nil then
-		local nTakeMoney = tonumber(strText)
+		--修正只可以小数点后2位
+		local strTakeMoney = nil
+		if string.find(strText,"%.") then
+			local _,_,strInteger,strDecimal = string.find(strText,"^(%d+)%.(%d+)$")
+			if strDecimal ~= nil and string.len(strDecimal) > 2 then
+				strDecimal = string.sub(strDecimal,1,2)
+				strTakeMoney = strInteger ..tostring(".") .. strDecimal
+			else
+				strTakeMoney = strText
+			end	
+		else
+			strTakeMoney = strText
+		end
+		local nTakeMoney = tonumber(strTakeMoney)
+		--到这里表示可以提现，纠正提现金额
 		if nTakeMoney < 1 then
-			nTakeMoney = 1
-		elseif nTakeMoney > 200 then 
-			nTakeMoney = 200
+			strTakeMoney = "1"
+		elseif nTakeMoney > gCanTakeMoney then 
+			strTakeMoney = tostring(gCanTakeMoney)
+		elseif nTakeMoney > 200 then
+			strTakeMoney = "200"
 		end
 		bTakeEnable = true
-		self:SetText(tostring(nTakeMoney))
+		self:SetText(tostring(strTakeMoney))
+		g_strLastInput = strTakeMoney
+	elseif string.find(strText,"可提现") == nil then
+		self:SetText(g_strLastInput)
+		bTakeEnable = true
 	end
 	ObjBtnTake:Enable(bTakeEnable)	
 end
@@ -111,6 +133,10 @@ function OnLButtonDownPanel(self, x, y)
 	end
 end
 
+function OnClickUnBindWeiXin(self)
+
+end
+
 function OnInitControl(self)
 	
 end
@@ -122,17 +148,41 @@ function CheckCanTakeCash()
 	return tFunctionHelper.CheckIsAnotherDay(nLastTime, nCurrentTime)
 end
 
+function UpdateTakeRule(self)
+	local ObjTakeRule = self:GetControlObject("TakeCashPanel.Panel.TakeRule")
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strNickName = tUserConfig["tUserInfo"]["strNickName"]
+	if Helper:IsRealString(strNickName) then
+		strNickName = Helper.tipUtil:GetLastWord(strNickName)
+	else
+		strNickName = "*"
+	end
+	local strText = "提现规则 ：\r\n"
+	strText = strText .. "1. 提现通过微信红包发放，10000元宝可提现1元人民币\r\n"
+	strText = strText .. "2. 提现金额最小1元，最大200元，每天只能提现1次\r\n"
+	strText = strText .. "3. 红包将发到您已绑定的微信账号（*"..tostring(strNickName).."）中,"
+	ObjTakeRule:SetText(strText)
+end
+
 function UpdateUIByBalance(self, nBalance)
+	UpdateTakeRule(self)
 	local ObjEdit = self:GetControlObject("TakeCashPanel.Panel.Edit")
 	local ObjBtnTake = self:GetControlObject("TakeCashPanel.Panel.Take")
 	ObjBtnTake:Enable(false)
-	local nTakeMoney = math.floor(nBalance/1000)
+	local Integer,Decimal = math.modf(nBalance/10000)
+	Decimal = math.floor(Decimal*100)/100
+	nTakeMoney = Integer+Decimal
 	if nTakeMoney < 1 then
 		nTakeMoney = 0
 		ObjEdit:SetEnable(false)
-	elseif CheckCanTakeCash() then
+	end	
+	if CheckCanTakeCash() then
 		ObjEdit:SetEnable(true)
-		--ObjBtnTake:Enable(true)
+	else
+		ObjEdit:SetEnable(false)
 	end
 	if nTakeMoney > 200 then
 		nTakeMoney = 200
@@ -140,12 +190,14 @@ function UpdateUIByBalance(self, nBalance)
 	gCanTakeMoney = nTakeMoney
 	ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
 	if not CheckCanTakeCash() then
-		local OwnerCtrl = self:GetOwnerControl()
-		SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
+		--local OwnerCtrl = self:GetOwnerControl()
+		--SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
+		SetMsgToUser(self, "今天已提现，请明天再来~")
 	end
 end
 
 function UpdateUserBalance(self, nBalance)
+	gBalance = nBalance
 	local ObjTextNum = self:GetControlObject("TakeCashPanel.Panel.Amount.Num")
 	ObjTextNum:SetText(nBalance)
 	AdjustAmountTextPosition(self)
@@ -182,8 +234,8 @@ end
 function OnShowPanel(self, bShow)
 	if bShow then
 		AdjustAmountTextPosition(self)
-		if not CheckCanTakeCash() then
-			SetMsgToUser(self, "今天已提现，请明天再来~")
-		end
+	else
+		g_strLastInput = ""
 	end
+	UpdateUIByBalance(self,gBalance)
 end

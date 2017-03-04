@@ -67,7 +67,7 @@
 										<antialias>2</antialias>
 									</attr>
 								</obj>
-								<obj id="QRCodePanel.Panel.QRCode.Failed" class="LayoutObject">
+								<obj id="QRCodePanel.Panel.QRCode.GenFailed" class="LayoutObject">
 									<attr>
 										<left>5</left>
 										<top>5</top>
@@ -76,7 +76,7 @@
 										<!--visible>false</visible-->
 									</attr>
 									<children>
-										<obj id="QRCodePanel.Panel.QRCode.Failed.Desc" class="TextObject">
+										<obj id="QRCodePanel.Panel.QRCode.GenFailed.Desc" class="TextObject">
 											<attr>
 												<left>1</left>
 												<top>64</top>
@@ -90,7 +90,7 @@
 												<!--visible>false</visible-->
 											</attr>
 										</obj>
-										<obj id="QRCodePanel.Panel.QRCode.Failed.Refresh" class="TextLinkEx">
+										<obj id="QRCodePanel.Panel.QRCode.GenFailed.Refresh" class="TextLinkEx">
 											<attr>
 												<left>1</left>
 												<top>84</top>
@@ -155,6 +155,62 @@
 												<height>16</height>
 												<HAlign>center</HAlign>
 												<VAlign>center</VAlign>
+												<Text>请刷新</Text>
+												<Font>font.yahei13.underline</Font>
+												<TextColor>system.white</TextColor>
+												<TextHoverColor>system.white</TextHoverColor>
+												<Underline>false</Underline>
+												<!--Show>false</Show-->
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="QRCodePanel.Panel.QRCode.BindFailed" class="LayoutObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>162</width>
+										<height>162</height>
+										<!--visible>false</visible-->
+									</attr>
+									<children>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Desc" class="TextObject">
+											<attr>
+												<left>1</left>
+												<top>64</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<valign>center</valign>
+												<halign>center</halign>
+												<textcolor>system.white</textcolor>
+												<font>font.text13</font>
+												<text>二维码绑定失败</text>
+												<!--visible>false</visible-->
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Refresh" class="TextLinkEx">
+											<attr>
+												<left>1</left>
+												<top>84</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<HAlign>center</HAlign>
+												<VAlign>center</VAlign>
 												<Text>重新绑定</Text>
 												<Font>font.yahei13.underline</Font>
 												<TextColor>system.white</TextColor>
@@ -208,7 +264,7 @@
 								</obj>
 							</children>
 						</obj>
-						<obj id="QRCodePanel.Panel.BegainMining" class="TipAddin.Button">
+						<!--obj id="QRCodePanel.Panel.BegainMining" class="TipAddin.Button">
 							<attr>
 								<left>(father.width-160)/2</left>
 								<top>305</top>
@@ -225,7 +281,7 @@
 							<eventlist>
 								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickBegainMining" />
 							</eventlist>
-						</obj>
+						</obj-->
 						<obj id="QRCodePanel.Panel.ActiveTime" class="TextObject">
 							<attr>
 								<left>10</left>

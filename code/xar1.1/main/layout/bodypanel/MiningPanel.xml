@@ -101,6 +101,20 @@
 								</obj>
 							</children>
 						</obj>
+						<obj id="MiningPanel.Panel.MiningState" class="TextObject">
+							<attr>
+								<left>father.width-10</left>
+								<top>336</top>
+								<width>father.width-20</width>
+								<height>32</height>
+								<valign>center</valign>
+								<halign>right</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text13</font>
+								<text>正在向服务器请求赚宝所需要的数据参数</text>
+								<multiline>1</multiline>
+							</attr>
+						</obj>
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>

@@ -83,6 +83,10 @@ function SetBtnStyle(objRootCtrl, bMainPanel)
 	tFunctionHelper.UpdateWindow()
 end
 
+function ChangeTitle(self, strTitle)
+	local ObjTitleText = self:GetControlObject("TitleCtrl.Caption.Title")
+	ObjTitleText:SetText(strTitle)
+end
 
 function HideWndToTray(objUIElement)
 	local objTree = objUIElement:GetOwner()

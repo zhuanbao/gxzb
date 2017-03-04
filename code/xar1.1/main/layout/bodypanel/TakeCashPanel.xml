@@ -73,9 +73,10 @@
 												<transparent>1</transparent>
 												<textcolor>444444</textcolor>
 												<font>font.text14</font>
-												<number>1</number>
+												<number>0</number>
 												<text>可提现0元</text>
 												<enable>0</enable>
+												<maxlength>6</maxlength>
 											</attr>
 											<eventlist>
 												<event name="OnFocusChange" file="TakeCashPanel.xml.lua" func="OnEditFocusChange" />
@@ -168,7 +169,7 @@
 								<visible>0</visible>
 							</attr>
 						</obj>
-						<obj id="QRCodePanel.Panel.TakeRule" class="TextObject">
+						<obj id="TakeCashPanel.Panel.TakeRule" class="TextObject">
 							<attr>
 								<left>25</left>
 								<top>325</top>
@@ -177,10 +178,31 @@
 								<valign>center</valign>
 								<halign>left</halign>
 								<textcolor>DDDDDD</textcolor>
-								<font>font.text13</font>
+								<font>font.text11</font>
 								<multiline>1</multiline>
-								<text>提现规则 ：1. 提现通过微信红包发放，10000元宝可提现1元人民币。2. 提现金额最小1元，最大200元，每天只能提现1次。</text>
+								<text>提现规则 ：
+								1. 提现通过微信红包发放，10000元宝可提现1元人民币
+								2. 提现金额最小1元，最大200元，每天只能提现1次
+								3. 红包将发到您已绑定的微信账号（**）中,</text>
 							</attr>
+						</obj>
+						<obj id="TakeCashPanel.Panel.UnBindWeiXin" class="TextLinkEx">
+							<attr>
+								<left>238</left>
+								<top>325+45</top>
+								<width>60</width>
+								<height>16</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>点此解绑</Text>
+								<Font>font.yahei11.underline</Font>
+								<TextColor>system.blue</TextColor>
+								<TextHoverColor>system.blue</TextHoverColor>
+								<Underline>false</Underline>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickUnBindWeiXin" />
+							</eventlist>
 						</obj>
 					</children>
 				</obj>
