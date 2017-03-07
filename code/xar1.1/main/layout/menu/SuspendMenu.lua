@@ -39,7 +39,8 @@ end
 function SetBallSetting(value)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
-	tUserConfig["tConfig"]["showball"] = value
+	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
+	tUserConfig["tConfig"]["ShowBall"]["nState"] = value
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 

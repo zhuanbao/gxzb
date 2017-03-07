@@ -32,16 +32,24 @@
 							<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
 						</eventlist>
 					</obj>
-					<obj id="titlehead" class="TextObject">
+					<obj id="titlelogo" class="ImageObject">
 						<attr>
-							<left>12</left>
+							<left>16</left>
+							<top>5</top>
+							<width>20</width>
+							<height>20</height>
+							<image>GXZB.Caption.Logo</image>
+						</attr>
+					</obj>
+					<obj id="titletext" class="TextObject">
+						<attr>
+							<left>29+16</left>
 							<top>0</top>
-							<height>28</height>
-							<width>90</width>
-							<textcolor>system.white</textcolor>
-							<text></text>
-							<halign>left</halign>
-							<font>font.text13</font>
+							<width>200</width>
+							<height>30</height>
+							<text>共享赚宝</text>
+							<textcolor>system.black</textcolor>
+							<font>font.default12</font>
 							<valign>center</valign>
 						</attr>
 					</obj>

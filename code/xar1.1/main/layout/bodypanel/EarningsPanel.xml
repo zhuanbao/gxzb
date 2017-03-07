@@ -119,9 +119,11 @@
 		<attr_def>
 			<attr name="ColumnColorSrc" type="string"><default>system.red</default></attr>
 			<attr name="ColumnColorDest" type="string"><default>system.pink</default></attr>
+			<attr name="FailedColor" type="string"><default>DDDDDD</default></attr>
 		</attr_def>
 		<method_def>
 			<Update file="EarningsPanel.xml.lua" func="BarChartUpdate"/>
+			<UpdateUserBalance file="EarningsPanel.xml.lua" func="UpdateUserBalance"/>
 		</method_def>
 		<objtemplate>
 			<children>
@@ -161,17 +163,55 @@
 								<zorder>99999</zorder>
 							</attr>
 						</obj>
-						<obj id="BottomText" class="TextObject">
+						<obj id="BottomLayout" class="LayoutObject">
 							<attr>
-								<left>0</left>
+								<left>35</left>
 								<top>father.height</top>
 								<width>father.width</width>
 								<height>20</height>
-								<halign>center</halign>
-								<valign>center</valign>
-								<textcolor>system.black</textcolor>
-								<font>font.text14</font>
 							</attr>
+							<children>
+								<obj id="BottomTextHead" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>66</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>system.black</textcolor>
+										<font>font.text13</font>
+										<text>您的库存有</text>
+									</attr>
+								</obj>
+								<obj id="BottomTextBalance" class="TextObject">
+									<attr>
+										<left>66+1</left>
+										<top>0</top>
+										<width>father.width-(66+1)-(41+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>E5961C</textcolor>
+										<font>font.text13</font>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+								<obj id="BottomTextTail" class="TextObject">
+									<attr>
+										<left>father.width-(41+1)</left>
+										<top>0</top>
+										<width>41</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>right</halign>
+										<textcolor>system.black</textcolor>
+										<font>font.text13</font>
+										<text>个元宝</text>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 					</children>
 				</obj>

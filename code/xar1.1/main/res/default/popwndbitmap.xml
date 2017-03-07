@@ -22,5 +22,7 @@
 		<texture id="xuanfu-strip" image="popwndbitmap\xuanfu-strip.png" />
 		<bitmap id="GXZB.Share.QRcode" path="popwndbitmap\shareqrcode.jpg"/>
 		<bitmap id="charttips-bkg" path="popwndbitmap\charttips-bkg.png"/>
+		<texture id="process-bar" image="popwndbitmap\process-bar.png" />
+		<texture id="process-bkg" image="popwndbitmap\process-bkg.png" />
 	</resource>
 </XLUE>

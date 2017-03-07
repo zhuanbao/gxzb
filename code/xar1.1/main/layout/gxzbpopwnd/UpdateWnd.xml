@@ -64,7 +64,7 @@
 							<attr>
 								<left>37</left>
 								<top>50</top>
-								<width>150</width>
+								<width>father.width-37</width>
 								<height>36</height>
 								<valign>top</valign>
 								<halign>left</halign>
@@ -126,7 +126,7 @@
 								<top>father.height-50</top>
 								<width>260</width>
 								<height>10</height>
-								<texture></texture>
+								<texture>process-bkg</texture>
 								<visible>0</visible>
 							</attr>
 							<children>
@@ -134,16 +134,16 @@
 									<attr>
 										<left>1</left>
 										<top>1</top>
-										<width>father.width-2</width>
+										<width>0</width>
 										<height>father.height-2</height>
-										<texture>GXZB.TakeCashPanel.EditBkg</texture>
+										<texture>process-bar</texture>
 										<visible>0</visible>
 									</attr>
 								</obj>
 								<obj id="UpdateWnd.Progress.text" class="TextObject">
 									<attr>
 										<left>(father.width-100)/2</left>
-										<top>father.height+15</top>
+										<top>father.height+10</top>
 										<width>100</width>
 										<height>20</height>
 										<valign>center</valign>

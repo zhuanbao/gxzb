@@ -1,96 +1,105 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local g_tNewVersionInfo = nil
+--0未更新， 1正在更新
+local g_UpdateState = 0
+--是否被取消
+local g_UpdateCancel = false
 
 function OnClickClose(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
+	if g_UpdateState == 1 then
+		local nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
+			{
+				["parentWnd"] = objHostWnd, 
+				["Text"] = "您正在升级，是否退出？",
+				["ChangeUI"] = function(objWnd)
+					local objtree = objWnd:GetBindUIObjectTree()
+					local btnyes = objtree:GetUIObject("yes")
+					local btnno = objtree:GetUIObject("no")
+					btnyes:SetText("确定")
+					btnno:SetText("取消")
+				end,
+			}
+		)
+		--点了取消或关闭
+		if nRet == 1 then
+			return
+		--点了退出
+		else
+			g_UpdateState = 0
+			g_UpdateCancel = true
+		end
+	end
 	objHostWnd:EndDialog(0)
 end
 
-function ManualUpdate(tNewVersionInfo)
-	if tFunctionHelper.CheckIsUpdating() then
-		tFunctionHelper.TipLog("[ManualUpdate] CheckIsUpdating failed,another thread is updating!")
-		return
-	end
-	local strCurVersion = tFunctionHelper.GetGXZBVersion()
-	local strNewVersion = tNewVersionInfo.strVersion		
-	if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
-		or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
-		--tFunctionHelper.TipLog("[ManualUpdate] strCurVersion is nil or is not New Version")
-		--return
-	end
-	
-	tFunctionHelper.SetIsUpdating(true)
-	--[[tFunctionHelper.DownLoadNewVersion(tNewVersionInfo, function(strRealPath) 
-		tFunctionHelper.SetIsUpdating(false)
-	
-		if not Helper:IsRealString(strRealPath) then
-			return
-		end
-		tFunctionHelper.SaveCommonUpdateUTC()
-		Helper.tipUtil:ShellExecute(0, "open", strRealPath, "", 0, "SW_SHOWNORMAL")
-	end)]]
-	local strUrl = "http://1.198.5.17/dlied1.qq.com/bns/mannual/bns_setup_220365434_220365504_201702131910_signed.exe?mkey=58b50538fa31befb&f=8f5d&c=0&p=.exe"
-	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strUrl)
-	if not string.find(strFileName, "%.exe$") then
-		strFileName = strFileName..".exe"
-	end
-	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
-	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
-	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
-		--XLMessageBox(tostring(nRet).."\n"..tostring(savepath).."\n"..tostring(ulProgress).."\n"..tostring(ulProgressMax))
-	end)
+function CheckPacketMD5(strPacketPath)
+	local strServerMD5 = g_tNewVersionInfo["strMD5"]
+	return FunctionObj.CheckMD5(strPacketPath, strServerMD5)
 end
 
+
+local progress, progrBar, progrText
 function OnClickUpdateBtn(self)
-	--OnClickClose(self)
 	if not g_tNewVersionInfo then 
 		return 
 	end
 	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
 	local TextMain = self:GetObject("tree:UpdateWnd.Content.TextMain")
 	local BtnUpdate = self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn")
-	local progress = self:GetObject("tree:UpdateWnd.Progress.bkg")
-	local progrBar = self:GetObject("tree:UpdateWnd.Progress.bar")
-	local progrText = self:GetObject("tree:UpdateWnd.Progress.text")
+	progress = self:GetObject("tree:UpdateWnd.Progress.bkg")
+	progrBar = self:GetObject("tree:UpdateWnd.Progress.bar")
+	progrText = self:GetObject("tree:UpdateWnd.Progress.text")
 	TextMain:SetVisible(false)
 	BtnUpdate:Show(false)
 	progress:SetVisible(true)
 	progress:SetChildrenVisible(true)
-	
-	if tFunctionHelper.CheckIsUpdating() then
-		tFunctionHelper.TipLog("[ManualUpdate] CheckIsUpdating failed,another thread is updating!")
+	progrBar:SetVisible(true)
+	progrText:SetVisible(true)
+	TextBig:SetObjPos(107, 100, "father.width", 136)
+	--正在更新
+	g_UpdateState = 1
+	if g_UpdateCancel then
+		g_UpdateCancel = false
 		return
 	end
 	local strCurVersion = tFunctionHelper.GetGXZBVersion()
 	local strNewVersion = g_tNewVersionInfo.strVersion		
 	if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
 		or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
-		tFunctionHelper.TipLog("[ManualUpdate] strCurVersion is nil or is not New Version")
+		tFunctionHelper.TipLog("[OnClickUpdateBtn] strCurVersion is nil or is not New Version")
 		return
 	end
-	
-	tFunctionHelper.SetIsUpdating(true)
-	local strUrl = "http://1.198.5.17/dlied1.qq.com/bns/mannual/bns_setup_220365434_220365504_201702131910_signed.exe?mkey=58b50538fa31befb&f=8f5d&c=0&p=.exe"
+	local strUrl = g_tNewVersionInfo["strPacketURL"]
 	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strUrl)
 	if not string.find(strFileName, "%.exe$") then
 		strFileName = strFileName..".exe"
 	end
 	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
 	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
+	
+	tFunctionHelper.TipLog("[OnClickUpdateBtn] strUrl = "..tostring(strUrl)..", strSavePath = "..tostring(strSavePath))
 	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
-		--XLMessageBox(tostring(nRet).."\n"..tostring(savepath).."\n"..tostring(ulProgress).."\n"..tostring(ulProgressMax))
+		if g_UpdateCancel then
+			if nRet == 0 then
+				g_UpdateCancel = false
+			end
+			tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress g_UpdateCancel = "..tostring(g_UpdateCancel))
+			return
+		end
+		tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress nRet = "..tostring(nRet)..", ulProgress = "..tostring(ulProgress)..", ulProgressMax = "..tostring(ulProgressMax))
 		if nRet == -2 and type(ulProgress) == "number" and type(ulProgressMax) == "number" and ulProgress < ulProgressMax and ulProgress > 0 then
 			local rate = ulProgress/ulProgressMax
-			local rateText = tostring(math.floor(rate*100)).."/%"
+			local rateText = tostring(math.floor(rate*100)).."%"
 			local l, t, r, b = progrBar:GetObjPos()
 			local fl, ft, fr, fb = progress:GetObjPos()
 			local w = fr - fl - 2
 			progrBar:SetObjPos(l, t, l + w*rate, b)
-			progrText:SetText("正在安装"..rateText)
-		elseif nRet == 0  then
-			
+			progrText:SetText("正在下载"..rateText)
+		elseif nRet == 0 and  Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
+			tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
 		end
 	end)
 end
@@ -138,12 +147,8 @@ function OnCreate(self)
 		
 		local function ShowNoUpdate()
 			--已经是最新
-			TextMain:SetText("你的共享赚宝已经是最新版本，无需更新")
-			--TextVersion:SetText("版本："..tFunctionHelper.GetGXZBVersion() or "1.0.0.1")
-			--TextVersion:SetVisible(true)
+			TextMain:SetText("你的共享赚宝已经是最新版本。")
 			BtnSure:SetText("确定")
-			
-			Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, {["parentWnd"] = self, ["Text"] = "没别的，就是想谈个框"})
 		end
 		
 		local function ShowReadyUpdate(strVersion, strContent)
@@ -166,6 +171,16 @@ function OnCreate(self)
 		end
 		
 		local function InitMainWnd(nRet, strCfgPath)			
+			--[[tNewVersionInfo = {
+				strVersion = "v1.0.0.2",
+				strContent = "1、修改了XX\n2、优化了xx\n3、see more",
+				strPacketURL = "http://down.sandai.net/thunder9/Thunder9.1.26.614.exe",
+				strMD5 = "1221212",
+			}
+			ShowReadyUpdate(tNewVersionInfo["strVersion"] or "V3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
+			g_tNewVersionInfo = tNewVersionInfo
+			if true then return end]]
+			
 			if 0 ~= nRet then
 				ShowNoUpdate()
 				return
@@ -189,7 +204,8 @@ function OnCreate(self)
 			local strSavePath = GetPacketSavePath(strPacketURL)
 			if Helper:IsRealString(tNewVersionInfo.strMD5) 
 				and tFunctionHelper.CheckMD5(strSavePath, tNewVersionInfo.strMD5) then
-				ShowInstallPanel(objRootCtrl, strSavePath, tNewVersionInfo)
+				--ShowInstallPanel(objRootCtrl, strSavePath, tNewVersionInfo)
+				tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
 				return
 			end
 			ShowReadyUpdate(tNewVersionInfo["strVersion"] or "V3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")

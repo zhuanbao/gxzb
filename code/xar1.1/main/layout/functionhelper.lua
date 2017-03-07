@@ -44,6 +44,10 @@ local g_tConfigFileStruct = {
 		["tContent"] = {}, 
 		["fnMergeOldFile"] = function(infoTable, strFileName) return MergeOldUserCfg(infoTable, strFileName) end,
 	},
+	["tEarnings"] = {
+		["strFileName"] = "Earnings.dat",
+		["tContent"] = {}, 
+	},
 }
 
 
@@ -1865,7 +1869,54 @@ function QuerySvrForGetHistoryInfo(ntype)
 end
 
 --查询收益接口,ntype = 0 最近24小时，1 最近1个月
+--不同整点才回去请求，否则使用本地
+--请求失败显示上次， 颜色用灰色
 function GetHistoryToServer(ntype, fnCallBack)
+	local function CheckLastUTC(utc)
+		if type(utc) ~= "number" then
+			return true
+		end
+		local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
+		local nLYear, nLMonth, nLDay, nLHour = tipUtil:FormatCrtTime(utc)
+		local nCYear, nCMonth, nCDay, nCHour = tipUtil:FormatCrtTime(utc)
+		if nLYear ~= nCYear or nLMonth ~= nCMonth or nLDay ~= nCDay or nLHour ~= nCHour then
+			return true
+		end
+		return false
+	end
+	local function GetLocal(tLocal)
+		local t = {}
+		local count = 0
+		tLocal = tLocal or {}
+		if ntype == 0 then
+			if type(tLocal["hour24"]) == "table" and #tLocal["hour24"] == 24 then
+				return tLocal["hour24"]
+			end
+			count = 24
+		else
+			if type(tLocal["day30"]) == "table" and #tLocal["day30"] == 30 then
+				return tLocal["day30"]
+			end
+			count = 30
+		end
+		for i = 1, count do
+			t[i] = {i, 0}
+		end
+		return t
+	end
+	local function Save2Local(tServer)
+		local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
+		tEarnings["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
+		--TODO:现在不确定服务器返回什么格式， 等确定了再改这里
+		tEarnings["hour24"] = tServer
+		tEarnings["day30"] = tServer
+		SaveConfigToFileByKey("tEarnings")
+	end
+	local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
+	if not CheckLastUTC(tEarnings["lastutc"]) then
+		fnCallBack(true, GetLocal(tEarnings))
+		return
+	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
 	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
@@ -1878,13 +1929,14 @@ function GetHistoryToServer(ntype, fnCallBack)
 			local tabInfo = DeCodeJson(strContent)	
 			if type(tabInfo) ~= "table" then
 				TipLog("[GetHistoryToServer] parse info error.")
-				fnCallBack(false)
+				fnCallBack(false, GetLocal(tEarnings))
 				return
 			end
 			fnCallBack(true, tabInfo)
+			Save2Local(tabInfo)
 		else
 			TipLog("[GetHistoryToServer] get content failed.")
-			fnCallBack(false)
+			fnCallBack(false, GetLocal(tEarnings))
 		end	
 	end)
 end
@@ -2169,6 +2221,8 @@ function UnBindingClientFromServer()
 end
 
 function UpdateUserBalance(nBalance)
+	--在注册记录一下， 方便卸载时判断余额
+	RegSetValue("HKEY_CURRENT_USER\\Software\\gxzb\\balance", nBalance)
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return

@@ -146,6 +146,29 @@ end
 --------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------柱形图部分------------------------------------------------------------
+function UpdateUserBalance(self, nBalance)
+	local bottomText = self:GetObject("BottomTextBalance")
+	if bottomText then
+		bottomText:SetText(tostring(nBalance or 0))
+		local textHead = self:GetObject("BottomTextHead")
+		local textTail = self:GetObject("BottomTextTail")
+		local fater = self:GetObject("BottomLayout")
+		local l, t, r, b = fater:GetObjPos()
+		local w, h = r - l, b - t
+		local nLenHead = textHead:GetTextExtent()
+		local nLenTail = textTail:GetTextExtent()
+		local nLenBalance = bottomText:GetTextExtent()
+		local gap = 1
+		local nMax = w - (nLenHead + gap + nLenTail + gap) 
+		if nLenBalance > nMax then
+			nLenBalance = nMax
+		end
+		local nNewLeft = 0
+		textHead:SetObjPos(nNewLeft, 0, nNewLeft+nLenHead, h)
+		bottomText:SetObjPos(nNewLeft + (nLenHead + gap), 0, nNewLeft + (nLenHead + gap) + nLenBalance, h)
+		textTail:SetObjPos(nNewLeft + (nLenHead + gap) + (nLenBalance + gap), 0, nNewLeft + (nLenHead + gap) + (nLenBalance + gap) + nLenTail, h)
+	end
+end
 
 function BarChartUpdate(self, fnConvert)
 	local attr = self:GetAttribute()
@@ -155,10 +178,8 @@ function BarChartUpdate(self, fnConvert)
 	--[[table.sort(attr.Data, function(t1, t2)
 		return t1[1] < t2[1]
 	end)]]
-	local bottomText = self:GetObject("BottomText")
-	if bottomText then
-		bottomText:SetText("您的金库有"..(attr.Data["balance"] or 0).."个元宝")
-	end
+	--更新余额
+	UpdateUserBalance(self, attr.Data["balance"])
 	local barchartpanel = self:GetObject("barchartpanel")
 	barchartpanel:RemoveAllChild()
 	local ymax = 0
@@ -169,30 +190,15 @@ function BarChartUpdate(self, fnConvert)
 			end
 		end
 	end
+	--最小显示5个刻度
 	if ymax == 0 then
-		return
+		ymax = 5
 	end
 	local l, t, r, b = barchartpanel:GetObjPos()
 	--减去横纵坐标的宽度
 	local w, h = r - l -2, b - t - 2
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 	--显示纵坐标刻度
-	--[[for i = 1, #attr.Data do
-		if type(attr.Data[i]) == "table" then
-			local ytmp = h*i/#attr.Data
-			if ytmp <= h then
-				local yreal = h - ytmp
-				local newTextObject = objFactory:CreateUIObject("", "TextObject")
-				newTextObject:SetText(tostring(math.abs(ymax*i/#attr.Data)))
-				barchartpanel:AddChild(newTextObject)
-				newTextObject:SetObjPos(-50, yreal-8, 0, yreal+8)
-				newTextObject:SetVAlign("center")
-				newTextObject:SetHAlign("center")
-				newTextObject:SetTextColorResID("system.black")
-				newTextObject:SetTextFont("font.text10")
-			end
-		end
-	end]]
 	for i = 1, 5 do
 		local ytmp = h*i/5
 		local yreal = h - ytmp
@@ -225,7 +231,13 @@ function BarChartUpdate(self, fnConvert)
 	local function ConvertData2Point(xindex, ydata)
 		--local xreal = (#attr.Data == 1 and 0 or w*(xindex-1)/(#attr.Data)) + 2
 		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*3)) + 2 
-		local yreal = h - h*ydata/ymax
+		local yreal = h-2
+		if ydata > 0 then
+			yreal = h - h*ydata/ymax
+		end
+		if yreal > h-2 then
+			yreal = h-2
+		end
 		return math.floor(xreal), math.floor(yreal)
 	end
 	local xstart=0
@@ -246,8 +258,9 @@ function BarChartUpdate(self, fnConvert)
 					xstart = xsrc + itemw
 					Drawxline(xstart, attr.Data[i][1])
 				end
-				newFillObject:SetSrcColor(attr.ColumnColorSrc)
-				newFillObject:SetDestColor(attr.ColumnColorSrc)
+				local normalColor = attr.Data["reqFailed"] and attr.FailedColor or attr.ColumnColorSrc
+				newFillObject:SetSrcColor(normalColor)
+				newFillObject:SetDestColor(normalColor)
 				newFillObject:SetSrcPt(0, 0)
 				newFillObject:SetDestPt(r-l, b-t)
 				newFillObject:SetObjPos(l, t, r, b)
@@ -262,9 +275,11 @@ function BarChartUpdate(self, fnConvert)
 					local scal = 1-dat[2]/ymax
 					if scal <= 0.4 then
 						scal = 0.4
+					elseif scal >= 0.8 then
+						scal = 0.8
 					end
 					local fa = XLGetObject("Xunlei.XLGraphic.Factory.Object")
-					local cl = fa:CreateColor(0, 0, scal*255, 255)
+					local cl = attr.Data["reqFailed"] and fa:CreateColor(scal*255, scal*255, scal*255, 255) or fa:CreateColor(0, 0, scal*255, 255)
 					newFillObject:SetSrcColor(cl)
 					newFillObject:SetDestColor(cl)
 					tips:ChangeColor(cl)
@@ -275,8 +290,8 @@ function BarChartUpdate(self, fnConvert)
 				
 				newFillObject:AttachListener("OnMouseLeave", false, 
 				function(self)
-					newFillObject:SetSrcColor(attr.ColumnColorSrc)
-					newFillObject:SetDestColor(attr.ColumnColorSrc)
+					newFillObject:SetSrcColor(normalColor)
+					newFillObject:SetDestColor(normalColor)
 					local tips = barchartpanel:GetObject("tips")
 					if tips then
 						tips:SetVisible(false)
@@ -323,13 +338,9 @@ function OnClickHourBtnBarChart(self)
 	end
 	attr.currentpanel = 1
 	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
-		if bRet and type(tabInfo) == "table" then
-			attr.Data = tabInfo
-		else
-			--请求失败
-			attr.Data = {balance=8976, {1, 1000}, {2, 1800}, {4, 9000}, {3, 4000}, {6, 5000}, {5, 1200}, {8, 500}, {7, 2100}, {10, 1700}, {9, 2900}, {11, 4800}, {12, 3100}, {13, 400}, {14, 8000}, {15, 1000}, {16, 1800}, {17, 9000}, {18, 4000}, {19, 5000}, {20, 1200}, {21, 500}, {22, 2100}, {23, 1700}, {24, 2900}}
-			
-		end
+		attr.Data = tabInfo
+		attr.Data["reqFailed"] = not bRet
+		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end
@@ -341,13 +352,10 @@ function OnClickDayBtnBarChart(self)
 		return
 	end
 	attr.currentpanel = 2
-	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
-		if bRet and type(tabInfo) == "table" then
-			attr.Data = tabInfo
-		else
-			--请求失败
-			attr.Data = {balance=6666, {11, 7002}, {12, 3003}, {13, 6580}, {14, 1021}, {15, 9000}}
-		end
+	tFunctionHelper.GetHistoryToServer(1, function(bRet, tabInfo)
+		attr.Data = tabInfo
+		attr.Data["reqFailed"] = not bRet
+		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end

@@ -256,7 +256,9 @@ function OnCreate(self)
 			end
 			ObjTextCacheInfo:SetText(strInfo)
 		end
-		
+		if type(tUserConfig["tConfig"]) ~= "table" then
+			tUserConfig["tConfig"] = {}
+		end
 		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
 			tUserConfig["tConfig"]["WorkModel"] = {}
 		end
