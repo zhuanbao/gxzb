@@ -249,6 +249,8 @@ public:
 	
 	static int GetProcessElevation(lua_State* pLuaState);
 	static int  FnGetDiskFreeSpaceEx(lua_State* pLuaState);
+	static int  GetLastWord(lua_State* pLuaState);
+	static int FGetLastInputInfo(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };

@@ -20,14 +20,17 @@ LuaIPCUtil::~LuaIPCUtil(void)
 	if (m_hPipeThread)
 	{
 		CloseHandle(m_hPipeThread);
+		m_hPipeThread = NULL;
 	}
 	if (m_hWorkProcess)
 	{
 		CloseHandle(m_hWorkProcess);
+		m_hWorkProcess = NULL;
 	}
-	if (m_hConsoleRedirect)
+	if(m_hPipeQuitEvent)
 	{
-		CloseHandle(m_hConsoleRedirect);
+		CloseHandle(m_hPipeQuitEvent);
+		m_hPipeQuitEvent = NULL;
 	}
 }
 
@@ -45,7 +48,7 @@ XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] =
 
 HANDLE LuaIPCUtil::m_hPipeThread  = NULL;
 HANDLE LuaIPCUtil::m_hWorkProcess  = NULL;
-HANDLE LuaIPCUtil::m_hConsoleRedirect  = NULL;
+HANDLE LuaIPCUtil::m_hPipeQuitEvent  = NULL;
 
 LuaIPCUtil* __stdcall LuaIPCUtil::Instance(void *)
 {
@@ -68,6 +71,17 @@ void LuaIPCUtil::RegisterObj( XL_LRT_ENV_HANDLE hEnv )
 	theObject.pfnGetObject = (fnGetObject)LuaIPCUtil::Instance;
 
 	XLLRT_RegisterGlobalObj(hEnv,theObject);
+}
+
+BOOL LuaIPCUtil::WaitPipeQuitEvent()
+{
+	//故意等一秒，为了让pipe线程挂起一会
+	DWORD dwMilliseconds = 1*1000;
+	if (WAIT_TIMEOUT == ::WaitForSingleObject(m_hPipeQuitEvent, dwMilliseconds))
+	{
+		return FALSE;
+	}
+	return TRUE;
 }
 
 UINT WINAPI PipeProc(PVOID pArg)
@@ -108,6 +122,10 @@ UINT WINAPI PipeProc(PVOID pArg)
 	}  
 	while(TRUE)
 	{
+		if (LuaIPCUtil::WaitPipeQuitEvent())
+		{
+			break;
+		}
 		UINT uWriteSize = 0;
 		char szBuffer[MAX_PIPE_BUFFIE_LEN] = {0};
 		{
@@ -159,9 +177,18 @@ UINT WINAPI PipeProc(PVOID pArg)
 #define REDIRECTPATH DEFAULT_LOGFILE_PATH"\\WorkRedirect.txt"
 int LuaIPCUtil::StartWork(lua_State* pLuaState)
 {
+	if (NULL == m_hPipeQuitEvent)
+	{
+		m_hPipeQuitEvent = CreateEventA(NULL, TRUE, FALSE, PIPE_QUIT_EVENT);
+	}
+	else
+	{
+		 ResetEvent(m_hPipeQuitEvent);
+	}
 	long lRet = 0;
 	const char* pParams = lua_tostring(pLuaState, 2);
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
+	TSDEBUG4CXX(L"StartWork FindWindowA" << hWnd); 
 	if (NULL == hWnd && NULL != pParams)
 	{
 		CComBSTR bstrParams;
@@ -193,7 +220,8 @@ int LuaIPCUtil::StartWork(lua_State* pLuaState)
 	else
 	{
 		//SendMessageA(hWnd,WM_USER_START,0,0);
-		PostMessageA(hWnd,WM_USER_START,0,0);
+		//PostMessageA(hWnd,WM_USER_START,0,0);
+		SendMessageTimeout(hWnd, WM_USER_START, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 		lRet = 1;
 	}
 	if (lRet && (NULL == m_hPipeThread || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hPipeThread, 0)))
@@ -215,7 +243,8 @@ int LuaIPCUtil::StopWork(lua_State* pLuaState)
 	if (hWnd)
 	{
 		//SendMessageA(hWnd,WM_USER_PAUSE,0,0);
-		PostMessageA(hWnd,WM_USER_PAUSE,0,0);
+		//PostMessageA(hWnd,WM_USER_PAUSE,0,0);
+		SendMessageTimeout(hWnd, WM_USER_PAUSE, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	return 0;
 }
@@ -227,7 +256,19 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 	if (hWnd)
 	{
 		//SendMessageA(hWnd,WM_EXIT,0,0);
-		PostMessageA(hWnd,WM_EXIT,0,0);
+		//PostMessageA(hWnd,WM_EXIT,0,0);
+		SendMessageTimeout(hWnd, WM_EXIT, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
+	}
+	SetEvent(m_hPipeQuitEvent);
+	if (m_hPipeThread)
+	{
+		CloseHandle(m_hPipeThread);
+		m_hPipeThread = NULL;
+	}
+	if (m_hWorkProcess)
+	{
+		CloseHandle(m_hWorkProcess);
+		m_hWorkProcess = NULL;
 	}
 	return 0;
 }
@@ -326,7 +367,7 @@ int LuaIPCUtil::SendPoolUrl(lua_State* pLuaState)
 int LuaIPCUtil::IsWorkProcessRunning(lua_State* pLuaState)
 {
 	long lRet = 1;
-	if (NULL == m_hWorkProcess  || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hPipeThread, 0))
+	if (NULL == m_hWorkProcess  || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hWorkProcess, 0))
 	{
 		lRet = 0;
 	}
@@ -340,7 +381,10 @@ int LuaIPCUtil::ControlSpeed(lua_State* pLuaState)
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
 	if (hWnd)
 	{
-		SendMessageA(hWnd,WM_USER_CONTRAL_SPEED,(WPARAM)uPrecent,0);
+		//SendMessageA(hWnd,WM_USER_CONTRAL_SPEED,(WPARAM)uPrecent,0);
+		//PostMessageA(hWnd,WM_USER_CONTRAL_SPEED,(WPARAM)uPrecent,0);
+		SendMessageTimeout(hWnd, WM_USER_CONTRAL_SPEED, (WPARAM)uPrecent, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	return 0;
 }
+

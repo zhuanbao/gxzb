@@ -3,6 +3,7 @@
 #define IPC_UTIL_CLASS	"IPC.Util.Class"
 #define IPC_UTIL_OBJ		"IPC.Util"
 
+#define PIPE_QUIT_EVENT  "UserPipeQuitEvent_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}"
 
 class LuaIPCUtil
 {
@@ -28,7 +29,10 @@ private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 	static HANDLE m_hPipeThread;
 	static HANDLE m_hWorkProcess;
-	static HANDLE m_hConsoleRedirect;
+	static HANDLE m_hPipeQuitEvent;
+	static HANDLE m_hPipeContinueEvent;
+public:
+	static BOOL WaitPipeQuitEvent();
 };
 
 

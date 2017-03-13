@@ -219,6 +219,8 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	
 	{"GetProcessElevation", GetProcessElevation},
 	{"GetDiskFreeSpace", FnGetDiskFreeSpaceEx},
+	{"GetLastWord", GetLastWord},
+	{"GetLastInputInfo", FGetLastInputInfo},
 	{NULL, NULL}
 };
 
@@ -5537,4 +5539,32 @@ int LuaAPIUtil::GetProcessElevation(lua_State* pLuaState)
 	}
 	lua_pushnil(pLuaState);
 	return 1;
+}
+
+int LuaAPIUtil::GetLastWord(lua_State* luaState)
+{
+
+	const std::string utfstr = luaL_checkstring(luaState, 2);
+	std::wstring unicodetext = ultra::_UTF2T(utfstr);
+	long length = unicodetext.length();
+	std::wstring unicodelastword = unicodetext.substr(length-1);
+	std::string utflastword = ultra::_T2UTF(unicodelastword);
+	lua_pushstring(luaState, utflastword.c_str());
+	return 1;
+}
+
+int LuaAPIUtil::FGetLastInputInfo(lua_State *pLuaState)
+{
+	int iRet = -1;
+	DWORD dwTime = 0;
+	LASTINPUTINFO lii;
+	lii.cbSize = sizeof(LASTINPUTINFO);
+	if (GetLastInputInfo(&lii))
+	{
+		iRet = 0;
+		dwTime = lii.dwTime;
+	}
+	lua_pushinteger(pLuaState, iRet);
+	lua_pushnumber(pLuaState, dwTime);
+	return 2;
 }
