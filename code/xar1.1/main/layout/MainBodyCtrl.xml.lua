@@ -107,7 +107,7 @@ end
 function UpdateUserBalance(self, nBalance)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
-		TipLog("[UpdateWeiXinInfo] get objPanelCenter failed ")
+		TipLog("[UpdateUserBalance] get objPanelCenter failed ")
 		return false
 	end
 	
@@ -121,7 +121,39 @@ function UpdateUserBalance(self, nBalance)
 	return true
 end
 
+function UpdateMiningSpeed(self, nSpeed)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateMiningSpeed] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateMiningSpeed) == "function" then
+			objChild:UpdateMiningSpeed(nSpeed)
+		end	
+	end
+	return true
+end
 
+function UpdateMiningState(self, nState, nParam)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateMiningState] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateMiningState) == "function" then
+			objChild:UpdateMiningState(nState, nParam)
+		end	
+	end
+	return true
+end
 
 function OnClickMiningPanel(self)
 	local OwnerCtrl = self:GetOwnerControl()

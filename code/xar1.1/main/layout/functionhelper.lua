@@ -23,11 +23,12 @@ local g_bWorking = false
 local g_WorkingTimerId = nil
 --local g_WorkingFailCounter = 30  --30秒无状态就表示失败
 local g_PreWorkState = 0
-local g_WorkModel = 1 -- 默认智能
+--local g_WorkModel = 1 -- 默认智能
 
 --服务端信息
-local g_SpeedSum = 0 
-local g_PerSpeed = 0
+local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
+local g_PerSpeed = 0 --服务端返回的平均速度(元宝/(M*Hour))
+local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
 
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
@@ -225,6 +226,7 @@ function RegisterFunctionObject(self)
 	obj.CheckIsBinded = CheckIsBinded
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.UpdateUserBalance = UpdateUserBalance
+	obj.CheckCanMine = CheckCanMine
 	obj.NotifyPause = NotifyPause
 	obj.NotifyQuit = NotifyQuit
 	obj.NotifyStart = NotifyStart
@@ -1151,29 +1153,17 @@ function SetNotifyIconState(strText)
 	end
 	g_tipNotifyIcon:ShowNotifyIconTip(false)
 	
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local bWorkOpen = tUserConfig["bWorkOpen"] or false
-	local nMoneyCount = tUserConfig["nMoneyCountOneDay"] or 0
+	local strState, bShowSpeed = GetToolTipInfo()
 	
-	local strState = "正常赚宝"
-	if not bWorkOpen then
-		strState = "停止赚宝"
+	local strShowText = "共享赚宝  状态："..strState
+	
+	local nBalance = GetUserCurrentBalance()
+	strShowText = strShowText .. "\r\n金库余额：" .. tostring(nBalance) .. "元宝"
+	if bShowSpeed then
+		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(g_MiningSpeedPerHour) .. "元宝/小时"
 	end
-	local strDefaultText = "共享赚宝\r\n状态："..strState.."\r\n今日赚得元宝："..tostring(nMoneyCount).."元"
-	
-	local strResImageDir = __document .. "\\..\\..\\..\\..\\res"
-	local strImageName = "GXZB.TrayIcon.Close.ico"
-	if bWorkOpen then
-		strImageName = "GXZB.TrayIcon.Open.ico"
-	end
-	
-	local strImagePath = strResImageDir.. "\\".. strImageName
-	if not tipUtil:QueryFileExists(strImagePath) then
-		strImagePath = nil
-	end
-	
-	local strShowText = strText or strDefaultText
-	g_tipNotifyIcon:SetIcon(strImagePath, strShowText)
+
+	g_tipNotifyIcon:SetIcon(nil, strShowText)
 end
 
 
@@ -2036,6 +2026,33 @@ function SetMinerInfo(strText)
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	--设置工作进程状态信息
 end
+local g_nDagCacheMinSize = 4*1024*1024*1024
+function PopDAGCacheErrorWnd(strContent)
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+	objHostWnd:Show(1)
+	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.DAGCacheErrorWnd", "GXZB.DAGCacheErrorWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd,["strContent"] = strContent})
+	Helper:DestoryTransparentMask(objHostWnd)
+end
+
+function CheckCanMine()
+	local strValue = RegQueryValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir") or ""
+	if not IsRealString(strValue) or not tipUtil:QueryFileExists(strValue) then
+		PopDAGCacheErrorWnd("磁盘缓存目录所在驱动器不存在，请重新设置缓存目录")
+		return false
+	end
+	local nFreeBytes = tipUtil:GetDiskFreeSpace(strValue)
+	local tabFiles = tipUtil:FindFileList(strValue,"*.*")
+	local nCurrentBytes = 0
+	for i=1,#tabFiles do
+		nCurrentBytes = nCurrentBytes + tipUtil:GetFileSize(tabFiles[i])
+	end
+	if nCurrentBytes+nFreeBytes < g_nDagCacheMinSize then
+		PopDAGCacheErrorWnd("磁盘缓存目录所在驱动器可用空间小于4G,请释放更多的可用空间或重新设置缓存目录")
+		return false
+	end
+	return true
+end
 
 function UpdateWorkSpeed(strSpeed)
 	TipLog("[QuerySvrForPushCalcInfo] strSpeed = " .. tostring(strSpeed))
@@ -2249,7 +2266,7 @@ function NotifyPause()
 	end	
 	g_bWorking = false
 	g_PreWorkState = 0
-	g_WorkModel = 1
+	--g_WorkModel = 1
 end
 
 function NotifyQuit()
@@ -2260,7 +2277,7 @@ function NotifyQuit()
 	end	
 	g_bWorking = false
 	g_PreWorkState = 0
-	g_WorkModel = 1
+	--g_WorkModel = 1
 end
 
 function NotifyStart()
@@ -2290,17 +2307,38 @@ local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
+local MING_MINING_EEEOR_TIMEOUT = 100
 
 local MING_DAG_CHECKING = 1
 local MING_DAG_SUNCCESS = 2
 local MING_DAG_FAIL = 3
+
+function GetToolTipInfo()
+	local bShowSpeed = false
+	local strText = ""
+	if g_PreWorkState == MING_CHECK_DAG 
+		or g_PreWorkState == MING_CALCULATE_DAG then
+		strText = "准备中"
+	elseif g_PreWorkState == MING_MINING_SPEED
+		or g_PreWorkState == MING_SOLUTION_FIND then
+		strText = "运行中"
+		bShowSpeed = true
+	elseif g_PreWorkState == MING_MINING_EEEOR or g_PreWorkState == MING_MINING_EEEOR_TIMEOUT then
+		strText = "出错了"
+		bShowSpeed = true
+	else
+		strText = "未开启"
+	end	
+	TipLog("[GetToolTipInfo]: g_PreWorkState = " .. tostring(g_PreWorkState) .. ", strText = " .. tostring(strText) .. ", MING_CHECK_DAG = " .. tostring(MING_CHECK_DAG))
+	return strText,bShowSpeed
+end
 	
 function QueryAndUpdateWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
 	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
 	if nType == MING_CHECK_DAG then
 		g_PreWorkState = MING_CHECK_DAG
-		if p1 == 1 then
+		if p1 == MING_DAG_CHECKING then
 			SetMinerInfo("更新任务数据中...")
 		elseif p1 == MING_DAG_SUNCCESS then
 			SetMinerInfo("更新任务数据完成")
@@ -2318,7 +2356,8 @@ function QueryAndUpdateWorkState()
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
 			g_SpeedSum = g_SpeedSum + p1
-			--UpdateWorkSpeed(p1*g_PerSpeed)
+			g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed*3600)
+			--UpdateWorkSpeed(g_MiningSpeedPerHour)
 		end	
 		return true
 	elseif nType == MING_MINING_EEEOR then
@@ -2333,21 +2372,58 @@ function QueryAndUpdateWorkState()
 	return false
 end
 --[[
+0 全速，1智能
 --智能模式下 
 --a)当前为低速状态切换为高速态条件（60秒内无输入且当前为非全屏状态）+10%
-	且每隔20秒再加10%(前提是继续满足条件，最大为90%)
+	且每隔30秒再加10%(前提是继续满足条件，最大为90%)
   b)当前为高速状态切换为低速态条件(60秒内有输入或者当前为全屏状态)速度降低到10%
 --]]
-function ChangeWorkModel()
+local g_CurrentPrecent = 100
+function LimitSpeedCond()
+	if tipUtil:IsNowFullScreen() then
+		TipLog("[LimitSpeedCond] full screen")
+		return true
+	end
+	local hr, dwTime = tipUtil:GetLastInputInfo()
+	local dwTickCount = tipUtil:GetTickCount()
+	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 10*1000 then
+		TipLog("[LimitSpeedCond] Last input in 60 second")
+		return true
+	end
+	return false
+end
+
+--函数5秒调一次，
+local g_ChangeSpeedCounter = 0
+function ChangeMiningSpeed()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "workmodel"})
-	if nWorkModel ~= g_WorkModel then
-		if nWorkModel == 0 then
-			IPCUtil:ControlSpeed(90)
-		else
-			IPCUtil:ControlSpeed(10)
+	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
+	if nWorkModel ~= 1 then
+		g_ChangeSpeedCounter = 0
+		if g_CurrentPrecent ~= 100 then
+			g_CurrentPrecent = 100
+			IPCUtil:ControlSpeed(g_CurrentPrecent)
 		end	
-		g_WorkModel = nWorkModel
+	else
+		if LimitSpeedCond() then
+			g_ChangeSpeedCounter = 0
+			if g_CurrentPrecent ~= 10 then
+			 g_CurrentPrecent = 10
+			 IPCUtil:ControlSpeed(g_CurrentPrecent)
+			end
+		else
+			if g_CurrentPrecent < 90 then
+				if g_ChangeSpeedCounter > 8 then
+					g_CurrentPrecent = g_CurrentPrecent + 20
+					if g_CurrentPrecent > 90 then
+						g_CurrentPrecent = 90
+					end
+					IPCUtil:ControlSpeed(g_CurrentPrecent)
+					g_ChangeSpeedCounter = 0
+				end	
+			end
+			g_ChangeSpeedCounter = g_ChangeSpeedCounter + 1
+		end	
 	end
 end
 
@@ -2363,7 +2439,7 @@ function WorkingTimerHandle()
 	
 	local nWorkModelConuter = 1
 	local nWorkModelInterval = math.ceil(5/interval)
-	
+	g_ChangeSpeedCounter = 0
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 			local bQuery = QueryAndUpdateWorkState()
@@ -2372,6 +2448,7 @@ function WorkingTimerHandle()
 					--借用上报算力的间隔来，检测工作进程是否没有响应了
 					--nReportCalcInterval秒没响应 是否要杀进程
 					--UpdateWorkSpeed(tostring(0))
+					g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
 				end
 				local nAverageSpeed = math.floor(g_SpeedSum/nReportConuter)
 				g_SpeedSum = 0
@@ -2381,12 +2458,14 @@ function WorkingTimerHandle()
 				nReportConuter = nReportConuter + 1
 			end	
 			--智能限速
-			if nWorkModelConuter > nWorkModelInterval then
-				--ChangeWorkModel()
-				nWorkModelConuter = 1
-			else
-				nWorkModelConuter = nWorkModelConuter + 1
-			end
+			if g_PreWorkState == MING_MINING_SPEED then
+				if nWorkModelConuter > nWorkModelInterval then
+					ChangeMiningSpeed()
+					nWorkModelConuter = 1
+				else
+					nWorkModelConuter = nWorkModelConuter + 1
+				end
+			end	
 		end, interval*1000)
 	end	
 end
