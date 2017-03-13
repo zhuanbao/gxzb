@@ -6,6 +6,8 @@
 		<method_def>
 			<ChangeBindEntryVisible file="MiningPanel.xml.lua" func="ChangeBindEntryVisible"/>
 			<UpdateUserBalance file="MiningPanel.xml.lua" func="UpdateUserBalance"/>
+			<UpdateMiningSpeed file="MiningPanel.xml.lua" func="UpdateMiningSpeed"/>
+			<UpdateMiningState file="MiningPanel.xml.lua" func="UpdateMiningState"/>
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<event_def>
@@ -21,17 +23,54 @@
 						<height>father.height</height>
 					</attr>
 					<children>
+						<obj id="MiningPanel.Panel.MiningSpeed" class="LayoutObject">
+							<attr>
+								<left>18+30+5</left>
+								<top>22</top>
+								<width>father.width-(18+30+5)*2</width>
+								<height>24</height>
+							</attr>
+							<children>
+								<obj id="MiningPanel.Panel.MiningSpeed.Description" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>65</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>DDDDDD</textcolor>
+										<font>font.text13</font>
+										<text>赚宝速度：</text>
+									</attr>
+								</obj>
+								<obj id="MiningPanel.Panel.MiningSpeed.Speed" class="TextObject">
+									<attr>
+										<left>65+1</left>
+										<top>0</top>
+										<width>father.width-(65+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>E5961C</textcolor>
+										<font>font.text13</font>
+										<text>0元宝/小时</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+							</children>
+						</obj>
 						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width - 14</left>
+								<left>father.width - 18-30</left>
 								<top>15</top>
 								<width>30</width>
 								<height>30</height>
-								<NormalBkgID>GXZB.MiningPanel.StopMing</NormalBkgID>
-								<DownBkgID>GXZB.MiningPanel.StopMing</DownBkgID>
-								<HoverBkgID>GXZB.MiningPanel.StopMing</HoverBkgID>
-								<DisableBkgID>GXZB.MiningPanel.StopMing</DisableBkgID>
-								<Visible>false</Visible>
+								<NormalBkgID>GXZB.MiningPanel.StopMining</NormalBkgID>
+								<DownBkgID>GXZB.MiningPanel.StopMining</DownBkgID>
+								<HoverBkgID>GXZB.MiningPanel.StopMining</HoverBkgID>
+								<DisableBkgID>GXZB.MiningPanel.StopMining</DisableBkgID>
+								<Visible>true</Visible>
 							</attr>									
 							<eventlist>
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
@@ -49,6 +88,23 @@
 								<zorder>50</zorder>
 								<drawmode>1</drawmode>
 								<antialias>2</antialias>
+								<cursor>IDC_HAND</cursor>
+							</attr>
+							<eventlist>
+								<event name="OnLButtonDown" file="MiningPanel.xml.lua" func="OnClickStartMining" />
+							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.Preparing" class="TextObject">
+							<attr>
+								<left>(father.width-192)/2+(192-66)/2</left>
+								<top>80+(192-24)/2</top>
+								<width>66</width>
+								<height>24</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>DDDDDD</textcolor>
+								<font>font.text18</font>
+								<text>准备中</text>
 							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
@@ -103,16 +159,17 @@
 						</obj>
 						<obj id="MiningPanel.Panel.MiningState" class="TextObject">
 							<attr>
-								<left>father.width-10</left>
+								<left>10</left>
 								<top>336</top>
 								<width>father.width-20</width>
-								<height>32</height>
+								<height>40</height>
 								<valign>center</valign>
-								<halign>right</halign>
+								<halign>center</halign>
 								<textcolor>DDDDDD</textcolor>
-								<font>font.text13</font>
-								<text>正在向服务器请求赚宝所需要的数据参数</text>
+								<font>font.text12</font>
+								<text>本地基础数据块已过期，正在重新生成。根据你的设备配置情况，该过程大概需要10-30分钟，请耐心等待...</text>
 								<multiline>1</multiline>
+								<visible>0</visible>
 							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
