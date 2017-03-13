@@ -27,6 +27,12 @@ function GetDagCache()
 	local strValue = Helper:QueryRegValue(strDAGRegPath) or ""
 	return strValue
 end
+--重新设置DAG Cache
+function ResetDAGCacheFlag() 
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["nChangeDAGCache"] = 0
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
 
 function SaveSettingConfig(objTree)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -48,6 +54,7 @@ function SaveSettingConfig(objTree)
 	local strCurrentDagCachePath = GetDagCache()
 	if string.lower(strCurrentDagCachePath) ~= string.lower(strNewDagCachePath) then
 		Helper:SetRegValue(strDAGRegPath, strNewDagCachePath)
+		ResetDAGCacheFlag()
 	end
 	
 	if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
@@ -256,13 +263,11 @@ function OnCreate(self)
 			end
 			ObjTextCacheInfo:SetText(strInfo)
 		end
-		if type(tUserConfig["tConfig"]) ~= "table" then
-			tUserConfig["tConfig"] = {}
+		
+		if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
+			tUserConfig["tConfig"]["SuspendedWnd"] = {}
 		end
-		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
-			tUserConfig["tConfig"]["WorkModel"] = {}
-		end
-		g_SuspendedWndState = tUserConfig["tConfig"]["WorkModel"]["nState"] or 0
+		g_SuspendedWndState = tUserConfig["tConfig"]["SuspendedWnd"]["nState"] or 0
 		if g_SuspendedWndState == 0 then
 			ObjRadioShow:SetCheck(true, false)
 		elseif g_SuspendedWndState == 1 then
@@ -271,11 +276,12 @@ function OnCreate(self)
 			ObjRadioShowAtMining:SetCheck(true, false)
 		end
 		
-		if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
-			tUserConfig["tConfig"]["SuspendedWnd"] = {}
+		
+		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
+			tUserConfig["tConfig"]["WorkModel"] = {}
 		end
-		g_SuspendedWndState = tUserConfig["tConfig"]["SuspendedWnd"]["nState"] or 0
-		if g_SuspendedWndState == 0 then
+		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or 0
+		if g_nWorkModel == 0 then
 			ObjRadioFull:SetCheck(true, false)
 		else
 			ObjRadioIntelligent:SetCheck(true, false)
