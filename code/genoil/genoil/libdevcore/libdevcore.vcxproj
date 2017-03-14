@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{85A0FEF6-98AF-4906-AB7B-22BF3D87B5AB}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libdevcore</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;STATICLIB;_DEBUG;_WIN32_WINNT=0x0501;NOMINMAX;MINIUPNP_STATICLIB;ETH_JSONRPC;ETH_ETHASHCL;ETH_STRATUM;ETH_CURL;ETH_FRONTIER;ETH_TRUE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\x64\include;..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4068;4996;4503;4267;4180;4290;4244;4800</DisableSpecificWarnings>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalOptions> /machine:x64 /ignore:4221</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;STATICLIB;NDEBUG;_WIN32_WINNT=0x0501;NOMINMAX;MINIUPNP_STATICLIB;ETH_JSONRPC;ETH_ETHASHCL;ETH_STRATUM;ETH_CURL;ETH_FRONTIER;ETH_TRUE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\x64\include;..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4068;4996;4503;4267;4180;4290;4244;4800</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalOptions> /machine:x64 /ignore:4221 </AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Assertions.h" />
+    <ClInclude Include="Base64.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="CommonData.h" />
+    <ClInclude Include="CommonIO.h" />
+    <ClInclude Include="CommonJS.h" />
+    <ClInclude Include="concurrent_queue.h" />
+    <ClInclude Include="db.h" />
+    <ClInclude Include="debugbreak.h" />
+    <ClInclude Include="Diff.h" />
+    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="FileSystem.h" />
+    <ClInclude Include="FixedHash.h" />
+    <ClInclude Include="Guards.h" />
+    <ClInclude Include="Hash.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="MemoryDB.h" />
+    <ClInclude Include="picosha2.h" />
+    <ClInclude Include="RangeMask.h" />
+    <ClInclude Include="RLP.h" />
+    <ClInclude Include="SHA3.h" />
+    <ClInclude Include="StructuredLogger.h" />
+    <ClInclude Include="Terminal.h" />
+    <ClInclude Include="TransientDirectory.h" />
+    <ClInclude Include="TrieCommon.h" />
+    <ClInclude Include="TrieDB.h" />
+    <ClInclude Include="TrieHash.h" />
+    <ClInclude Include="UndefMacros.h" />
+    <ClInclude Include="vector_ref.h" />
+    <ClInclude Include="Worker.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Base64.cpp" />
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="CommonData.cpp" />
+    <ClCompile Include="CommonIO.cpp" />
+    <ClCompile Include="CommonJS.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
+    <ClCompile Include="FixedHash.cpp" />
+    <ClCompile Include="Guards.cpp" />
+    <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MemoryDB.cpp" />
+    <ClCompile Include="RangeMask.cpp" />
+    <ClCompile Include="RLP.cpp" />
+    <ClCompile Include="SHA3.cpp" />
+    <ClCompile Include="StructuredLogger.cpp" />
+    <ClCompile Include="TransientDirectory.cpp" />
+    <ClCompile Include="TrieCommon.cpp" />
+    <ClCompile Include="TrieDB.cpp" />
+    <ClCompile Include="TrieHash.cpp" />
+    <ClCompile Include="Worker.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
