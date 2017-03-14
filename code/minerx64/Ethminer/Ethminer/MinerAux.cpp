@@ -167,7 +167,7 @@ bool MinerCLI::interpretOption(int& i, int argc, char** argv)
 bool MinerCLI::IsIntegratedGraphics(std::string strDevicesName)
 {
 	transform(strDevicesName.begin(), strDevicesName.end(), strDevicesName.begin(), tolower);
-	if (strDevicesName.find("intel1") != std::string::npos)
+	if (strDevicesName.find("intel") != std::string::npos)
 	{
 		return true;
 	}
@@ -248,12 +248,10 @@ bool MinerCLI::FilterGpuDevices(uint32_t& platformID, std::vector<uint32_t> &dev
 
 void MinerCLI::InitMinerParam()
 {
-	if (m_minerType == "cpu")
+	bool bGPU = false;
+	if (m_minerType == "opencl" || m_minerType == "auto")
 	{
-		EthashCPUMiner::setNumInstances(m_miningThreads);
-	}
-	else if (m_minerType == "opencl")
-	{
+		bGPU = true;
 		//保证执行一次
 		if (m_autoSelectDevices) {
 			m_autoSelectDevices = false;
@@ -263,12 +261,15 @@ void MinerCLI::InitMinerParam()
 			if (!FilterGpuDevices(platformID, deviceID))
 			{
 				cout << "Auto select Devices failed, No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument" << endl;
-				exit(2);
+				bGPU = false;
 			}
-			m_openclPlatform = platformID;
-			m_v_deviceID = deviceID;
+			if (bGPU)
+			{
+				m_openclPlatform = platformID;
+				m_v_deviceID = deviceID;
+			}
 		}
-		if (!EthashGPUMiner::configureGPU(
+		if (bGPU && EthashGPUMiner::configureGPU(
 			m_localWorkSize,
 			m_globalWorkSizeMultiplier,
 			m_msPerBatch,
@@ -279,9 +280,24 @@ void MinerCLI::InitMinerParam()
 			m_currentBlock,
 			m_v_deviceID
 		))
+		{
+			EthashGPUMiner::setNumInstances(m_miningThreads);
+			m_minerType = "opencl";
+			return;
+		}
+		else if(m_minerType == "opencl")
+		{
 			exit(1);
-		EthashGPUMiner::setNumInstances(m_miningThreads);
+			return;
+		}
 	}
+	if (m_minerType == "cpu" || m_minerType == "auto")
+	{
+		m_minerType = "cpu";
+		EthashCPUMiner::setNumInstances(m_miningThreads);
+		return;
+	}
+	
 	//doFarm(m_minerType, m_farmURL, m_farmRecheckPeriod);
 }
 

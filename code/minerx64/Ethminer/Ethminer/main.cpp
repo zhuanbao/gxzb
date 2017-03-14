@@ -91,6 +91,8 @@ int main(int argc, char** argv)
 	}
 	if (MsgWndIPC::Instance()->HandleSingleton()) {
 		exit(0);
+		msgwndlog << "sHandleSingleton";
+		Sleep(5000);
 		return 0;
 	}
 
@@ -115,7 +117,11 @@ int main(int argc, char** argv)
 	{
 		MsgWndIPC::Instance()->RunMsgLoop();
 	}
-	msgwndlog << "exit process";
+	msgwndlog << "start terminate process";
+	TerminateProcess(GetCurrentProcess(), (UINT)0);
+	//ExitProcess(0);
+	msgwndlog << "end terminate process";
+	//msgwndlog << "exit process";
 	exit(0);
 
 

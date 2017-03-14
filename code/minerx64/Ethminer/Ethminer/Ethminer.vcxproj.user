@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-F http://pool.ethfans.org:5555/0xC11422DF6dad71D4183e77dA0145fB77418A8891.ww19</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand>D:\gxzb\trunk\code\minerx64\Ethminer\x64\Debug\gxzb.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>-F http://guangdong-pool.ethfans.org:5555/0xC11422DF6dad71D4183e77dA0145fB77418A8891.wll12123e123_qeqwe123123aqwed</LocalDebuggerCommandArguments>

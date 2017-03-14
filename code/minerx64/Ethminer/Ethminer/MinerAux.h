@@ -156,7 +156,7 @@ private:
 	OperationMode mode;
 
 	/// Mining options
-	std::string m_minerType = "cpu";
+	std::string m_minerType = "auto";
 	unsigned m_openclPlatform = 0;
 	unsigned m_openclDevice = 0;
 	std::vector<uint32_t> m_v_deviceID;

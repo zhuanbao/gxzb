@@ -46,6 +46,7 @@ public:
 	void WaitWorkEvent();
 	bool HandleSingleton();
 	void CloseSingletonMutex();
+	void DestroyWindow();
 	void StartMining();
 	void StopMining();
 	void SetContralSpeed(uint32_t precent);

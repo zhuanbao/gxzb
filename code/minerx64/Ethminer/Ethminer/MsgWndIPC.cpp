@@ -13,9 +13,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 		{
 			MsgWndIPC::Instance()->StopMining();
 			MsgWndIPC::Instance()->CloseSingletonMutex();
+			MsgWndIPC::Instance()->DestroyWindow();
+			msgwndlog << "start terminate process";
 			TerminateProcess(GetCurrentProcess(), (UINT)0);
-			msgwndlog << "get exit message";
-			::PostQuitMessage(0);
 		}
 		break;
 	case WM_USER_START:
@@ -76,6 +76,7 @@ bool MsgWndIPC::Create(MinerCLI* pMinerCLI)
 		msgwndlog << "msg wnd create failed, dwLastError = " << dwLastError;
 		return false;
 	}
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 	m_pMinerCLI = pMinerCLI;
 	m_globalWorkSizeMultiplier_Max = ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier;
 	m_miningThreads_Max = std::thread::hardware_concurrency();
@@ -132,6 +133,10 @@ bool MsgWndIPC::HandleSingleton()
 	return false;
 }
 
+void MsgWndIPC::DestroyWindow()
+{
+	::DestroyWindow(m_hWnd);
+}
 void MsgWndIPC::CloseSingletonMutex()
 {
 	if (m_hMutex)
@@ -156,6 +161,7 @@ void MsgWndIPC::StartMining()
 		m_pMinerCLI->InitFarmParam();
 		m_threadMiner = unique_ptr<thread>(new thread([=]() {
 			setThreadName("workertd");
+			//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 			m_pMinerCLI->StartMiningThread();
 		}));
 	}
@@ -178,6 +184,10 @@ void MsgWndIPC::StopMining()
 
 void MsgWndIPC::SetContralSpeed(uint32_t precent)
 {
+	if (IsDebug())
+	{
+		msgwndlog << "contral speed precent"<< precent;
+	}
 	StopMining();
 	unsigned t_num = m_miningThreads_Max*precent / 100;
 	m_pMinerCLI->SetCPUThreadCount(t_num == 0 ? 1 : t_num);
