@@ -38,6 +38,7 @@ enum ethash_io_rc ethash_io_prepare(
 
 	// assert directory exists
 	if (!ethash_mkdir(dirname)) {
+		ETHASH_CRITICAL("dirname = %s", dirname);
 		ETHASH_CRITICAL("Could not create the ethash directory");
 		goto end;
 	}
@@ -55,6 +56,7 @@ enum ethash_io_rc ethash_io_prepare(
 		f = ethash_fopen(tmpfile, "rb+");
 		ETHASH_CRITICAL("enter check dag");
 		if (f) {
+			ETHASH_CRITICAL("dag exist");
 			size_t found_size;
 			if (!ethash_file_size(f, &found_size)) {
 				fclose(f);
@@ -63,6 +65,7 @@ enum ethash_io_rc ethash_io_prepare(
 			}
 			if (file_size != found_size - ETHASH_DAG_MAGIC_NUM_SIZE) {
 				fclose(f);
+				ETHASH_CRITICAL("dag size mismatch, current size = %I64d,need size = %I64d", found_size, file_size);
 				ret = ETHASH_IO_MEMO_SIZE_MISMATCH;
 				goto free_memo;
 			}

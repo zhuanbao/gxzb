@@ -26,6 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <shlobj.h>
+#include <shlwapi.h>
+
 FILE* ethash_fopen(char const* file_name, char const* mode)
 {
 	FILE* f;
@@ -40,7 +42,7 @@ char* ethash_strncat(char* dest, size_t dest_size, char const* src, size_t count
 bool ethash_mkdir(char const* dirname)
 {
 	int rc = _mkdir(dirname);
-	return rc != -1 || errno == EEXIST;
+	return rc != -1 || (errno == EEXIST || PathFileExistsA(dirname) == TRUE);
 }
 
 int ethash_fileno(FILE* f)
@@ -84,7 +86,7 @@ bool ethash_file_size(FILE* f, size_t* ret_size)
 	return true;
 }
 
-//优先从注册表获取DAG保存路径 HKEY_CURRENT_USER\Software\Acer
+//优先从注册表获取DAG保存路径 HKEY_CURRENT_USER\Software\gxzb
 bool ethash_get_userset_dir(char* strbuf)
 {
 	bool bRet = false;
@@ -119,11 +121,16 @@ bool ethash_get_default_dirname(char* strbuf, size_t buffsize)
 		if (!SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, (CHAR*)strbuf))) {
 			return false;
 		}
+		else
+		{
+			if (!ethash_strncat(strbuf, buffsize, "\\", 1)) {
+				return false;
+			}
+			return ethash_strncat(strbuf, buffsize, dir_suffix, sizeof(dir_suffix));
+		}
 	}
-	
-	if (!ethash_strncat(strbuf, buffsize, "\\", 1)) {
-		return false;
+	else
+	{
+		return strbuf;
 	}
-
-	return ethash_strncat(strbuf, buffsize, dir_suffix, sizeof(dir_suffix));
 }
