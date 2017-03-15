@@ -3,32 +3,32 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>398</width>
-			<height>190</height>
+			<width>553</width>
+			<height>333</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>398</width>
-				<height>190</height>
-				<texture>common-bkg</texture>
+				<width>553</width>
+				<height>333</height>
+				<texture>GXZB.MainWnd.Bkg</texture>
 			</attr>	
 			<children>
 				<obj id="UpdateWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
+						<left>26</left>
+						<top>18</top>
+						<width>father.width-52</width>
+						<height>father.height-18-34</height>
 					</attr>
 					<children>
 						<obj id="UpdateWnd.Caption.CloseBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25</left>
-								<top>9</top>
-								<width>12</width>
-								<height>12</height>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
@@ -38,37 +38,46 @@
 								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickClose" />
 							</eventlist>	
 						</obj>
+						<obj id="UpdateWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
 						<obj id="UpdateWnd.Title" class="TextObject">
 							<attr>
-								<left>18</left>
-								<top>10</top>
+								<left>26+6</left>
+								<top>8</top>
 								<width>70</width>
 								<height>20</height>
-								<valign>center</valign>
+								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.default13</font>
 								<text>检查更新</text>
 							</attr>
 						</obj>
-						<obj id="UpdateWnd.Logo" class="ImageObject">
+						<obj id="UpdateWnd.Icon" class="ImageObject">
 							<attr>
-								<left>28</left>
+								<left>54</left>
 								<top>80</top>
-								<width>50</width>
-								<height>50</height>
+								<width>80</width>
+								<height>80</height>
 								<image>logo-mid</image>
 							</attr>
 						</obj>
 						<obj id="UpdateWnd.Content.TextBig" class="TextObject">
 							<attr>
-								<left>37</left>
-								<top>50</top>
-								<width>father.width-37</width>
+								<left>54+80+24</left>
+								<top>70</top>
+								<width>father.width-54-80-50</width>
 								<height>36</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
+								<textcolor>6D5539</textcolor>
 								<font>font.text16</font>
 								<text>发现了新版本</text>
 								<visible>0</visible>
@@ -76,66 +85,48 @@
 						</obj>
 						<obj id="UpdateWnd.Content.TextMain" class="TextObject">
 							<attr>
-								<left>108</left>
-								<top>63</top>
+								<left>54+80+24</left>
+								<top>95</top>
 								<width>260</width>
-								<height>40</height>
+								<height>25</height>
 								<valign>center</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text>你的共享赚宝已经是最新版本，无需更新！</text>
-								<multiline>1</multiline>
 							</attr>
 						</obj>
 						<obj id="UpdateWnd.Content.TextVersion" class="TextObject">
 							<attr>
-								<left>107</left>
-								<top>105</top>
+								<left>54+80+24</left>
+								<top>95</top>
 								<width>150</width>
-								<height>20</height>
-								<valign>center</valign>
+								<height>130</height>
+								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>999999</textcolor>
-								<font>font.text12</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text14</font>
 								<text>版本：1.0.0.1</text>
 								<visible>0</visible>
+								<multiline>1</multiline>
 							</attr>
-						</obj>
-						<obj id="UpdateWnd.Sure.Btn" class="TipAddin.Button">
-							<attr>
-								<Text>确定</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>(father.width-73)/2</left>
-								<top>father.height-50</top>
-								<width>73</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickClose" />
-							</eventlist>	
 						</obj>
 						<obj id="UpdateWnd.Progress.bkg" class="TextureObject">
 							<attr>
-								<left>(father.width-260)/2</left>
-								<top>father.height-50</top>
-								<width>260</width>
-								<height>10</height>
+								<left>(father.width-330)/2</left>
+								<top>father.height-80</top>
+								<width>330</width>
+								<height>16</height>
 								<texture>process-bkg</texture>
 								<visible>0</visible>
 							</attr>
 							<children>
 								<obj id="UpdateWnd.Progress.bar" class="TextureObject">
 									<attr>
-										<left>1</left>
-										<top>1</top>
+										<left>0</left>
+										<top>0</top>
 										<width>0</width>
-										<height>father.height-2</height>
+										<height>father.height</height>
 										<texture>process-bar</texture>
 										<visible>0</visible>
 									</attr>
@@ -143,11 +134,13 @@
 								<obj id="UpdateWnd.Progress.text" class="TextObject">
 									<attr>
 										<left>(father.width-100)/2</left>
-										<top>father.height+10</top>
+										<top>father.height+12</top>
 										<width>100</width>
 										<height>20</height>
 										<valign>center</valign>
 										<halign>center</halign>
+										<font>font.text12</font>
+										<textcolor>B08756</textcolor>
 										<visible>0</visible>
 									</attr>
 								</obj>
@@ -157,15 +150,15 @@
 							<attr>
 								<Text>一键升级</Text>
 								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
+								<TextColor>system.white</TextColor>
 								<left>(father.width-153)/2</left>
-								<top>father.height-65</top>
+								<top>father.height-75</top>
 								<width>153</width>
-								<height>49</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
+								<height>54</height>
+								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
+								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
+								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
+								<DisableBkgID>texture.Update.OneKeyUpdate.disable</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickUpdateBtn" />
@@ -183,8 +176,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>520</width>
-            <height>282</height>
+            <width>553</width>
+            <height>333</height>
             
             <topmost>0</topmost>
             <visible>1</visible>

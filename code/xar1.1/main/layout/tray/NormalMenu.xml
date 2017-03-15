@@ -104,7 +104,7 @@
 			<width>father.width</width>
 			<TextPos>28</TextPos>
 			<Font>font.text12</Font>
-			<FontColorNormal>system.white</FontColorNormal>
+			<FontColorNormal>color.menu.text</FontColorNormal>
 		</attr>
 	</objtemplate>
 

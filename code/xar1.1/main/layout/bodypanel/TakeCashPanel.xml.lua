@@ -136,9 +136,7 @@ end
 function OnClickUnBindWeiXin(self)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:Show(1)
-	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-	Helper:CreateModalWnd("GXZB.UnBindWnd", "GXZB.UnBindWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd})
-	Helper:DestoryTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.UnBindWnd", "GXZB.UnBindWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
 end
 
 function OnInitControl(self)

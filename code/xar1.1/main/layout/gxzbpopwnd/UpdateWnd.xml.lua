@@ -46,19 +46,21 @@ function OnClickUpdateBtn(self)
 	if not g_tNewVersionInfo then 
 		return 
 	end
-	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
+	--local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
+	--local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
 	local TextMain = self:GetObject("tree:UpdateWnd.Content.TextMain")
 	local BtnUpdate = self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn")
 	progress = self:GetObject("tree:UpdateWnd.Progress.bkg")
 	progrBar = self:GetObject("tree:UpdateWnd.Progress.bar")
 	progrText = self:GetObject("tree:UpdateWnd.Progress.text")
 	TextMain:SetVisible(false)
+	--TextVersion:SetVisible(false)
 	BtnUpdate:Show(false)
 	progress:SetVisible(true)
 	progress:SetChildrenVisible(true)
 	progrBar:SetVisible(true)
 	progrText:SetVisible(true)
-	TextBig:SetObjPos(107, 100, "father.width", 136)
+	--TextBig:SetObjPos(158, 100, "father.width", 136)
 	--正在更新
 	g_UpdateState = 1
 	if g_UpdateCancel then
@@ -135,34 +137,31 @@ function OnCreate(self)
 		local TextBig = objtree:GetUIObject("UpdateWnd.Content.TextBig")
 		local TextMain = objtree:GetUIObject("UpdateWnd.Content.TextMain")
 		local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
-		local BtnSure = objtree:GetUIObject("UpdateWnd.Sure.Btn")
 		local BtnUpdate = objtree:GetUIObject("UpdateWnd.OneKeyUpdate.Btn")
 		TextMain:SetMultilineTextLimitWidth(260)
 		--查询更新
 		TextBig:SetVisible(false)
 		BtnUpdate:Show(false)
 		--TextVersion:SetVisible(false)
-		BtnSure:SetText("取消")
-		TextMain:SetText("正在为你检查更新，请稍后...")
+		TextMain:SetText("正在为您检查更新，请稍后...")
 		
 		local function ShowNoUpdate()
 			--已经是最新
-			TextMain:SetText("你的共享赚宝已经是最新版本。")
-			BtnSure:SetText("确定")
+			TextMain:SetText("您的共享赚宝已经是最新版本。")
 		end
 		
 		local function ShowReadyUpdate(strVersion, strContent)
 			--发现新版本
 			TextBig:SetVisible(true)
 			TextBig:SetText("发现共享赚宝新版本"..tostring(strVersion))
-			--TextVersion:SetVisible(false)
+			TextMain:SetVisible(false)
+			TextVersion:SetVisible(true)
 			BtnUpdate:Show(true)
-			BtnSure:Show(false)
-			TextMain:SetText(strContent)
-			local w, h = TextMain:GetTextExtent()
-			local Hoffset =  h + 10 - 40
+			TextVersion:SetText(strContent)
+			local w, h = TextVersion:GetTextExtent()
+			local Hoffset =  h - 130
 			if Hoffset > 0 then
-				TextMain:SetObjPos(108, 68, 108+260, 68 + h + 10)
+				TextVersion:SetObjPos(158, 95, 158+260, 95 + h + 10)
 				local wndL, wndT, wndR, wndB = self:GetWindowRect()
 				self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset)
 				objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset)

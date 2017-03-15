@@ -4,32 +4,40 @@
 			<ItemTop>2</ItemTop>
 		</attr>
 		<children>
-			<obj id="openkuaikan" class="MenuItemObject" templateid="menu.context.item">
+			<obj id="openmainui" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
-					<Text>开机自动赚宝</Text>
-					<Icon>setting_check.icon</Icon>
-					<IconWidth>13</IconWidth>
-					<IconHeight>13</IconHeight>
+					<Text>主界面</Text>
+					<Icon>bitmap.menu.main.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
 					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
-					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Sysboot" />
-					<event name="OnInit" file="TrayMenu.xml.lua" function="OnInit_Sysboot" />
+					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_MainUI" />
+					<event name="OnInit" file="TrayMenu.xml.lua" function="OnInit_MainUI" />
 				</eventlist>
 			</obj>
-			<obj id="hidehall" class="MenuItemObject" templateid="menu.context.item">
+			<obj id="pause" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
-					<Text>隐藏悬浮球</Text>
+					<Text>暂停</Text>
+					<Icon>bitmap.menu.pause.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
+					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
-					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Hideball" />
-					<event name="OnInit" file="TrayMenu.xml.lua" function="OnInit_Hideball" />
+					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Pause" />
+					<event name="OnInit" file="TrayMenu.xml.lua" function="OnInit_Pause" />
 				</eventlist>
 			</obj>
 			
 			<obj id="setting" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
 					<Text>设置</Text>
+					<Icon>bitmap.menu.setting.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
+					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Setting" />
@@ -38,6 +46,10 @@
 			<obj id="update" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
 					<Text>检查更新</Text>
+					<Icon>bitmap.menu.update.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
+					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Update" />
@@ -46,6 +58,10 @@
 			<obj id="about" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
 					<Text>关于</Text>
+					<Icon>bitmap.menu.about.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
+					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_About" />
@@ -54,6 +70,10 @@
 			<obj id="exit" class="MenuItemObject" templateid="menu.context.item">
 				<attr>
 					<Text>退出</Text>
+					<Icon>bitmap.menu.exit.normal</Icon>
+					<IconWidth>16</IconWidth>
+					<IconHeight>16</IconHeight>
+					<IconPos>8</IconPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Exit" />

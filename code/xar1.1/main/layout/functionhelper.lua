@@ -1043,10 +1043,12 @@ end
 function PopTipPre4Hour()
 	SetTimer(function(item, id)
 		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+		g_LastRemindBalance = g_Balance
+		local nTipPopIntervalMs  = g_ServerConfig["nTipPopIntervalMs"] or 4*3600*1000
 		if tUserConfig["nMoneyPer4Hour"] and tonumber(tUserConfig["nMoneyPer4Hour"]) and tonumber(tUserConfig["nMoneyPer4Hour"]) > 0 then
 			ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
 		end
-	end, 4*3600*1000)
+	end, nTipPopIntervalMs)
 end
 
 function ShowIntroduceOnce()
@@ -2030,9 +2032,7 @@ local g_nDagCacheMinSize = 4*1024*1024*1024
 function PopDAGCacheErrorWnd(strContent)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:Show(1)
-	local maskWnd = Helper:CreateTransparentMask(objHostWnd)
-	Helper:CreateModalWnd("GXZB.DAGCacheErrorWnd", "GXZB.DAGCacheErrorWndTree", maskWnd:GetWndHandle(), {["parentWnd"] = maskWnd,["strContent"] = strContent})
-	Helper:DestoryTransparentMask(objHostWnd)
+	Helper:CreateModalWnd("GXZB.DAGCacheErrorWnd", "GXZB.DAGCacheErrorWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd,["strContent"] = strContent})
 end
 
 function CheckCanMine()

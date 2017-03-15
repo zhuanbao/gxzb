@@ -35,8 +35,8 @@
 									<attr>
 										<left>10</left>
 										<top>5</top>
-										<width>20</width>
-										<height>20</height>
+										<width>14</width>
+										<height>13</height>
 										<image>GXZB.Caption.Logo</image>
 									</attr>
 								</obj>
@@ -56,8 +56,8 @@
 									<attr>
 										<left>father.width-25</left>
 										<top>8</top>
-										<width>14</width>
-										<height>14</height>
+										<width>15</width>
+										<height>15</height>
 										<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
 										<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
 										<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>

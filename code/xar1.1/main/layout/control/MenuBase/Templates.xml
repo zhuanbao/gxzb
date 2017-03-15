@@ -17,9 +17,9 @@
 			<Height>20</Height>
 			<Width>111</Width>
 			<TextFont>basecontrol.defaultfont.12</TextFont>
-			<NormalTextColor>basecontrol.white</NormalTextColor>
+			<NormalTextColor>color.menu.text</NormalTextColor>
 			<DisableTextColor>basecontrol.gray</DisableTextColor>
-			<HoverBkgID>MenuBar.Select.Bkg</HoverBkgID>
+			<HoverBkgID>texture.menu.item.bkg</HoverBkgID>
 			<SubMenuArrowNormalBkgID>bitmap.menu.arrow.normal</SubMenuArrowNormalBkgID>
 			<SubMenuArrowDisableBkgID>bitmap.menu.arrow.disable</SubMenuArrowDisableBkgID>
 			

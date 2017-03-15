@@ -27,8 +27,8 @@
 							<attr>
 								<left>father.width-25</left>
 								<top>9</top>
-								<width>12</width>
-								<height>12</height>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
@@ -55,8 +55,8 @@
 							<attr>
 								<left>28</left>
 								<top>50</top>
-								<width>50</width>
-								<height>50</height>
+								<width>80</width>
+								<height>80</height>
 								<image>logo-mid</image>
 							</attr>
 						</obj>

@@ -1,28 +1,21 @@
 <XLUE>
 	<resource>
-		<texture id="bindweixin-bkg" image="popwndbitmap\bindweixin-bkg.png" />
-		<texture id="bindweixin-bkg2" image="popwndbitmap\bindweixin-bkg2.png" />
-		<texture id="bindweixin-btn-normal" image="popwndbitmap\bindweixin-btn-normal.png" />
-		<texture id="bindweixin-btn-hover" image="popwndbitmap\bindweixin-btn-hover.png" />
-		
-		<texture id="tixian-bkg" image="popwndbitmap\tixian-bkg.png" />
-		<texture id="tixian-btn-normal" image="popwndbitmap\tixian-btn-normal.png" />
-		<texture id="tixian-btn-hover" image="popwndbitmap\tixian-btn-hover.png" />
-		<texture id="tixian-edit" image="popwndbitmap\tixian-edit.png" />
-		
-		<texture id="setting-bkg" image="popwndbitmap\setting-bkg.png" />
-		<texture id="setting-btn-normal" image="popwndbitmap\setting-btn-normal.png" />
-		<texture id="setting-btn-hover" image="popwndbitmap\setting-btn-hover.png" />
-		<texture id="setting-edit-bkg" image="popwndbitmap\setting-edit-bkg.png" />
-		
-		<texture id="common-bkg" image="popwndbitmap\common-bkg.png" />
 		<bitmap id="logo-mid" path="popwndbitmap\logo-mid.png" />
-		
-		<texture id="xuanfu-bkg" image="popwndbitmap\xuanfu-bkg.png" />
-		<texture id="xuanfu-strip" image="popwndbitmap\xuanfu-strip.png" />
-		<bitmap id="GXZB.Share.QRcode" path="popwndbitmap\shareqrcode.jpg"/>
+
+		<texture id="process-bar" type="ThreeInOneH" image="popwndbitmap\process-bar.png" />
+		<texture id="process-bkg" type="ThreeInOneH" image="popwndbitmap\process-bkg.png" />
+
 		<bitmap id="charttips-bkg" path="popwndbitmap\charttips-bkg.png"/>
-		<texture id="process-bar" image="popwndbitmap\process-bar.png" />
-		<texture id="process-bkg" image="popwndbitmap\process-bkg.png" />
+		<bitmap id="charttips-bkg-day" path="popwndbitmap\charttips-bkg-day.png"/>
+		<bitmap id="xyLineBkg24" path="popwndbitmap\xyLineBkg24.png" />
+		<bitmap id="xyLineBkg30" path="popwndbitmap\xyLineBkg30.png" />
+		<texture id="earnings.btnunsel" type="ThreeInOneH" image="popwndbitmap\earnings.btnunsel.png" />
+		<texture id="earnings.btnsel" type="ThreeInOneH" image="popwndbitmap\earnings.btnsel.png" />
+		<imagelist id="imagelist.Update.OneKeyUpdate" vertical="0" varyblock="1" splitter="1" image="popwndbitmap\onekeyupdate.png"/>
+			<texture id="texture.Update.OneKeyUpdate.normal" type="ThreeInOneH" imagelist="imagelist.Update.OneKeyUpdate" index="1" />
+			<texture id="texture.Update.OneKeyUpdate.hover" type="ThreeInOneH" imagelist="imagelist.Update.OneKeyUpdate" index="2" />
+			<texture id="texture.Update.OneKeyUpdate.down" type="ThreeInOneH" imagelist="imagelist.Update.OneKeyUpdate" index="3" />
+			<texture id="texture.Update.OneKeyUpdate.disable" type="ThreeInOneH" imagelist="imagelist.Update.OneKeyUpdate" index="4" />
+		<texture id="msgbox.bkg" type="NineInOne" image="popwndbitmap\msgbox.bkg.png" />
 	</resource>
 </XLUE>

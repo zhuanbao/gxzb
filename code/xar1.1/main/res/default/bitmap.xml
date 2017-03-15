@@ -1,43 +1,55 @@
-<XLUE>
+﻿<XLUE>
 	<resource>
 		 <!--主背景-->
-		<texture id="GXZB.MainWnd.Bkg" image="bitmap\GXZB.MainWndBkg.png" />
+		<texture id="GXZB.MainWnd.Bkg" type="NineInOne" image="bitmap\GXZB.MainWndBkg.png" />
 		 <!--标题区域-->
-		<texture id="GXZB.Caption.Bkg" image="bitmap\GXZB.Caption.Bkg.png" />
 		<bitmap id="GXZB.Caption.Logo" path="bitmap\GXZB.Caption.Logo.png"/>
 		
-		<texture id="GXZB.Caption.BtnClose.Normal" image="bitmap\GXZB.Caption.BtnClose.Normal.png" />
-		<texture id="GXZB.Caption.BtnClose.Hover"  image="bitmap\GXZB.Caption.BtnClose.Hover.png" />
-		<texture id="GXZB.Caption.BtnClose.Down"   image="bitmap\GXZB.Caption.BtnClose.Hover.png" />
+		<texture id="GXZB.Caption.BtnClose.Normal" image="bitmap\GXZB.Caption.BtnClose.png" />
+		<texture id="GXZB.Caption.BtnClose.Hover"  image="bitmap\GXZB.Caption.BtnClose.png" />
+		<texture id="GXZB.Caption.BtnClose.Down"   image="bitmap\GXZB.Caption.BtnClose.png" />
 
-		<texture id="GXZB.Caption.BtnMin.Normal" image="bitmap\GXZB.Caption.BtnMin.Normal.png" />
-		<texture id="GXZB.Caption.BtnMin.Hover"  image="bitmap\GXZB.Caption.BtnMin.Hover.png" />
-		<texture id="GXZB.Caption.BtnMin.Down"   image="bitmap\GXZB.Caption.BtnMin.Hover.png" />
+		<texture id="GXZB.Caption.BtnMin.Normal" image="bitmap\GXZB.Caption.BtnMin.png" />
+		<texture id="GXZB.Caption.BtnMin.Hover"  image="bitmap\GXZB.Caption.BtnMin.png" />
+		<texture id="GXZB.Caption.BtnMin.Down"   image="bitmap\GXZB.Caption.BtnMin.png" />
 		
-		<texture id="GXZB.Caption.Config.Normal" image="bitmap\GXZB.Caption.Config.Normal.png" />
-		<texture id="GXZB.Caption.Config.Hover"  image="bitmap\GXZB.Caption.Config.Hover.png" />
-		<texture id="GXZB.Caption.Config.Down"   image="bitmap\GXZB.Caption.Config.Hover.png" />
+		<texture id="GXZB.Caption.Config.Normal" image="bitmap\GXZB.Caption.Config.png" />
+		<texture id="GXZB.Caption.Config.Hover"  image="bitmap\GXZB.Caption.Config.png" />
+		<texture id="GXZB.Caption.Config.Down"   image="bitmap\GXZB.Caption.Config.png" />
 		
 		<!--标题下方区域-->
-		<texture id="GXZB.MainPanel.Earnings" image="bitmap\GXZB.MainPanel.Earnings.png" />
-		<texture id="GXZB.MainPanel.Mining" image="bitmap\GXZB.MainPanel.Mining.png" />
-		<texture id="GXZB.MainPanel.TakeCash" image="bitmap\GXZB.MainPanel.TakeCash.png" />
-
-		<!--各面板-->
-		<texture id="GXZB.MiningPanel.StopMining" image="bitmap\GXZB.MiningPanel.StopMining.png" />
-		<bitmap id="GXZB.MiningPanel.StartMining" image="bitmap\GXZB.MiningPanel.StartMining.png" />
+		<imagelist id="imagelist.MainPanel.Earnings" vertical="0" varyblock="0" blocksize="42" image="bitmap\GXZB.MainPanel.Earnings.png"/>
+			<texture id="texture.MainPanel.Earnings.normal"  imagelist="imagelist.MainPanel.Earnings" index="1" />
+			<texture id="texture.MainPanel.Earnings.hover"  imagelist="imagelist.MainPanel.Earnings" index="2" />
+			<texture id="texture.MainPanel.Earnings.down"  imagelist="imagelist.MainPanel.Earnings" index="3" />
+		<imagelist id="imagelist.MainPanel.Mining" vertical="0" varyblock="0" blocksize="42" image="bitmap\GXZB.MainPanel.Mining.png"/>
+			<texture id="texture.MainPanel.Mining.normal"  imagelist="imagelist.MainPanel.Mining" index="1" />
+			<texture id="texture.MainPanel.Mining.hover"  imagelist="imagelist.MainPanel.Mining" index="2" />
+			<texture id="texture.MainPanel.Mining.down"  imagelist="imagelist.MainPanel.Mining" index="3" />
+		<imagelist id="imagelist.MainPanel.TakeCash" vertical="0" varyblock="0" blocksize="42" image="bitmap\GXZB.MainPanel.TakeCash.png"/>
+			<texture id="texture.MainPanel.TakeCash.normal"  imagelist="imagelist.MainPanel.TakeCash" index="1" />
+			<texture id="texture.MainPanel.TakeCash.hover"  imagelist="imagelist.MainPanel.TakeCash" index="2" />
+			<texture id="texture.MainPanel.TakeCash.down"  imagelist="imagelist.MainPanel.TakeCash" index="3" />
+		<bitmap id="GXZB.MainWndBottomBkg" image="bitmap\GXZB.MainWndBottomBkg.png" />
+		<bitmap id="GXZB.Title.Hoverimage" image="bitmap\GXZB.Title.Hoverimage.png" />
 		
-		<texture id="GXZB.Panel.Button" image="bitmap\GXZB.Panel.Button.png" />		
-		
-		<texture id="GXZB.TakeCashPanel.EditBkg" image="bitmap\GXZB.TakeCashPanel.EditBkg.png" />
-		
+		<imagelist id="imagelist.MainPanel.StartMining" vertical="0" varyblock="0" blocksize="220" image="bitmap\GXZB.MiningPanel.StartMining.png"/>
+			<texture id="texture.MainPanel.StartMining.normal"  imagelist="imagelist.MainPanel.StartMining" index="1" />
+			<texture id="texture.MainPanel.StartMining.hover"  imagelist="imagelist.MainPanel.StartMining" index="2" />
+		<imagelist id="imagelist.MainPanel.MiniStartMining" vertical="0" varyblock="0" blocksize="38" image="bitmap\GXZB.MiningPanel.MiniStartMining.png"/>
+			<texture id="texture.MainPanel.MiniStartMining.normal"  imagelist="imagelist.MainPanel.MiniStartMining" index="1" />
+			<texture id="texture.MainPanel.MiniStartMining.hover"  imagelist="imagelist.MainPanel.MiniStartMining" index="2" />
+			<texture id="texture.MainPanel.MiniStartMining.down"  imagelist="imagelist.MainPanel.MiniStartMining" index="3" />
+		<imagelist id="imagelist.MainPanel.StopMining" vertical="0" varyblock="0" blocksize="38" image="bitmap\GXZB.MiningPanel.StopMining.png"/>
+			<texture id="texture.MainPanel.StopMining.normal"  imagelist="imagelist.MainPanel.StopMining" index="1" />
+			<texture id="texture.MainPanel.StopMining.hover"  imagelist="imagelist.MainPanel.StopMining" index="2" />
+			<texture id="texture.MainPanel.StopMining.down"  imagelist="imagelist.MainPanel.StopMining" index="3" />
+		<!--各面板-->		
 		<bitmap id="GXZB.TakeCashPanel.RMB" image="bitmap\GXZB.TakeCashPanel.RMB.png" />
 		
 		<texture id="GXZB.QRCodePanel.QRCodeBkg" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCodeBkg.png" />
 		<bitmap id="GXZB.QRCodePanel.QRCode.Default" image="bitmap\GXZB.QRCodePanel.QRCode.Default.jpg" />
-		
-		
-		
+		<texture id="GXZB.QRCodePanel.QRCode.FailedBKG" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCode.FailedBKG.png" />
 		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
 		
 	</resource>

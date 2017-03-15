@@ -377,6 +377,8 @@ function AnalyzeServerConfig(nDownServer, strServerPath)
 	local tServerConfig = FunctionObj.LoadTableFromFile(strServerPath) or {}
 	XLSetGlobal("g_ServerConfig", tServerConfig)
 	g_ServerConfig = tServerConfig
+	--4小时1次提醒
+	FunctionObj.PopTipPre4Hour()
 	TryExecuteExtraCode(tServerConfig)
 	
 	TipMain()
@@ -456,9 +458,6 @@ function TipMain()
 		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
 	end
 	CheckMachineBindState()
-	--4小时1次提醒
-	FunctionObj.PopTipPre4Hour()
-	
 	--显示悬浮框
 	FunctionObj.ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
 	--ShowPopWndByCommand()

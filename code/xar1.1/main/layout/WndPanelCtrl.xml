@@ -29,9 +29,9 @@
 								<!--标题栏-->
 								<obj id="WndPanel.Title" class="TitleCtrl">
 									<attr>
-										<left>0</left>
-										<top>0</top>
-										<width>father.width</width>
+										<left>26</left>
+										<top>18</top>
+										<width>father.width-52</width>
 										<height>29</height>
 										<zorder>9999</zorder>
 									</attr>
@@ -40,10 +40,10 @@
 								<!--标题下方-->
 								<obj id="WndPanel.MainBody" class="MainBodyCtrl">
 									<attr>
-										<left>0</left>
-										<top>29</top>
-										<width>father.width</width>
-										<height>father.height-29</height>
+										<left>26</left>
+										<top>18+29</top>
+										<width>father.width-52</width>
+										<height>father.height-29-18-34</height>
 									</attr>
 								</obj>
 							</children>
@@ -60,15 +60,15 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>320</width>
-			<height>520</height>
+			<width>420</width>
+			<height>652</height>
 		</attr>
 		<obj id="root.layout" class="MainWndRootCtrl" >
 			<attr>
 			    <left>0</left>
 				<top>0</top>
-				<width>320</width>
-				<height>520</height>
+				<width>420</width>
+				<height>652</height>
 			</attr>
 			<children>
 				<obj id="root.ctrl" class="MainPanelRootCtrl" >

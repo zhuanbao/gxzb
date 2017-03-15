@@ -3,32 +3,32 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>274</width>
-			<height>152</height>
+			<width>545</width>
+			<height>338</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>274</width>
-				<height>152</height>
-				<texture>common-bkg</texture>
+				<width>545</width>
+				<height>338</height>
+				<texture>GXZB.MainWnd.Bkg</texture>
 			</attr>	
 			<children>
 				<obj id="AboutWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
+						<left>26</left>
+						<top>18</top>
+						<width>father.width-52</width>
+						<height>father.height-18-34</height>
 					</attr>
 					<children>
 						<obj id="AboutWnd.Caption.CloseBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25</left>
-								<top>9</top>
-								<width>12</width>
-								<height>12</height>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
@@ -38,90 +38,99 @@
 								<event name="OnClick" file="AboutWnd.xml.lua" func="OnClickClose" />
 							</eventlist>	
 						</obj>
+						<obj id="AboutWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
 						<obj id="AboutWnd.Title" class="TextObject">
 							<attr>
-								<left>18</left>
-								<top>10</top>
+								<left>26+6</left>
+								<top>8</top>
 								<width>70</width>
 								<height>20</height>
-								<valign>center</valign>
+								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.default13</font>
 								<text>关于</text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Logo" class="ImageObject">
+						<obj id="AboutWnd.Icon" class="ImageObject">
 							<attr>
-								<left>28</left>
-								<top>50</top>
-								<width>50</width>
-								<height>50</height>
+								<left>90</left>
+								<top>100</top>
+								<width>80</width>
+								<height>80</height>
 								<image>logo-mid</image>
 							</attr>
 						</obj>
 						<obj id="AboutWnd.Content.Version" class="TextObject">
 							<attr>
-								<left>106</left>
-								<top>48</top>
-								<width>60</width>
+								<left>204</left>
+								<top>100</top>
+								<width>80</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text>程序版本：</text>
 							</attr>
 						</obj>
 						<obj id="AboutWnd.Content.VersionValue" class="TextObject">
 							<attr>
-								<left>170</left>
-								<top>48</top>
+								<left>284</left>
+								<top>100</top>
 								<width>84</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text></text>
 							</attr>
 						</obj>
 						<obj id="AboutWnd.Content.Date" class="TextObject">
 							<attr>
-								<left>106</left>
-								<top>75</top>
-								<width>60</width>
+								<left>204</left>
+								<top>125</top>
+								<width>80</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text>更新日期：</text>
 							</attr>
 						</obj>
 						<obj id="AboutWnd.Content.DateValue" class="TextObject">
 							<attr>
-								<left>170</left>
-								<top>75</top>
+								<left>284</left>
+								<top>125</top>
 								<width>84</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text></text>
 							</attr>
 						</obj>
 						<obj id="AboutWnd.Content.Url" class="TextObject">
 							<attr>
-								<left>106</left>
-								<top>107</top>
-								<width>148</width>
+								<left>204</left>
+								<top>150</top>
+								<width>200</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text14</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
 								<text>http://www.baidu.com</text>
 							</attr>
 						</obj>
@@ -136,8 +145,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>274</width>
-            <height>152</height>
+            <width>545</width>
+            <height>338</height>
             
             <topmost>0</topmost>
             <visible>1</visible>

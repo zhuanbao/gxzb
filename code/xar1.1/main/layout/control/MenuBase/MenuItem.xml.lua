@@ -48,7 +48,13 @@ function PreSelect(self)
 		local bkgObj = self:GetControlObject("menu.item.bkg")
 		bkgObj:SetTextureID(attr.HoverBkgID)
 	end
-	
+	--处理图标变化
+	local iconobj = self:GetObject("menu.item.icon")
+	local resid = iconobj:GetResID()
+	if resid and string.find(resid, "normal$") then
+		resid = string.gsub(resid, "normal", "hover")
+		iconobj:SetResID(resid)
+	end
 	local tree = self:GetOwner()
 	local menuWnd = tree:GetBindHostWnd()
 	local userData = menuWnd:GetUserData()
@@ -147,6 +153,13 @@ function OnMouseLeave(self)
 	end
 	local bkgObj = self:GetControlObject("menu.item.bkg")
 	bkgObj:SetTextureID(attr.NormalBkgID or "")
+	--处理图标变化
+	local iconobj = self:GetObject("menu.item.icon")
+	local resid = iconobj:GetResID()
+	if resid and string.find(resid, "hover$") then
+		resid = string.gsub(resid, "hover", "normal")
+		iconobj:SetResID(resid)
+	end
 	if attr.bPreSelect then
 		attr.bPreSelect = false
 	end

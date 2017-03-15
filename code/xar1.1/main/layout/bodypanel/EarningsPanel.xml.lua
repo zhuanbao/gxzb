@@ -190,32 +190,51 @@ function BarChartUpdate(self, fnConvert)
 			end
 		end
 	end
-	--最小显示5个刻度
+	--最小显示7个刻度
+	local minYnumber = 7
 	if ymax == 0 then
-		ymax = 5
+		ymax = minYnumber
 	end
 	local l, t, r, b = barchartpanel:GetObjPos()
+	local coorWidth = 1
 	--减去横纵坐标的宽度
-	local w, h = r - l -2, b - t - 2
+	local w, h = r - l - coorWidth, b - t - coorWidth
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+	
+	--初始化一些颜色配置
+	attr.FailedColor = "DDDDDD"
+	attr.FailedHoverColor = "666666"
+	if attr.currentpanel == 1 then
+		attr.ColumnColorSrc = "FFDD92"
+		attr.ColumnColorSrcHover = "EEB93B"
+		attr.LineColor = "CDA140"
+		attr.TipRes = "charttips-bkg"
+	else
+		attr.ColumnColorSrc = "FFC08D"
+		attr.ColumnColorSrcHover = "FF7B39"
+		attr.LineColor = "C57046"
+		attr.TipRes = "charttips-bkg-day"
+	end
+	
 	--显示纵坐标刻度
-	for i = 1, 5 do
-		local ytmp = h*i/5
+	for i = 1, minYnumber do
+		local ytmp = h*i/minYnumber
 		local yreal = h - ytmp
 		local newTextObject = objFactory:CreateUIObject("", "TextObject")
-		newTextObject:SetText(tostring(math.floor(ymax*i/5)))
+		newTextObject:SetText(tostring(math.floor(ymax*i/minYnumber)))
 		barchartpanel:AddChild(newTextObject)
-		newTextObject:SetObjPos(-50, yreal-8, 0, yreal+8)
+		newTextObject:SetObjPos(-50, yreal-6, 0, yreal+6)
 		newTextObject:SetVAlign("center")
 		newTextObject:SetHAlign("center")
-		newTextObject:SetTextColorResID("system.black")
-		newTextObject:SetTextFont("font.text10")
+		newTextObject:SetTextColorResID(attr.LineColor)
+		newTextObject:SetTextFont("font.text12")
 	end
 	--间隔宽度是柱子的一半
 	local itemw = w/(#attr.Data*3-1)
 	if itemw < 2 then
 		itemw = 2
 	end
+	
 	--显示横坐标刻度
 	function Drawxline(xreal, text)
 		local newTextObject = objFactory:CreateUIObject("", "TextObject")
@@ -224,13 +243,13 @@ function BarChartUpdate(self, fnConvert)
 		newTextObject:SetObjPos(xreal-25, h+10, xreal+25, h+26)
 		newTextObject:SetVAlign("center")
 		newTextObject:SetHAlign("center")
-		newTextObject:SetTextColorResID("system.black")
-		newTextObject:SetTextFont("font.text10")
+		newTextObject:SetTextColorResID(attr.LineColor)
+		newTextObject:SetTextFont("font.text12")
 	end
 	--将数据转换为坐标系中的点
 	local function ConvertData2Point(xindex, ydata)
 		--local xreal = (#attr.Data == 1 and 0 or w*(xindex-1)/(#attr.Data)) + 2
-		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*3)) + 2 
+		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*3)) + coorWidth 
 		local yreal = h-2
 		if ydata > 0 then
 			yreal = h - h*ydata/ymax
@@ -240,6 +259,7 @@ function BarChartUpdate(self, fnConvert)
 		end
 		return math.floor(xreal), math.floor(yreal)
 	end
+	
 	local xstart=0
 	local function DrawBar()
 		for i, dat in ipairs(attr.Data) do
@@ -249,12 +269,12 @@ function BarChartUpdate(self, fnConvert)
 				local xsrc, ysrc = ConvertData2Point(i, dat[2])
 				local l, t, r, b = xsrc, ysrc, xsrc+itemw*2, h
 				if #attr.Data == i then
-					r = w+2
+					r = w + coorWidth
 				end
 				if t == b then
 					t = b - 1
 				end
-				if i == 1 or xsrc + itemw - xstart > 60 then
+				if i == 1 or i == #attr.Data/2 or i == #attr.Data  then
 					xstart = xsrc + itemw
 					Drawxline(xstart, attr.Data[i][1])
 				end
@@ -278,12 +298,17 @@ function BarChartUpdate(self, fnConvert)
 					elseif scal >= 0.8 then
 						scal = 0.8
 					end
-					local fa = XLGetObject("Xunlei.XLGraphic.Factory.Object")
-					local cl = attr.Data["reqFailed"] and fa:CreateColor(scal*255, scal*255, scal*255, 255) or fa:CreateColor(0, 0, scal*255, 255)
-					newFillObject:SetSrcColor(cl)
-					newFillObject:SetDestColor(cl)
-					tips:ChangeColor(cl)
-					tips:SetObjPos(l + itemw - 30, t - 30, l + itemw + 30, t-1)
+					--不做自适应填充色
+					--local fa = XLGetObject("Xunlei.XLGraphic.Factory.Object")
+					--local cl = attr.Data["reqFailed"] and fa:CreateColor(scal*255, scal*255, scal*255, 255) or fa:CreateColor(0, 0, scal*255, 255)
+					--newFillObject:SetSrcColor(cl)
+					--newFillObject:SetDestColor(cl)
+					--tips:ChangeColor(cl)
+					local hoverColor = attr.Data["reqFailed"] and attr.FailedHoverColor or attr.ColumnColorSrcHover
+					newFillObject:SetSrcColor(hoverColor)
+					newFillObject:SetDestColor(hoverColor)
+					tips:GetObject("bkg"):SetResID(attr.TipRes)
+					tips:SetObjPos(l + itemw - 35, t - 55, l + itemw + 36, t-1)
 					tips:SetVisible(true)
 					tips:SetChildrenVisible(true)
 				end)
@@ -330,12 +355,42 @@ function OnVisibleChange(self, bVisible)
 	end
 end
 
+function ChangeBtnState(self, state)
+	local otherbtn
+	if state == 1 then
+		otherbtn = self:GetObject("control:EarningsPanel.DayBtn")
+	else
+		otherbtn = self:GetObject("control:EarningsPanel.HourBtn")
+	end
+	local selfattr = self:GetAttribute()
+	local otherattr = otherbtn:GetAttribute()
+	selfattr.NormalBkgID = "earnings.btnsel"
+	selfattr.DownBkgID = "earnings.btnsel"
+	selfattr.HoverBkgID = "earnings.btnsel"
+	selfattr.DisableBkgID = "earnings.btnsel"
+	otherattr.NormalBkgID = "earnings.btnunsel"
+	otherattr.DownBkgID = "earnings.btnunsel"
+	otherattr.HoverBkgID = "earnings.btnunsel"
+	otherattr.DisableBkgID = "earnings.btnunsel"
+	self:Updata()
+	otherbtn:Updata()
+	self:SetTextColor("system.white")
+	otherbtn:SetTextColor("B08756")
+	local zorder = otherbtn:GetZorder()
+	if type(zorder) == "number" then
+		self:SetZorder(zorder+1)
+	end
+end
+
 function OnClickHourBtnBarChart(self)
 	local barobj = self:GetObject("control:EarningsPanel.BarChart")
 	local attr = barobj:GetAttribute()
 	if attr.currentpanel == 1 then
 		return
 	end
+	ChangeBtnState(self, 1)
+	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
+	barobj:SetObjPos("(father.width-191)/2", 70, "(father.width-191)/2 + 191", 70+246+30)
 	attr.currentpanel = 1
 	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
 		attr.Data = tabInfo
@@ -351,6 +406,9 @@ function OnClickDayBtnBarChart(self)
 	if attr.currentpanel == 2 then
 		return
 	end
+	ChangeBtnState(self, 2)
+	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
+	barobj:SetObjPos("(father.width-240)/2", 70, "(father.width-240)/2 + 240", 70+246+30)
 	attr.currentpanel = 2
 	tFunctionHelper.GetHistoryToServer(1, function(bRet, tabInfo)
 		attr.Data = tabInfo

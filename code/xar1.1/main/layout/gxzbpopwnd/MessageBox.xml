@@ -4,8 +4,8 @@
 		<attr>
 			<top>0</top>
 			<left>0</left>
-			<width>470</width>
-			<height>270</height>
+			<width>354</width>
+			<height>202</height>
 		</attr>
 		<children>
 			<obj id="root" class="TextureObject">
@@ -14,107 +14,118 @@
 					<top>0</top>
 					<width>father.width</width>
 					<height>father.height</height>
-					<texture>common-bkg</texture>
+					<texture>msgbox.bkg</texture>
 				</attr>	
 				<children>
-					<obj id="close" class="TipAddin.Button">
+					<obj id="layout" class="LayoutObject">
 						<attr>
-							<left>father.width-30</left>
-							<top>5</top>
-							<height>12</height>
-							<width>12</width>
-							<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-							<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-							<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-							<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-						</attr>
-						<eventlist>
-							<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
-						</eventlist>
-					</obj>
-					<obj id="titlelogo" class="ImageObject">
-						<attr>
-							<left>16</left>
-							<top>5</top>
-							<width>20</width>
-							<height>20</height>
-							<image>GXZB.Caption.Logo</image>
-						</attr>
-					</obj>
-					<obj id="titletext" class="TextObject">
-						<attr>
-							<left>29+16</left>
-							<top>0</top>
-							<width>200</width>
-							<height>30</height>
-							<text>共享赚宝</text>
-							<textcolor>system.black</textcolor>
-							<font>font.default12</font>
-							<valign>center</valign>
-						</attr>
-					</obj>
+							<left>9</left>
+							<top>9</top>
+							<width>father.width-18</width>
+							<height>father.height-18</height>
+						</attr>	
+						<children>
+							<obj id="close" class="TipAddin.Button">
+								<attr>
+									<left>father.width-30</left>
+									<top>5</top>
+									<height>15</height>
+									<width>15</width>
+									<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+									<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+									<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+									<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
+								</eventlist>
+							</obj>
+							<obj id="titlelogo" class="ImageObject">
+								<attr>
+									<left>12</left>
+									<top>11</top>
+									<width>14</width>
+									<height>13</height>
+									<image>GXZB.Caption.Logo</image>
+								</attr>
+							</obj>
+							<obj id="titletext" class="TextObject">
+								<attr>
+									<left>26+6</left>
+									<top>8</top>
+									<width>200</width>
+									<height>30</height>
+									<text>共享赚宝</text>
+									<textcolor>6D5539</textcolor>
+									<font>font.default13</font>
+									<valign>top</valign>
+								</attr>
+							</obj>
 
-					<obj id="MainText" class="TextObject">
-						<attr>
-							<left>173</left>
-							<top>120</top>
-							<width>father.width-200</width>
-							<height>father.height-36</height>
-							<multiline>1</multiline>
-							<font>font.text14</font>
-							<text></text>
-							<halign>left</halign>
-							<textcolor>system.white</textcolor>
-							<wordellipsis>1</wordellipsis>
-							<valign>left</valign>
-							
-						</attr>
-					</obj>
-					<obj id="yes" class="TipAddin.Button">
-						<attr>
-							<left>159</left>
-							<top>198</top>
-							<height>25</height>
-							<width>73</width>
-							<NormalBkgID>setting-btn-normal</NormalBkgID>
-							<DownBkgID>setting-btn-normal</DownBkgID>
-							<HoverBkgID>setting-btn-hover</HoverBkgID>
-							<DisableBkgID>setting-btn-hover</DisableBkgID>
-							<Text>可以</Text>
-							<TextFont>font.text16</TextFont>
-							<TextColor>DDDDDD</TextColor>
+							<obj id="MainText" class="TextObject">
+								<attr>
+									<left>30</left>
+									<top>64</top>
+									<width>father.width-60</width>
+									<height>father.height-100</height>
+									<multiline>1</multiline>
+									<font>font.text16</font>
+									<text></text>
+									<halign>center</halign>
+									<textcolor>6D5539</textcolor>
+									<wordellipsis>1</wordellipsis>
+									<valign>top</valign>
+									
+								</attr>
+							</obj>
+							<obj id="yes" class="TipAddin.Button">
+								<attr>
+									<left>70</left>
+									<top>113</top>
+									<height>36</height>
+									<width>100</width>
+									<NormalBkgID>setting-surebtn-normal</NormalBkgID>
+									<DownBkgID>setting-surebtn-down</DownBkgID>
+									<HoverBkgID>setting-surebtn-hover</HoverBkgID>
+									<DisableBkgID>setting-surebtn-normal</DisableBkgID>
+									<Text>可以</Text>
+									<TextFont>font.text16</TextFont>
+									<TextColor>system.white</TextColor>
 
-						</attr>
-						<eventlist>
-							<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
-						</eventlist>
-					</obj>
-					<obj id="no" class="TipAddin.Button">
-						<attr>
-							<left>241</left>
-							<top>198</top>
-							<height>25</height>
-							<width>73</width>
-							<NormalBkgID>setting-btn-normal</NormalBkgID>
-							<DownBkgID>setting-btn-normal</DownBkgID>
-							<HoverBkgID>setting-btn-hover</HoverBkgID>
-							<DisableBkgID>setting-btn-hover</DisableBkgID>
-							<Text>不行</Text>
-							<TextFont>font.text16</TextFont>
-							<TextColor>DDDDDD</TextColor>
-						</attr>
-						<eventlist>
-							<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
-						</eventlist>
-					</obj>
-					<obj id="MainIcon" class="ImageObject">
-						<attr>
-							<left>110</left>
-							<top>110</top>
-							<height>50</height>
-							<width>50</width>
-							<image>logo-mid</image>
-						</attr>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
+								</eventlist>
+							</obj>
+							<obj id="no" class="TipAddin.Button">
+								<attr>
+									<left>180</left>
+									<top>113</top>
+									<height>36</height>
+									<width>100</width>
+									<NormalBkgID>setting-cacelbtn-normal</NormalBkgID>
+									<DownBkgID>setting-cacelbtn-down</DownBkgID>
+									<HoverBkgID>setting-cacelbtn-hover</HoverBkgID>
+									<DisableBkgID>setting-cacelbtn-normal</DisableBkgID>
+									<Text>不行</Text>
+									<TextFont>font.text16</TextFont>
+									<TextColor>system.white</TextColor>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
+								</eventlist>
+							</obj>
+							<obj id="MainIcon" class="ImageObject">
+								<attr>
+									<left>60</left>
+									<top>80</top>
+									<height>80</height>
+									<width>80</width>
+									<image>logo-mid</image>
+									<visible>0</visible>
+								</attr>
+							</obj>
+						</children>
 					</obj>
 				</children>
 			</obj>

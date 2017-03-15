@@ -39,8 +39,8 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>left</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text13</font>
+										<textcolor>6D5539</textcolor>
+										<font>font.text14</font>
 										<text>赚宝速度：</text>
 									</attr>
 								</obj>
@@ -52,8 +52,8 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>E5961C</textcolor>
-										<font>font.text13</font>
+										<textcolor>CB8C25</textcolor>
+										<font>font.text14</font>
 										<text>0元宝/小时</text>
 										<endellipsis>1</endellipsis>
 									</attr>
@@ -62,55 +62,53 @@
 						</obj>
 						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width - 18-30</left>
+								<left>father.width - 18-38</left>
 								<top>15</top>
-								<width>30</width>
-								<height>30</height>
-								<NormalBkgID>GXZB.MiningPanel.StopMining</NormalBkgID>
-								<DownBkgID>GXZB.MiningPanel.StopMining</DownBkgID>
-								<HoverBkgID>GXZB.MiningPanel.StopMining</HoverBkgID>
-								<DisableBkgID>GXZB.MiningPanel.StopMining</DisableBkgID>
+								<width>38</width>
+								<height>38</height>
+								<NormalBkgID>texture.MainPanel.StopMining.normal</NormalBkgID>
+								<DownBkgID>texture.MainPanel.StopMining.down</DownBkgID>
+								<HoverBkgID>texture.MainPanel.StopMining.hover</HoverBkgID>
+								<DisableBkgID>texture.MainPanel.StopMining.normal</DisableBkgID>
 								<Visible>true</Visible>
 							</attr>									
 							<eventlist>
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
 							</eventlist>
 						</obj>
-						<obj id="MiningPanel.Panel.StartBtn" class="ImageObject">
+						<obj id="MiningPanel.Panel.StartBtn" class="TipAddin.Button">
 							<attr>
-								<left>(father.width-192)/2</left>
-								<top>80</top>
-								<width>192</width>
-								<height>192</height>
-								<image>GXZB.MiningPanel.StartMining</image>
-								<valign>center</valign>
-								<halign>center</halign>
-								<zorder>50</zorder>
-								<drawmode>1</drawmode>
-								<antialias>2</antialias>
-								<cursor>IDC_HAND</cursor>
-							</attr>
+								<left>(father.width-220)/2</left>
+								<top>94</top>
+								<width>220</width>
+								<height>220</height>
+								<NormalBkgID>texture.MainPanel.StartMining.normal</NormalBkgID>
+								<DownBkgID>texture.MainPanel.StartMining.normal</DownBkgID>
+								<HoverBkgID>texture.MainPanel.StartMining.hover</HoverBkgID>
+								<DisableBkgID>texture.MainPanel.StartMining.normal</DisableBkgID>
+								<Visible>true</Visible>
+							</attr>									
 							<eventlist>
-								<event name="OnLButtonDown" file="MiningPanel.xml.lua" func="OnClickStartMining" />
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStartMining" />
 							</eventlist>
 						</obj>
 						<obj id="MiningPanel.Panel.Preparing" class="TextObject">
 							<attr>
-								<left>(father.width-192)/2+(192-66)/2</left>
-								<top>80+(192-24)/2</top>
+								<left>(father.width-220)/2+(220-66)/2</left>
+								<top>94+(220-24)/2</top>
 								<width>66</width>
 								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text18</font>
+								<textcolor>system.white</textcolor>
+								<font>font.text22</font>
 								<text>准备中</text>
 							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
 							<attr>
 								<left>5</left>
-								<top>310</top>
+								<top>330</top>
 								<width>father.width-10</width>
 								<height>24</height>
 							</attr>
@@ -119,39 +117,39 @@
 									<attr>
 										<left>0</left>
 										<top>0</top>
-										<width>66</width>
-										<height>16</height>
+										<width>80</width>
+										<height>20</height>
 										<valign>center</valign>
 										<halign>left</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text13</font>
+										<textcolor>6D5539</textcolor>
+										<font>font.text20</font>
 										<text>您的金库有</text>
 									</attr>
 								</obj>
 								<obj id="MiningPanel.Panel.Amount.Num" class="TextObject">
 									<attr>
-										<left>66+1</left>
+										<left>80+1</left>
 										<top>0</top>
 										<width>father.width-(66+1)-(41+1)</width>
-										<height>16</height>
+										<height>20</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>E5961C</textcolor>
-										<font>font.text13</font>
+										<textcolor>CB8C25</textcolor>
+										<font>font.text20</font>
 										<text>0</text>
 										<endellipsis>1</endellipsis>
 									</attr>
 								</obj>
 								<obj id="MiningPanel.Panel.Amount.Unit" class="TextObject">
 									<attr>
-										<left>father.width-(41+1)</left>
+										<left>father.width-(60+1)</left>
 										<top>0</top>
-										<width>41</width>
-										<height>16</height>
+										<width>60</width>
+										<height>20</height>
 										<valign>center</valign>
 										<halign>right</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text13</font>
+										<textcolor>6D5539</textcolor>
+										<font>font.text20</font>
 										<text>个元宝</text>
 									</attr>
 								</obj>
@@ -160,13 +158,13 @@
 						<obj id="MiningPanel.Panel.MiningState" class="TextObject">
 							<attr>
 								<left>10</left>
-								<top>336</top>
+								<top>356</top>
 								<width>father.width-20</width>
 								<height>40</height>
 								<valign>center</valign>
 								<halign>center</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text12</font>
+								<textcolor>AF8656</textcolor>
+								<font>font.text13</font>
 								<text>本地基础数据块已过期，正在重新生成。根据你的设备配置情况，该过程大概需要10-30分钟，请耐心等待...</text>
 								<multiline>1</multiline>
 								<visible>0</visible>
@@ -175,15 +173,15 @@
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>
-								<top>356</top>
+								<top>376</top>
 								<width>80</width>
 								<height>24</height>
 								<HAlign>center</HAlign>
 								<VAlign>center</VAlign>
 								<Text>绑定微信账号</Text>
 								<Font>font.yahei13.underline</Font>
-								<TextColor>system.black</TextColor>
-								<TextHoverColor>system.black</TextHoverColor>
+								<TextColor>AF8656</TextColor>
+								<TextHoverColor>AF8656</TextHoverColor>
 								<Underline>false</Underline>
 								<Show>false</Show>
 							</attr>

@@ -1,43 +1,30 @@
-<XLUE>
+﻿<XLUE>
 	<resource>
 		<!--菜单-->
-		<texture id="MenuBar.Select.Bkg" image="menu\MenuBar.Select.Bkg.png" />
-		<texture id="texture.menu.container.bkg" type="NineInOne" image="menu\texture.menu.container.bkg.png" />
-		<texture id="texture.menu.combobox.bkg" type="NineInOne" image="menu\texture.menu.combobox.bkg.png" />
-		
 		<imagelist id="imagelist.menu.item.bkg" splitter="1" varyblock="1" image="menu\imagelist.menu.item.bkg.png"/>
+			<texture id="texture.menu.container.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="1" />
 			<texture id="texture.menu.item.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="2" />
-
-		<imagelist id="imagelist.menu.icon.del" splitter="1" varyblock="1" image="menu\imagelist.menu.icon.del.png"/>
-			<bitmap id="bitmap.menu.icon.del.normal"  imagelist="imagelist.menu.icon.del" index="1" />
-			<bitmap id="bitmap.menu.icon.del.disable"  imagelist="imagelist.menu.icon.del" index="2" />
-			
-		<imagelist id="imagelist.menu.icon.play" splitter="1" varyblock="1" image="menu\imagelist.menu.icon.play.png"/>
-			<bitmap id="bitmap.menu.icon.play.normal"  imagelist="imagelist.menu.icon.play" index="1" />
-			<bitmap id="bitmap.menu.icon.play.disable"  imagelist="imagelist.menu.icon.play" index="2" />
-			
-		<imagelist id="imagelist.menu.icon" splitter="1" varyblock="1" image="menu\imagelist.menu.icon.png"/>
-			<bitmap id="bitmap.menu.icon.check.normal"  imagelist="imagelist.menu.icon" index="1" />
-			<bitmap id="bitmap.menu.icon.check.disable" imagelist="imagelist.menu.icon" index="2" />
-			<bitmap id="bitmap.menu.arrow.disable"      imagelist="imagelist.menu.icon" index="4" />
 			
 		<bitmap id="bitmap.menu.arrow.normal"  path="menu\bitmap.menu.submenu.arrow.png" />
 		
-		<texture id="texture.menu.splitter" type="ThreeInOneH" image="menu\texture.menu.splitter.png" />
-		<imagelist id="imagelist.menu.setting_check" splitter="1" varyblock="1" image="menu\setting_check.png"/>
-			<bitmap id="bitmap.menu.setting_check.normal"  imagelist="imagelist.menu.setting_check" index="1" />
-			<texture id="setting_check.normal"   imagelist="imagelist.menu.setting_check" index="1" />
-			<texture id="setting_check.hover"   imagelist="imagelist.menu.setting_check" index="2" />
-			<texture id="setting_check.down"   imagelist="imagelist.menu.setting_check" index="3" />
-		<imagelist id="setting_radio" vertical="0" splitter="1" varyblock="1" image="menu\setting_radio.png" />
-			<texture id="setting_radio.normal"   imagelist="setting_radio" index="1" />
-			<texture id="setting_radio.hover"   imagelist="setting_radio" index="2" />
-			<bitmap id="setting_radio.icon"   imagelist="setting_radio" index="2" />
-		<imagelist id="setting_uncheck" vertical="0" splitter="1" varyblock="1" image="menu\setting_uncheck.png" />
-			<bitmap id="setting_uncheck.icon"   imagelist="setting_uncheck" index="1" />
-			<texture id="setting_uncheck.normal"   imagelist="setting_uncheck" index="1" />
-			<texture id="setting_uncheck.hover"   imagelist="setting_uncheck" index="2" />
-			<texture id="setting_uncheck.down"   imagelist="setting_uncheck" index="3" />
+		<imagelist id="imagelist.menu.setting" vertical="0" varyblock="0" blocksize="16" image="menu\setting.png"/>
+			<bitmap id="bitmap.menu.setting.normal"  imagelist="imagelist.menu.setting" index="1" />
+			<bitmap id="bitmap.menu.setting.hover"  imagelist="imagelist.menu.setting" index="2" />
+		<imagelist id="imagelist.menu.exit" vertical="0" varyblock="0" blocksize="16" image="menu\exit.png"/>
+			<bitmap id="bitmap.menu.exit.normal"  imagelist="imagelist.menu.exit" index="1" />
+			<bitmap id="bitmap.menu.exit.hover"  imagelist="imagelist.menu.exit" index="2" />
+		<imagelist id="imagelist.menu.main" vertical="0" varyblock="0" blocksize="16" image="menu\main.png"/>
+			<bitmap id="bitmap.menu.main.normal"  imagelist="imagelist.menu.main" index="1" />
+			<bitmap id="bitmap.menu.main.hover"  imagelist="imagelist.menu.main" index="2" />
+		<imagelist id="imagelist.menu.about" vertical="0" varyblock="0" blocksize="16" image="menu\about.png"/>
+			<bitmap id="bitmap.menu.about.normal"  imagelist="imagelist.menu.about" index="1" />
+			<bitmap id="bitmap.menu.about.hover"  imagelist="imagelist.menu.about" index="2" />
+		<imagelist id="imagelist.menu.update" vertical="0" varyblock="0" blocksize="16" image="menu\update.png"/>
+			<bitmap id="bitmap.menu.update.normal"  imagelist="imagelist.menu.update" index="1" />
+			<bitmap id="bitmap.menu.update.hover"  imagelist="imagelist.menu.update" index="2" />
+		<imagelist id="imagelist.menu.pause" vertical="0" varyblock="0" blocksize="16" image="menu\pause.png"/>
+			<bitmap id="bitmap.menu.pause.normal"  imagelist="imagelist.menu.pause" index="1" />
+			<bitmap id="bitmap.menu.pause.hover"  imagelist="imagelist.menu.pause" index="2" />
 		<!--菜单-->
 	</resource>
 </XLUE>

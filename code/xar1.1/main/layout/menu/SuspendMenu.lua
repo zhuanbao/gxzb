@@ -8,7 +8,7 @@ local menuFunTable = {}
 
 function InitIcon(self, resid)
 	local icon = self:GetControlObject("menu.item.icon")
-	icon:SetObjPos2(9, "(father.height - 13)/2", 13, 13)
+	icon:SetObjPos2(9, "(father.height - 16)/2", 16, 16)
 	icon:SetResID(resid)
 end
 
@@ -29,11 +29,12 @@ function menuFunTable.OnSelect_hideball(self)
 end
 
 function menuFunTable.OnSelect_exit(self)
-	local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+	--[[local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	if wnd then
 		wnd:Show(0)
 	end
-	tFunctionHelper.ReportAndExit()
+	tFunctionHelper.ReportAndExit()]]
+	GXZBMenu.SettingMenu.menuFunTable.OnSelect_exit()
 end
 
 function SetBallSetting(value)
@@ -46,7 +47,7 @@ end
 
 local menuTable = {
 --主界面
-{id="mainui", text = "主界面", OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting_check.normal") end},
+{id="mainui", text = "主界面", OnInitFun = function(self) InitIcon(self, "bitmap.menu.main.normal") end},
 --设置
 {
 	id="setting", 
@@ -57,10 +58,10 @@ local menuTable = {
 		{id="allwayshide", text = "始终隐藏", OnSelectFun = function(self) SetBallSetting(1)  end},
 		{id="onlymakemoney", text = "仅赚宝时显示", OnSelectFun = function(self) SetBallSetting(2)  end},
 	},
-	OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting_check.normal") end
+	OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting.normal") end
 },
 --退出
-{id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting_check.normal") end},
+{id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.main.normal") end},
 }
 
 GXZBMenu.SuspendMenu = {}

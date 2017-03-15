@@ -1,4 +1,4 @@
-<XLUE>
+﻿<XLUE>
 	<resource>
 		<font id="default.font.underline" height="12" facename="宋体" underline="1"/>
 		<font id="font.underline" height="12" facename="微软雅黑" underline="1"/>
@@ -29,6 +29,7 @@
 		<font id="font.number21" height="21" facename="Arial" /> 
 		<font id="font.number22" height="22" facename="Arial" /> 
 		<font id="font.text22" height="22" facename="defaultfont"/> 
-		<font id="font.text23" height="23" facename="defaultfont" /> 
+		<font id="font.text23" height="23" facename="defaultfont" />
+ 		<font id="font.text20" height="20" facename="defaultfont" />
 	</resource>
 </XLUE>

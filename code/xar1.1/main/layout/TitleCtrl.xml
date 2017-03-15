@@ -23,32 +23,32 @@
 					<children>
 						<obj id="TitleCtrl.Caption.Logo" class="ImageObject">
 							<attr>
-								<left>16</left>
-								<top>5</top>
-								<width>20</width>
-								<height>20</height>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
 								<image>GXZB.Caption.Logo</image>
 							</attr>
 						</obj>
 						<obj id="TitleCtrl.Caption.Title" class="TextObject">
 							<attr>
-								<left>29+16</left>
-								<top>0</top>
+								<left>26+6</left>
+								<top>8</top>
 								<width>200</width>
 								<height>father.height</height>
 								<text>共享赚宝</text>
-								<textcolor>system.black</textcolor>
-								<font>font.default12</font>
-								<valign>center</valign>
+								<textcolor>6D5539</textcolor>
+								<font>font.default13</font>
+								<valign>top</valign>
 							</attr>
 						</obj>
 						
 						<obj id="TitleCtrl.Caption.CloseBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25</left>
-								<top>8</top>
-								<width>14</width>
-								<height>14</height>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
@@ -59,14 +59,26 @@
 								<event name="OnMouseEnter" file="TitleCtrl.xml.lua" func="OnMouseEnterCloseBtn" />
 								<event name="OnMouseLeave" file="TitleCtrl.xml.lua" func="OnMouseLeave" />
 							</eventlist>
+							<children>
+								<obj id="TitleCtrl.Caption.CloseBtn.Hoverimage" class="ImageObject">
+									<attr>
+										<left>-5</left>
+										<top>-9</top>
+										<width>25</width>
+										<height>3</height>
+										<visible>0</visible>
+										<image>GXZB.Title.Hoverimage</image>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 						
 						<obj id="TitleCtrl.Caption.BtnMin" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25*2</left>
-								<top>8</top>
-								<width>14</width>
-								<height>14</height>
+								<left>father.width-27-26</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnMin.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.BtnMin.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.BtnMin.Hover</HoverBkgID>
@@ -77,14 +89,26 @@
 								<event name="OnMouseEnter" file="TitleCtrl.xml.lua" func="OnMouseEnterMinBtn" />
 								<event name="OnMouseLeave" file="TitleCtrl.xml.lua" func="OnMouseLeave" />
 							</eventlist>
+							<children>
+								<obj id="TitleCtrl.Caption.BtnMin.Hoverimage" class="ImageObject">
+									<attr>
+										<left>-5</left>
+										<top>-9</top>
+										<width>25</width>
+										<height>3</height>
+										<visible>0</visible>
+										<image>GXZB.Title.Hoverimage</image>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 						
 						<obj id="TitleCtrl.Caption.Config" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25*3 - 3</left>
-								<top>8</top>
-								<width>14</width>
-								<height>14</height>
+								<left>father.width - 27 - 26*2</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
 								<NormalBkgID>GXZB.Caption.Config.Normal</NormalBkgID>
 								<DownBkgID>GXZB.Caption.Config.Down</DownBkgID>
 								<HoverBkgID>GXZB.Caption.Config.Hover</HoverBkgID>
@@ -95,6 +119,18 @@
 								<event name="OnMouseEnter" file="TitleCtrl.xml.lua" func="OnMouseEnterConfigBtn" />
 								<event name="OnMouseLeave" file="TitleCtrl.xml.lua" func="OnMouseLeave" />
 							</eventlist>
+							<children>
+								<obj id="TitleCtrl.Caption.Config.Hoverimage" class="ImageObject">
+									<attr>
+										<left>-5</left>
+										<top>-9</top>
+										<width>25</width>
+										<height>3</height>
+										<visible>0</visible>
+										<image>GXZB.Title.Hoverimage</image>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 					</children>				
 				</obj>			

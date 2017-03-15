@@ -1,5 +1,172 @@
 <xlue>
+	<control class="SuspendLeftGoldBalance">
+		<method_def>
+			<SetState file="SuspendWnd.xml.lua" func="LeftGoldBalance_SetState"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="goldicon" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>15</top>
+						<width>82</width>
+						<height>father.height</height>
+						<image>suspend-gold-gray</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+				</obj>
+				<obj id="goldtexthead" class="TextObject">
+					<attr>
+						<left>0</left>
+						<top>25</top>
+						<width>82</width>
+						<height>12</height>
+						<valign>center</valign>
+						<halign>center</halign>
+						<textcolor>color.suspend.balance</textcolor>
+						<font>font.suspend.balancehead</font>
+						<shadow>1</shadow>
+						<shadowoffset>1,1</shadowoffset>
+						<shadowcolor>color.suspend.balanceshadow</shadowcolor>
+						<text>金库余额</text>
+					</attr>
+				</obj>
+				<obj id="goldtextnumber" class="TextObject">
+					<attr>
+						<left>0</left>
+						<top>37</top>
+						<width>82</width>
+						<height>30</height>
+						<valign>top</valign>
+						<halign>center</halign>
+						<textcolor>color.suspend.balance</textcolor>
+						<font>font.suspend.balancenumber</font>
+						<shadow>1</shadow>
+						<shadowoffset>1,1</shadowoffset>
+						<shadowcolor>color.suspend.balanceshadow</shadowcolor>
+						<text>666w</text>
+					</attr>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<control class="SuspendRightDisk">
+		<method_def>
+			<SetState file="SuspendWnd.xml.lua" func="SuspendRightDisk_SetState"/>
+			<UpdateSpeed file="SuspendWnd.xml.lua" func="SuspendRightDisk_UpdateSpeed"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="goldicon" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<image>suspend-gold-gray</image>
+						<valign>center</valign>
+						<halign>center</halign>
+					</attr>
+				</obj>
+				<obj id="graydisk" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>5</top>
+						<width>father.width</width>
+						<height>father.height-5</height>
+						<image>suspend-nowork-rightdisk-hoverleft</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+					<children>
+						<obj id="graydisk.needle" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-nowork-rightdisk-needlegray</image>
+								<valign>center</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+						<obj id="starticon" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-nowork-rightdisk-hoverright</image>
+								<valign>top</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+				<obj id="lightdisk" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>5</top>
+						<width>82</width>
+						<height>father.height-5</height>
+						<image>suspend-work-rightdisk-hoverleft</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+					<children>
+						<obj id="lightdisk.needle" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-needle-needle1</image>
+								<valign>center</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+						<obj id="speedtext" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>40</top>
+								<width>father.width</width>
+								<height>12</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>color.suspend.speed</textcolor>
+								<font>font.suspend.speed</font>
+								<shadow>1</shadow>
+								<shadowoffset>1,1</shadowoffset>
+								<shadowcolor>color.suspend.speedshadow</shadowcolor>
+								<text>666YB/h</text>
+							</attr>
+						</obj>
+						<obj id="stopicon" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-work-rightdisk-hoverright</image>
+								<valign>top</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
 	<control class="SuspendCtrl">
+		<method_def>
+			<!--设置状态： 0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边-->
+			<SetState file="SuspendWnd.xml.lua" func="SuspendCtrl_SetState"/>
+			<!--更新水平线， 其实就是换图-->
+			<UpdateLine file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateLine"/>
+		</method_def>
 		<objtemplate>
 			<children>
 				<obj id="bkg" class="LayoutObject">
@@ -12,35 +179,29 @@
 					<children>
 						<obj id="strip" class="TextureObject">
 							<attr>
-								<left>father.width</left>
-								<top>8</top>
-								<width>0</width>
-								<height>father.height-15</height>
-								<texture>xuanfu-strip</texture>
-							</attr>
-						</obj>	
-						<obj id="ball" class="TextureObject">
-							<attr>
-								<left>175</left>
+								<left>father.width-82</left>
 								<top>0</top>
-								<width>75</width>
-								<height>75</height>
-								<texture>xuanfu-bkg</texture>
+								<width>82</width>
+								<height>father.height</height>
+								<texture>suspend-nowork-bkg0</texture>
 							</attr>
 							<children>
-								<obj id="SuspendWnd.ShowSpeed" class="TextObject">
+								<obj id="RightDisk" class="SuspendRightDisk">
 									<attr>
-										<left>0</left>
-										<top>40</top>
-										<width>father.width</width>
-										<height>father.height-40</height>
-										<valign>center</valign>
-										<halign>center</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text12</font>
-										<text>0H/S</text>
+										<left>father.width-82</left>
+										<top>0</top>
+										<width>82</width>
+										<height>father.height</height>
 									</attr>
-								</obj>
+								</obj>	
+								<obj id="LeftGoldBalance" class="SuspendLeftGoldBalance">
+									<attr>
+										<left>13</left>
+										<top>0</top>
+										<width>82</width>
+										<height>father.height</height>
+									</attr>
+								</obj>	
 							</children>
 						</obj>	
 					</children>
@@ -54,6 +215,7 @@
 				<event name="OnLButtonDbClick" file="SuspendWnd.xml.lua" func="OnLButtonDbClickSuspend" />
 				<!--event name="OnMouseHover" file="SuspendWnd.xml.lua" func="OnMouseHover" /-->
 				<event name="OnRButtonUp" file="SuspendWnd.xml.lua" func="OnRButtonUpSuspend" />
+				<event name="OnInitControl" file="SuspendWnd.xml.lua" func="OnInitControl" />
 			</eventlist>
 		</objtemplate>
 	</control>
@@ -63,8 +225,8 @@
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>250</width>
-				<height>75</height>
+				<width>154</width>
+				<height>82</height>
 			</attr>	
 		</obj>
 	</objtreetemplate>
@@ -74,8 +236,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>250</width>
-            <height>75</height>
+            <width>154</width>
+            <height>82</height>
             
             <topmost>1</topmost>
             <visible>1</visible>

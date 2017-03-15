@@ -136,37 +136,29 @@
 						<srccolor>system.white</srccolor>
 					</attr>
 					<children>
-						<obj id="yline" class="FillObject">
-							<attr>
-								<left>0</left>
-								<top>0</top>
-								<width>2</width>
-								<height>father.height-30</height>
-								<srccolor>system.black</srccolor>
-							</attr>
-						</obj>
-						<obj id="xline" class="FillObject">
-							<attr>
-								<left>0</left>
-								<top>father.height-30-2</top>
-								<width>father.width</width>
-								<height>2</height>
-								<srccolor>system.black</srccolor>
-							</attr>
-						</obj>
 						<obj id="barchartpanel" class="LayoutObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
 								<width>father.width</width>
 								<height>father.height-30</height>
+							</attr>
+						</obj>
+						<obj id="xyLineBkg" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-30</height>
+								<image>xyLineBkg24</image>
+								<halign>center</halign>
 								<zorder>99999</zorder>
 							</attr>
 						</obj>
 						<obj id="BottomLayout" class="LayoutObject">
 							<attr>
-								<left>35</left>
-								<top>father.height</top>
+								<left>(father.width-120)/2</left>
+								<top>father.height + 20</top>
 								<width>father.width</width>
 								<height>20</height>
 							</attr>
@@ -179,7 +171,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>left</halign>
-										<textcolor>system.black</textcolor>
+										<textcolor>6D5539</textcolor>
 										<font>font.text13</font>
 										<text>您的库存有</text>
 									</attr>
@@ -192,7 +184,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>E5961C</textcolor>
+										<textcolor>E39C29</textcolor>
 										<font>font.text13</font>
 										<text>0</text>
 										<endellipsis>1</endellipsis>
@@ -206,7 +198,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>right</halign>
-										<textcolor>system.black</textcolor>
+										<textcolor>6D5539</textcolor>
 										<font>font.text13</font>
 										<text>个元宝</text>
 									</attr>
@@ -262,25 +254,25 @@
 				<obj id="bkg" class="FillObject">
 					<attr>
 						<left>5</left>
-						<top></top>
+						<top>40</top>
 						<width>father.width-10</width>
-						<height>father.height</height>
+						<height>father.height-40</height>
 						<srccolor>system.white</srccolor>
 					</attr>
 					<children>
 						<obj id="EarningsPanel.HourBtn" class="TipAddin.Button">
 							<attr>
 								<Text>最近24小时</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>(father.width-100*3)/2</left>
+								<TextFont>font.text13</TextFont>
+								<TextColor>B08756</TextColor>
+								<left>(father.width-192)/2</left>
 								<top>0</top>
-								<width>100</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
+								<width>102</width>
+								<height>26</height>
+								<NormalBkgID>earnings.btnunsel</NormalBkgID>
+								<DownBkgID>earnings.btnunsel</DownBkgID>
+								<HoverBkgID>earnings.btnunsel</HoverBkgID>
+								<DisableBkgID>earnings.btnunsel</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickHourBtnBarChart" />
@@ -289,16 +281,16 @@
 						<obj id="EarningsPanel.DayBtn" class="TipAddin.Button">
 							<attr>
 								<Text>最近30天</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>(father.width-100*3)/2+200</left>
+								<TextFont>font.text13</TextFont>
+								<TextColor>B08756</TextColor>
+								<left>(father.width-192)/2+85</left>
 								<top>0</top>
-								<width>100</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
+								<width>102</width>
+								<height>26</height>
+								<NormalBkgID>earnings.btnunsel</NormalBkgID>
+								<DownBkgID>earnings.btnunsel</DownBkgID>
+								<HoverBkgID>earnings.btnunsel</HoverBkgID>
+								<DisableBkgID>earnings.btnunsel</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickDayBtnBarChart" />
@@ -306,9 +298,9 @@
 						</obj>
 						<obj id="EarningsPanel.BarChart" class="BarChart">
 							<attr>
-								<left>50</left>
+								<left>60</left>
 								<top>30+40</top>
-								<width>father.width-50-10</width>
+								<width>father.width-60-10</width>
 								<height>father.height-100</height>
 							</attr>	
 						</obj>

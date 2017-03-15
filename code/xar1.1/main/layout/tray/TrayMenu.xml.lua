@@ -4,40 +4,40 @@ function OnSelect_Setting(self)
 end
 
 
-function OnSelect_Sysboot(self)
-	GXZBMenu.SettingMenu.menuFunTable.OnSelect_autowork()
+function OnSelect_MainUI(self)
+	GXZBMenu.SuspendMenu.menuFunTable.OnSelect_mainui()
 end
 
 
-function OnInit_Sysboot(self)
-	local attr = self:GetAttribute()
+function OnInit_MainUI(self)
+	--[[local attr = self:GetAttribute()
 	if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
 		attr.Icon = "bitmap.menu.setting_check.normal"
 	else
 		attr.Icon = ""
-	end
+	end]]
 end
 
-function OnInit_Hideball(self)
-	local attr = self:GetAttribute()
+function OnInit_Pause(self)
+	--[[local attr = self:GetAttribute()
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
 	if objHostWnd and objHostWnd:GetVisible() then
 		attr.Text = "隐藏悬浮球"
 	else
 		attr.Text = "显示悬浮球"
-	end
+	end]]
 end
 
-function OnSelect_Hideball(self)
+function OnSelect_Pause(self)
 	--GXZBMenu.SettingMenu.menuFunTable.OnInit_hideball()
-	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
+	--[[local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
 	if objHostWnd then
 		if objHostWnd:GetVisible() then
 			objHostWnd:Show(0)
 		else
 			objHostWnd:Show(1)
 		end
-	end
+	end]]
 end
 
 function OnSelect_Update(self)

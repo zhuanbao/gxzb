@@ -41,12 +41,12 @@ end
 function OnClickShare(self)
 	local wndTree = self:GetOwner()
 	local wnd = wndTree:GetBindHostWnd()
-	local maskWnd, maskWndTree = Helper:CreateTransparentMask(wnd)
+	--local maskWnd, maskWndTree = Helper:CreateTransparentMask(wnd)
 	
 	--创建“设置“窗口之前，先创建一个半透明蒙层（Mask）窗口覆盖到主窗口上，再以Mask窗口为父窗口创建”设置“窗口
 	--此时”设置“窗口已经成为主窗口的 孙子 窗口  所以，比较好的方法就是：“不要跟强势的场景处在同一组内”
-	local userData = {["parentWnd"] = maskWnd, ["maskWndParent"] = wnd}
-	Helper:CreateModalWnd("ShareWnd", "ShareWndTree", maskWnd:GetWndHandle(), userData)
+	local userData = {["parentWnd"] = wnd, ["maskWndParent"] = wnd}
+	Helper:CreateModalWnd("ShareWnd", "ShareWndTree", wnd:GetWndHandle(), userData)
 end
 
 -----辅助函数----
@@ -106,15 +106,26 @@ end
 
 function OnMouseEnterConfigBtn(self)
 	Helper.Tip:SetTips("设置")
+	local hoverimage = self:GetObject("TitleCtrl.Caption.Config.Hoverimage")
+	hoverimage:SetVisible(true)
 end
 function OnMouseEnterMinBtn(self)
 	Helper.Tip:SetTips("最小化")
+	local hoverimage = self:GetObject("TitleCtrl.Caption.BtnMin.Hoverimage")
+	hoverimage:SetVisible(true)
 end
 
 function OnMouseEnterCloseBtn(self)
 	Helper.Tip:SetTips("关闭")
+	local hoverimage = self:GetObject("TitleCtrl.Caption.CloseBtn.Hoverimage")
+	hoverimage:SetVisible(true)
 end
 
 function OnMouseLeave(self)
 	Helper.Tip:DestoryTipWnd()
+	local id = self:GetID()
+	local hoverimage = self:GetObject(id..".Hoverimage")
+	if hoverimage then
+		hoverimage:SetVisible(false)
+	end
 end

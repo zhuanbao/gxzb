@@ -426,6 +426,12 @@ function OnMouseMove(self)
 		end
 		local menu = self:GetFather()
 		menu:SetHoverItem(self)
+		--在这里设置图标hover状态
+		local iconObj = self:GetControlObject("icon")
+		if attr.Icon ~= nil then
+			local hovericon = string.gsub(attr.Icon, "normal", "hover")
+			iconObj:SetResID(hovericon)
+		end
 		self:SetFocus( true )
 		if attr.TipsText then
 	--		XMP.SetTips(attr.TipsText,0)
@@ -447,6 +453,11 @@ function OnMouseLeave(self)
 		local menu = self:GetFather()
 		--local oldItem = menu:GetAttribute().HoverItem
 		menu:SetHoverItem(nil)
+		--在这里设置图标normal状态
+		local iconObj = self:GetControlObject("icon")
+		if attr.Icon ~= nil then
+			iconObj:SetResID(attr.Icon)
+		end
 		if attr.TipsText then
 	--		XMP.SetTips()
 		end

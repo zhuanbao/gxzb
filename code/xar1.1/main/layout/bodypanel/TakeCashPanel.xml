@@ -32,30 +32,30 @@
 									<attr>
 										<left>52</left>
 										<top>7</top>
-										<width>58</width>
-										<height>16</height>
+										<width>70</width>
+										<height>20</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text13</font>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
 										<text>提取金额</text>
 									</attr>
 								</obj>
 								<obj id="TakeCashPanel.Panel.EditBkg" class="TextureObject">
 									<attr>
-										<left>115</left>
+										<left>130</left>
 										<top>0</top>
 										<width>150</width>
-										<height>30</height>
-										<texture>GXZB.TakeCashPanel.EditBkg</texture>
+										<height>32</height>
+										<texture>setting-edit-bkg</texture>
 									</attr>	
 									<children>
 										<obj id="TakeCashPanel.Panel.RMB" class="ImageObject">
 											<attr>
 												<left>4</left>
-												<top>8</top>
+												<top>10</top>
 												<width>10</width>
-												<height>13</height>
+												<height>12</height>
 												<image>GXZB.TakeCashPanel.RMB</image>
 												<valign>center</valign>
 												<halign>center</halign>
@@ -71,8 +71,8 @@
 												<width>110</width>
 												<height>24</height>
 												<transparent>1</transparent>
-												<textcolor>444444</textcolor>
-												<font>font.text14</font>
+												<textcolor>BCB9B5</textcolor>
+												<font>font.text16</font>
 												<number>0</number>
 												<text>可提现0元</text>
 												<enable>0</enable>
@@ -103,7 +103,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>left</halign>
-										<textcolor>DDDDDD</textcolor>
+										<textcolor>6D5539</textcolor>
 										<font>font.text13</font>
 										<text>您的库存有</text>
 									</attr>
@@ -116,7 +116,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>center</halign>
-										<textcolor>E5961C</textcolor>
+										<textcolor>E39C29</textcolor>
 										<font>font.text13</font>
 										<text>0</text>
 										<endellipsis>1</endellipsis>
@@ -130,7 +130,7 @@
 										<height>16</height>
 										<valign>center</valign>
 										<halign>right</halign>
-										<textcolor>DDDDDD</textcolor>
+										<textcolor>6D5539</textcolor>
 										<font>font.text13</font>
 										<text>个元宝</text>
 									</attr>
@@ -139,14 +139,16 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.Take" class="TipAddin.Button">
 							<attr>
-								<left>(father.width-160)/2</left>
+								<left>(father.width-185)/2</left>
 								<top>206</top>
-								<width>160</width>
-								<height>40</height>
-								<NormalBkgID>GXZB.Panel.Button</NormalBkgID>
-								<DownBkgID>GXZB.Panel.Button</DownBkgID>
-								<HoverBkgID>GXZB.Panel.Button</HoverBkgID>
-								<DisableBkgID>GXZB.Panel.Button</DisableBkgID>
+								<width>185</width>
+								<height>55</height>
+								<TextFont>font.text20</TextFont>
+								<TextColor>system.white</TextColor>
+								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
+								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
+								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
+								<DisableBkgID>texture.Update.OneKeyUpdate.normal</DisableBkgID>
 								<Visible>true</Visible>
 								<Text>提现</Text>
 								<Enable>false</Enable>
@@ -163,8 +165,8 @@
 								<height>16</height>
 								<valign>center</valign>
 								<halign>center</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text13</font>
+								<textcolor>B08756</textcolor>
+								<font>font.text12</font>
 								<text>今天已提现，请明天再来~</text>
 								<visible>0</visible>
 							</attr>
@@ -174,11 +176,11 @@
 								<left>25</left>
 								<top>325</top>
 								<width>father.width - 25*2</width>
-								<height>60</height>
-								<valign>center</valign>
+								<height>80</height>
+								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text11</font>
+								<textcolor>B0A69C</textcolor>
+								<font>font.text12</font>
 								<multiline>1</multiline>
 								<text>提现规则 ：
 								1. 提现通过微信红包发放，10000元宝可提现1元人民币
@@ -188,16 +190,16 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.UnBindWeiXin" class="TextLinkEx">
 							<attr>
-								<left>238</left>
-								<top>325+45</top>
+								<left>255</left>
+								<top>325+50</top>
 								<width>60</width>
 								<height>16</height>
 								<HAlign>center</HAlign>
 								<VAlign>center</VAlign>
 								<Text>点此解绑</Text>
-								<Font>font.yahei11.underline</Font>
-								<TextColor>system.blue</TextColor>
-								<TextHoverColor>system.blue</TextHoverColor>
+								<Font>font.yahei12.underline</Font>
+								<TextColor>317FFF</TextColor>
+								<TextHoverColor>317FFF</TextHoverColor>
 								<Underline>false</Underline>
 							</attr>
 							<eventlist>

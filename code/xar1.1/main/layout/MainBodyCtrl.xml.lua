@@ -158,6 +158,7 @@ end
 function OnClickMiningPanel(self)
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"MiningPanel")
+	ChangeBtnState(self)
 end
 
 function OnClickTakeCashPanel(self)
@@ -167,13 +168,7 @@ function OnClickTakeCashPanel(self)
 		strPanel = "QRCodePanel"
 	end
 	ChangePanel(OwnerCtrl,strPanel)
-end
-
-function ShowMainPanel(self)
-	local objmain = self:GetOwnerControl()
-	if objmain then
-		objmain:ChangePanel("MiningPanel")
-	end
+	ChangeBtnState(self)
 end
 
 function OnClickEarningsPanel(self)
@@ -181,8 +176,37 @@ function OnClickEarningsPanel(self)
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")
 	end
+	ChangeBtnState(self)
 end
 
+local btnids = {"MainPanel.Buttom.Earnings.Btn", "MainPanel.Buttom.Mining.Btn", "MainPanel.Buttom.TakeCash.Btn"}
+function ChangeBtnState(self)
+	local id = self:GetID()
+	for _, vid in ipairs(btnids) do
+		if vid == id then
+			local attr = self:GetAttribute()
+			if not attr.bakimage then
+				attr.bakimage = {attr.NormalBkgID, attr.HoverBkgID, attr.DownBkgID, attr.DisableBkgID}
+				attr.NormalBkgID = attr.HoverBkgID
+				attr.DownBkgID = attr.HoverBkgID
+				attr.HoverBkgID = attr.HoverBkgID
+				attr.DisableBkgID = attr.HoverBkgID
+				self:Updata()
+			end
+		else
+			local otherobj = self:GetObject("control:"..vid)
+			local otherattr = otherobj:GetAttribute()
+			if otherattr.bakimage then
+				otherattr.NormalBkgID = otherattr.bakimage[1]
+				otherattr.HoverBkgID = otherattr.bakimage[2]
+				otherattr.DownBkgID = otherattr.bakimage[3]
+				otherattr.DisableBkgID = otherattr.bakimage[4]
+				otherattr.bakimage = nil
+				otherobj:Updata()
+			end
+		end
+	end
+end
 
 -----辅助函数----
 function GetCurrentCtrlName(objRootCtrl)

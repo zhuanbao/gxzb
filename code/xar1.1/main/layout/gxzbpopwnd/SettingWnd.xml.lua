@@ -1,8 +1,6 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb"
-local strDAGRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir"
-local g_nDagCacheMinSize = 4*1024*1024*1024
 
 local g_AutoRunState = false
 local g_nWorkModel = 0
@@ -23,17 +21,6 @@ function SetAutoRun()
 	Helper:SetRegValue(strAutoRunRegPath, strValue)
 end
 
-function GetDagCache()
-	local strValue = Helper:QueryRegValue(strDAGRegPath) or ""
-	return strValue
-end
---重新设置DAG Cache
-function ResetDAGCacheFlag() 
-	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["nChangeDAGCache"] = 0
-	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-end
-
 function SaveSettingConfig(objTree)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if g_AutoRunState and not CheckIsAutoRun() then
@@ -49,14 +36,9 @@ function SaveSettingConfig(objTree)
 	end
 	tUserConfig["tUserInfo"]["strMachineName"] = strMachineName
 	
-	local ObjEditDagCache = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Edit")
-	local strNewDagCachePath = ObjEditDagCache:GetText(strMachineName)
-	local strCurrentDagCachePath = GetDagCache()
-	if string.lower(strCurrentDagCachePath) ~= string.lower(strNewDagCachePath) then
-		Helper:SetRegValue(strDAGRegPath, strNewDagCachePath)
-		ResetDAGCacheFlag()
+	if type(tUserConfig["tConfig"]) ~= "table" then
+		tUserConfig["tConfig"] = {}
 	end
-	
 	if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
 		tUserConfig["tConfig"]["WorkModel"] = {}
 	end
@@ -100,50 +82,6 @@ end
 
 function OnMachineEditFocusChange(self, bFocus)
 	SetEditTextState(self, bFocus)
-end
-
-function OnDagCacheEditFocusChange(self, bFocus)
-	SetEditTextState(self, bFocus)
-end
-
-function OnDagCacheEditTextChange(self)
-	local bRet = false
-	local strInfo = "无效路径"
-	local strText = self:GetText()
-	local ObjDagCacheInfo = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Info")
-	local ObjBtnConfirm = self:GetObject("tree:SettingWnd.Buttom.Confirm")
-	if Helper:IsRealString(strText) and Helper.tipUtil:QueryFileExists(strText) then
-		local nBytes = Helper.tipUtil:GetDiskFreeSpace(strText)
-		if type(nBytes) == "number" then
-			local strSize = tFunctionHelper.FormatByteUnit(nBytes)
-			if nBytes >= g_nDagCacheMinSize then
-				bRet = true
-				strInfo = "剩余空间".. strSize .. ",更改后需重启生效"
-			else
-				strInfo = "剩余空间" .. strSize ..",该磁盘剩余空间小于4G，请重新选择！"
-			end	
-		end
-	end
-	if not bRet then
-		ObjBtnConfirm:Enable(false)
-		ObjDagCacheInfo:SetTextColorResID("system.red")
-	else	
-		ObjBtnConfirm:Enable(true)
-		ObjDagCacheInfo:SetTextColorResID("DDDDDD")
-	end
-	ObjDagCacheInfo:SetText(strInfo)
-end
-
-function OnClickChangeDir(self)
-	local editDagCache = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Edit")
-	local strPath = editDagCache:GetText()
-	if not Helper:IsRealString(strPath) or not Helper.tipUtil:QueryFileExists(strPath) then
-		strPath = "C:\\"
-	end
-	local strNewPath = Helper.tipUtil:FolderDialog("目录选择", strPath)
-	if Helper:IsRealString(strNewPath) and Helper.tipUtil:QueryFileExists(strNewPath) then
-		editDagCache:SetText(strNewPath)
-	end
 end
 
 function OnClickConfirm(self)
@@ -200,9 +138,7 @@ end
 
 function OnLButtonDownCaption(self, x, y)
 	local editMachineID = self:GetObject("tree:SettingWnd.Content.MachineIDArea.Edit")
-	local editDagCache = self:GetObject("tree:SettingWnd.Content.DagCacheArea.Edit")
 	SetSettingWndEditFocus(editMachineID, x, y)
-	SetSettingWndEditFocus(editDagCache, x, y)
 end
 
 
@@ -225,10 +161,6 @@ function OnCreate(self)
 		
 		local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
 		
-		local ObjEditDagCache = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Edit")
-		
-		local ObjTextCacheInfo = objTree:GetUIObject("SettingWnd.Content.DagCacheArea.Info")
-		
 		local ObjRadioShow = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Show")
 		local ObjRadioHide = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Hide")
 		local ObjRadioShowAtMining = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.ShowAtMining")
@@ -249,21 +181,10 @@ function OnCreate(self)
 		if Helper:IsRealString(strMachineName) then 
 			ObjEditMachineID:SetText(strMachineName)
 		end 
-		
-		local strDagCachePath = GetDagCache()
-		if Helper:IsRealString(strDagCachePath)then
-			ObjEditDagCache:SetText(strDagCachePath)
-			local strInfo = "无效路径"
-			if Helper.tipUtil:QueryFileExists(strDagCachePath) then
-				local nBytes = Helper.tipUtil:GetDiskFreeSpace(strDagCachePath)
-				if type(nBytes) == "number" then
-					local strSize = tFunctionHelper.FormatByteUnit(nBytes)
-					strInfo = "剩余空间".. strSize .. ",更改后需重启生效"
-				end
-			end
-			ObjTextCacheInfo:SetText(strInfo)
+
+		if type(tUserConfig["tConfig"]) ~= "table" then
+			tUserConfig["tConfig"] = {}
 		end
-		
 		if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
 			tUserConfig["tConfig"]["SuspendedWnd"] = {}
 		end

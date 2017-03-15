@@ -12,5 +12,6 @@
 		<color id="basecontrol.black" red="0" green="0" blue="0" alpha="255" />
 		<color id="basecontrol.white" red="255" green="255" blue="255" alpha="255" />
 		<color id="basecontrol.gray"  red="150" green="150" blue="150" alpha="255"/>
+		<color id="color.menu.text" value="#6D5539"/>
 	</resource>
 </XLUE>

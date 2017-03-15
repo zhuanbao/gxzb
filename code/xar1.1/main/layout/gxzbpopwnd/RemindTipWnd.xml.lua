@@ -33,8 +33,12 @@ function OnShowWindow(self, bShow)
 		else
 			self:Show(0)
 		end
+		local nTipHoldMs = 15000
+		if type(g_ServerConfig) == "table" and type(g_ServerConfig["nTipHoldMs"]) == "number" then
+			nTipHoldMs = g_ServerConfig["nTipHoldMs"]
+		end
 		SetOnceTimer(function(item, id)
 			self:Show(0)
-		end, 15000)
+		end, nTipHoldMs)
 	end
 end
