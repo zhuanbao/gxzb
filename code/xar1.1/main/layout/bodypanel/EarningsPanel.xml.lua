@@ -170,6 +170,9 @@ function UpdateUserBalance(self, nBalance)
 	end
 end
 
+local xylineFailedBitmap24 = nil
+local xylineFailedBitmap30 = nil
+local tipsFailedBitmap = nil
 function BarChartUpdate(self, fnConvert)
 	local attr = self:GetAttribute()
 	if not attr or type(attr.Data) ~= "table" or #attr.Data == 0 then
@@ -202,7 +205,7 @@ function BarChartUpdate(self, fnConvert)
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 	
 	--初始化一些颜色配置
-	attr.FailedColor = "DDDDDD"
+	attr.FailedColor = "999999"
 	attr.FailedHoverColor = "666666"
 	if attr.currentpanel == 1 then
 		attr.ColumnColorSrc = "FFDD92"
@@ -215,7 +218,26 @@ function BarChartUpdate(self, fnConvert)
 		attr.LineColor = "C57046"
 		attr.TipRes = "charttips-bkg-day"
 	end
-	
+	--坐标轴变色
+	if attr.Data["reqFailed"] then
+		local xyLineBkg = self:GetObject("xyLineBkg")
+		local xgp = XLGetObject("Xunlei.XLGraphic.Factory.Object")
+		local clor = xgp:CreateColor(51, 51, 51, 255)
+		local h, s, l = clor:ToHSL()
+		if attr.currentpanel == 1 then
+			if not xylineFailedBitmap24 then
+				xylineFailedBitmap24 = xyLineBkg:GetBitmap():Clone()
+				xylineFailedBitmap24:ModifyColor(h, s, l, 0)
+			end
+			xyLineBkg:SetBitmap(xylineFailedBitmap24)
+		else
+			if not xylineFailedBitmap30 then
+				xylineFailedBitmap30 = xyLineBkg:GetBitmap():Clone()
+				xylineFailedBitmap30:ModifyColor(h, s, l, 0)
+			end
+			xyLineBkg:SetBitmap(xylineFailedBitmap30)
+		end
+	end
 	--显示纵坐标刻度
 	for i = 1, minYnumber do
 		local ytmp = h*i/minYnumber
@@ -226,7 +248,7 @@ function BarChartUpdate(self, fnConvert)
 		newTextObject:SetObjPos(-50, yreal-6, 0, yreal+6)
 		newTextObject:SetVAlign("center")
 		newTextObject:SetHAlign("center")
-		newTextObject:SetTextColorResID(attr.LineColor)
+		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
 		newTextObject:SetTextFont("font.text12")
 	end
 	--间隔宽度是柱子的一半
@@ -243,7 +265,7 @@ function BarChartUpdate(self, fnConvert)
 		newTextObject:SetObjPos(xreal-25, h+10, xreal+25, h+26)
 		newTextObject:SetVAlign("center")
 		newTextObject:SetHAlign("center")
-		newTextObject:SetTextColorResID(attr.LineColor)
+		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
 		newTextObject:SetTextFont("font.text12")
 	end
 	--将数据转换为坐标系中的点
@@ -290,6 +312,18 @@ function BarChartUpdate(self, fnConvert)
 					if not tips then
 						tips = objFactory:CreateUIObject("tips", "BarChartTips")
 						barchartpanel:AddChild(tips)
+						tips:GetObject("bkg"):SetResID(attr.TipRes)
+						--tip变色
+						if attr.Data["reqFailed"] then
+							local xgp = XLGetObject("Xunlei.XLGraphic.Factory.Object")
+							local clor = xgp:CreateColor(102, 102, 102, 255)
+							local h, s, l = clor:ToHSL()
+							if not tipsFailedBitmap then
+								tipsFailedBitmap = tips:GetObject("bkg"):GetBitmap():Clone()
+								tipsFailedBitmap:ModifyColor(h, s, l, 0)
+							end
+							tips:GetObject("bkg"):SetBitmap(tipsFailedBitmap)
+						end
 					end
 					tips:SetText(""..dat[2].."\n"..dat[1])
 					local scal = 1-dat[2]/ymax
@@ -307,7 +341,6 @@ function BarChartUpdate(self, fnConvert)
 					local hoverColor = attr.Data["reqFailed"] and attr.FailedHoverColor or attr.ColumnColorSrcHover
 					newFillObject:SetSrcColor(hoverColor)
 					newFillObject:SetDestColor(hoverColor)
-					tips:GetObject("bkg"):SetResID(attr.TipRes)
 					tips:SetObjPos(l + itemw - 35, t - 55, l + itemw + 36, t-1)
 					tips:SetVisible(true)
 					tips:SetChildrenVisible(true)
