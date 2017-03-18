@@ -76,6 +76,8 @@ function OnWorkStateChange(self,nState)
 	if nState == 1 then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(true)
+		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
+		ObjStartBtnText:SetText("准备中......")
 	elseif nState == 2 then
 		ResetUIVisible(self)
 	elseif nState == 3 then

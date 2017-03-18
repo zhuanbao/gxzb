@@ -14,8 +14,9 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
 
-local g_strPoolUrl = nil
+local g_strCmdLineFormat = nil
 local g_strWallet = nil
+local g_strPool = nil
 local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
@@ -1769,7 +1770,7 @@ function QuerySvrForReportPoolInfo()
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(GetHostName(g_strPoolUrl))))
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_strPool)))
 	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_strWallet)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
@@ -2061,12 +2062,13 @@ function GeneratTaskInfo(fnCallBack)
 				local tabItem = tTaskInfo[i]
 				if type(tabItem) == "table" and CheckPeerIDList(tabItem["tPIDlist"]) then
 					local strWorkID = strInfo
-					local strPoolUrl = tabItem["strPoolFormat"]
-					strPoolUrl = string.gsub(strPoolUrl,"(<wallet>)",tabItem["strWallet"])
-					strPoolUrl = string.gsub(strPoolUrl,"(<workid>)",strWorkID)
-					if IsRealString(strWorkID) and IsRealString(strPoolUrl) then
-						g_strPoolUrl = strPoolUrl
+					local strCmdLineFormat = tabItem["strCmdLineFormat"]
+					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<wallet>)",tabItem["strWallet"])
+					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<workid>)",strWorkID)
+					if IsRealString(strWorkID) and IsRealString(strCmdLineFormat) then
+						g_strCmdLineFormat = strCmdLineFormat
 						g_strWallet = tabItem["strWallet"]
+						g_strPool = tabItem["strPool"]
 						InitMinerInfoToServer()
 						fnCallBack(true)
 					end
@@ -2244,13 +2246,13 @@ function NotifyStart()
 	local function StartTask()
 		local strDir = GetModuleDir()
 		local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
-		local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
+		local strCmdLine = strWorkExe .. " " .. g_strCmdLineFormat
 		g_bWorking = true
 		IPCUtil:Start(strCmdLine)
 		WorkingTimerHandle()
 		OnWorkStateChange(1)
 	end
-	if g_strPoolUrl then
+	if g_strCmdLineFormat then
 		StartTask()
 	else
 		GeneratTaskInfo(function(bTask)
@@ -2316,7 +2318,7 @@ function QueryAndUpdateWorkState()
 	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))
 	if nType == MING_CALCULATE_DAG then
 		if g_PreWorkState ~= MING_CALCULATE_DAG then
-			UpdateWorkState(MING_CALCULATE_DAG)
+			UpdateMiningState(MING_CALCULATE_DAG)
 		end
 		g_PreWorkState = MING_CALCULATE_DAG
 		if tonumber(p1) ~= nil then
@@ -2325,7 +2327,7 @@ function QueryAndUpdateWorkState()
 		return true
 	elseif nType == MING_MINING_SPEED then
 		if g_PreWorkState ~= MING_MINING_SPEED then
-			UpdateWorkState(MING_MINING_SPEED)
+			UpdateMiningState(MING_MINING_SPEED)
 		end
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
