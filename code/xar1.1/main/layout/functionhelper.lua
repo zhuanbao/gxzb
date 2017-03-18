@@ -793,7 +793,8 @@ function ReadAllConfigInfo()
 		local infoTable = LoadTableFromFile(strCfgPath)
 		if type(infoTable) ~= "table" then
 			TipLog("[ReadAllConfigInfo] GetConfigFile failed! "..tostring(strFileName))
-			return false
+			--读失败了不用返回
+			--return false
 		end
 		
 		local tContent = infoTable
