@@ -22,7 +22,7 @@
 						<obj id="QRCodePanel.Panel.Title" class="TextObject">
 							<attr>
 								<left>(father.width-130)/2</left>
-								<top>37</top>
+								<top>49</top>
 								<width>130</width>
 								<height>24</height>
 								<valign>center</valign>
@@ -35,7 +35,7 @@
 						<obj id="QRCodePanel.Panel.Description" class="TextObject">
 							<attr>
 								<left>(father.width-230)/2</left>
-								<top>65</top>
+								<top>85</top>
 								<width>230</width>
 								<height>24</height>
 								<valign>center</valign>
@@ -48,7 +48,7 @@
 						<obj id="QRCodePanel.Panel.QRCode.Bkg" class="TextureObject">
 							<attr>
 								<left>(father.width-194)/2</left>
-								<top>120</top>
+								<top>138</top>
 								<width>194</width>
 								<height>194</height>
 								<texture>GXZB.QRCodePanel.QRCodeBkg</texture>
@@ -291,7 +291,7 @@
 						<obj id="QRCodePanel.Panel.ActiveTime" class="TextObject">
 							<attr>
 								<left>10</left>
-								<top>300</top>
+								<top>346</top>
 								<width>father.width - 10</width>
 								<height>16</height>
 								<valign>center</valign>
@@ -305,7 +305,7 @@
 						<obj id="QRCodePanel.Panel.UnBind" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>
-								<top>360</top>
+								<top>424</top>
 								<width>80</width>
 								<height>16</height>
 								<HAlign>center</HAlign>
