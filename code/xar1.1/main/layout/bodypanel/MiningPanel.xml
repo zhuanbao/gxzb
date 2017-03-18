@@ -97,9 +97,9 @@
 						</obj>
 						<obj id="MiningPanel.Panel.StartBtn.Text" class="TextObject">
 							<attr>
-								<left>(father.width-220)/2+(220-100)/2</left>
+								<left>(father.width-220)/2+(220-140)/2</left>
 								<top>94+(220-24)/2</top>
-								<width>100</width>
+								<width>140</width>
 								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>

@@ -234,6 +234,7 @@
 				<top>0</top>
 				<width>154</width>
 				<height>82</height>
+				<cursor>IDC_HAND</cursor>
 			</attr>	
 		</obj>
 	</objtreetemplate>
