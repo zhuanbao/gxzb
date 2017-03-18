@@ -34,7 +34,7 @@ function InitMainBodyCtrl(objRootCtrl)
 	if not bSucc then
 		return false
 	end
-	--[[local strPanel = "MiningPanel"
+	local strPanel = "MiningPanel"
 	if tFunctionHelper.CheckShouldRemindBind() then
 		strPanel = "QRCodePanel"
 		tFunctionHelper.SaveLastRemindBindUTC()
@@ -42,10 +42,6 @@ function InitMainBodyCtrl(objRootCtrl)
 	local bSucc = objMainBodyCtrl:ChangePanel(strPanel)
 	if not bSucc then
 		return false
-	end]]--
-	local TakeCash = objMainBodyCtrl:GetObject("MainPanel.Buttom.TakeCash.Btn")
-	if TakeCash then
-		TakeCash:FireExtEvent("OnClick", 0, 0)
 	end
 	return true
 end

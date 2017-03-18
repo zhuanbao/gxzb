@@ -11,20 +11,56 @@ function TipLog(strLog)
 	end
 end
 
+local imageOpenAni = nil
+function StartAnim(self, bstart)
+	local father = self:GetOwnerControl()
+	local animimage = father:GetObject("MiningPanel.Panel.StartAnim")
+	local startbtn = father:GetObject("MiningPanel.Panel.StartBtn")
+	local Preparing = father:GetObject("MiningPanel.Panel.Preparing")
+	if bstart and not imageOpenAni then
+		startbtn:Show(false)
+		Preparing:SetVisible(false)
+		if not animimage then
+			local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+			animimage = objFactory:CreateUIObject("MiningPanel.Panel.StartAnim", "ImageObject")
+			father:AddChild(animimage)
+			local l, t, r, b = startbtn:GetObjPos()
+			local w, h = r-l, b-t
+			local offsetW, offsetH = (280-w)/2, (280-h)/2 
+			animimage:SetObjPos(l-offsetW, t-offsetH, r+offsetW, b+offsetH)
+		end
+		animimage:SetVisible(true)
+		imageOpenAni = Helper.Ani:RunSeqFrameAni(animimage, "GXZB.MainPanel.WorkingAnim", nil, 4000, true)
+	else
+		if imageOpenAni then
+			imageOpenAni:Stop()
+			imageOpenAni = nil
+		end
+		if animimage then
+			animimage:SetVisible(false)
+		end
+		startbtn:Show(true)
+		Preparing:SetVisible(true)
+	end
+end
+
 function OnClickStopMining(self)
 	if tFunctionHelper.CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		ResetUIVisible(OwnerCtrl)
 		tFunctionHelper.NotifyPause()
+		StartAnim(self, false)
+	else
+		tFunctionHelper.NotifyStart()
+		StartAnim(self, true)
 	end
 end
 
 function OnClickStartMining(self)
-	if tFunctionHelper.CheckCanMine() then
-		if not tFunctionHelper.CheckIsWorking() then
-			tFunctionHelper.NotifyStart()
-		end
-	end	
+	if not tFunctionHelper.CheckIsWorking() then
+		tFunctionHelper.NotifyStart()
+		StartAnim(self, true)
+	end
 end
 
 function OnClickBindWeiXin(self)
@@ -34,8 +70,8 @@ end
 
 function OnInitControl(self)
 	local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
-	ObjMiningSpeed:SetChildrenVisible(false)
-	ObjMiningSpeed:SetVisible(false)
+	--ObjMiningSpeed:SetChildrenVisible(false)
+	--ObjMiningSpeed:SetVisible(false)
 	
 	ResetUIVisible(self)
 end
@@ -71,18 +107,7 @@ end
 
 function UpdateMiningSpeed(self, nSpeed)
 	local ObjMiningState = self:GetControlObject("MiningPanel.Panel.MiningState")
-	--[[
-	if ObjMiningState:GetVisible() then
-		strText = ""
-		ObjMiningState:SetText(strText)
-		ObjMiningState:SetVisible(false)
-		--隐藏
-	end
-	--]]
-	SetDAGCacheFlag(nFlag)
 	ResetUIVisible(self)
-	local ObjPreparingText = OwnerCtrl:GetControlObject("MiningPanel.Panel.Preparing")
-	ObjPreparingText:SetVisible(false)
 	
 	local ObjTextSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed.Speed")
 	local strSpeed = tostring(nSpeed) .. "元宝/小时"
@@ -119,17 +144,10 @@ function AdjustAmountTextPosition(self)
 	ObjTextUnit:SetObjPos(nNewLeft+(nLenDesc+gap)+(nLenNum+gap), 0, nNewLeft+(nLenDesc+gap)+(gap+nLenNum)+nLenUnit, height)
 end
 
-
-local MING_CHECK_DAG = 1
-local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
 local MING_MINING_EEEOR_TIMEOUT = 100
-
-local MING_DAG_CHECKING = 1
-local MING_DAG_SUNCCESS = 2
-local MING_DAG_FAIL = 3
 
 
 function ShowPreparingText(self)
@@ -140,6 +158,13 @@ function ShowPreparingText(self)
 	if not ObjPreparingText:GetVisible() then
 		ObjPreparingText:SetVisible(true)
 	end
+	local objstopbtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+	local objstopattr = objstopbtn:GetAttribute()
+	objstopattr.NormalBkgID = "texture.MainPanel.StopMining.normal"
+	objstopattr.HoverBkgID = "texture.MainPanel.StopMining.hover"
+	objstopattr.DownBkgID = "texture.MainPanel.StopMining.down"
+	objstopattr.DisableBkgID = "texture.MainPanel.StopMining.normal"
+	objstopbtn:Updata()
 	local strText = "准备中"
 	local nCounter = 0
 	g_TimeIDPreparing = timeMgr:SetTimer(function(Itm, id)
@@ -154,48 +179,10 @@ function ShowPreparingText(self)
 	end, 1000)
 end
 
-function GetDAGCacheFlag() 
-	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	return tUserConfig["nChangeDAGCache"] or 0
-end
-function SetDAGCacheFlag(nFlag) 
-	if GetDAGCacheFlag() ~= 1 then
-		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-		tUserConfig["nChangeDAGCache"] = nFlag
-		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-	end	
-end
-
 function UpdateMiningState(self, nState, nParam)
 	local ObjMiningState = self:GetControlObject("MiningPanel.Panel.MiningState")
 	local strText = ""
-	if nState == MING_CHECK_DAG then
-		if nParam == MING_DAG_CHECKING then
-			strText = "正在向服务器请求赚宝所需要的数据参数"
-		elseif nParam == MING_DAG_SUNCCESS then
-			strText = "生成基础数据块成功，开始赚宝..."
-			SetDAGCacheFlag(1)
-		else
-			strText = "生成基础数据块失败，请重新开始..."
-		end
-		ObjMiningState:SetText(strText)
-		ObjMiningState:SetVisible(true)
-		g_CanShowBindEntry = false
-		ChangeBindEntryVisible(self)
-	elseif nState == MING_CALCULATE_DAG then
-		local strCurrentText = ObjMiningState:GetText()
-		if string.find(strCurrentText,"正在生成赚宝所需要的基础数据块") == nil and string.find(strCurrentText,"本地基础数据块已过期，正在重新生成") == nil then
-			if GetDAGCacheFlag() == 0 then
-				strText = "正在生成赚宝所需要的基础数据块。根据你的设备配置情况，该过程大概需要10-30分钟，请耐心等待..."
-			else
-				strText = "本地基础数据块已过期，正在重新生成。根据你的设备配置情况，该过程大概需要10-30分钟，请耐心等待..."
-			end	
-			ObjMiningState:SetText(strText)
-			ObjMiningState:SetVisible(true)
-			g_CanShowBindEntry = false
-			ChangeBindEntryVisible(self)
-		end	
-	elseif nState == MING_MINING_SPEED then
+	if nState == MING_MINING_SPEED then
 		--g_CanShowBindEntry = true
 	end
 end
@@ -206,10 +193,18 @@ function ResetUIVisible(OwnerCtrl)
 		g_TimeIDPreparing = nil
 	end
 	local ObjPreparingText = OwnerCtrl:GetControlObject("MiningPanel.Panel.Preparing")
-	ObjPreparingText:SetVisible(false)
+	ObjPreparingText:SetVisible(true)
+	ObjPreparingText:SetText("开始赚宝")
 	local ObjMiningState = OwnerCtrl:GetControlObject("MiningPanel.Panel.MiningState")
 	ObjMiningState:SetVisible(false)
 	ObjMiningState:SetText("")
+	local objstopbtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+	local objstopattr = objstopbtn:GetAttribute()
+	objstopattr.NormalBkgID = "texture.MainPanel.MiniStartMining.normal"
+	objstopattr.HoverBkgID = "texture.MainPanel.MiniStartMining.hover"
+	objstopattr.DownBkgID = "texture.MainPanel.MiniStartMining.down"
+	objstopattr.DisableBkgID = "texture.MainPanel.MiniStartMining.normal"
+	objstopbtn:Updata()
 	g_CanShowBindEntry = true
 	ChangeBindEntryVisible(OwnerCtrl)
 end

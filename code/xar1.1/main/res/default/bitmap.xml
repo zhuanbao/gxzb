@@ -16,6 +16,7 @@
 		<texture id="GXZB.Caption.Config.Normal" image="bitmap\GXZB.Caption.Config.png" />
 		<texture id="GXZB.Caption.Config.Hover"  image="bitmap\GXZB.Caption.Config.png" />
 		<texture id="GXZB.Caption.Config.Down"   image="bitmap\GXZB.Caption.Config.png" />
+		<imageseq id="GXZB.MainPanel.WorkingAnim" folder="bitmap\workani"/>
 		
 		<!--标题下方区域-->
 		<imagelist id="imagelist.MainPanel.Earnings" vertical="0" varyblock="0" blocksize="42" image="bitmap\GXZB.MainPanel.Earnings.png"/>

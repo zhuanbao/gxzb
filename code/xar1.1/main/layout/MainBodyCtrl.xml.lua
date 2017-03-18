@@ -39,7 +39,49 @@ function InitPanelList(self, tPanelList)
 	return true	
 end
 
+local btnids = {"MainPanel.Buttom.Earnings.Btn", "MainPanel.Buttom.Mining.Btn", "MainPanel.Buttom.TakeCash.Btn"}
+function ChangeBtnState(self)
+	local id = self:GetID()
+	for _, vid in ipairs(btnids) do
+		if vid == id then
+			local attr = self:GetAttribute()
+			if not attr.bakimage then
+				attr.bakimage = {attr.NormalBkgID, attr.HoverBkgID, attr.DownBkgID, attr.DisableBkgID}
+				attr.NormalBkgID = attr.HoverBkgID
+				attr.DownBkgID = attr.HoverBkgID
+				attr.HoverBkgID = attr.HoverBkgID
+				attr.DisableBkgID = attr.HoverBkgID
+				self:Updata()
+			end
+		else
+			local otherobj = self:GetObject("control:"..vid)
+			local otherattr = otherobj:GetAttribute()
+			if otherattr.bakimage then
+				otherattr.NormalBkgID = otherattr.bakimage[1]
+				otherattr.HoverBkgID = otherattr.bakimage[2]
+				otherattr.DownBkgID = otherattr.bakimage[3]
+				otherattr.DisableBkgID = otherattr.bakimage[4]
+				otherattr.bakimage = nil
+				otherobj:Updata()
+			end
+		end
+	end
+end
+
+local PanelBtnMap = {
+	["EarningsPanel"] = "MainPanel.Buttom.Earnings.Btn",
+	["MiningPanel"] = "MainPanel.Buttom.Mining.Btn",
+	["QRCodePanel"] = "MainPanel.Buttom.TakeCash.Btn",
+	["TakeCashPanel"] = "MainPanel.Buttom.TakeCash.Btn",
+}
 function ChangePanel(self, strNewCtrlName)
+	local function changebtnstate()
+		local btn = self:GetControlObject(PanelBtnMap[strNewCtrlName])
+		if btn then
+			ChangeBtnState(btn)
+		end
+	end
+	changebtnstate()
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
 		
@@ -158,7 +200,6 @@ end
 function OnClickMiningPanel(self)
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"MiningPanel")
-	ChangeBtnState(self)
 end
 
 function OnClickTakeCashPanel(self)
@@ -168,43 +209,12 @@ function OnClickTakeCashPanel(self)
 		strPanel = "QRCodePanel"
 	end
 	ChangePanel(OwnerCtrl,strPanel)
-	ChangeBtnState(self)
 end
 
 function OnClickEarningsPanel(self)
 	local objmain = self:GetOwnerControl()
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")
-	end
-	ChangeBtnState(self)
-end
-
-local btnids = {"MainPanel.Buttom.Earnings.Btn", "MainPanel.Buttom.Mining.Btn", "MainPanel.Buttom.TakeCash.Btn"}
-function ChangeBtnState(self)
-	local id = self:GetID()
-	for _, vid in ipairs(btnids) do
-		if vid == id then
-			local attr = self:GetAttribute()
-			if not attr.bakimage then
-				attr.bakimage = {attr.NormalBkgID, attr.HoverBkgID, attr.DownBkgID, attr.DisableBkgID}
-				attr.NormalBkgID = attr.HoverBkgID
-				attr.DownBkgID = attr.HoverBkgID
-				attr.HoverBkgID = attr.HoverBkgID
-				attr.DisableBkgID = attr.HoverBkgID
-				self:Updata()
-			end
-		else
-			local otherobj = self:GetObject("control:"..vid)
-			local otherattr = otherobj:GetAttribute()
-			if otherattr.bakimage then
-				otherattr.NormalBkgID = otherattr.bakimage[1]
-				otherattr.HoverBkgID = otherattr.bakimage[2]
-				otherattr.DownBkgID = otherattr.bakimage[3]
-				otherattr.DisableBkgID = otherattr.bakimage[4]
-				otherattr.bakimage = nil
-				otherobj:Updata()
-			end
-		end
 	end
 end
 

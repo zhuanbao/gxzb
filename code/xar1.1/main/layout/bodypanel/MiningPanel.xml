@@ -25,9 +25,9 @@
 					<children>
 						<obj id="MiningPanel.Panel.MiningSpeed" class="LayoutObject">
 							<attr>
-								<left>18+30+5</left>
-								<top>22</top>
-								<width>father.width-(18+30+5)*2</width>
+								<left>98</left>
+								<top>32</top>
+								<width>father.width-98*2</width>
 								<height>24</height>
 							</attr>
 							<children>
@@ -51,7 +51,7 @@
 										<width>father.width-(65+1)</width>
 										<height>16</height>
 										<valign>center</valign>
-										<halign>center</halign>
+										<halign>left</halign>
 										<textcolor>CB8C25</textcolor>
 										<font>font.text14</font>
 										<text>0元宝/小时</text>
@@ -94,21 +94,22 @@
 						</obj>
 						<obj id="MiningPanel.Panel.Preparing" class="TextObject">
 							<attr>
-								<left>(father.width-220)/2+(220-66)/2</left>
+								<left>(father.width-220)/2+(220-100)/2</left>
 								<top>94+(220-24)/2</top>
-								<width>66</width>
+								<width>100</width>
 								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>
 								<textcolor>system.white</textcolor>
 								<font>font.text22</font>
 								<text>准备中</text>
+								<zorder>99999999</zorder>
 							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
 							<attr>
 								<left>5</left>
-								<top>330</top>
+								<top>330+40</top>
 								<width>father.width-10</width>
 								<height>24</height>
 							</attr>
@@ -158,7 +159,7 @@
 						<obj id="MiningPanel.Panel.MiningState" class="TextObject">
 							<attr>
 								<left>10</left>
-								<top>356</top>
+								<top>356+42</top>
 								<width>father.width-20</width>
 								<height>40</height>
 								<valign>center</valign>
@@ -173,7 +174,7 @@
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>
-								<top>376</top>
+								<top>376+42</top>
 								<width>80</width>
 								<height>24</height>
 								<HAlign>center</HAlign>

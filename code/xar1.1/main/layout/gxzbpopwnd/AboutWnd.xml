@@ -36,7 +36,26 @@
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="AboutWnd.xml.lua" func="OnClickClose" />
-							</eventlist>	
+								<event name="OnMouseEnter">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if not hoverimage then
+										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+										self:AddChild(hoverimage)
+										hoverimage:SetObjPos(-5, -9, 20, -6)
+										hoverimage:SetResID("GXZB.Title.Hoverimage")
+									end
+									hoverimage:SetVisible(true)
+								</event>
+								<event name="OnMouseLeave">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if hoverimage then
+										hoverimage:SetVisible(false)
+									end
+								</event>
+							</eventlist>
 						</obj>
 						<obj id="AboutWnd.Logo" class="ImageObject">
 							<attr>
@@ -121,18 +140,23 @@
 								<text></text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.Url" class="TextObject">
+						<obj id="AboutWnd.Content.Url" class="TextLinkEx">
 							<attr>
 								<left>204</left>
 								<top>150</top>
 								<width>200</width>
 								<height>20</height>
-								<valign>top</valign>
-								<halign>left</halign>
-								<textcolor>6D5539</textcolor>
-								<font>font.text16</font>
-								<text>http://www.baidu.com</text>
+								<HAlign>left</HAlign>
+								<VAlign>center</VAlign>
+								<Text>http://www.baidu.com</Text>
+								<Font>font.yahei13.underline</Font>
+								<TextColor>AF8656</TextColor>
+								<TextHoverColor>AF8656</TextHoverColor>
+								<Underline>false</Underline>
 							</attr>
+							<eventlist>
+								<event name="OnClick" file="AboutWnd.xml.lua" func="OnClickLink" />
+							</eventlist>
 						</obj>
 					</children>
 				</obj>

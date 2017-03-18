@@ -65,6 +65,25 @@
 									</attr>
 									<eventlist>
 										<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickCloseDialog" />
+										<event name="OnMouseEnter">
+											local self = ...
+											local hoverimage = self:GetObject("hoverimage")
+											if not hoverimage then
+												local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+												hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+												self:AddChild(hoverimage)
+												hoverimage:SetObjPos(-5, -9, 20, -6)
+												hoverimage:SetResID("GXZB.Title.Hoverimage")
+											end
+											hoverimage:SetVisible(true)
+										</event>
+										<event name="OnMouseLeave">
+											local self = ...
+											local hoverimage = self:GetObject("hoverimage")
+											if hoverimage then
+												hoverimage:SetVisible(false)
+											end
+										</event>
 									</eventlist>	
 								</obj>
 							</children>

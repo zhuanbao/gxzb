@@ -46,21 +46,27 @@ function OnClickUpdateBtn(self)
 	if not g_tNewVersionInfo then 
 		return 
 	end
-	--local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
-	--local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
-	local TextMain = self:GetObject("tree:UpdateWnd.Content.TextMain")
+	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
+	local TextVersion = self:GetObject("tree:UpdateWnd.Content.TextVersion")
 	local BtnUpdate = self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn")
 	progress = self:GetObject("tree:UpdateWnd.Progress.bkg")
 	progrBar = self:GetObject("tree:UpdateWnd.Progress.bar")
 	progrText = self:GetObject("tree:UpdateWnd.Progress.text")
-	TextMain:SetVisible(false)
-	--TextVersion:SetVisible(false)
+	TextVersion:SetVisible(false)
 	BtnUpdate:Show(false)
 	progress:SetVisible(true)
 	progress:SetChildrenVisible(true)
 	progrBar:SetVisible(true)
 	progrText:SetVisible(true)
-	--TextBig:SetObjPos(158, 100, "father.width", 136)
+	TextBig:SetObjPos(144, 100, 159+260, 107+25)
+	local bigicon = self:GetObject("tree:UpdateWnd.Icon")
+	bigicon:SetObjPos(50, 70, 50+80, 70+80)
+	local wnd = self:GetOwner():GetBindHostWnd()
+	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
+	wnd:Move(wndL, wndT, wndL+450, wndT+298)
+	local root = self:GetOwner():GetUIObject("root")
+	root:SetObjPos(0, 0, 450, 298)
+	wnd:SetMaxTrackSize(450, 298)
 	--正在更新
 	g_UpdateState = 1
 	if g_UpdateCancel then
@@ -147,6 +153,7 @@ function OnCreate(self)
 		
 		local function ShowNoUpdate()
 			--已经是最新
+			TextMain:SetObjPos(159, 107, 159+260, 107+25)
 			TextMain:SetText("您的共享赚宝已经是最新版本。")
 		end
 		
@@ -161,7 +168,7 @@ function OnCreate(self)
 			local w, h = TextVersion:GetTextExtent()
 			local Hoffset =  h - 130
 			if Hoffset > 0 then
-				TextVersion:SetObjPos(158, 95, 158+260, 95 + h + 10)
+				TextVersion:SetObjPos(158, 98, 158+260, 95 + h + 10)
 				local wndL, wndT, wndR, wndB = self:GetWindowRect()
 				self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset)
 				objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset)

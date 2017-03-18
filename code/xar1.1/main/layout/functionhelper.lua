@@ -226,7 +226,6 @@ function RegisterFunctionObject(self)
 	obj.CheckIsBinded = CheckIsBinded
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.UpdateUserBalance = UpdateUserBalance
-	obj.CheckCanMine = CheckCanMine
 	obj.NotifyPause = NotifyPause
 	obj.NotifyQuit = NotifyQuit
 	obj.NotifyStart = NotifyStart
@@ -2028,31 +2027,6 @@ function SetMinerInfo(strText)
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	--设置工作进程状态信息
 end
-local g_nDagCacheMinSize = 4*1024*1024*1024
-function PopDAGCacheErrorWnd(strContent)
-	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-	objHostWnd:Show(1)
-	Helper:CreateModalWnd("GXZB.DAGCacheErrorWnd", "GXZB.DAGCacheErrorWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd,["strContent"] = strContent})
-end
-
-function CheckCanMine()
-	local strValue = RegQueryValue("HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\DAGDir") or ""
-	if not IsRealString(strValue) or not tipUtil:QueryFileExists(strValue) then
-		PopDAGCacheErrorWnd("磁盘缓存目录所在驱动器不存在，请重新设置缓存目录")
-		return false
-	end
-	local nFreeBytes = tipUtil:GetDiskFreeSpace(strValue)
-	local tabFiles = tipUtil:FindFileList(strValue,"*.*")
-	local nCurrentBytes = 0
-	for i=1,#tabFiles do
-		nCurrentBytes = nCurrentBytes + tipUtil:GetFileSize(tabFiles[i])
-	end
-	if nCurrentBytes+nFreeBytes < g_nDagCacheMinSize then
-		PopDAGCacheErrorWnd("磁盘缓存目录所在驱动器可用空间小于4G,请释放更多的可用空间或重新设置缓存目录")
-		return false
-	end
-	return true
-end
 
 function UpdateWorkSpeed(strSpeed)
 	TipLog("[QuerySvrForPushCalcInfo] strSpeed = " .. tostring(strSpeed))
@@ -2207,7 +2181,7 @@ function UnBindingClientFromClient()
 	--]]
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
-	ChangeClientTitle("共享赚宝(未绑定)")
+	ChangeClientTitle("共享赚宝 (未绑定)")
 	if CheckIsWorking() then
 		NotifyQuit()
 	end
@@ -2302,24 +2276,15 @@ function NotifyStart()
 	end
 end
 
-local MING_CHECK_DAG = 1
-local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
 local MING_MINING_EEEOR_TIMEOUT = 100
 
-local MING_DAG_CHECKING = 1
-local MING_DAG_SUNCCESS = 2
-local MING_DAG_FAIL = 3
-
 function GetToolTipInfo()
 	local bShowSpeed = false
 	local strText = ""
-	if g_PreWorkState == MING_CHECK_DAG 
-		or g_PreWorkState == MING_CALCULATE_DAG then
-		strText = "准备中"
-	elseif g_PreWorkState == MING_MINING_SPEED
+	if g_PreWorkState == MING_MINING_SPEED
 		or g_PreWorkState == MING_SOLUTION_FIND then
 		strText = "运行中"
 		bShowSpeed = true
@@ -2329,30 +2294,14 @@ function GetToolTipInfo()
 	else
 		strText = "未开启"
 	end	
-	TipLog("[GetToolTipInfo]: g_PreWorkState = " .. tostring(g_PreWorkState) .. ", strText = " .. tostring(strText) .. ", MING_CHECK_DAG = " .. tostring(MING_CHECK_DAG))
+	TipLog("[GetToolTipInfo]: g_PreWorkState = " .. tostring(g_PreWorkState) .. ", strText = " .. tostring(strText))
 	return strText,bShowSpeed
 end
 	
 function QueryAndUpdateWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
 	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
-	if nType == MING_CHECK_DAG then
-		g_PreWorkState = MING_CHECK_DAG
-		if p1 == MING_DAG_CHECKING then
-			SetMinerInfo("更新任务数据中...")
-		elseif p1 == MING_DAG_SUNCCESS then
-			SetMinerInfo("更新任务数据完成")
-		elseif p1 == MING_DAG_FAIL then
-			SetMinerInfo("更新任务数据失败")	
-		end
-		return true
-	elseif nType == MING_CALCULATE_DAG then
-		g_PreWorkState = MING_CALCULATE_DAG
-		if tonumber(p1) ~= nil then
-			SetMinerInfo("初始化新数据中...\r\n已经完成" .. tostring(p1) .. "%")
-		end
-		return true
-	elseif nType == MING_MINING_SPEED then
+	if nType == MING_MINING_SPEED then
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
 			g_SpeedSum = g_SpeedSum + p1
@@ -2444,7 +2393,7 @@ function WorkingTimerHandle()
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 			local bQuery = QueryAndUpdateWorkState()
 			if nReportConuter >= nReportCalcInterval then
-				if not bQuery and g_PreWorkState ~= MING_CHECK_DAG and g_PreWorkState ~= MING_CALCULATE_DAG then
+				if not bQuery then
 					--借用上报算力的间隔来，检测工作进程是否没有响应了
 					--nReportCalcInterval秒没响应 是否要杀进程
 					--UpdateWorkSpeed(tostring(0))

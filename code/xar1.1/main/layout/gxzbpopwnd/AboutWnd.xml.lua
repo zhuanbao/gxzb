@@ -37,3 +37,7 @@ function OnCreate(self)
 		end
 	end
 end
+
+function OnClickLink(self)
+	Helper.tipUtil:OpenURL(self:GetText())
+end

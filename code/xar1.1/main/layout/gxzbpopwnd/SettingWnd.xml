@@ -65,6 +65,25 @@
 									</attr>
 									<eventlist>
 										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCloseDialog" />
+										<event name="OnMouseEnter">
+											local self = ...
+											local hoverimage = self:GetObject("hoverimage")
+											if not hoverimage then
+												local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+												hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+												self:AddChild(hoverimage)
+												hoverimage:SetObjPos(-5, -9, 20, -6)
+												hoverimage:SetResID("GXZB.Title.Hoverimage")
+											end
+											hoverimage:SetVisible(true)
+										</event>
+										<event name="OnMouseLeave">
+											local self = ...
+											local hoverimage = self:GetObject("hoverimage")
+											if hoverimage then
+												hoverimage:SetVisible(false)
+											end
+										</event>
 									</eventlist>	
 								</obj>
 								
@@ -170,88 +189,6 @@
 										</obj>
 									</children>
 								</obj>
-								<!--obj id="SettingWnd.Content.DagCacheArea" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5</top>
-										<width>father.width-2</width>
-										<height>34+22</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.DagCacheArea.SettingName" class="TextObject">
-											<attr>
-												<left>70</left>
-												<top>0</top>
-												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
-												<halign>left</halign>
-												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
-												<text>缓存目录</text>
-											</attr>
-										</obj>
-										<obj id="SettingWnd.Content.DagCacheArea.EditBkg" class="TextureObject">
-											<attr>
-												<left>70+120+5</left>
-												<top>0</top>
-												<width>230</width>
-												<height>24</height>
-												<texture>setting-edit-bkg</texture>
-											</attr>	
-											<children>
-												<obj id="SettingWnd.Content.DagCacheArea.Edit" class="EditObject">
-													<attr>
-														<left>0</left>
-														<top>0</top>
-														<width>father.width</width>
-														<height>father.height</height>
-														<transparent>1</transparent>
-														<viewinset>2, 2, 2, 2</viewinset>
-														<textcolor>555555</textcolor>
-														<font>font.text13</font>
-														<text></text>
-													</attr>
-													<eventlist>
-														<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnDagCacheEditFocusChange" />
-														<event name="OnChange" file="SettingWnd.xml.lua" func="OnDagCacheEditTextChange" />
-													</eventlist>
-												</obj>
-											</children>
-										</obj>
-										<obj id="SettingWnd.Content.DagCacheArea.ChangeDir" class="TipAddin.Button">
-											<attr>
-												<left>70+120+5+230</left>
-												<top>0</top>
-												<width>62</width>
-												<height>24</height>
-												<NormalBkgID>setting-btn-normal</NormalBkgID>
-												<DownBkgID>setting-btn-normal</DownBkgID>
-												<HoverBkgID>setting-btn-hover</HoverBkgID>
-												<DisableBkgID>setting-btn-hover</DisableBkgID>
-												<Text>更改目录</Text>
-												<TextFont>font.text13</TextFont>
-												<TextColor>6D5539</TextColor>
-											</attr>
-											<eventlist>
-												<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickChangeDir" />
-											</eventlist>	
-										</obj>
-										<obj id="SettingWnd.Content.DagCacheArea.Info" class="TextObject">
-											<attr>
-												<left>70+120+5</left>
-												<top>34+5</top>
-												<width>250</width>
-												<height>17</height>
-												<valign>center</valign>
-												<halign>left</halign>
-												<textcolor>B08756</textcolor>
-												<font>font.text12</font>
-												<text>剩余空间4G,更改后需重启生效</text>
-											</attr>
-										</obj>
-									</children>
-								</obj-->
 								<obj id="SettingWnd.Content.SuspendedWnd" class="LayoutObject">
 									<attr>
 										<left>1</left>

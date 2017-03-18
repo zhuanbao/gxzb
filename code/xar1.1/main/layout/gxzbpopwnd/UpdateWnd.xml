@@ -3,24 +3,24 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>553</width>
-			<height>333</height>
+			<width>520</width>
+			<height>298</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>553</width>
-				<height>333</height>
-				<texture>GXZB.MainWnd.Bkg</texture>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
 			</attr>	
 			<children>
 				<obj id="UpdateWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>26</left>
-						<top>18</top>
-						<width>father.width-52</width>
-						<height>father.height-18-34</height>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
 					</attr>
 					<children>
 						<obj id="UpdateWnd.Caption.CloseBtn" class="TipAddin.Button">
@@ -36,6 +36,25 @@
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if not hoverimage then
+										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+										self:AddChild(hoverimage)
+										hoverimage:SetObjPos(-5, -9, 20, -6)
+										hoverimage:SetResID("GXZB.Title.Hoverimage")
+									end
+									hoverimage:SetVisible(true)
+								</event>
+								<event name="OnMouseLeave">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if hoverimage then
+										hoverimage:SetVisible(false)
+									end
+								</event>
 							</eventlist>	
 						</obj>
 						<obj id="UpdateWnd.Logo" class="ImageObject">
@@ -71,7 +90,7 @@
 						</obj>
 						<obj id="UpdateWnd.Content.TextBig" class="TextObject">
 							<attr>
-								<left>54+80+24</left>
+								<left>54+80+26</left>
 								<top>70</top>
 								<width>father.width-54-80-50</width>
 								<height>36</height>
@@ -85,8 +104,8 @@
 						</obj>
 						<obj id="UpdateWnd.Content.TextMain" class="TextObject">
 							<attr>
-								<left>54+80+24</left>
-								<top>95</top>
+								<left>54+80+50</left>
+								<top>107</top>
 								<width>260</width>
 								<height>25</height>
 								<valign>center</valign>
@@ -99,13 +118,13 @@
 						<obj id="UpdateWnd.Content.TextVersion" class="TextObject">
 							<attr>
 								<left>54+80+24</left>
-								<top>95</top>
+								<top>98</top>
 								<width>150</width>
 								<height>130</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.text14</font>
+								<font>font.text12</font>
 								<text>版本：1.0.0.1</text>
 								<visible>0</visible>
 								<multiline>1</multiline>
@@ -114,7 +133,7 @@
 						<obj id="UpdateWnd.Progress.bkg" class="TextureObject">
 							<attr>
 								<left>(father.width-330)/2</left>
-								<top>father.height-80</top>
+								<top>father.height-100</top>
 								<width>330</width>
 								<height>16</height>
 								<texture>process-bkg</texture>
@@ -149,12 +168,12 @@
 						<obj id="UpdateWnd.OneKeyUpdate.Btn" class="TipAddin.Button">
 							<attr>
 								<Text>一键升级</Text>
-								<TextFont>font.text16</TextFont>
+								<TextFont>font.text20</TextFont>
 								<TextColor>system.white</TextColor>
-								<left>(father.width-153)/2</left>
-								<top>father.height-75</top>
-								<width>153</width>
-								<height>54</height>
+								<left>(father.width-186)/2</left>
+								<top>father.height-85</top>
+								<width>186</width>
+								<height>55</height>
 								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
 								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
 								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
@@ -176,8 +195,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>553</width>
-            <height>333</height>
+            <width>520</width>
+            <height>298</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
