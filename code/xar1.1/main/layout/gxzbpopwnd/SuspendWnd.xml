@@ -2,6 +2,7 @@
 	<control class="SuspendLeftGoldBalance">
 		<method_def>
 			<SetState file="SuspendWnd.xml.lua" func="LeftGoldBalance_SetState"/>
+			<Click file="SuspendWnd.xml.lua" func="LeftGoldBalance_Click"/>
 		</method_def>
 		<objtemplate>
 			<children>
@@ -45,7 +46,7 @@
 						<shadow>1</shadow>
 						<shadowoffset>1,1</shadowoffset>
 						<shadowcolor>color.suspend.balanceshadow</shadowcolor>
-						<text>666w</text>
+						<text>0</text>
 					</attr>
 				</obj>
 			</children>
@@ -56,6 +57,7 @@
 		<method_def>
 			<SetState file="SuspendWnd.xml.lua" func="SuspendRightDisk_SetState"/>
 			<UpdateSpeed file="SuspendWnd.xml.lua" func="SuspendRightDisk_UpdateSpeed"/>
+			<Click file="SuspendWnd.xml.lua" func="SuspendRightDisk_Click"/>
 		</method_def>
 		<objtemplate>
 			<children>
@@ -140,7 +142,7 @@
 								<shadow>1</shadow>
 								<shadowoffset>1,1</shadowoffset>
 								<shadowcolor>color.suspend.speedshadow</shadowcolor>
-								<text>666YB/h</text>
+								<text></text>
 							</attr>
 						</obj>
 						<obj id="stopicon" class="ImageObject">
@@ -166,6 +168,11 @@
 			<SetState file="SuspendWnd.xml.lua" func="SuspendCtrl_SetState"/>
 			<!--更新水平线， 其实就是换图-->
 			<UpdateLine file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateLine"/>
+			<OnWorkStateChange file="SuspendWnd.xml.lua" func="SuspendCtrl_OnWorkStateChange"/>
+			<UpdateMiningState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateMiningState"/>
+			<UpdateWorkSpeed file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateWorkSpeed"/>
+			<UpdateUserBalance file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateUserBalance"/>
+			<UpdateClientUnBindState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateClientUnBindState"/>
 		</method_def>
 		<objtemplate>
 			<children>

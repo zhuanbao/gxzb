@@ -1845,6 +1845,10 @@ function QuerySvrForGetHistoryInfo(ntype)
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
+	if not tUserConfig["tUserInfo"]["strWorkID"] then
+		TipLog("[QuerySvrForGetHistoryInfo] strWorkID = nil")
+		return
+	end
 	local strInterfaceName = "getHistory"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
@@ -1909,6 +1913,12 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
 	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	if not strReguestUrl then
+		local tDef = GetLocal()
+		fnCallBack(false, tDef)
+		Save2Local(tDef)
+		return
+	end
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
 	NewAsynGetHttpContent(strReguestUrl, false
 	, function(nRet, strContent, respHeaders)
@@ -2170,6 +2180,11 @@ function UpdateClientUnBindState()
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	UpdateUserBalance(0)
 	objMainBodyCtrl:UpdateClientUnBindState()
+	--更新球
+	local root = GetSuspendRootCtrol()
+	if root and type(root.UpdateClientUnBindState) == "function" then
+		root:UpdateClientUnBindState()
+	end
 end
 
 --所有要更新账户余额的地方在这里处理
@@ -2190,6 +2205,11 @@ function UpdateUserBalance(nBalance)
 	end
 	--]]
 	objMainBodyCtrl:UpdateUserBalance(nBalance)
+	--更新球
+	local root = GetSuspendRootCtrol()
+	if root and type(root.UpdateUserBalance) == "function" then
+		root:UpdateUserBalance(nBalance)
+	end
 end
 
 --所有要更新速度的地方在这里处理
@@ -2203,7 +2223,11 @@ function UpdateWorkSpeed(nMiningSpeedPerHour)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	objMainBodyCtrl:UpdateWorkSpeed(nMiningSpeedPerHour)
-	
+	--更新球
+	local root = GetSuspendRootCtrol()
+	if root and type(root.UpdateWorkSpeed) == "function" then
+		root:UpdateWorkSpeed(nMiningSpeedPerHour)
+	end
 end
 
 --所有要更新DAG进度的地方在这里处理
@@ -2227,6 +2251,11 @@ function UpdateMiningState(nMiningState)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	objMainBodyCtrl:UpdateMiningState(nMiningState)
+	--更新球
+	local root = GetSuspendRootCtrol()
+	if root and type(root.UpdateMiningState) == "function" then
+		root:UpdateMiningState(nState)
+	end
 end
 ------------
 --所有要更新工作状态的地方在这里处理
@@ -2240,8 +2269,23 @@ function OnWorkStateChange(nState)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	objMainBodyCtrl:OnWorkStateChange(nState)
+	--更新球
+	local root = GetSuspendRootCtrol()
+	if root and type(root.OnWorkStateChange) == "function" then
+		root:OnWorkStateChange(nState)
+	end
 end
 ------------
+function GetSuspendRootCtrol()
+	local uHostWndMgr = XLGetObject("Xunlei.UIEngine.HostWndManager")
+	local objSuspendWnd = uHostWndMgr:GetHostWnd("GXZB.SuspendWnd.Instance")
+	if objSuspendWnd then
+		local objtreeSuspend = objSuspendWnd:GetBindUIObjectTree()
+		local root = objtreeSuspend:GetUIObject("root")
+		return root
+	end
+end
+
 function NotifyStart()
 	local function StartTask()
 		local strDir = GetModuleDir()

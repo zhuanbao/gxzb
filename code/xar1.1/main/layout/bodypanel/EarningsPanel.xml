@@ -1,119 +1,4 @@
 <xlue>
-	<!--曲线图控件-->
-	<control class="LineChart">
-		<attr_def>
-			<attr name="ColumnColor" type="string"><default>system.red</default></attr>
-		</attr_def>
-		<method_def>
-			<Update file="EarningsPanel.xml.lua" func="LineChartUpdate"/>
-			<OnShowPanel file="EarningsPanel.xml.lua" func="OnShowPanel"/>
-		</method_def>
-		<objtemplate>
-			<children>
-				<obj id="bkg" class="FillObject">
-					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
-						<srccolor>DDDDDD</srccolor>
-					</attr>
-					<children>
-						<obj id="yline" class="FillObject">
-							<attr>
-								<left>0</left>
-								<top>0</top>
-								<width>2</width>
-								<height>father.height</height>
-								<srccolor>system.black</srccolor>
-							</attr>
-						</obj>
-						<obj id="xline" class="FillObject">
-							<attr>
-								<left>0</left>
-								<top>father.height</top>
-								<width>father.width</width>
-								<height>2</height>
-								<srccolor>system.black</srccolor>
-							</attr>
-						</obj>
-						<obj id="linepanel" class="LayoutObject">
-							<attr>
-								<left>0</left>
-								<top>0</top>
-								<width>father.width</width>
-								<height>father.height</height>
-								<zorder>99999</zorder>
-							</attr>
-						</obj>
-					</children>
-				</obj>
-			</children>
-		</objtemplate>
-	</control>
-	<!--曲线图面板-->
-	<control class="LinePanel">
-		<objtemplate>
-			<children>
-				<obj id="bkg" class="FillObject">
-					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
-						<srccolor>DDDDDD</srccolor>
-					</attr>
-					<children>
-						<obj id="LinePanel.HourBtn" class="TipAddin.Button">
-							<attr>
-								<Text>最近24小时</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>(father.width-100*3)/2</left>
-								<top>0</top>
-								<width>100</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickHourBtnLineChart" />
-							</eventlist>	
-						</obj>
-						<obj id="LinePanel.DayBtn" class="TipAddin.Button">
-							<attr>
-								<Text>最近30天</Text>
-								<TextFont>font.text16</TextFont>
-								<TextColor>DDDDDD</TextColor>
-								<left>(father.width-100*3)/2+200</left>
-								<top>0</top>
-								<width>100</width>
-								<height>30</height>
-								<NormalBkgID>setting-btn-normal</NormalBkgID>
-								<DownBkgID>setting-btn-normal</DownBkgID>
-								<HoverBkgID>setting-btn-hover</HoverBkgID>
-								<DisableBkgID>setting-btn-hover</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickDayBtnLineChart" />
-							</eventlist>	
-						</obj>
-						<obj id="LinePanel.LineChart" class="LineChart">
-							<attr>
-								<left>50</left>
-								<top>30+10</top>
-								<width>father.width-50-10</width>
-								<height>father.height-80</height>
-							</attr>	
-						</obj>
-					</children>
-				</obj>
-			</children>
-		</objtemplate>
-	</control>
-	
 	<!--柱形图控件-->
 	<control class="BarChart">
 		<attr_def>
@@ -124,6 +9,7 @@
 		<method_def>
 			<Update file="EarningsPanel.xml.lua" func="BarChartUpdate"/>
 			<UpdateUserBalance file="EarningsPanel.xml.lua" func="UpdateUserBalance"/>
+			<UpdateClientUnBindState file="EarningsPanel.xml.lua" func="UpdateClientUnBindState"/>
 		</method_def>
 		<objtemplate>
 			<children>

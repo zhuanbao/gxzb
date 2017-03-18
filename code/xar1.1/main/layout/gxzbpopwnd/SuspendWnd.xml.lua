@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local FunctionObj = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 function PopupInDeskRightTop(self)
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
@@ -32,23 +32,17 @@ function OnLButtonDbClickSuspend(self, x, y)
 	objHostWnd:BringWindowToTop(true)
 end
 
-function OnLButtonDown(self, x, y)
-	local attr = self:GetAttribute()
-	if not attr.anim then
-		attr.hitpoint = {x, y}
-		self:SetCaptureMouse(true)
-	end
-end
-
-function OnLButtonUp(self, x, y)
-	local attr = self:GetAttribute()
-	attr.hitpoint = nil
-	self:SetCaptureMouse(false)
-end
-
 -------------------------------
 --------以下是控件逻辑---------
 -------------------------------
+function LeftGoldBalance_Click(self)
+	local attr = self:GetAttribute()
+	if attr.currentstate == 2 or attr.currentstate == 5 then
+		local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+		objHostWnd:BringWindowToTop(true)
+	end
+end
+
 function LeftGoldBalance_SetState(self, state)
 	local attr = self:GetAttribute()
 	if state == attr.currentstate then
@@ -108,6 +102,20 @@ function LeftGoldBalance_SetState(self, state)
 		goldtextnumber:SetVisible(false)
 		goldtexthead:SetVisible(false)
 		goldicon:SetResID("suspend-gold-light")
+	end
+end
+
+function SuspendRightDisk_Click(self)
+	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
+	local attr = self:GetAttribute()
+	if attr.currentstate == 1 then
+		if not tFunctionHelper.CheckIsWorking() then
+			tFunctionHelper.NotifyStart()
+		end
+	elseif attr.currentstate == 4 then
+		if tFunctionHelper.CheckIsWorking() then
+			tFunctionHelper.NotifyPause()
+		end
 	end
 end
 
@@ -216,19 +224,151 @@ function SuspendCtrl_UpdateLine(self, nLineValue)
 	strip:SetTextureID(strResHead..tostring(nLineValue))
 end
 
-function OnInitControl(self)
+--1:Start,2:Pause,3:Quit
+function SuspendCtrl_OnWorkStateChange(self, state)
 	local attr = self:GetAttribute()
-	attr.workstate = "work"
-	self:SetState(attr.workstate == "work" and 3 or 0)
+	attr.currentstate = attr.currentstate or 0
+	if state == 1 then
+		if attr.currentstate  <= 2 then
+			local newState = attr.currentstate + 3
+			self:SetState(newState)
+		end
+	elseif state == 2 or state == 3 then
+		if attr.currentstate  >= 3 then
+			local newState = attr.currentstate - 3
+			self:SetState(newState)
+		end
+	end
+end
+
+local MING_MINING_SPEED = 3
+local MING_MINING_EEEOR = 4
+local MING_SOLUTION_FIND = 5
+local MING_MINING_EEEOR_TIMEOUT = 100
+function SuspendCtrl_UpdateMiningState(self, nMiningState)
+	local attr = self:GetAttribute()
+	attr.currentstate = attr.currentstate or 0
 	local RightDisk = self:GetObject("RightDisk")
-	SetTimer(function(item, id)
-		local randnum = math.random(1, 14)
-		RightDisk:UpdateSpeed(randnum)
-	end, 1000)
+	local speedtext = RightDisk:GetObject("speedtext")
+	if nMiningState == MING_MINING_SPEED and  tFunctionHelper.CheckIsWorking() then
+		speedtext:SetText("")
+	elseif nMiningState == MING_CALCULATE_DAG and  tFunctionHelper.CheckIsWorking() then
+		if attr.currentstate  <= 2 then
+			local newState = attr.currentstate + 3
+			self:SetState(newState)
+		end
+		speedtext:SetText("准备中")
+	end
+end
+
+function SuspendCtrl_UpdateWorkSpeed(self, nMiningSpeedPerHour)
+	if type(nMiningSpeedPerHour) ~= "number" then
+		return
+	end
+	local attr = self:GetAttribute()
+	attr.currentstate = attr.currentstate or 0
+	if attr.currentstate  <= 2 then
+		local newState = attr.currentstate + 3
+		self:SetState(newState)
+	end
+	local RightDisk = self:GetObject("RightDisk")
+	local speedtext = RightDisk:GetObject("speedtext")
+	speedtext:SetText(tostring(nMiningSpeedPerHour).."YB/h")
+	local scaleValue = {0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000}
+	local nScale = 13
+	for i, v in ipairs(scaleValue) do
+		if i < #scaleValue and nMiningSpeedPerHour >= v and nMiningSpeedPerHour < scaleValue[i+1] then
+			nScale = i
+			break
+		end
+	end
+	RightDisk:UpdateSpeed(nScale)
+end
+
+function SuspendCtrl_UpdateUserBalance(self, nBalance)
+	if type(nBalance) ~= "number" then
+		return
+	end
+	local scaleValue = {0, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000}
+	local nScale = 9
+	for i, v in ipairs(scaleValue) do
+		if i < #scaleValue and nBalance >= v and nMiningSpeedPerHour < scaleValue[i+1] then
+			nScale = i
+			break
+		end
+	end
+	self:UpdateLine(nScale)
+	--更新灰色余额
+	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
+	local goldtextnumber = LeftGoldBalance:GetObject("goldtextnumber")
+	local strShow
+	if nScale < 10000 then
+		strShow = tostring(nScale)
+	else
+		local nInte, nDeci = math.modf(nScale/10000)
+		local nDeciHold = math.floor(nDeci*100)
+		strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+	end
+	goldtextnumber:SetText(strShow)
+end
+
+function SuspendCtrl_UpdateClientUnBindState(self)
+	--先将状态变成未工作态
+	local attr = self:GetAttribute()
+	attr.currentstate = attr.currentstate or 0
+	if attr.currentstate  > 2 then
+		local newState = attr.currentstate - 3
+		self:SetState(newState)
+	end
+	--更新余额为0
+	self:UpdateLine(0)
+	--清除速度显示
+	local RightDisk = self:GetObject("RightDisk")
+	local speedtext = RightDisk:GetObject("speedtext")
+	speedtext:SetText("")
+	--清除灰色余额
+	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
+	local goldtextnumber = LeftGoldBalance:GetObject("goldtextnumber")
+	goldtextnumber:SetText("")
 end
 
 local minWidth = 82
 local shadowOffset = 10
+function OnLButtonDown(self, x, y)
+	local attr = self:GetAttribute()
+	if not attr.anim then
+		attr.moveflag = false
+		attr.hitpoint = {x, y}
+		self:SetCaptureMouse(true)
+	end
+end
+
+function OnLButtonUp(self, x, y)
+	local attr = self:GetAttribute()
+	--按下了左键且没有拖动， 弹起时则认为是点击操作
+	if not attr.moveflag and attr.hitpoint then
+		local l, t, r, b = self:GetObjPos()
+		local width, height = r - l, b - t
+		--在右边弹起
+		if x >= width - minWidth then
+			local RightDisk = self:GetObject("RightDisk")
+			RightDisk:Click()
+		else
+			--在左边的元宝上弹起
+			if x >= 28 and x <= 76 and y >= 20 and y <= 63 then
+				local LeftGoldBalance = self:GetObject("LeftGoldBalance")
+				LeftGoldBalance:Click()
+			end
+		end
+	end
+	attr.hitpoint = nil
+	self:SetCaptureMouse(false)
+end
+
+function OnInitControl(self)
+	self:SetState(0)
+end
+
 function OnMouseMove(self, x, y)
 	CheckStripAnim(self, false, x, y)
 	local attr = self:GetAttribute()
@@ -255,13 +395,14 @@ function OnMouseMove(self, x, y)
 		local width = r - l
 		--停在右边
 		if x >= width - minWidth then
-			self:SetState(attr.workstate == "work" and 4 or 1)
+			self:SetState(attr.currentstate >= 3 and 4 or 1)
 		--停在左边
 		else
-			self:SetState(attr.workstate == "work" and 5 or 2)
+			self:SetState(attr.currentstate >= 3 and 5 or 2)
 		end
 		return
 	end
+	attr.moveflag = true
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
 	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
@@ -357,7 +498,7 @@ function CheckStripAnim(self, isHide, x, y)
 		return
 	end
 	--在这里处理缩回时隐藏圆盘
-	self:SetState(attr.workstate == "work" and 3 or 0)
+	self:SetState(attr.currentstate >= 3 and 3 or 0)
 	
 	local aniFactory = XLGetObject("Xunlei.UIEngine.AnimationFactory")
 	attr.animstrip = aniFactory:CreateAnimation("PosChangeAnimation")
