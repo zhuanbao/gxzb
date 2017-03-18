@@ -9,9 +9,14 @@
 			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
 			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+			
+			<UpdateClientBindState file="MainBodyCtrl.xml.lua" func="UpdateClientBindState"/>
+			<UpdateClientUnBindState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MainBodyCtrl.xml.lua" func="UpdateUserBalance"/>
 			<UpdateMiningSpeed file="MainBodyCtrl.xml.lua" func="UpdateMiningSpeed"/>
 			<UpdateMiningState file="MainBodyCtrl.xml.lua" func="UpdateMiningState"/>
+			<UpdateDagProgress file="MainBodyCtrl.xml.lua" func="UpdateDagProgress"/>
+			<OnWorkStateChange file="MainBodyCtrl.xml.lua" func="OnWorkStateChange"/>
 		</method_def>
 		<event_def>
 			

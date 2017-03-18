@@ -146,6 +146,40 @@ function GetChildObjByCtrlName(self, strCtrlName)
 	return objCurPanel
 end
 
+function UpdateClientBindState(self)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateClientBindState] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateClientBindState) == "function" then
+			objChild:UpdateClientBindState()
+		end	
+	end
+	return true
+end
+
+function UpdateClientUnBindState(self)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateClientUnBindState] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateClientUnBindState) == "function" then
+			objChild:UpdateClientUnBindState()
+		end	
+	end
+	return true
+end
+
 function UpdateUserBalance(self, nBalance)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
@@ -180,7 +214,8 @@ function UpdateMiningSpeed(self, nSpeed)
 	return true
 end
 
-function UpdateMiningState(self, nState, nParam)
+
+function UpdateMiningState(self, nMiningState)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
 		TipLog("[UpdateMiningState] get objPanelCenter failed ")
@@ -191,7 +226,41 @@ function UpdateMiningState(self, nState, nParam)
 	for i=0,nChildCnt-1 do
 		local objChild = objPanelCenter:GetChildByIndex(i)
 		if objChild and type(objChild.UpdateMiningState) == "function" then
-			objChild:UpdateMiningState(nState, nParam)
+			objChild:UpdateMiningState(nMiningState)
+		end	
+	end
+	return true
+end
+
+function UpdateDagProgress(self, nProgress)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateDagProgress] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateDagProgress) == "function" then
+			objChild:UpdateDagProgress(nProgress)
+		end	
+	end
+	return true
+end
+
+function OnWorkStateChange(self, nState)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[OnWorkStateChange] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.OnWorkStateChange) == "function" then
+			objChild:OnWorkStateChange(nState)
 		end	
 	end
 	return true

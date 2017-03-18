@@ -4,10 +4,13 @@
 			<attr name="bHasInit" type="bool"/>
 		</attr_def>
 		<method_def>
-			<ChangeBindEntryVisible file="MiningPanel.xml.lua" func="ChangeBindEntryVisible"/>
+			<UpdateClientBindState file="MiningPanel.xml.lua" func="UpdateClientBindState"/>
+			<UpdateClientUnBindState file="MiningPanel.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MiningPanel.xml.lua" func="UpdateUserBalance"/>
 			<UpdateMiningSpeed file="MiningPanel.xml.lua" func="UpdateMiningSpeed"/>
 			<UpdateMiningState file="MiningPanel.xml.lua" func="UpdateMiningState"/>
+			<UpdateDagProgress file="MiningPanel.xml.lua" func="UpdateDagProgress"/>
+			<OnWorkStateChange file="MiningPanel.xml.lua" func="OnWorkStateChange"/>
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 		</method_def>
 		<event_def>
@@ -70,7 +73,7 @@
 								<DownBkgID>texture.MainPanel.StopMining.down</DownBkgID>
 								<HoverBkgID>texture.MainPanel.StopMining.hover</HoverBkgID>
 								<DisableBkgID>texture.MainPanel.StopMining.normal</DisableBkgID>
-								<Visible>true</Visible>
+								<Visible>false</Visible>
 							</attr>									
 							<eventlist>
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
@@ -92,7 +95,7 @@
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStartMining" />
 							</eventlist>
 						</obj>
-						<obj id="MiningPanel.Panel.Preparing" class="TextObject">
+						<obj id="MiningPanel.Panel.StartBtn.Text" class="TextObject">
 							<attr>
 								<left>(father.width-220)/2+(220-100)/2</left>
 								<top>94+(220-24)/2</top>
@@ -102,7 +105,7 @@
 								<halign>center</halign>
 								<textcolor>system.white</textcolor>
 								<font>font.text22</font>
-								<text>准备中</text>
+								<text>开始赚宝</text>
 								<zorder>99999999</zorder>
 							</attr>
 						</obj>
@@ -156,7 +159,7 @@
 								</obj>
 							</children>
 						</obj>
-						<obj id="MiningPanel.Panel.MiningState" class="TextObject">
+						<!--obj id="MiningPanel.Panel.MiningState" class="TextObject">
 							<attr>
 								<left>10</left>
 								<top>356+42</top>
@@ -170,7 +173,7 @@
 								<multiline>1</multiline>
 								<visible>0</visible>
 							</attr>
-						</obj>
+						</obj-->
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>

@@ -21,9 +21,7 @@ local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 -- 工作中用到的
 local g_bWorking = false
 local g_WorkingTimerId = nil
---local g_WorkingFailCounter = 30  --30秒无状态就表示失败
 local g_PreWorkState = 0
---local g_WorkModel = 1 -- 默认智能
 
 --服务端信息
 local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
@@ -217,7 +215,6 @@ function RegisterFunctionObject(self)
 	obj.PopTipPre4Hour = PopTipPre4Hour
 	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
-	obj.SetMinerInfo = SetMinerInfo
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
 	obj.GetUserWorkID = GetUserWorkID
 	obj.GetMainHostWnd = GetMainHostWnd
@@ -2018,36 +2015,6 @@ function SetMachineNameChangeInfo()
 	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 end
 
-function SetMinerInfo(strText)
-	local wnd = GetMainHostWnd()
-	if not wnd then
-		return
-	end
-	local objtree = wnd:GetBindUIObjectTree()
-	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
-	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	--设置工作进程状态信息
-end
-
-function UpdateWorkSpeed(strSpeed)
-	TipLog("[QuerySvrForPushCalcInfo] strSpeed = " .. tostring(strSpeed))
-	local nSpeed = tonumber(strSpeed) or 0
-	gCurrentWorkSpeed = nSpeed
-	local strSpeed = FormatHashRate(nSpeed)
-	UpdateSpeed2SuspendUI(strSpeed)
-end
-
-function UpdateSpeed2SuspendUI(nSpeed)
-	local SuspendWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
-	if SuspendWnd and SuspendWnd:GetVisible() then
-		local objtree = SuspendWnd:GetBindUIObjectTree()
-		local textShowSpeed = objtree:GetUIObject("SuspendWnd.ShowSpeed")
-		if textShowSpeed then
-			textShowSpeed:SetText(tostring(nSpeed).."/S")
-		end
-	end
-end
-
 function InitMachName()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
@@ -2153,7 +2120,33 @@ end
 2.退出挖矿
 3.更新UI
 --]]
-function ChangeBindWeiXinEntryVisible(bVisible)
+function UnBindingClientFromClient()
+	SendMinerInfoToServer(GetUnBindUrl(),3)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tUserInfo"] = nil
+	SaveConfigToFileByKey("tUserConfig")
+	ChangeClientTitle("共享赚宝 (未绑定)")
+	if CheckIsWorking() then
+		NotifyQuit()
+	end
+	UpdateClientUnBindState()
+end
+
+function UnBindingClientFromServer()
+	--不用再发统计了
+	--SendMinerInfoToServer(GetUnBindUrl(),3)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tUserInfo"] = nil
+	SaveConfigToFileByKey("tUserConfig")
+	ChangeClientTitle("共享赚宝(未绑定)")
+	if CheckIsWorking() then
+		NotifyQuit()
+	end
+	UpdateClientUnBindState()
+end
+
+--所有要处理绑定后信息的地方在这里处理
+function UpdateClientBindState()
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
@@ -2161,57 +2154,23 @@ function ChangeBindWeiXinEntryVisible(bVisible)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	local ObjMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
-	if ObjMiningPanel then
-		ObjMiningPanel:ChangeBindEntryVisible(bVisible)
-	end
+	objMainBodyCtrl:UpdateClientBindState()
 end
 
-function UnBindingClientFromClient()
-	SendMinerInfoToServer(GetUnBindUrl(),3)
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	--[[
-	if type(tUserConfig["tUserInfo"]) ~= "table" then
-		tUserConfig["tUserInfo"] = {}
+--所有要处理解绑后信息的地方在这里处理
+function UpdateClientUnBindState()
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
 	end
-	for strKey, strValue in pairs(tUserConfig["tUserInfo"]) do
-		if strKey ~= "strWorkID" then
-			tUserConfig["tUserInfo"][strKey] = nil
-		end
-	end
-	--]]
-	tUserConfig["tUserInfo"] = nil
-	SaveConfigToFileByKey("tUserConfig")
-	ChangeClientTitle("共享赚宝 (未绑定)")
-	if CheckIsWorking() then
-		NotifyQuit()
-	end
-	ChangeBindWeiXinEntryVisible(false)
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	UpdateUserBalance(0)
+	objMainBodyCtrl:UpdateClientUnBindState()
 end
 
-function UnBindingClientFromServer()
-	--不用再发统计了
-	--SendMinerInfoToServer(GetUnBindUrl(),3)
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	--[[
-	if type(tUserConfig["tUserInfo"]) ~= "table" then
-		tUserConfig["tUserInfo"] = {}
-	end
-	for strKey, strValue in pairs(tUserConfig["tUserInfo"]) do
-		if strKey ~= "strWorkID" then
-			tUserConfig["tUserInfo"][strKey] = nil
-		end
-	end
-	--]]
-	tUserConfig["tUserInfo"] = nil
-	SaveConfigToFileByKey("tUserConfig")
-	ChangeClientTitle("共享赚宝(未绑定)")
-	if CheckIsWorking() then
-		NotifyQuit()
-	end
-	ChangeBindWeiXinEntryVisible(false)
-end
-
+--所有要更新账户余额的地方在这里处理
 function UpdateUserBalance(nBalance)
 	--在注册记录一下， 方便卸载时判断余额
 	RegSetValue("HKEY_CURRENT_USER\\Software\\gxzb\\balance", nBalance)
@@ -2231,38 +2190,65 @@ function UpdateUserBalance(nBalance)
 	objMainBodyCtrl:UpdateUserBalance(nBalance)
 end
 
+--所有要更新速度的地方在这里处理
+function UpdateWorkSpeed(nMiningSpeedPerHour)
+	TipLog("[UpdateWorkSpeed] nMiningSpeedPerHour = " .. tostring(nMiningSpeedPerHour))
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateWorkSpeed(nMiningSpeedPerHour)
+	
+end
 
+--所有要更新DAG进度的地方在这里处理
+function UpdateDagProgress(nProgress)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateDagProgress(nProgress)
+end
+--所有要更新Mining状态的地方在这里处理
+function UpdateMiningState(nMiningState)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateMiningState(nMiningState)
+end
 ------------
-function NotifyPause()
-	IPCUtil:StopWork()
-	if g_WorkingTimerId then
-		timeMgr:KillTimer(g_WorkingTimerId)
-		g_WorkingTimerId = nil
-	end	
-	g_bWorking = false
-	g_PreWorkState = 0
-	--g_WorkModel = 1
+--所有要更新工作状态的地方在这里处理
+--1:Start,2:Pause,3:Quit
+function OnWorkStateChange(nState)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:OnWorkStateChange(nState)
 end
-
-function NotifyQuit()
-	IPCUtil:Quit()
-	if g_WorkingTimerId then
-		timeMgr:KillTimer(g_WorkingTimerId)
-		g_WorkingTimerId = nil
-	end	
-	g_bWorking = false
-	g_PreWorkState = 0
-	--g_WorkModel = 1
-end
-
+------------
 function NotifyStart()
 	local function StartTask()
 		local strDir = GetModuleDir()
-		local strWorkExe = tipUtil:PathCombine(strDir,"Ethminer.exe")
+		local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
 		local strCmdLine = strWorkExe .. " " .. "-F " .. g_strPoolUrl
 		g_bWorking = true
-		IPCUtil:StartWork(strCmdLine)
+		IPCUtil:Start(strCmdLine)
 		WorkingTimerHandle()
+		OnWorkStateChange(1)
 	end
 	if g_strPoolUrl then
 		StartTask()
@@ -2277,6 +2263,29 @@ function NotifyStart()
 	end
 end
 
+function NotifyPause()
+	IPCUtil:Pause()
+	if g_WorkingTimerId then
+		timeMgr:KillTimer(g_WorkingTimerId)
+		g_WorkingTimerId = nil
+	end	
+	g_bWorking = false
+	g_PreWorkState = 0
+	OnWorkStateChange(2)
+end
+
+function NotifyQuit()
+	IPCUtil:Quit()
+	if g_WorkingTimerId then
+		timeMgr:KillTimer(g_WorkingTimerId)
+		g_WorkingTimerId = nil
+	end	
+	g_bWorking = false
+	g_PreWorkState = 0
+	OnWorkStateChange(3)
+end
+
+local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
@@ -2285,7 +2294,10 @@ local MING_MINING_EEEOR_TIMEOUT = 100
 function GetToolTipInfo()
 	local bShowSpeed = false
 	local strText = ""
-	if g_PreWorkState == MING_MINING_SPEED
+	if g_PreWorkState == MING_CALCULATE_DAG then
+		strText = "准备中"
+		bShowSpeed = true
+	elseif g_PreWorkState == MING_MINING_SPEED
 		or g_PreWorkState == MING_SOLUTION_FIND then
 		strText = "运行中"
 		bShowSpeed = true
@@ -2301,13 +2313,25 @@ end
 	
 function QueryAndUpdateWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
-	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))	
-	if nType == MING_MINING_SPEED then
+	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))
+	if nType == MING_CALCULATE_DAG then
+		if g_PreWorkState ~= MING_CALCULATE_DAG then
+			UpdateWorkState(MING_CALCULATE_DAG)
+		end
+		g_PreWorkState = MING_CALCULATE_DAG
+		if tonumber(p1) ~= nil then
+			UpdateDagProgress(p1)
+		end
+		return true
+	elseif nType == MING_MINING_SPEED then
+		if g_PreWorkState ~= MING_MINING_SPEED then
+			UpdateWorkState(MING_MINING_SPEED)
+		end
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
 			g_SpeedSum = g_SpeedSum + p1
 			g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed*3600)
-			--UpdateWorkSpeed(g_MiningSpeedPerHour)
+			UpdateWorkSpeed(g_MiningSpeedPerHour)
 		end	
 		return true
 	elseif nType == MING_MINING_EEEOR then
@@ -2323,12 +2347,8 @@ function QueryAndUpdateWorkState()
 end
 --[[
 0 全速，1智能
---智能模式下 
---a)当前为低速状态切换为高速态条件（60秒内无输入且当前为非全屏状态）+10%
-	且每隔30秒再加10%(前提是继续满足条件，最大为90%)
-  b)当前为高速状态切换为低速态条件(60秒内有输入或者当前为全屏状态)速度降低到10%
 --]]
-local g_CurrentPrecent = 100
+local g_CurrentPerBatch = 0
 function LimitSpeedCond()
 	if tipUtil:IsNowFullScreen() then
 		TipLog("[LimitSpeedCond] full screen")
@@ -2343,36 +2363,31 @@ function LimitSpeedCond()
 	return false
 end
 
---函数5秒调一次，
-local g_ChangeSpeedCounter = 0
+--函数5秒调一次
+local g_GlobalWorkSizeMultiplier = 100
+local g_msMaxPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
 function ChangeMiningSpeed()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
 	if nWorkModel ~= 1 then
-		g_ChangeSpeedCounter = 0
-		if g_CurrentPrecent ~= 100 then
-			g_CurrentPrecent = 100
-			IPCUtil:ControlSpeed(g_CurrentPrecent)
+		if g_CurrentPerBatch ~= 0 then
+			g_CurrentPerBatch = 0
+			IPCUtil:ControlSpeed(2048,g_CurrentPerBatch)
 		end	
 	else
 		if LimitSpeedCond() then
-			g_ChangeSpeedCounter = 0
-			if g_CurrentPrecent ~= 10 then
-			 g_CurrentPrecent = 10
-			 IPCUtil:ControlSpeed(g_CurrentPrecent)
+			if g_CurrentPerBatch < g_msMaxPerBatch then
+				g_CurrentPerBatch = g_CurrentPerBatch+10
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier,g_CurrentPerBatch)
 			end
 		else
-			if g_CurrentPrecent < 90 then
-				if g_ChangeSpeedCounter > 8 then
-					g_CurrentPrecent = g_CurrentPrecent + 20
-					if g_CurrentPrecent > 90 then
-						g_CurrentPrecent = 90
-					end
-					IPCUtil:ControlSpeed(g_CurrentPrecent)
-					g_ChangeSpeedCounter = 0
-				end	
+			if g_CurrentPerBatch > 0 then
+				g_CurrentPerBatch = g_CurrentPerBatch - 10
+				if g_CurrentPerBatch < 0 then
+					g_CurrentPerBatch = 0
+				end
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier, g_CurrentPerBatch)
 			end
-			g_ChangeSpeedCounter = g_ChangeSpeedCounter + 1
 		end	
 	end
 end
