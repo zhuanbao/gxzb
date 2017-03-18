@@ -18,8 +18,8 @@ public:
 	static void RegisterObj(XL_LRT_ENV_HANDLE hEnv);
 
 public:
-	static int StartWork(lua_State* pLuaState);
-	static int StopWork(lua_State* luaState);
+	static int Start(lua_State* pLuaState);
+	static int Pause(lua_State* luaState);
 	static int Quit(lua_State* pLuaState);
 	static int QueryWorkState(lua_State* pLuaState);
 	static int ControlSpeed(lua_State* pLuaState);

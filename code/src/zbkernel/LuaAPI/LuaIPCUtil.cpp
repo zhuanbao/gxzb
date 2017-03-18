@@ -36,8 +36,8 @@ LuaIPCUtil::~LuaIPCUtil(void)
 
 XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] = 
 {
-	{"StartWork", StartWork},
-	{"StopWork", StopWork},
+	{"Start", Start},
+	{"Pause", Pause},
 	{"Quit", Quit},
 	{"ControlSpeed",ControlSpeed},
 	{"QueryWorkState",QueryWorkState},
@@ -175,7 +175,7 @@ UINT WINAPI PipeProc(PVOID pArg)
 }
 
 #define REDIRECTPATH DEFAULT_LOGFILE_PATH"\\WorkRedirect.txt"
-int LuaIPCUtil::StartWork(lua_State* pLuaState)
+int LuaIPCUtil::Start(lua_State* pLuaState)
 {
 	if (NULL == m_hPipeQuitEvent)
 	{
@@ -237,7 +237,7 @@ int LuaIPCUtil::StartWork(lua_State* pLuaState)
 }
 
 
-int LuaIPCUtil::StopWork(lua_State* pLuaState)
+int LuaIPCUtil::Pause(lua_State* pLuaState)
 {
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
 	if (hWnd)
@@ -377,13 +377,14 @@ int LuaIPCUtil::IsWorkProcessRunning(lua_State* pLuaState)
 
 int LuaIPCUtil::ControlSpeed(lua_State* pLuaState)
 {
-	UINT uPrecent = (DWORD)lua_tointeger(pLuaState, 2);
+	UINT _globalWorkSizeMultiplier = (DWORD)lua_tointeger(pLuaState, 2);
+	UINT _msPerBatch = (DWORD)lua_tointeger(pLuaState, 3);
 	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
 	if (hWnd)
 	{
 		//SendMessageA(hWnd,WM_USER_CONTRAL_SPEED,(WPARAM)uPrecent,0);
 		//PostMessageA(hWnd,WM_USER_CONTRAL_SPEED,(WPARAM)uPrecent,0);
-		SendMessageTimeout(hWnd, WM_USER_CONTRAL_SPEED, (WPARAM)uPrecent, 0, SMTO_ABORTIFHUNG, 200, NULL);
+		SendMessageTimeout(hWnd, WM_USER_CONTRAL_SPEED, (WPARAM)_globalWorkSizeMultiplier, (LPARAM)_msPerBatch, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	return 0;
 }
