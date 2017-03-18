@@ -81,7 +81,12 @@ end
 
 function ResetUIVisible(OwnerCtrl)
 	local ImgTmpCode = OwnerCtrl:GetControlObject("QRCodePanel.Panel.QRCode.TmpCode")
-	ImgTmpCode:SetResID("GXZB.QRCodePanel.QRCode.Default")
+	local objDefault = objGraphicFac:CreateBitmap("ARGB32", 182, 182)
+	local clorDefault = objGraphicFac:CreateColor(0, 0, 0, 127)
+	if objDefault and clorDefault then
+		objDefault:Fill(clorDefault)
+		ImgTmpCode:SetBitmap(objDefault)
+	end
 	ShowCtrl(OwnerCtrl, nil)
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	textActiveTime:SetVisible(false)

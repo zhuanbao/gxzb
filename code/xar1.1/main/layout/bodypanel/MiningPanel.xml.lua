@@ -50,9 +50,7 @@ function OnClickStopMining(self)
 		ResetUIVisible(OwnerCtrl)
 		tFunctionHelper.NotifyPause()
 		StartAnim(self, false)
-	else
-		tFunctionHelper.NotifyStart()
-		StartAnim(self, true)
+		self:Show(false)
 	end
 end
 
@@ -60,6 +58,8 @@ function OnClickStartMining(self)
 	if not tFunctionHelper.CheckIsWorking() then
 		tFunctionHelper.NotifyStart()
 		StartAnim(self, true)
+		local objstopbtn = self:GetObject("control:MiningPanel.Panel.StopBtn")
+		objstopbtn:Show(true)
 	end
 end
 
@@ -159,12 +159,7 @@ function ShowPreparingText(self)
 		ObjPreparingText:SetVisible(true)
 	end
 	local objstopbtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
-	local objstopattr = objstopbtn:GetAttribute()
-	objstopattr.NormalBkgID = "texture.MainPanel.StopMining.normal"
-	objstopattr.HoverBkgID = "texture.MainPanel.StopMining.hover"
-	objstopattr.DownBkgID = "texture.MainPanel.StopMining.down"
-	objstopattr.DisableBkgID = "texture.MainPanel.StopMining.normal"
-	objstopbtn:Updata()
+	objstopbtn:Show(true)
 	local strText = "准备中"
 	local nCounter = 0
 	g_TimeIDPreparing = timeMgr:SetTimer(function(Itm, id)
@@ -199,12 +194,7 @@ function ResetUIVisible(OwnerCtrl)
 	ObjMiningState:SetVisible(false)
 	ObjMiningState:SetText("")
 	local objstopbtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
-	local objstopattr = objstopbtn:GetAttribute()
-	objstopattr.NormalBkgID = "texture.MainPanel.MiniStartMining.normal"
-	objstopattr.HoverBkgID = "texture.MainPanel.MiniStartMining.hover"
-	objstopattr.DownBkgID = "texture.MainPanel.MiniStartMining.down"
-	objstopattr.DisableBkgID = "texture.MainPanel.MiniStartMining.normal"
-	objstopbtn:Updata()
+	objstopbtn:Show(false)
 	g_CanShowBindEntry = true
 	ChangeBindEntryVisible(OwnerCtrl)
 end

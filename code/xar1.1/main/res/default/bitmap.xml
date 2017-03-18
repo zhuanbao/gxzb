@@ -49,7 +49,6 @@
 		<bitmap id="GXZB.TakeCashPanel.RMB" image="bitmap\GXZB.TakeCashPanel.RMB.png" />
 		
 		<texture id="GXZB.QRCodePanel.QRCodeBkg" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCodeBkg.png" />
-		<bitmap id="GXZB.QRCodePanel.QRCode.Default" image="bitmap\GXZB.QRCodePanel.QRCode.Default.jpg" />
 		<texture id="GXZB.QRCodePanel.QRCode.FailedBKG" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCode.FailedBKG.png" />
 		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
 		
