@@ -459,7 +459,7 @@ function TipMain()
 	end
 	CheckMachineBindState()
 	--显示悬浮框
-	FunctionObj.ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
+	FunctionObj.ShowSuspendWnd()
 	--ShowPopWndByCommand()
 end
 

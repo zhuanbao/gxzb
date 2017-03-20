@@ -214,6 +214,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
+	obj.ShowSuspendWnd = ShowSuspendWnd
 	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
@@ -1038,15 +1039,30 @@ function HideTray()
 	end
 end
 
-function PopTipPre4Hour()
-	SetTimer(function(item, id)
-		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-		g_LastRemindBalance = g_Balance
-		local nTipPopIntervalMs  = g_ServerConfig["nTipPopIntervalMs"] or 4*3600*1000
-		if tUserConfig["nMoneyPer4Hour"] and tonumber(tUserConfig["nMoneyPer4Hour"]) and tonumber(tUserConfig["nMoneyPer4Hour"]) > 0 then
-			ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+--scene:0或nil 启动时 1赚宝时
+function ShowSuspendWnd(scene)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
+	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
+	local nState = tUserConfig["tConfig"]["ShowBall"]["nState"]
+	local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
+	if nState == nil or nState == 0 then
+		ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
+	elseif nState == 1 then
+		local SuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
+		if SuspendWnd then
+			SuspendWnd:Show(0)
 		end
-	end, nTipPopIntervalMs)
+	elseif scene == 1 and nState == 2 then
+		if not CheckIsWorking() then
+			local SuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
+			if SuspendWnd then
+				SuspendWnd:Show(0)
+			end
+		else
+			ShowPopupWndByName("GXZB.SuspendWnd.Instance",  true)
+		end
+	end
 end
 
 function ShowIntroduceOnce()
@@ -1863,7 +1879,7 @@ function QuerySvrForGetHistoryInfo(ntype)
 end
 
 --查询收益接口,ntype = 0 最近24小时，1 最近1个月
---不同整点才回去请求，否则使用本地
+--不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
 function GetHistoryToServer(ntype, fnCallBack)
 	local function CheckLastUTC(utc)
@@ -1939,6 +1955,61 @@ function GetHistoryToServer(ntype, fnCallBack)
 			fnCallBack(false, GetLocal(tEarnings))
 		end	
 	end)
+end
+
+function QuerySvrForNewGetGold()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tUserInfo"] = tUserConfig["tUserInfo"] or {}
+	if not tUserConfig["tUserInfo"]["strWorkID"] then
+		TipLog("[QuerySvrForNewGetGold] strWorkID = nil")
+		return
+	end
+	local strInterfaceName = "getNewGetGold"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForNewGetGold] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function PopTipPre4Hour()
+	local nTipPopIntervalMs  = g_ServerConfig["nTipPopIntervalMs"] or 4*3600*1000
+	SetTimer(
+		function(item, id)
+			local strUrl = QuerySvrForNewGetGold()
+			if IsRealString(strUrl) then
+				NewAsynGetHttpContent(strUrl, false
+				, function(nRet, strContent, respHeaders)
+					TipLog("[PopTipPre4Hour] nRet:"..tostring(nRet)
+							.." strContent:"..tostring(strContent))
+							
+					if 0 == nRet then
+						local tabInfo = DeCodeJson(strContent)
+						if type(tabInfo) ~= "table" 
+							or tabInfo["rtn"] ~= 0
+							or type(tabInfo["data"]) ~= "table" then
+							TipLog("[PopTipPre4Hour] tabInfo not right")
+							return
+						end
+						local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+						tUserConfig["nMoneyPer4Hour"] = tabInfo["data"]["newgetgold"]
+						SaveConfigToFileByKey("tUserConfig")
+						ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+					else
+						TipLog("[PopTipPre4Hour] nRet = "..tostring(nRet))
+					end
+				end)
+			end
+			--[[local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+			if tUserConfig["nMoneyPer4Hour"] and tonumber(tUserConfig["nMoneyPer4Hour"]) and tonumber(tUserConfig["nMoneyPer4Hour"]) > 0 then
+				ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+			end]]
+		end,	
+	nTipPopIntervalMs)
 end
 
 --挖矿信息
@@ -2292,6 +2363,8 @@ function NotifyStart()
 		local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
 		local strCmdLine = strWorkExe .. " " .. g_strCmdLineFormat
 		g_bWorking = true
+		--更新球的显示状态
+		ShowSuspendWnd(1)
 		IPCUtil:Start(strCmdLine)
 		WorkingTimerHandle()
 		OnWorkStateChange(1)
@@ -2316,6 +2389,8 @@ function NotifyPause()
 		g_WorkingTimerId = nil
 	end	
 	g_bWorking = false
+	--更新球的显示状态
+	ShowSuspendWnd(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(2)
 end
@@ -2327,6 +2402,8 @@ function NotifyQuit()
 		g_WorkingTimerId = nil
 	end	
 	g_bWorking = false
+	--更新球的显示状态
+	ShowSuspendWnd(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(3)
 end
