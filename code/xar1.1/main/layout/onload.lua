@@ -459,7 +459,7 @@ function TipMain()
 	end
 	CheckMachineBindState()
 	--显示悬浮框
-	FunctionObj.ShowSuspendWnd()
+	FunctionObj.UpdateSuspendWndVisible()
 	--ShowPopWndByCommand()
 end
 

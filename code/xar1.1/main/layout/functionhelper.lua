@@ -214,7 +214,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
-	obj.ShowSuspendWnd = ShowSuspendWnd
+	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
 	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
 	obj.UpdateWorkSpeed = UpdateWorkSpeed
@@ -1040,7 +1040,7 @@ function HideTray()
 end
 
 --scene:0或nil 启动时 1赚宝时
-function ShowSuspendWnd(scene)
+function UpdateSuspendWndVisible(scene)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
 	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
@@ -2364,7 +2364,7 @@ function NotifyStart()
 		local strCmdLine = strWorkExe .. " " .. g_strCmdLineFormat
 		g_bWorking = true
 		--更新球的显示状态
-		ShowSuspendWnd(1)
+		UpdateSuspendWndVisible(1)
 		IPCUtil:Start(strCmdLine)
 		WorkingTimerHandle()
 		OnWorkStateChange(1)
@@ -2390,7 +2390,7 @@ function NotifyPause()
 	end	
 	g_bWorking = false
 	--更新球的显示状态
-	ShowSuspendWnd(1)
+	UpdateSuspendWndVisible(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(2)
 end
@@ -2403,7 +2403,7 @@ function NotifyQuit()
 	end	
 	g_bWorking = false
 	--更新球的显示状态
-	ShowSuspendWnd(1)
+	UpdateSuspendWndVisible(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(3)
 end
