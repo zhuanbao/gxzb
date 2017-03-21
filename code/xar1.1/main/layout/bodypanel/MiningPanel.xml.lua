@@ -38,7 +38,7 @@ function UpdateMiningSpeed(self, nSpeed)
 	if not ObjMiningSpeed:GetVisible() then
 		ObjMiningSpeed:SetChildrenVisible(true)
 		ObjMiningSpeed:SetVisible(true)
-		ShowAnim(self, false)
+		ShowAnim(self, true)
 	end	
 	local ObjMiningState = self:GetControlObject("MiningPanel.Panel.MiningState")	
 	local ObjTextSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed.Speed")
@@ -58,7 +58,7 @@ function UpdateMiningState(self,nMiningState)
 		if not ObjMiningSpeed:GetVisible() then
 			ObjMiningSpeed:SetChildrenVisible(true)
 			ObjMiningSpeed:SetVisible(true)
-			ShowAnim(self, false)
+			ShowAnim(self, true)
 		end
 	elseif nMiningState == MING_CALCULATE_DAG and  tFunctionHelper.CheckIsWorking() then
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
