@@ -46,7 +46,7 @@ function UpdateMiningSpeed(self, nSpeed)
 	ObjTextSpeed:SetText(strSpeed)
 	AdjustSpeedTextPosition(self)
 end
-
+local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
