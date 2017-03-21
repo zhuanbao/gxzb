@@ -174,7 +174,68 @@ UINT WINAPI PipeProc(PVOID pArg)
 	return 0;
 }
 
-#define REDIRECTPATH DEFAULT_LOGFILE_PATH"\\WorkRedirect.txt"
+//#define REDIRECTPATH DEFAULT_LOGFILE_PATH"\\WorkRedirect.txt"
+//int LuaIPCUtil::Start(lua_State* pLuaState)
+//{
+//	if (NULL == m_hPipeQuitEvent)
+//	{
+//		m_hPipeQuitEvent = CreateEventA(NULL, TRUE, FALSE, PIPE_QUIT_EVENT);
+//	}
+//	else
+//	{
+//		 ResetEvent(m_hPipeQuitEvent);
+//	}
+//	long lRet = 0;
+//	const char* pParams = lua_tostring(pLuaState, 2);
+//	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
+//	TSDEBUG4CXX(L"StartWork FindWindowA" << hWnd); 
+//	if (NULL == hWnd && NULL != pParams)
+//	{
+//		CComBSTR bstrParams;
+//		LuaStringToCComBSTR(pParams,bstrParams);
+//
+//		STARTUPINFO si;
+//		PROCESS_INFORMATION pi;
+//		ZeroMemory( &si, sizeof(si) );
+//		si.cb = sizeof(si);	
+//		GetStartupInfo(&si);
+//		if (!ISTSDEBUGVALID())
+//		{
+//			//日志可打印 则显示控制台窗口
+//			si.dwFlags =STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;  
+//			si.wShowWindow =SW_HIDE;//隐藏控制台窗口 
+//		}
+//		ZeroMemory( &pi, sizeof(pi) );
+//		// Start the child process. 
+//		if(CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, FALSE, NULL, NULL, NULL,&si,	&pi ))
+//		{
+//			lRet = 1;
+//			m_hWorkProcess = pi.hProcess;
+//		}
+//		else
+//		{
+//			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
+//		}
+//	}
+//	else
+//	{
+//		//SendMessageA(hWnd,WM_USER_START,0,0);
+//		//PostMessageA(hWnd,WM_USER_START,0,0);
+//		SendMessageTimeout(hWnd, WM_USER_START, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
+//		lRet = 1;
+//	}
+//	if (lRet && (NULL == m_hPipeThread || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hPipeThread, 0)))
+//	{
+//		if (m_hPipeThread)
+//		{
+//			::CloseHandle(m_hPipeThread);
+//		}
+//		m_hPipeThread = (HANDLE)_beginthreadex(NULL, 0, PipeProc, NULL, 0, NULL);
+//	}
+//	lua_pushboolean(pLuaState, lRet);
+//	return 1;
+//}
+
 int LuaIPCUtil::Start(lua_State* pLuaState)
 {
 	if (NULL == m_hPipeQuitEvent)
@@ -185,57 +246,53 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 	{
 		 ResetEvent(m_hPipeQuitEvent);
 	}
+	if ((m_hPipeThread !=NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hPipeThread, 0)))
+	{
+		TerminateThread(m_hPipeThread,-2);
+		::CloseHandle(m_hPipeThread);
+		m_hPipeThread = NULL;
+	}
+	if (m_hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hWorkProcess, 0))
+	{
+		TerminateProcess(m_hWorkProcess,-2);
+		::CloseHandle(m_hWorkProcess);
+		m_hWorkProcess = NULL;
+	}
 	long lRet = 0;
 	const char* pParams = lua_tostring(pLuaState, 2);
-	HWND hWnd = FindWindowA(MSG_WND_CALSS, NULL);
-	TSDEBUG4CXX(L"StartWork FindWindowA" << hWnd); 
-	if (NULL == hWnd && NULL != pParams)
-	{
-		CComBSTR bstrParams;
-		LuaStringToCComBSTR(pParams,bstrParams);
+	CComBSTR bstrParams;
+	LuaStringToCComBSTR(pParams,bstrParams);
 
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-		ZeroMemory( &si, sizeof(si) );
-		si.cb = sizeof(si);	
-		GetStartupInfo(&si);
-		if (!ISTSDEBUGVALID())
-		{
-			//日志可打印 则显示控制台窗口
-			si.dwFlags =STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;  
-			si.wShowWindow =SW_HIDE;//隐藏控制台窗口 
-		}
-		ZeroMemory( &pi, sizeof(pi) );
-		// Start the child process. 
-		if(CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, FALSE, NULL, NULL, NULL,&si,	&pi ))
-		{
-			lRet = 1;
-			m_hWorkProcess = pi.hProcess;
-		}
-		else
-		{
-			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
-		}
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory( &si, sizeof(si) );
+	si.cb = sizeof(si);	
+	GetStartupInfo(&si);
+	if (!ISTSDEBUGVALID())
+	{
+		//日志可打印 则显示控制台窗口
+		si.dwFlags =STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;  
+		si.wShowWindow =SW_HIDE;//隐藏控制台窗口 
+	}
+	ZeroMemory( &pi, sizeof(pi) );
+	// Start the child process. 
+	if(CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, FALSE, NULL, NULL, NULL,&si,	&pi ))
+	{
+		lRet = 1;
+		m_hWorkProcess = pi.hProcess;
 	}
 	else
 	{
-		//SendMessageA(hWnd,WM_USER_START,0,0);
-		//PostMessageA(hWnd,WM_USER_START,0,0);
-		SendMessageTimeout(hWnd, WM_USER_START, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
-		lRet = 1;
+		TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
 	}
-	if (lRet && (NULL == m_hPipeThread || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hPipeThread, 0)))
+
+	if (lRet)
 	{
-		if (m_hPipeThread)
-		{
-			::CloseHandle(m_hPipeThread);
-		}
 		m_hPipeThread = (HANDLE)_beginthreadex(NULL, 0, PipeProc, NULL, 0, NULL);
 	}
 	lua_pushboolean(pLuaState, lRet);
 	return 1;
 }
-
 
 int LuaIPCUtil::Pause(lua_State* pLuaState)
 {
@@ -246,6 +303,17 @@ int LuaIPCUtil::Pause(lua_State* pLuaState)
 		//PostMessageA(hWnd,WM_USER_PAUSE,0,0);
 		SendMessageTimeout(hWnd, WM_USER_PAUSE, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
+	SetEvent(m_hPipeQuitEvent);
+	/*if (m_hPipeThread)
+	{
+		CloseHandle(m_hPipeThread);
+		m_hPipeThread = NULL;
+	}
+	if (m_hWorkProcess)
+	{
+		CloseHandle(m_hWorkProcess);
+		m_hWorkProcess = NULL;
+	}*/
 	return 0;
 }
 
@@ -260,7 +328,7 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 		SendMessageTimeout(hWnd, WM_EXIT, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	SetEvent(m_hPipeQuitEvent);
-	if (m_hPipeThread)
+	/*if (m_hPipeThread)
 	{
 		CloseHandle(m_hPipeThread);
 		m_hPipeThread = NULL;
@@ -269,7 +337,7 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 	{
 		CloseHandle(m_hWorkProcess);
 		m_hWorkProcess = NULL;
-	}
+	}*/
 	return 0;
 }
 
