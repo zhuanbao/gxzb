@@ -295,7 +295,7 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 	local scaleValue = {0, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000}
 	local nScale = 9
 	for i, v in ipairs(scaleValue) do
-		if i < #scaleValue and nBalance >= v and nMiningSpeedPerHour < scaleValue[i+1] then
+		if i < #scaleValue and nBalance >= v and nBalance < scaleValue[i+1] then
 			nScale = i
 			break
 		end
