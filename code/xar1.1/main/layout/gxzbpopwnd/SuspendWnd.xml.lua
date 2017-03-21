@@ -79,6 +79,8 @@ function LeftGoldBalance_SetState(self, state)
 		end
 		--停右边
 		if needDelay then
+			self:SetVisible(false)
+			self:SetChildrenVisible(false)
 			SetOnceTimer(hoverright, 100)
 		else
 			hoverright()
@@ -216,12 +218,12 @@ function SuspendCtrl_SetState(self, state)
 	local RightDisk = strip:GetObject("RightDisk")
 	local LeftGoldBalance = strip:GetObject("LeftGoldBalance")
 	RightDisk:SetState(state)
+	LeftGoldBalance:SetState(state)
 	if state == 0 then
 		LeftGoldBalance:SetObjPos(0, 0, 82, "father.height")
 	else
 		LeftGoldBalance:SetObjPos(10, 0, 82, "father.height")
 	end
-	LeftGoldBalance:SetState(state)
 	self:UpdateLine(attr.linevalue or 0)
 end
 
