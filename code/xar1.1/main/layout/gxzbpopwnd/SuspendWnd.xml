@@ -22,7 +22,7 @@
 						<left>0</left>
 						<top>25</top>
 						<width>82</width>
-						<height>12</height>
+						<height>15</height>
 						<valign>center</valign>
 						<halign>center</halign>
 						<textcolor>color.suspend.balance</textcolor>
@@ -36,7 +36,7 @@
 				<obj id="goldtextnumber" class="TextObject">
 					<attr>
 						<left>0</left>
-						<top>37</top>
+						<top>40</top>
 						<width>82</width>
 						<height>30</height>
 						<valign>top</valign>
@@ -203,7 +203,7 @@
 								</obj>	
 								<obj id="LeftGoldBalance" class="SuspendLeftGoldBalance">
 									<attr>
-										<left>13</left>
+										<left>0</left>
 										<top>0</top>
 										<width>82</width>
 										<height>father.height</height>
@@ -219,7 +219,7 @@
 				<event name="OnLButtonUp" file="SuspendWnd.xml.lua" func="OnLButtonUp" />
 				<event name="OnMouseMove" file="SuspendWnd.xml.lua" func="OnMouseMove" />
 				<event name="OnMouseLeave" file="SuspendWnd.xml.lua" func="OnMouseLeave" />
-				<event name="OnLButtonDbClick" file="SuspendWnd.xml.lua" func="OnLButtonDbClickSuspend" />
+				<!--event name="OnLButtonDbClick" file="SuspendWnd.xml.lua" func="OnLButtonDbClickSuspend" /-->
 				<!--event name="OnMouseHover" file="SuspendWnd.xml.lua" func="OnMouseHover" /-->
 				<event name="OnRButtonUp" file="SuspendWnd.xml.lua" func="OnRButtonUpSuspend" />
 				<event name="OnInitControl" file="SuspendWnd.xml.lua" func="OnInitControl" />

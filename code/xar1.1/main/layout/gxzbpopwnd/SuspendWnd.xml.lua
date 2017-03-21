@@ -56,10 +56,10 @@ function LeftGoldBalance_SetState(self, state)
 	local goldicon = self:GetObject("goldicon")
 	local goldtexthead = self:GetObject("goldtexthead")
 	local goldtextnumber = self:GetObject("goldtextnumber")
-	if state == 0 or state == 3 then
+	if state == 3 then
 		self:SetVisible(false)
 		self:SetChildrenVisible(false)
-	elseif state == 1 or state == 4 then
+	elseif state == 0 or state == 1 or state == 4 then
 		local function hoverright()
 			self:SetVisible(true)
 			self:SetChildrenVisible(true)
@@ -70,6 +70,7 @@ function LeftGoldBalance_SetState(self, state)
 			goldtextnumber:SetAlpha(255)
 			goldtexthead:SetTextColorResID("color.suspend.balance")
 			goldtexthead:SetAlpha(255)
+			goldtexthead:SetTextFontResID("font.suspend.balancehead")
 			local goldzorder = goldicon:GetZorder()
 			if type(goldzorder) == "number" then
 				goldtexthead:SetZorder(goldzorder+1)
@@ -91,6 +92,7 @@ function LeftGoldBalance_SetState(self, state)
 		goldtextnumber:SetAlpha(117)
 		goldtexthead:SetTextColorResID("color.suspend.balance.lower")
 		goldtexthead:SetAlpha(117)
+		goldtexthead:SetTextFontResID("font.suspend.balancehead.lower")
 		goldicon:SetResID("suspend-gold-light")
 		local textzorder = goldtexthead:GetZorder()
 		if type(textzorder) == "number" then
@@ -108,11 +110,14 @@ end
 function SuspendRightDisk_Click(self)
 	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
 	local attr = self:GetAttribute()
+	LOG("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(tFunctionHelper.CheckIsWorking()))
 	if attr.currentstate == 1 then
+		--self:GetOwnerControl():OnWorkStateChange(1)
 		if not tFunctionHelper.CheckIsWorking() then
 			tFunctionHelper.NotifyStart()
 		end
 	elseif attr.currentstate == 4 then
+		--self:GetOwnerControl():OnWorkStateChange(2)
 		if tFunctionHelper.CheckIsWorking() then
 			tFunctionHelper.NotifyPause()
 		end
@@ -211,14 +216,20 @@ function SuspendCtrl_SetState(self, state)
 	local RightDisk = strip:GetObject("RightDisk")
 	local LeftGoldBalance = strip:GetObject("LeftGoldBalance")
 	RightDisk:SetState(state)
+	if state == 0 then
+		LeftGoldBalance:SetObjPos(0, 0, 82, "father.height")
+	else
+		LeftGoldBalance:SetObjPos(10, 0, 82, "father.height")
+	end
 	LeftGoldBalance:SetState(state)
+	self:UpdateLine(attr.linevalue or 0)
 end
 
 function SuspendCtrl_UpdateLine(self, nLineValue)
 	local attr = self:GetAttribute()
 	local strip = self:GetObject("strip")
 	local strResHead = "suspend-nowork-bkg"
-	if attr.currentstate == 3 or attr.currentstate == 4 then
+	if attr.currentstate >= 3 then
 		strResHead = "suspend-work-bkg"
 	end
 	strip:SetTextureID(strResHead..tostring(nLineValue))
@@ -235,7 +246,7 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
 		end
-		speedtext:SetText("准备中...")
+		speedtext:SetText("准备中")
 	elseif state == 2 or state == 3 then
 		if attr.currentstate  >= 3 then
 			local newState = attr.currentstate - 3
@@ -244,6 +255,7 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 	end
 end
 
+local MING_CALCULATE_DAG = 2
 local MING_MINING_SPEED = 3
 local MING_MINING_EEEOR = 4
 local MING_SOLUTION_FIND = 5
@@ -260,7 +272,7 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
 		end
-		speedtext:SetText("准备中...")
+		speedtext:SetText("准备中")
 	end
 end
 
@@ -300,16 +312,18 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 			break
 		end
 	end
+	local attr = self:GetAttribute()
+	attr.linevalue = nScale
 	self:UpdateLine(nScale)
 	--更新灰色余额
 	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
 	local goldtextnumber = LeftGoldBalance:GetObject("goldtextnumber")
 	local strShow
-	if nScale < 10000 then
-		strShow = tostring(nScale)
+	if nBalance < 10000 then
+		strShow = tostring(nBalance)
 	else
-		local nInte, nDeci = math.modf(nScale/10000)
-		local nDeciHold = math.floor(nDeci*100)
+		local nInte, nDeci = math.modf(nBalance/10000)
+		local nDeciHold = math.floor(nDeci*10)
 		strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
 	end
 	goldtextnumber:SetText(strShow)
@@ -339,8 +353,11 @@ local minWidth = 82
 local shadowOffset = 10
 function OnLButtonDown(self, x, y)
 	local attr = self:GetAttribute()
+	--重置点击事件标志位
+	LOG("SuspendWnd OnLButtonDown x="..tostring(x)..", y="..tostring(y))
+	attr.moveflag = false
+	attr.lbtndown = {x, y}
 	if not attr.anim then
-		attr.moveflag = false
 		attr.hitpoint = {x, y}
 		self:SetCaptureMouse(true)
 	end
@@ -348,8 +365,10 @@ end
 
 function OnLButtonUp(self, x, y)
 	local attr = self:GetAttribute()
+	LOG("SuspendWnd OnLButtonUp attr.moveflag="..tostring(attr.moveflag)..", attr.lbtndown="..tostring(attr.lbtndown))
 	--按下了左键且没有拖动， 弹起时则认为是点击操作
-	if not attr.moveflag and attr.hitpoint then
+	if not attr.moveflag and attr.lbtndown then
+		LOG("SuspendWnd OnLButtonUp can call click")
 		local l, t, r, b = self:GetObjPos()
 		local width, height = r - l, b - t
 		--在右边弹起
@@ -364,6 +383,7 @@ function OnLButtonUp(self, x, y)
 			end
 		end
 	end
+	attr.lbtndown = nil
 	attr.hitpoint = nil
 	self:SetCaptureMouse(false)
 end
@@ -405,7 +425,10 @@ function OnMouseMove(self, x, y)
 		end
 		return
 	end
-	attr.moveflag = true
+	if attr.lbtndown and attr.lbtndown.x ~= nil and attr.lbtndown.y ~= nil and attr.lbtndown.x ~= x and attr.lbtndown.y ~= y then
+		LOG("SuspendWnd OnMouseMove x="..tostring(x)..", y="..tostring(y)..", attr.lbtndown.x="..tostring(attr.lbtndown.x)..", attr.lbtndown.y="..tostring(attr.lbtndown.y))
+		attr.moveflag = true
+	end
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
 	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
