@@ -217,7 +217,7 @@ function RegisterFunctionObject(self)
 	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
 	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
-	obj.UpdateWorkSpeed = UpdateWorkSpeed
+	obj.UpdateMiningSpeed = UpdateMiningSpeed
 	obj.GetUserWorkID = GetUserWorkID
 	obj.GetMainHostWnd = GetMainHostWnd
 	obj.ChangeMainBodyPanel = ChangeMainBodyPanel
@@ -2296,8 +2296,8 @@ function UpdateMiningSpeed(nMiningSpeedPerHour)
 	objMainBodyCtrl:UpdateMiningSpeed(nMiningSpeedPerHour)
 	--更新球
 	local root = GetSuspendRootCtrol()
-	if root and type(root.UpdateWorkSpeed) == "function" then
-		root:UpdateWorkSpeed(nMiningSpeedPerHour)
+	if root and type(root.UpdateMiningSpeed) == "function" then
+		root:UpdateMiningSpeed(nMiningSpeedPerHour)
 	end
 end
 

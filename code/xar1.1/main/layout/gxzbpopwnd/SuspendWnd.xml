@@ -170,7 +170,7 @@
 			<UpdateLine file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateLine"/>
 			<OnWorkStateChange file="SuspendWnd.xml.lua" func="SuspendCtrl_OnWorkStateChange"/>
 			<UpdateMiningState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateMiningState"/>
-			<UpdateWorkSpeed file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateWorkSpeed"/>
+			<UpdateMiningSpeed file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateMiningSpeed"/>
 			<UpdateUserBalance file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateUserBalance"/>
 			<UpdateClientUnBindState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateClientUnBindState"/>
 		</method_def>
