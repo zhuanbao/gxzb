@@ -2284,8 +2284,8 @@ function UpdateUserBalance(nBalance)
 end
 
 --所有要更新速度的地方在这里处理
-function UpdateWorkSpeed(nMiningSpeedPerHour)
-	TipLog("[UpdateWorkSpeed] nMiningSpeedPerHour = " .. tostring(nMiningSpeedPerHour))
+function UpdateMiningSpeed(nMiningSpeedPerHour)
+	TipLog("[UpdateMiningSpeed] nMiningSpeedPerHour = " .. tostring(nMiningSpeedPerHour))
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
@@ -2293,7 +2293,7 @@ function UpdateWorkSpeed(nMiningSpeedPerHour)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	objMainBodyCtrl:UpdateWorkSpeed(nMiningSpeedPerHour)
+	objMainBodyCtrl:UpdateMiningSpeed(nMiningSpeedPerHour)
 	--更新球
 	local root = GetSuspendRootCtrol()
 	if root and type(root.UpdateWorkSpeed) == "function" then
@@ -2454,7 +2454,7 @@ function QueryAndUpdateWorkState()
 		if tonumber(p1) ~= nil then
 			g_SpeedSum = g_SpeedSum + p1
 			g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed*3600)
-			UpdateWorkSpeed(g_MiningSpeedPerHour)
+			UpdateMiningSpeed(g_MiningSpeedPerHour)
 		end	
 		return true
 	elseif nType == MING_MINING_EEEOR then
@@ -2535,7 +2535,7 @@ function WorkingTimerHandle()
 				if not bQuery then
 					--借用上报算力的间隔来，检测工作进程是否没有响应了
 					--nReportCalcInterval秒没响应 是否要杀进程
-					--UpdateWorkSpeed(tostring(0))
+					--UpdateMiningSpeed(tostring(0))
 					g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
 				end
 				local nAverageSpeed = math.floor(g_SpeedSum/nReportConuter)
