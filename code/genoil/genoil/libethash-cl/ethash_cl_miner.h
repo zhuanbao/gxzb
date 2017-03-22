@@ -31,6 +31,7 @@ public:
 		// reports progress, return true to abort
 		virtual bool found(uint64_t const* nonces, uint32_t count) = 0;
 		virtual bool searched(uint64_t start_nonce, uint32_t count) = 0;
+		virtual void setaborted() = 0;
 	};
 
 	ethash_cl_miner();
@@ -68,6 +69,7 @@ public:
 		unsigned _extraGPUMemory,
 		uint64_t _currentBlock
 	);
+	static void setCheckQuitHandler(std::function<bool()> const& _handler){ s_CheckQuitHandler = _handler; }
 	void setOpenCLParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch);
 	using FnDAGProgess = std::function<void(int)>;
 	bool init(
@@ -76,11 +78,11 @@ public:
 		uint64_t _lightSize,
 		unsigned _platformId,
 		unsigned _deviceId,
-		std::function<bool(void)> const& _fnisStopped,
+		search_hook& _hook,
 		FnDAGProgess _OnDAGProgess = NULL
 		);
 	void finish();
-	void search(uint8_t const* _header, uint64_t _target, search_hook& _hook, bool _ethStratum, uint64_t _startN, std::function<bool(void)> const& _fnisStopped);
+	void search(uint8_t const* _header, uint64_t _target, search_hook& _hook, bool _ethStratum, uint64_t _startN);
 
 	/* -- default values -- */
 	/// Default value of the local work size. Also known as workgroup size.
@@ -118,4 +120,5 @@ private:
 	static unsigned s_extraRequiredGPUMem;
 
 	mutable dev::SharedMutex x_miner;
+	static std::function<bool()> s_CheckQuitHandler;
 };

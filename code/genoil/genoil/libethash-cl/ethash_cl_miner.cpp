@@ -70,6 +70,7 @@ unsigned const ethash_cl_miner::c_defaultLocalWorkSize = 64;
 unsigned const ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier = 4096; // * CL_DEFAULT_LOCAL_WORK_SIZE
 unsigned const ethash_cl_miner::c_defaultMSPerBatch = 0;
 
+std::function<bool()> ethash_cl_miner::s_CheckQuitHandler = nullptr;
 // TODO: If at any point we can use libdevcore in here then we should switch to using a LogChannel
 #if defined(_WIN32)
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* lpOutputString);
@@ -399,7 +400,7 @@ bool ethash_cl_miner::init(
 	uint64_t _lightSize,
 	unsigned _platformId,
 	unsigned _deviceId,
-	std::function<bool(void)> const& _fnisStopped,
+	search_hook& hook,
 	FnDAGProgess _OnDAGProgess
 )
 {
@@ -407,9 +408,14 @@ bool ethash_cl_miner::init(
 	try
 	{
 		vector<cl::Platform> platforms = getPlatforms();
-		if (platforms.empty() || _fnisStopped())
+		if (platforms.empty())
 			return false;
-
+		if (s_CheckQuitHandler && s_CheckQuitHandler())
+		{
+			hook.setaborted();
+			return false;
+		}
+		
 		// use selected platform
 		_platformId = min<unsigned>(_platformId, platforms.size() - 1);
 
@@ -427,7 +433,7 @@ bool ethash_cl_miner::init(
 		}
 		// get GPU device of the default platform
 		vector<cl::Device> devices = getDevices(platforms, _platformId);
-		if (devices.empty() || _fnisStopped())
+		if (devices.empty())
 		{
 			ETHCL_LOG("No OpenCL devices found.");
 			return false;
@@ -554,8 +560,13 @@ bool ethash_cl_miner::init(
 		m_dagKernel.setArg(2, m_dag);
 		m_dagKernel.setArg(3, ~0u);
 
-		for (uint32_t i = 0; i < fullRuns && !_fnisStopped(); i++)
+		for (uint32_t i = 0; i < fullRuns; i++)
 		{
+			if (s_CheckQuitHandler && s_CheckQuitHandler())
+			{
+				hook.setaborted();
+				return true;
+			}
 			m_dagKernel.setArg(0, i * m_globalWorkSize);
 			m_queue.enqueueNDRangeKernel(m_dagKernel, cl::NullRange, m_globalWorkSize, s_workgroupSize);
 			m_queue.finish();
@@ -565,7 +576,7 @@ bool ethash_cl_miner::init(
 				_OnDAGProgess(100 * i/fullRuns);
 			}
 		}
-		if (_OnDAGProgess && !_fnisStopped())
+		if (_OnDAGProgess)
 		{
 			//进到这里表示DAG计算已经完成了
 			_OnDAGProgess(100);
@@ -585,7 +596,7 @@ typedef struct
 	unsigned buf;
 } pending_batch;
 
-void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook& hook, bool _ethStratum, uint64_t _startN, std::function<bool(void)> const& _fnisStopped)
+void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook& hook, bool _ethStratum, uint64_t _startN)
 {
 	try
 	{
@@ -625,8 +636,9 @@ void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook
 		else start_nonce = uniform_int_distribution<uint64_t>()(engine);
 		for (;; start_nonce += m_globalWorkSize)
 		{
-			if (_fnisStopped())
+			if (s_CheckQuitHandler && s_CheckQuitHandler())
 			{
+				hook.setaborted();
 				return;
 			}
 			// supply output buffer to kernel
