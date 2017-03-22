@@ -46,7 +46,7 @@ EthStratumClient::EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType
 
 	m_protocol = protocol;
 	m_email = email;
-	m_CheckQuitHandle = _handler;
+	m_CheckQuitHandler = _handler;
 	p_farm = f;
 	p_worktimer = nullptr;
 	connect();
@@ -144,7 +144,7 @@ void EthStratumClient::disconnect()
 
 void EthStratumClient::resolve_handler(const boost::system::error_code& ec, tcp::resolver::iterator i)
 {
-	if (m_CheckQuitHandle())
+	if (m_CheckQuitHandler())
 	{
 		disconnect();
 		return;
@@ -166,7 +166,7 @@ void EthStratumClient::resolve_handler(const boost::system::error_code& ec, tcp:
 void EthStratumClient::connect_handler(const boost::system::error_code& ec, tcp::resolver::iterator i)
 {
 	dev::setThreadName("stratum");
-	if (m_CheckQuitHandle())
+	if (m_CheckQuitHandler())
 	{
 		disconnect();
 		return;
@@ -246,7 +246,7 @@ void EthStratumClient::readline() {
 }
 
 void EthStratumClient::handleResponse(const boost::system::error_code& ec) {
-	if (m_CheckQuitHandle())
+	if (m_CheckQuitHandler())
 	{
 		disconnect();
 		return;
@@ -265,7 +265,7 @@ void EthStratumClient::handleResponse(const boost::system::error_code& ec) {
 void EthStratumClient::readResponse(const boost::system::error_code& ec, std::size_t bytes_transferred)
 {
 	dev::setThreadName("stratum");
-	if (m_CheckQuitHandle())
+	if (m_CheckQuitHandler())
 	{
 		disconnect();
 		return;

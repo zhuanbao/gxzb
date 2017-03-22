@@ -46,7 +46,7 @@ EthStratumClientV2::EthStratumClientV2(GenericFarm<EthashProofOfWork> * f, Miner
 
 	m_protocol = protocol;
 	m_email = email;
-	m_CheckQuitHandle = _handler;
+	m_CheckQuitHandler = _handler;
 	p_farm = f;
 	p_worktimer = nullptr;
 	startWorking();
@@ -75,7 +75,7 @@ void EthStratumClientV2::workLoop()
 	while (m_running)
 	{
 		try {
-			if (m_CheckQuitHandle())
+			if (m_CheckQuitHandler())
 			{
 				disconnect();
 				break;
@@ -121,7 +121,7 @@ void EthStratumClientV2::workLoop()
 
 void EthStratumClientV2::connect()
 {
-	if (m_CheckQuitHandle())
+	if (m_CheckQuitHandler())
 	{
 		return;
 	}

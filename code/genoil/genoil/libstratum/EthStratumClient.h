@@ -98,5 +98,5 @@ private:
 
 	void processExtranonce(std::string& enonce);
 
-	std::function<bool()> m_CheckQuitHandle;
+	std::function<bool()> m_CheckQuitHandler;
 };
