@@ -97,7 +97,7 @@ function LeftGoldBalance_SetState(self, state)
 		if needDelay then
 			self:SetVisible(false)
 			self:SetChildrenVisible(false)
-			SetOnceTimer(hoverright, 100)
+			SetOnceTimer(hoverright, 200)
 		else
 			hoverright()
 		end
@@ -344,13 +344,12 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 		if nInte >= 1000 then
 			strShow = "999+w"
 		elseif nInte >=100 then
+			strShow = tostring(nInte).."w"
+		elseif nInte >=10 then
 			local nDeciHold = math.floor(nDeci*10)
 			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
-		elseif nInte >=10 then
-			local nDeciHold = math.floor(nDeci*100)
-			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
 		else
-			local nDeciHold = math.floor(nDeci*1000)
+			local nDeciHold = math.floor(nDeci*100)
 			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
 		end
 	end
@@ -603,6 +602,9 @@ function CheckStripAnim(self, isHide, x, y)
 				if curX < wndL or  curX > wndR or curY < wndT or curY > wndB then
 					CheckStripAnim(self, true)
 				end
+			else
+				--再处理一次缩回时隐藏圆盘
+				self:SetState(attr.currentstate >= 3 and 3 or 0)
 			end
 		end
 	end
