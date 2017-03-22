@@ -67,8 +67,27 @@ public:
 	{
 		if (m_threadMiner && m_threadMiner->joinable())
 		{
-			m_threadMiner->join();
-			m_threadMiner = nullptr;
+			//unique_ptr<thread>(new thread([=]() {
+			//	setThreadName("exitthread");
+			//	this_thread::sleep_for(chrono::milliseconds(1000*1));
+			//	msgwndlog << "deatch work thread";
+			//	m_threadMiner->detach();
+			//	exit(9);
+			//}));
+			//m_threadMiner->join();
+			//m_threadMiner = nullptr;
+			/*unsigned waitsecond = 0;
+			while (!m_threadMiner->joinable() || waitsecond < 60)
+			{
+			this_thread::sleep_for(chrono::milliseconds(1000 * 1));
+			waitsecond++;
+			}
+			msgwndlog << "waitsecond = " << waitsecond;*/
+			HANDLE hThread = (HANDLE)m_threadMiner->native_handle();
+			if (hThread && WAIT_TIMEOUT == ::WaitForSingleObject(hThread, 60 * 1000))
+			{
+				msgwndlog << "wait work thread exit timeout ";
+			}
 		}
 	}
 	bool WaitQuitEvent();

@@ -12,23 +12,23 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 	case WM_EXIT:
 		{
 			msgwndlog << "begain exit process";
-			MsgWndIPC::Instance()->Quit();
-			MsgWndIPC::Instance()->CloseSingletonMutex();
 			//MsgWndIPC::Instance()->DestroyWindow();
+			MsgWndIPC::Instance()->CloseSingletonMutex();
+			MsgWndIPC::Instance()->Quit();
 			MsgWndIPC::Instance()->WaitThreadExit();
-			//PostQuitMessage(0);
+			PostQuitMessage(0);
 			msgwndlog << "end exit process";
 		}
 		break;
 	case WM_USER_PAUSE:
 		{
-			msgwndlog << "begain exit process";
-			MsgWndIPC::Instance()->Quit();
-			MsgWndIPC::Instance()->CloseSingletonMutex();
+			msgwndlog << "begain pause process";
 			//MsgWndIPC::Instance()->DestroyWindow();
+			MsgWndIPC::Instance()->CloseSingletonMutex();
+			MsgWndIPC::Instance()->Quit();
 			MsgWndIPC::Instance()->WaitThreadExit();
-			//PostQuitMessage(0);
-			msgwndlog << "end exit process";
+			PostQuitMessage(0);
+			msgwndlog << "end pause process";
 		}
 		break;
 	case WM_USER_CONTRAL_SPEED:
