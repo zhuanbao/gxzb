@@ -127,10 +127,6 @@ public:
 	 */
 	void stop()
 	{
-		for (std::shared_ptr<Miner> const& miner : m_miners)
-		{
-			miner.get()->setThreadStop();
-		}
 		cnote << "stop farm try get lock";
 		WriteGuard l(x_minerWork);
 		cnote << "stop farm try clear m_miners";

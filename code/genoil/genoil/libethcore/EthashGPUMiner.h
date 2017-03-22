@@ -67,9 +67,8 @@ public:
 	}
 	void setSpeedLimitParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch) override;
 	using FnDAGProgess = std::function<void(int)>;
-	static void onDAGProgess(FnDAGProgess const& _handler) { m_OnDAGProgess = _handler; }
-	void setThreadStop() override;
-	bool isStopThread(){ return m_ThreadStop; }
+	static void onDAGProgess(FnDAGProgess const& _handler) { s_OnDAGProgess = _handler; }
+	static void setCheckQuitHandler(std::function<bool()> const& _handler);
 protected:
 	void kickOff() override;
 	void pause() override;
@@ -88,8 +87,8 @@ private:
 	static unsigned s_deviceId;
 	static unsigned s_numInstances;
 	static int s_devices[16];
-	static FnDAGProgess m_OnDAGProgess;
-
+	static FnDAGProgess s_OnDAGProgess;
+	static std::function<bool()> s_CheckQuitHandler;
 };
 
 }

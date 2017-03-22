@@ -185,7 +185,6 @@ public:
 	{
 
 	}
-	virtual void setThreadStop(){ }
 protected:
 	// REQUIRED TO BE REIMPLEMENTED BY A SUBCLASS:
 
