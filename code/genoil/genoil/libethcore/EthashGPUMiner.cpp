@@ -67,7 +67,7 @@ public:
 		UniqueGuard l(x_all);
 		m_aborted = m_abort = false;
 	}
-
+	void setaborted(){ m_aborted = true; }
 protected:
 	virtual bool found(uint64_t const* _nonces, uint32_t _count) override
 	{
@@ -104,7 +104,8 @@ unsigned EthashGPUMiner::s_platformId = 0;
 unsigned EthashGPUMiner::s_deviceId = 0;
 unsigned EthashGPUMiner::s_numInstances = 0;
 int EthashGPUMiner::s_devices[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-EthashGPUMiner::FnDAGProgess EthashGPUMiner::m_OnDAGProgess = nullptr;
+EthashGPUMiner::FnDAGProgess EthashGPUMiner::s_OnDAGProgess = nullptr;
+std::function<bool()> EthashGPUMiner::s_CheckQuitHandler = nullptr;
 
 EthashGPUMiner::EthashGPUMiner(ConstructionInfo const& _ci):
 	GenericMiner<EthashProofOfWork>(_ci),
@@ -151,16 +152,17 @@ void EthashGPUMiner::workLoop()
 		cnote << "set work; seed: " << "#" + w.seedHash.hex().substr(0, 8) + ", target: " << "#" + w.boundary.hex().substr(0, 12);
 		if (!m_miner || m_minerSeed != w.seedHash)
 		{
-			if (isStopThread())
+			if (s_CheckQuitHandler && s_CheckQuitHandler())
+			{
+				m_hook->setaborted();
 				return;
+			}
 			if (s_dagLoadMode == DAG_LOAD_MODE_SEQUENTIAL)
 			{
 				while (s_dagLoadIndex < index()) {
 					this_thread::sleep_for(chrono::seconds(1));
 				}
 			}
-			if (isStopThread())
-				return;
 			cnote << "begain re init dag data";
 			m_minerSeed = w.seedHash;
 
@@ -189,15 +191,16 @@ void EthashGPUMiner::workLoop()
 			cnote << "begain calculate light dag data";
 			light = EthashAux::light(w.seedHash);
 			cnote << "end calculate light dag data";
-			if (isStopThread())
+			if (s_CheckQuitHandler && s_CheckQuitHandler())
+			{
+				m_hook->setaborted();
 				return;
+			}
 			bytesConstRef lightData = light->data();
 			
 			cnote << "begain calculate full dag data";
-			m_miner->init(light->light, lightData.data(), lightData.size(), s_platformId, device, [&](){ return isStopThread(); }, m_OnDAGProgess);
+			m_miner->init(light->light, lightData.data(), lightData.size(), s_platformId, device, *m_hook,s_OnDAGProgess);
 			cnote << "end calculate full dag data";
-			if (isStopThread())
-				return;
 			s_dagLoadIndex++;
 		}
 		uint64_t upper64OfBoundary = (uint64_t)(u64)((u256)w.boundary >> 192);
@@ -205,8 +208,13 @@ void EthashGPUMiner::workLoop()
 		if (w.exSizeBits >= 0)
 			startN = w.startNonce | ((uint64_t)index() << (64 - 4 - w.exSizeBits)); // this can support up to 16 devices
 		cnote << "begain search";
-		m_miner->search(w.headerHash.data(), upper64OfBoundary, *m_hook, (w.exSizeBits >= 0), startN, [&](){ return isStopThread(); });
+		m_miner->search(w.headerHash.data(), upper64OfBoundary, *m_hook, (w.exSizeBits >= 0), startN);
 		cnote << "end search";
+		if (s_CheckQuitHandler && s_CheckQuitHandler())
+		{
+			m_hook->setaborted();
+			return;
+		}
 	}
 	catch (cl::Error const& _e)
 	{
@@ -275,9 +283,9 @@ bool EthashGPUMiner::configureGPU(
 	return true;
 }
 
-void EthashGPUMiner::setThreadStop()
+void EthashGPUMiner::setCheckQuitHandler(std::function<bool()> const& _handler)
 {
-	cnote << "set thread stop";
-	m_ThreadStop = true;
+	s_CheckQuitHandler = _handler; 
+	ethash_cl_miner::setCheckQuitHandler(_handler);
 }
 #endif
