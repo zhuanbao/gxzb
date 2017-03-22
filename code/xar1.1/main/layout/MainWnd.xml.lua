@@ -1,6 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local gRootCtrl = nil
-
+local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 function OnClose( self )
 	self:Show(0)
@@ -46,9 +46,25 @@ function PopupInDeskMiddle(self)
 	return true
 end
 
+function FetchValueByPath(obj, path)
+	local cursor = obj
+	for i = 1, #path do
+		cursor = cursor[path[i]]
+		if cursor == nil then
+			return nil
+		end
+	end
+	return cursor
+end
 
 function OnCreate( self )
-	 PopupInDeskMiddle(self)
+	 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local tMain = FetchValueByPath(tUserConfig, {"tWindow", "tMain"})
+	if type(tMain) == "table" and type(tMain.nLeft) == "number" and type(tMain.nTop) == "number" and type(tMain.nWidth) == "number" and type(tMain.nHeight) == "number" then
+		self:Move(tMain.nLeft, tMain.nTop, tMain.nWidth, tMain.nHeight)
+	else	
+		PopupInDeskMiddle(self)
+	end
 end
 
 

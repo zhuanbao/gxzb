@@ -1,6 +1,17 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
+function FetchValueByPath(obj, path)
+	local cursor = obj
+	for i = 1, #path do
+		cursor = cursor[path[i]]
+		if cursor == nil then
+			return nil
+		end
+	end
+	return cursor
+end
+
 function PopupInDeskRightTop(self)
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
 	local wndL, wndT, wndR, wndB = self:GetWindowRect()
@@ -8,9 +19,14 @@ function PopupInDeskRightTop(self)
 	return true
 end
 
-function OnCreate( self )
-	local objtree = self:GetBindUIObjectTree()
-	PopupInDeskRightTop(self)
+function OnCreate(self)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local tSuspend = FetchValueByPath(tUserConfig, {"tWindow", "tSuspend"})
+	if type(tSuspend) == "table" and type(tSuspend.nLeft) == "number" and type(tSuspend.nTop) == "number" and type(tSuspend.nWidth) == "number" and type(tSuspend.nHeight) == "number" then
+		self:Move(tSuspend.nLeft, tSuspend.nTop, tSuspend.nWidth, tSuspend.nHeight)
+	else	
+		PopupInDeskRightTop(self)
+	end
 	SetTimer(function(item, id)
 		self:SetTopMost(false)
 		self:SetTopMost(true)
@@ -325,8 +341,18 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 		strShow = tostring(nBalance)
 	else
 		local nInte, nDeci = math.modf(nBalance/10000)
-		local nDeciHold = math.floor(nDeci*10)
-		strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+		if nInte >= 1000 then
+			strShow = "999+w"
+		elseif nInte >=100 then
+			local nDeciHold = math.floor(nDeci*10)
+			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+		elseif nInte >=10 then
+			local nDeciHold = math.floor(nDeci*100)
+			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+		else
+			local nDeciHold = math.floor(nDeci*1000)
+			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+		end
 	end
 	goldtextnumber:SetText(strShow)
 end
@@ -394,6 +420,18 @@ function OnInitControl(self)
 	self:SetState(0)
 end
 
+function SaveWindowPos(l, t, w, h)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	--local tSuspend = FetchValueByPath(tUserConfig, {"tWindow", "tSuspend"})
+	tUserConfig["tWindow"] = tUserConfig["tWindow"] or {}
+	tUserConfig["tWindow"]["tSuspend"] = tUserConfig["tWindow"]["tSuspend"] or {}
+	tUserConfig["tWindow"]["tSuspend"].nLeft = l
+	tUserConfig["tWindow"]["tSuspend"].nTop = t
+	tUserConfig["tWindow"]["tSuspend"].nWidth  = w
+	tUserConfig["tWindow"]["tSuspend"].nHeight = h
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
 function OnMouseMove(self, x, y)
 	CheckStripAnim(self, false, x, y)
 	local attr = self:GetAttribute()
@@ -427,7 +465,7 @@ function OnMouseMove(self, x, y)
 		end
 		return
 	end
-	if attr.lbtndown and attr.lbtndown.x ~= nil and attr.lbtndown.y ~= nil and attr.lbtndown.x ~= x and attr.lbtndown.y ~= y then
+	if attr.lbtndown and  attr.lbtndown[1] ~= x and attr.lbtndown[2] ~= y then
 		LOG("SuspendWnd OnMouseMove x="..tostring(x)..", y="..tostring(y)..", attr.lbtndown.x="..tostring(attr.lbtndown.x)..", attr.lbtndown.y="..tostring(attr.lbtndown.y))
 		attr.moveflag = true
 	end
@@ -442,21 +480,35 @@ function OnMouseMove(self, x, y)
 	workbottom = workbottom + shadowOffset
 	local dx, dy = math.floor(x - attr.hitpoint[1]),  math.floor(y - attr.hitpoint[2])
 	local tarL, tarT, tarR, tarB = wndL + dx, wndT + dy,  wndR + dx, wndB + dy
+	local saveL, saveT, saveR, saveB = tarL, tarT, tarR, tarB
 	if tarL < workleft then
 		tarR = tarR + workleft - tarL
 		tarL = workleft
+		--
+		saveL = tarL + 1
+		saveR = tarR + 1
 	elseif tarR > workright then
 		tarL = math.floor(tarL - (tarR - workright))
 		tarR = workright
+		--
+		saveL = tarL - 1
+		saveR = tarR - 1
 	end
 	if tarT < worktop then
 		tarB = tarB + worktop - tarT
 		tarT = worktop
+		--
+		saveB = tarB + 1
+		saveT = tarT + 1
 	elseif tarB > workbottom then
 		tarT = tarT - (tarB - workbottom)
 		tarB = workbottom
+		--
+		saveB = tarB - 1
+		saveT = tarT - 1
 	end
 	wnd:Move(tarL, tarT, tarR - tarL, tarB - tarT)
+	SaveWindowPos(saveL, saveT, saveR - saveL, saveB - saveT)
 end
 
 function OnMouseLeave(self)

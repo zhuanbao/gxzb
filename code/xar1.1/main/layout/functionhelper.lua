@@ -1410,6 +1410,20 @@ function GetOldCfgContent(strCurFileName)
 end
 
 function ReportAndExit()
+	--记住主窗体位置
+	local wnd = GetMainHostWnd()
+	if wnd then
+		local l, t, r, b = wnd:GetWindowRect()
+		local w, h = r-l, b - t
+		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+		tUserConfig["tWindow"] = tUserConfig["tWindow"] or {}
+		tUserConfig["tWindow"]["tMain"] = tUserConfig["tWindow"]["tMain"] or {}
+		tUserConfig["tWindow"]["tMain"].nLeft = l
+		tUserConfig["tWindow"]["tMain"].nTop = t
+		tUserConfig["tWindow"]["tMain"].nWidth  = w
+		tUserConfig["tWindow"]["tMain"].nHeight = h
+		SaveConfigToFileByKey("tUserConfig")
+	end
 	DestroyMainWnd()
 	DestroyPopupWnd()
 	HideTray()

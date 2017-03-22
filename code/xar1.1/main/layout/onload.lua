@@ -468,9 +468,8 @@ function PreTipMain()
 	FunctionObj.StartRunCountTimer()
 	SendStartupReport(false)
 	
+	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
-	
-	local bSuccess = FunctionObj.ReadAllConfigInfo()	
 	if not CheckMachineSuitable() then
 		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		return

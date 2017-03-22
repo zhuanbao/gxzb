@@ -44,12 +44,15 @@ function SaveSettingConfig(objTree)
 	end
 	tUserConfig["tConfig"]["WorkModel"]["nState"] = g_nWorkModel
 
-	if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
-		tUserConfig["tConfig"]["SuspendedWnd"] = {}
+	if type(tUserConfig["tConfig"]["ShowBall"]) ~= "table" then
+		tUserConfig["tConfig"]["ShowBall"] = {}
 	end
-	tUserConfig["tConfig"]["SuspendedWnd"]["nState"] = g_SuspendedWndState
+	tUserConfig["tConfig"]["ShowBall"]["nState"] = g_SuspendedWndState
 	
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+	--更新球的状态
+	local isWorking = tFunctionHelper.CheckIsWorking()
+	tFunctionHelper.UpdateSuspendWndVisible(isWorking and 1 or 0)
 end
 
 function DestoryDialog(self)
@@ -185,10 +188,10 @@ function OnCreate(self)
 		if type(tUserConfig["tConfig"]) ~= "table" then
 			tUserConfig["tConfig"] = {}
 		end
-		if type(tUserConfig["tConfig"]["SuspendedWnd"]) ~= "table" then
-			tUserConfig["tConfig"]["SuspendedWnd"] = {}
+		if type(tUserConfig["tConfig"]["ShowBall"]) ~= "table" then
+			tUserConfig["tConfig"]["ShowBall"] = {}
 		end
-		g_SuspendedWndState = tUserConfig["tConfig"]["SuspendedWnd"]["nState"] or 0
+		g_SuspendedWndState = tUserConfig["tConfig"]["ShowBall"]["nState"] or 0
 		if g_SuspendedWndState == 0 then
 			ObjRadioShow:SetCheck(true, false)
 		elseif g_SuspendedWndState == 1 then
