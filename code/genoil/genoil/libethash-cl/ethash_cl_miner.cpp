@@ -68,6 +68,7 @@ using namespace std;
 
 unsigned const ethash_cl_miner::c_defaultLocalWorkSize = 64;
 unsigned const ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier = 4096; // * CL_DEFAULT_LOCAL_WORK_SIZE
+unsigned const ethash_cl_miner::c_defaultMSPerBatch = 0;
 
 // TODO: If at any point we can use libdevcore in here then we should switch to using a LogChannel
 #if defined(_WIN32)
@@ -105,7 +106,27 @@ ethash_cl_miner::ethash_cl_miner()
 
 ethash_cl_miner::~ethash_cl_miner()
 {
+	ETHCL_LOG("ethash_cl_miner destructor");
 	finish();
+	cl::Context m_context;
+	cl::CommandQueue m_queue;
+	cl::Kernel m_searchKernel;
+	cl::Kernel m_dagKernel;
+	cl::Buffer m_dag;
+	cl::Buffer m_light;
+	cl::Buffer m_header;
+	cl::Buffer m_searchBuffer[c_bufferCount];
+	m_searchKernel.Release();
+	m_dagKernel.Release();
+	m_queue.Release();
+	m_context.Release();
+	m_dag.Release();
+	m_light.Release();
+	m_header.Release();
+	for (unsigned i = 0; i != c_bufferCount; ++i)
+	{
+		m_searchBuffer[i].Release();
+	}
 }
 
 std::vector<cl::Platform> ethash_cl_miner::getPlatforms()
@@ -196,6 +217,7 @@ bool ethash_cl_miner::configureGPU(
 	unsigned _platformId,
 	unsigned _localWorkSize,
 	unsigned _globalWorkSize,
+	unsigned _msPerBatch,
 	bool _allowCPU,
 	unsigned _extraGPUMemory,
 	uint64_t _currentBlock
@@ -203,6 +225,7 @@ bool ethash_cl_miner::configureGPU(
 {
 	s_workgroupSize = _localWorkSize;
 	s_initialGlobalWorkSize = _globalWorkSize;
+	s_msPerBatch = _msPerBatch;
 	s_allowCPU = _allowCPU;
 	s_extraRequiredGPUMem = _extraGPUMemory;
 
@@ -232,8 +255,18 @@ bool ethash_cl_miner::configureGPU(
 	);
 }
 
+void ethash_cl_miner::setOpenCLParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch)
+{
+	dev::WriteGuard l(x_miner);
+	s_initialGlobalWorkSize = _globalWorkSizeMultiplier * s_workgroupSize;
+	//m_globalWorkSize = s_initialGlobalWorkSize;
+	s_msPerBatch = _msPerBatch;
+	ETHCL_LOG("setOpenCLParam s_initialGlobalWorkSize = " << s_initialGlobalWorkSize <<", s_msPerBatch = " << s_msPerBatch);
+}
+
 bool ethash_cl_miner::s_allowCPU = false;
 unsigned ethash_cl_miner::s_extraRequiredGPUMem;
+unsigned ethash_cl_miner::s_msPerBatch = ethash_cl_miner::c_defaultMSPerBatch;
 unsigned ethash_cl_miner::s_workgroupSize = ethash_cl_miner::c_defaultLocalWorkSize;
 unsigned ethash_cl_miner::s_initialGlobalWorkSize = ethash_cl_miner::c_defaultGlobalWorkSizeMultiplier * ethash_cl_miner::c_defaultLocalWorkSize;
 
@@ -319,6 +352,40 @@ void ethash_cl_miner::listDevices()
 	ETHCL_LOG(outString);
 }
 
+std::vector<ethash_cl_miner::platform_device_info> ethash_cl_miner::GetAllPlatformDeviceInfo(unsigned _extraGPUMemory, uint64_t _currentBlock)
+{
+	std::vector<platform_device_info> v_info;
+	vector<cl::Platform> platforms = getPlatforms();
+	if (platforms.empty())
+		return v_info;
+	for (unsigned i = 0; i < platforms.size(); ++i) {
+		vector<cl::Device> devices = getDevices(platforms, i);
+		for (unsigned j = 0; j < devices.size(); ++j) {
+			cl::Device _device = devices[j];
+			//uint64_t uBlock = _currentBlock ? _currentBlock:2970000;
+			uint64_t uBlock = _currentBlock;
+			uint64_t dagSize = ethash_get_datasize(uBlock);
+			uint64_t requiredSize = dagSize + _extraGPUMemory;
+			cl_ulong global_mem_size = _device.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
+			if (global_mem_size > requiredSize)
+			{
+				cl::Device _device = devices[j];
+				ethash_cl_miner::platform_device_info pd_info;
+				pd_info.name = _device.getInfo<CL_DEVICE_NAME>();
+				pd_info.type = _device.getInfo<CL_DEVICE_TYPE>();
+				pd_info.platformId = i;
+				pd_info.deviceId = j;
+				pd_info.global_mem_size = global_mem_size;
+				pd_info.max_mem_alloc_size = _device.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
+				pd_info.max_work_group_size = _device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+				v_info.push_back(pd_info);
+			}
+
+		}
+	}
+	return v_info;
+}
+
 void ethash_cl_miner::finish()
 {
 	if (m_queue())
@@ -331,14 +398,16 @@ bool ethash_cl_miner::init(
 	uint8_t const* _lightData, 
 	uint64_t _lightSize,
 	unsigned _platformId,
-	unsigned _deviceId
+	unsigned _deviceId,
+	std::function<bool(void)> const& _fnisStopped,
+	FnDAGProgess _OnDAGProgess
 )
 {
 	// get all platforms
 	try
 	{
 		vector<cl::Platform> platforms = getPlatforms();
-		if (platforms.empty())
+		if (platforms.empty() || _fnisStopped())
 			return false;
 
 		// use selected platform
@@ -358,7 +427,7 @@ bool ethash_cl_miner::init(
 		}
 		// get GPU device of the default platform
 		vector<cl::Device> devices = getDevices(platforms, _platformId);
-		if (devices.empty())
+		if (devices.empty() || _fnisStopped())
 		{
 			ETHCL_LOG("No OpenCL devices found.");
 			return false;
@@ -398,7 +467,11 @@ bool ethash_cl_miner::init(
 		m_queue = cl::CommandQueue(m_context, device);
 
 		// make sure that global work size is evenly divisible by the local workgroup size
-		m_globalWorkSize = s_initialGlobalWorkSize;
+		{
+			dev::ReadGuard l(x_miner);
+			m_globalWorkSize = s_initialGlobalWorkSize;
+		}
+		//m_globalWorkSize = s_initialGlobalWorkSize;
 		if (m_globalWorkSize % s_workgroupSize != 0)
 			m_globalWorkSize = ((m_globalWorkSize / s_workgroupSize) + 1) * s_workgroupSize;
 
@@ -481,14 +554,22 @@ bool ethash_cl_miner::init(
 		m_dagKernel.setArg(2, m_dag);
 		m_dagKernel.setArg(3, ~0u);
 
-		for (uint32_t i = 0; i < fullRuns; i++)
+		for (uint32_t i = 0; i < fullRuns && !_fnisStopped(); i++)
 		{
 			m_dagKernel.setArg(0, i * m_globalWorkSize);
 			m_queue.enqueueNDRangeKernel(m_dagKernel, cl::NullRange, m_globalWorkSize, s_workgroupSize);
 			m_queue.finish();
 			printf("OPENCL#%d: %.0f%%\n", _deviceId, 100.0f * (float)i / (float)fullRuns);
+			if (_OnDAGProgess)
+			{
+				_OnDAGProgess(100 * i/fullRuns);
+			}
 		}
-
+		if (_OnDAGProgess && !_fnisStopped())
+		{
+			//进到这里表示DAG计算已经完成了
+			_OnDAGProgess(100);
+		}
 	}
 	catch (cl::Error const& err)
 	{
@@ -504,10 +585,18 @@ typedef struct
 	unsigned buf;
 } pending_batch;
 
-void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook& hook, bool _ethStratum, uint64_t _startN)
+void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook& hook, bool _ethStratum, uint64_t _startN, std::function<bool(void)> const& _fnisStopped)
 {
 	try
 	{
+		unsigned msPerBatch = 0;
+		{
+			dev::ReadGuard l(x_miner);
+			msPerBatch = s_msPerBatch;
+			m_globalWorkSize = s_initialGlobalWorkSize;
+		}
+		if (m_globalWorkSize % s_workgroupSize != 0)
+			m_globalWorkSize = ((m_globalWorkSize / s_workgroupSize) + 1) * s_workgroupSize;
 		queue<pending_batch> pending;
 
 		// this can't be a static because in MacOSX OpenCL implementation a segfault occurs when a static is passed to OpenCL functions
@@ -536,7 +625,12 @@ void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook
 		else start_nonce = uniform_int_distribution<uint64_t>()(engine);
 		for (;; start_nonce += m_globalWorkSize)
 		{
+			if (_fnisStopped())
+			{
+				return;
+			}
 			// supply output buffer to kernel
+			auto t = chrono::high_resolution_clock::now();
 			m_searchKernel.setArg(0, m_searchBuffer[buf]);
 			m_searchKernel.setArg(3, start_nonce);
 
@@ -570,6 +664,22 @@ void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook
 					m_queue.enqueueWriteBuffer(m_searchBuffer[batch.buf], true, 0, 4, &c_zero);
 
 				pending.pop();
+			}
+
+			// adjust global work size depending on last search time
+			if (msPerBatch)
+			{
+				// Global work size must be:
+				//  - less than or equal to 2 ^ DEVICE_BITS - 1
+				//  - divisible by lobal work size (workgroup size)
+				auto d = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - t);
+				if (d != chrono::milliseconds(0)) // if duration is zero, we did not get in the actual searh/or search not finished
+				{
+					if (d < chrono::milliseconds(msPerBatch))
+					{
+						this_thread::sleep_for(chrono::milliseconds(msPerBatch) - d);
+					}
+				}
 			}
 		}
 

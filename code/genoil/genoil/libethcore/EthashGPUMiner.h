@@ -48,6 +48,7 @@ public:
 	static bool configureGPU(
 		unsigned _localWorkSize,
 		unsigned _globalWorkSizeMultiplier,
+		unsigned _msPerBatch,
 		unsigned _platformId,
 		unsigned _deviceId,
 		bool _allowCPU,
@@ -64,11 +65,14 @@ public:
 			s_devices[i] = _devices[i];
 		}
 	}
-
+	void setSpeedLimitParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch) override;
+	using FnDAGProgess = std::function<void(int)>;
+	static void onDAGProgess(FnDAGProgess const& _handler) { m_OnDAGProgess = _handler; }
+	void setThreadStop() override;
+	bool isStopThread(){ return m_ThreadStop; }
 protected:
 	void kickOff() override;
 	void pause() override;
-
 private:
 	void workLoop() override;
 	bool report(uint64_t _nonce);
@@ -77,12 +81,14 @@ private:
 
 	EthashCLHook* m_hook = nullptr;
 	ethash_cl_miner* m_miner = nullptr;
+	bool m_ThreadStop = false;
 
 	h256 m_minerSeed;		///< Last seed in m_miner
 	static unsigned s_platformId;
 	static unsigned s_deviceId;
 	static unsigned s_numInstances;
 	static int s_devices[16];
+	static FnDAGProgess m_OnDAGProgess;
 
 };
 

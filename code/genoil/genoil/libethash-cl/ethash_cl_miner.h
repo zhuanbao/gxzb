@@ -15,6 +15,8 @@
 #include <time.h>
 #include <functional>
 #include <libethash/ethash.h>
+#include <libdevcore/Guards.h>
+#include <thread>
 
 class ethash_cl_miner
 {
@@ -42,31 +44,51 @@ public:
 	static unsigned getNumDevices(unsigned _platformId = 0);
 	static std::string platform_info(unsigned _platformId = 0, unsigned _deviceId = 0);
 	static void listDevices();
+
+	struct platform_device_info
+	{
+		std::string name;
+		uint32_t type;
+		uint32_t platformId;
+		uint32_t deviceId;
+
+		uint64_t global_mem_size;
+		uint64_t max_mem_alloc_size;
+		uint64_t max_work_group_size;
+
+	};
+	static std::vector<platform_device_info> GetAllPlatformDeviceInfo(unsigned _extraGPUMemory, uint64_t _currentBlock);
+
 	static bool configureGPU(
 		unsigned _platformId,
 		unsigned _localWorkSize,
 		unsigned _globalWorkSize,
+		unsigned _msPerBatch,
 		bool _allowCPU,
 		unsigned _extraGPUMemory,
 		uint64_t _currentBlock
 	);
-
+	void setOpenCLParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch);
+	using FnDAGProgess = std::function<void(int)>;
 	bool init(
 		ethash_light_t _light,
 		uint8_t const* _lightData,
 		uint64_t _lightSize,
 		unsigned _platformId,
-		unsigned _deviceId
+		unsigned _deviceId,
+		std::function<bool(void)> const& _fnisStopped,
+		FnDAGProgess _OnDAGProgess = NULL
 		);
 	void finish();
-	void search(uint8_t const* _header, uint64_t _target, search_hook& _hook, bool _ethStratum, uint64_t _startN);
+	void search(uint8_t const* _header, uint64_t _target, search_hook& _hook, bool _ethStratum, uint64_t _startN, std::function<bool(void)> const& _fnisStopped);
 
 	/* -- default values -- */
 	/// Default value of the local work size. Also known as workgroup size.
 	static unsigned const c_defaultLocalWorkSize;
 	/// Default value of the global work size as a multiplier of the local work size
 	static unsigned const c_defaultGlobalWorkSizeMultiplier;
-
+	/// Default value of the milliseconds per global work size (per batch)
+	static unsigned const c_defaultMSPerBatch;
 private:
 
 	static std::vector<cl::Device> getDevices(std::vector<cl::Platform> const& _platforms, unsigned _platformId);
@@ -94,4 +116,6 @@ private:
 	/// GPU memory required for other things, like window rendering e.t.c.
 	/// User can set it via the --cl-extragpu-mem argument.
 	static unsigned s_extraRequiredGPUMem;
+
+	mutable dev::SharedMutex x_miner;
 };

@@ -75,6 +75,14 @@ public:
 		resetTimer();
 	}
 
+	void setSpeedLimitParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch)
+	{
+		//WriteGuard l(x_minerWork);
+		for (auto const& m : m_miners)
+			m->setSpeedLimitParam(_globalWorkSizeMultiplier, _msPerBatch);
+		//resetTimer();
+	}
+
 	void setSealers(std::map<std::string, SealerDescriptor> const& _sealers) { m_sealers = _sealers; }
 
 	/**
@@ -119,10 +127,18 @@ public:
 	 */
 	void stop()
 	{
+		for (std::shared_ptr<Miner> const& miner : m_miners)
+		{
+			miner.get()->setThreadStop();
+		}
+		cnote << "stop farm try get lock";
 		WriteGuard l(x_minerWork);
+		cnote << "stop farm try clear m_miners";
 		m_miners.clear();
+		cnote << "stop farm try reset m_work";
 		m_work.reset();
 		m_isMining = false;
+		cnote << "stop farm end";
 	}
 	
 	bool isMining() const

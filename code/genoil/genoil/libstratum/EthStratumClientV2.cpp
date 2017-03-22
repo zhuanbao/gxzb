@@ -27,7 +27,7 @@ static void diffToTarget(uint32_t *target, double diff)
 }
 
 
-EthStratumClientV2::EthStratumClientV2(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email)
+EthStratumClientV2::EthStratumClientV2(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, std::function<bool()> const& _handler)
 	: Worker("stratum"), 
 	  m_socket(m_io_service)
 {
@@ -46,7 +46,7 @@ EthStratumClientV2::EthStratumClientV2(GenericFarm<EthashProofOfWork> * f, Miner
 
 	m_protocol = protocol;
 	m_email = email;
-
+	m_CheckQuitHandle = _handler;
 	p_farm = f;
 	p_worktimer = nullptr;
 	startWorking();
@@ -75,6 +75,11 @@ void EthStratumClientV2::workLoop()
 	while (m_running)
 	{
 		try {
+			if (m_CheckQuitHandle())
+			{
+				disconnect();
+				break;
+			}
 			if (!m_connected)
 			{
 				//m_io_service.run();
@@ -116,6 +121,10 @@ void EthStratumClientV2::workLoop()
 
 void EthStratumClientV2::connect()
 {
+	if (m_CheckQuitHandle())
+	{
+		return;
+	}
 	cnote << "Connecting to stratum server " << p_active->host + ":" + p_active->port;
 
 	tcp::resolver r(m_io_service);
@@ -230,7 +239,6 @@ void EthStratumClientV2::disconnect()
 {
 	cnote << "Disconnecting";
 	m_connected = false;
-	m_running = false;
 	if (p_farm->isMining())
 	{
 		cnote << "Stopping farm";
@@ -238,6 +246,7 @@ void EthStratumClientV2::disconnect()
 	}
 	m_socket.close();
 	//m_io_service.stop();
+	m_running = false;
 }
 
 void EthStratumClientV2::processExtranonce(std::string& enonce)

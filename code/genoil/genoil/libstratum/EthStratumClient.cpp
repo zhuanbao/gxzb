@@ -27,7 +27,7 @@ static void diffToTarget(uint32_t *target, double diff)
 }
 
 
-EthStratumClient::EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email)
+EthStratumClient::EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, std::function<bool()> const& _handler)
 	: m_socket(m_io_service)
 {
 	m_minerType = m;
@@ -46,7 +46,7 @@ EthStratumClient::EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType
 
 	m_protocol = protocol;
 	m_email = email;
-
+	m_CheckQuitHandle = _handler;
 	p_farm = f;
 	p_worktimer = nullptr;
 	connect();
@@ -132,7 +132,6 @@ void EthStratumClient::disconnect()
 {
 	cnote << "Disconnecting";
 	m_connected = false;
-	m_running = false;
 	if (p_farm->isMining())
 	{
 		cnote << "Stopping farm";
@@ -140,10 +139,17 @@ void EthStratumClient::disconnect()
 	}
 	m_socket.close();
 	m_io_service.stop();
+	m_running = false;
 }
 
 void EthStratumClient::resolve_handler(const boost::system::error_code& ec, tcp::resolver::iterator i)
 {
+	if (m_CheckQuitHandle())
+	{
+		disconnect();
+		return;
+	}
+	
 	if (!ec)
 	{
 		async_connect(m_socket, i, boost::bind(&EthStratumClient::connect_handler,
@@ -160,7 +166,11 @@ void EthStratumClient::resolve_handler(const boost::system::error_code& ec, tcp:
 void EthStratumClient::connect_handler(const boost::system::error_code& ec, tcp::resolver::iterator i)
 {
 	dev::setThreadName("stratum");
-	
+	if (m_CheckQuitHandle())
+	{
+		disconnect();
+		return;
+	}
 	if (!ec)
 	{
 		m_connected = true;
@@ -236,6 +246,11 @@ void EthStratumClient::readline() {
 }
 
 void EthStratumClient::handleResponse(const boost::system::error_code& ec) {
+	if (m_CheckQuitHandle())
+	{
+		disconnect();
+		return;
+	}
 	if (!ec)
 	{
 		readline();
@@ -250,6 +265,11 @@ void EthStratumClient::handleResponse(const boost::system::error_code& ec) {
 void EthStratumClient::readResponse(const boost::system::error_code& ec, std::size_t bytes_transferred)
 {
 	dev::setThreadName("stratum");
+	if (m_CheckQuitHandle())
+	{
+		disconnect();
+		return;
+	}
 	x_pending.lock();
 	m_pending = m_pending > 0 ? m_pending - 1 : 0;
 	x_pending.unlock();

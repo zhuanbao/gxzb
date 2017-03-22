@@ -181,9 +181,12 @@ public:
 
 	unsigned index() const { return m_index; }
 
+	virtual void setSpeedLimitParam(unsigned _globalWorkSizeMultiplier, unsigned _msPerBatch)
+	{
+
+	}
+	virtual void setThreadStop(){ }
 protected:
-
-
 	// REQUIRED TO BE REIMPLEMENTED BY A SUBCLASS:
 
 	/**

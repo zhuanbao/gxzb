@@ -37,27 +37,16 @@
 #include <boost/algorithm/string/trim_all.hpp>
 #include <libdevcore/FileSystem.h>
 #include "MinerAux.h"
+
+#include "MsgWndIPC.h"
+#include <libethcore/EthashGPUMiner.h>
+
 using namespace std;
 using namespace dev;
 using namespace dev::eth;
 using namespace boost::algorithm;
 
 #undef RETURN
-
-void help()
-{
-	cout
-		<< "Usage ethminer [OPTIONS]" << endl
-		<< "Options:" << endl << endl;
-	MinerCLI::streamHelp(cout);
-	cout
-		<< "General Options:" << endl
-		<< "    -v,--verbosity <0 - 9>  Set the log verbosity from 0 to 9 (default: 8)." << endl
-		<< "    -V,--version  Show the version and exit." << endl
-		<< "    -h,--help  Show this help message and exit." << endl
-		;
-	exit(0);
-}
 
 void version()
 {
@@ -68,6 +57,7 @@ void version()
 
 int main(int argc, char** argv)
 {
+	/*
 	cout << "Genoil's ethminer " << ETH_PROJECT_VERSION << endl;
 	cout << "=====================================================================" << endl;
 	cout << "Forked from github.com/ethereum/cpp-ethereum" << endl;
@@ -75,7 +65,7 @@ int main(int argc, char** argv)
 	cout << "With contributions from nicehash, nerdralph, RoBiK and sp_ " << endl << endl;
 	cout << "Please consider a donation to:" << endl;
 	cout << "ETH: 0xeb9310b185455f863f526dab3d245809f6854b4d" << endl << endl;
-
+	
 	MinerCLI m(MinerCLI::OperationMode::Farm);
 
 	for (int i = 1; i < argc; ++i)
@@ -97,7 +87,49 @@ int main(int argc, char** argv)
 	}
 
 	m.execute();
+	*/
+	if (argc == 2)
+	{
+		string arg = argv[2];
+		if (arg == "--list-devices")
+		{
+			EthashGPUMiner::listDevices();
+			exit(0);
+		}
+	}
+	if (MsgWndIPC::Instance()->HandleSingleton()) {
+		exit(0);
+		msgwndlog << "another instance is running";
+		Sleep(5000);
+		return 0;
+	}
 
+	MinerCLI m(MinerCLI::OperationMode::Farm);
+	for (int i = 1; i < argc; ++i)
+	{
+		string arg = argv[i];
+		if (m.interpretOption(i, argc, argv))
+		{
+		}
+		else if ((arg == "-v" || arg == "--verbosity") && i + 1 < argc)
+			g_logVerbosity = atoi(argv[++i]);
+		else if (arg == "-V" || arg == "--version")
+			version();
+		else
+		{
+			cerr << "Invalid argument: " << arg << endl;
+			exit(-1);
+		}
+	}
+	if (MsgWndIPC::Instance()->Create(&m))
+	{
+		MsgWndIPC::Instance()->RunMsgLoop();
+	}
+	//msgwndlog << "start terminate process";
+	//TerminateProcess(GetCurrentProcess(), (UINT)0);
+	//msgwndlog << "end terminate process";
+	msgwndlog << "exit process";
+	exit(0);
 	return 0;
 }
 

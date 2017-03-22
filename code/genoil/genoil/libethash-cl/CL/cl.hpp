@@ -2754,6 +2754,10 @@ public:
         formats->assign(&value[0], &value[numEntries]);
         return CL_SUCCESS;
     }
+	cl_int Release()
+	{
+		return ::clReleaseContext(object_);
+	}
 };
 
 inline Device Device::getDefault(cl_int * err)
@@ -3308,6 +3312,10 @@ public:
         return result;
     }		
 #endif
+	cl_int Release()
+	{
+		return ::clReleaseMemObject(object_);
+	}
 };
 
 #if defined (USE_DX_INTEROP)
@@ -4954,6 +4962,10 @@ public:
             ::clSetKernelArg(object_, index, size, argPtr),
             __SET_KERNEL_ARGS_ERR);
     }
+	cl_int Release()
+	{
+		return ::clReleaseKernel(object_);
+	}
 };
 
 /*! \class Program
@@ -6550,6 +6562,10 @@ typedef CL_API_ENTRY cl_int (CL_API_CALL *PFN_clEnqueueReleaseD3D10ObjectsKHR)(
     {
         return detail::errHandler(::clFinish(object_), __FINISH_ERR);
     }
+	cl_int Release()
+	{
+		return ::clReleaseCommandQueue(object_);
+	}
 };
 
 #ifdef _WIN32

@@ -21,7 +21,7 @@ using namespace dev::eth;
 class EthStratumClient
 {
 public:
-	EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email);
+	EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType m, string const & host, string const & port, string const & user, string const & pass, int const & retries, int const & worktimeout, int const & protocol, string const & email, std::function<bool()> const& _handler);
 	~EthStratumClient();
 
 	void setFailover(string const & host, string const & port);
@@ -97,4 +97,6 @@ private:
 	int m_extraNonceHexSize;
 
 	void processExtranonce(std::string& enonce);
+
+	std::function<bool()> m_CheckQuitHandle;
 };
