@@ -43,8 +43,7 @@ function SetBallSetting(value)
 	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
 	tUserConfig["tConfig"]["ShowBall"]["nState"] = value
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-	local isWorking = tFunctionHelper.CheckIsWorking()
-	tFunctionHelper.UpdateSuspendWndVisible(isWorking and 1 or 0)
+	tFunctionHelper.UpdateSuspendWndVisible(value == 2 and 1 or 0)
 end
 
 local menuTable = {

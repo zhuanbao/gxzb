@@ -191,33 +191,28 @@ function SuspendRightDisk_SetState(self, state)
 		return
 	end
 	attr.currentstate = state
-	local goldicon = self:GetObject("goldicon")
 	local graydisk = self:GetObject("graydisk")
 	local starticon = graydisk:GetObject("starticon")
 	local lightdisk = self:GetObject("lightdisk")
 	local stopicon = lightdisk:GetObject("stopicon")
 	if state == 0 then
-		goldicon:SetVisible(true)
 		graydisk:SetVisible(false)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(false)
 		lightdisk:SetChildrenVisible(false)
 	elseif state == 1 then
-		goldicon:SetVisible(false)
 		lightdisk:SetVisible(false)
 		lightdisk:SetChildrenVisible(false)
 		graydisk:SetVisible(true)
 		graydisk:SetChildrenVisible(true)
 		starticon:SetVisible(true)
 	elseif state == 2 then
-		goldicon:SetVisible(false)
 		lightdisk:SetVisible(false)
 		lightdisk:SetChildrenVisible(false)
 		graydisk:SetVisible(true)
 		graydisk:SetChildrenVisible(true)
 		starticon:SetVisible(false)
 	elseif state == 4 then
-		goldicon:SetVisible(false)
 		graydisk:SetVisible(false)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
@@ -225,7 +220,6 @@ function SuspendRightDisk_SetState(self, state)
 		lightdisk:SetResID("suspend-work-rightdisk-hoverright-bottom")
 		stopicon:SetVisible(true)
 	else
-		goldicon:SetVisible(false)
 		graydisk:SetVisible(false)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
