@@ -94,9 +94,9 @@ local UIDecor = function(obj)
 		SetResID = function(self, value)
 			self._obj:SetResID(value)
 			if value == "suspend-gold-light" then
-				self._obj:SetObjPos(0, 15+1, 82, 63+1)
+				self._obj:SetObjPos(0, 13+1, 82, 61+1)
 			else
-				self._obj:SetObjPos(0, 15, 82, 63)
+				self._obj:SetObjPos(0, 13, 82, 61)
 			end
 		end,
 	}

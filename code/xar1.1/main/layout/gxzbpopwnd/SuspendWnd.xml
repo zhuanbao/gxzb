@@ -34,7 +34,7 @@
 							<attr>
 								<left>-1</left>
 								<top>-1</top>
-								<width>82</width>
+								<width>father.width</width>
 								<height>15</height>
 								<valign>center</valign>
 								<halign>center</halign>
@@ -62,7 +62,7 @@
 							<attr>
 								<left>-1</left>
 								<top>-1</top>
-								<width>82</width>
+								<width>father.width</width>
 								<height>30</height>
 								<valign>top</valign>
 								<halign>center</halign>
