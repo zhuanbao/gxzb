@@ -6,7 +6,7 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@ChildCtrl_MinerInfo: " .. tostring(strLog))
+		tipUtil:Log("@@ChildCtrl_MiningPanel: " .. tostring(strLog))
 	end
 end
 
@@ -70,15 +70,6 @@ function UpdateDagProgress(self,nProgress)
 	local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 	local strText = ("准备中 "..tostring(nProgress).."%")
 	ObjStartBtnText:SetText(strText)
-	if nProgress == 100 then
-		local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
-		if not ObjMiningSpeed:GetVisible() then
-			ObjMiningSpeed:SetChildrenVisible(true)
-			ObjMiningSpeed:SetVisible(true)
-			TipLog("[UpdateMiningState] ShowAnim")
-			ShowAnim(self, true)
-		end
-	end
 end
 --1:Start,2:Pause,3:Quit
 function OnWorkStateChange(self,nState)

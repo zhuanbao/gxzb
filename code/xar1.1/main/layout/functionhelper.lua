@@ -27,10 +27,14 @@ local g_PreWorkState = 0
 --服务端信息
 local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
 local g_SpeedSumCounter = 0 --累加的计数器
-local g_PerSpeed = 18 --服务端返回的平均速度((元宝/Hour)/M)
+local g_PerSpeed = 10 --服务端返回的平均速度((元宝/Hour)/M)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
-
+--限速
+local g_CurrentPerBatch = 0 --当前限速值
+--函数5秒调一次
+local g_GlobalWorkSizeMultiplier = 100
+local g_msMaxPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
@@ -2187,7 +2191,6 @@ function SetUserBindInfo(tabBindInfo)
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
 	ChangeClientTitle("共享赚宝")
-	--UpdateBindButtonText("解除绑定")
 end
 
 function CheckIsBinded()
@@ -2362,6 +2365,17 @@ function OnWorkStateChange(nState)
 	end
 end
 ------------
+function ResetGlobalParam()
+	if g_WorkingTimerId then
+		timeMgr:KillTimer(g_WorkingTimerId)
+		g_WorkingTimerId = nil
+	end	
+	g_PreWorkState = 0
+	g_MiningSpeedPerHour = 0
+	g_bWorking = false
+	g_CurrentPerBatch = 0
+end
+-----------
 function GetSuspendRootCtrol()
 	local uHostWndMgr = XLGetObject("Xunlei.UIEngine.HostWndManager")
 	local objSuspendWnd = uHostWndMgr:GetHostWnd("GXZB.SuspendWnd.Instance")
@@ -2399,30 +2413,18 @@ end
 
 function NotifyPause()
 	IPCUtil:Pause()
-	if g_WorkingTimerId then
-		timeMgr:KillTimer(g_WorkingTimerId)
-		g_WorkingTimerId = nil
-	end	
-	g_bWorking = false
+	ResetGlobalParam()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
-	g_PreWorkState = 0
 	OnWorkStateChange(2)
-	g_MiningSpeedPerHour = 0
 end
 
 function NotifyQuit()
 	IPCUtil:Quit()
-	if g_WorkingTimerId then
-		timeMgr:KillTimer(g_WorkingTimerId)
-		g_WorkingTimerId = nil
-	end	
-	g_bWorking = false
+	ResetGlobalParam()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
-	g_PreWorkState = 0
 	OnWorkStateChange(3)
-	g_MiningSpeedPerHour = 0
 end
 
 local MING_CALCULATE_DAG = 2
@@ -2493,7 +2495,7 @@ end
 --[[
 0 全速，1智能
 --]]
-local g_CurrentPerBatch = 0
+
 function LimitSpeedCond()
 	if tipUtil:IsNowFullScreen() then
 		TipLog("[LimitSpeedCond] full screen")
@@ -2508,9 +2510,6 @@ function LimitSpeedCond()
 	return false
 end
 
---函数5秒调一次
-local g_GlobalWorkSizeMultiplier = 100
-local g_msMaxPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
 function ChangeMiningSpeed()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
