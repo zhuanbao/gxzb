@@ -18,6 +18,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 			MsgWndIPC::Instance()->WaitThreadExit();
 			PostQuitMessage(0);
 			msgwndlog << "end exit process";
+			exit(0);
 		}
 		break;
 	case WM_USER_PAUSE:
@@ -29,6 +30,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 			MsgWndIPC::Instance()->WaitThreadExit();
 			PostQuitMessage(0);
 			msgwndlog << "end pause process";
+			exit(0);
 		}
 		break;
 	case WM_USER_CONTRAL_SPEED:
