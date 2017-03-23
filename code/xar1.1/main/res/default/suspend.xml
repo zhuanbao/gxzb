@@ -41,6 +41,7 @@
 		<!--工作时右侧圆盘-->
 		<bitmap id="suspend-work-rightdisk-hoverleft" path="suspend\work\hoverleft.png" /> 
 		<bitmap id="suspend-work-rightdisk-hoverright" path="suspend\work\hoverright.png" /> 
+		<bitmap id="suspend-work-rightdisk-hoverright-bottom" path="suspend\work\hoverrightdisk.png" /> 
 		<!--元宝图标-->
 		<bitmap id="suspend-gold-gray" path="suspend\suspend-gold-gray.png" /> 
 		<bitmap id="suspend-gold-light" path="suspend\suspend-gold-light.png" /> 

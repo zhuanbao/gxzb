@@ -51,6 +51,49 @@ end
 -------------------------------
 --------以下是控件逻辑---------
 -------------------------------
+local UIDecor = function(obj)
+	return {
+		_obj = obj,
+		SetVisible = function(self, isVisible)
+			self._obj:SetVisible(isVisible)
+			self._obj:SetChildrenVisible(isVisible)
+		end, 
+		SetAlpha = function(self, value)
+			self._obj:SetAlpha(value)
+			local child1 = self._obj:GetChildByIndex(0)
+			if child1 then
+				child1:SetAlpha(value)
+			end
+		end,
+		SetTextColorResID = function(self, value)
+			local child1 = self._obj:GetChildByIndex(0)
+			if child1 then
+				child1:SetTextColorResID(value)
+			end
+		end,
+		SetTextFontResID = function(self, value)
+			self._obj:SetTextFontResID(value)
+			local child1 = self._obj:GetChildByIndex(0)
+			if child1 then
+				child1:SetTextFontResID(value)
+			end
+		end,
+		SetZorder = function(self, value)
+			self._obj:SetZorder(value)
+		end,
+		GetZorder = function(self)
+			return self._obj:GetZorder()
+		end,
+		SetText = function(self, value)
+			self._obj:SetText(value)
+			local child1 = self._obj:GetChildByIndex(0)
+			if child1 then
+				child1:SetText(value)
+			end
+		end,
+	}
+end
+
 function LeftGoldBalance_Click(self)
 	local attr = self:GetAttribute()
 	if attr.currentstate == 2 or attr.currentstate == 5 then
@@ -70,8 +113,8 @@ function LeftGoldBalance_SetState(self, state)
 	end
 	attr.currentstate = state
 	local goldicon = self:GetObject("goldicon")
-	local goldtexthead = self:GetObject("goldtexthead")
-	local goldtextnumber = self:GetObject("goldtextnumber")
+	local goldtexthead = UIDecor(self:GetObject("goldtextheadconta"))
+	local goldtextnumber = UIDecor(self:GetObject("goldtextnumberconta"))
 	if state == 3 then
 		self:SetVisible(false)
 		self:SetChildrenVisible(false)
@@ -114,7 +157,7 @@ function LeftGoldBalance_SetState(self, state)
 		goldicon:SetResID("suspend-gold-light")
 		local textzorder = goldtexthead:GetZorder()
 		if type(textzorder) == "number" then
-			goldicon:SetZorder(textzorder+1)
+			goldicon:SetZorder(textzorder+101)
 		end
 	else
 		self:SetVisible(true)
@@ -179,6 +222,7 @@ function SuspendRightDisk_SetState(self, state)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
 		lightdisk:SetChildrenVisible(true)
+		lightdisk:SetResID("suspend-work-rightdisk-hoverright-bottom")
 		stopicon:SetVisible(true)
 	else
 		goldicon:SetVisible(false)
@@ -186,7 +230,12 @@ function SuspendRightDisk_SetState(self, state)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
 		lightdisk:SetChildrenVisible(true)
+		lightdisk:SetResID("suspend-work-rightdisk-hoverleft")
 		stopicon:SetVisible(false)
+	end
+	--重置指针
+	if state < 3 then
+		self:UpdateSpeed(1)
 	end
 end
 
@@ -195,9 +244,6 @@ function SuspendRightDisk_UpdateSpeed(self, nspeed)
 		return
 	end
 	local attr = self:GetAttribute()
-	if attr.currentstate ~= 3 and attr.currentstate ~= 4 then
-		return
-	end
 	if not attr.currentspeed then
 		attr.currentspeed = 1
 	end
@@ -335,7 +381,7 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 	self:UpdateLine(nScale)
 	--更新灰色余额
 	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
-	local goldtextnumber = LeftGoldBalance:GetObject("goldtextnumber")
+	local goldtextnumber = UIDecor(LeftGoldBalance:GetObject("goldtextnumberconta"))
 	local strShow
 	if nBalance < 10000 then
 		strShow = tostring(nBalance)
@@ -372,7 +418,7 @@ function SuspendCtrl_UpdateClientUnBindState(self)
 	speedtext:SetText("")
 	--清除灰色余额
 	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
-	local goldtextnumber = LeftGoldBalance:GetObject("goldtextnumber")
+	local goldtextnumber = UIDecor(LeftGoldBalance:GetObject("goldtextnumberconta"))
 	goldtextnumber:SetText("")
 end
 
@@ -553,6 +599,7 @@ function AnimHide(self, xoffset, yoffset, isHide)
 			if isHide then
 				attr.reverse = {-xoffset, -yoffset}
 			else
+				--当动画还没放完时鼠标已经离开了，无法触发离开事件了， 所以需要主动判断并调用OnMouseLeave
 				attr.reverse = nil
 				local curX, curY = Helper.tipUtil:GetCursorPos()
 				if curX < wndL or  curX > wndR or curY < wndT or curY > wndB then
