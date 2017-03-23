@@ -32,8 +32,8 @@
 					<children>
 						<obj id="goldtexthead" class="TextObject">
 							<attr>
-								<left>1</left>
-								<top>1</top>
+								<left>-1</left>
+								<top>-1</top>
 								<width>82</width>
 								<height>15</height>
 								<valign>center</valign>
@@ -60,8 +60,8 @@
 					<children>
 						<obj id="goldtextnumber" class="TextObject">
 							<attr>
-								<left>1</left>
-								<top>1</top>
+								<left>-1</left>
+								<top>-1</top>
 								<width>82</width>
 								<height>30</height>
 								<valign>top</valign>
