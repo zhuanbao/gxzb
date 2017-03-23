@@ -2340,7 +2340,7 @@ function UpdateMiningState(nMiningState)
 	--更新球
 	local root = GetSuspendRootCtrol()
 	if root and type(root.UpdateMiningState) == "function" then
-		root:UpdateMiningState(nState)
+		root:UpdateMiningState(nMiningState)
 	end
 end
 ------------
