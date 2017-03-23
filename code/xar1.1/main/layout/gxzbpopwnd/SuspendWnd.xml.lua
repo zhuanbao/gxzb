@@ -91,6 +91,14 @@ local UIDecor = function(obj)
 				child1:SetText(value)
 			end
 		end,
+		SetResID = function(self, value)
+			self._obj:SetResID(value)
+			if value == "suspend-gold-light" then
+				self._obj:SetObjPos(0, 15+1, 82, 63+1)
+			else
+				self._obj:SetObjPos(0, 15, 82, 63)
+			end
+		end,
 	}
 end
 
@@ -112,7 +120,7 @@ function LeftGoldBalance_SetState(self, state)
 		needDelay = true
 	end
 	attr.currentstate = state
-	local goldicon = self:GetObject("goldicon")
+	local goldicon = UIDecor(self:GetObject("goldicon"))
 	local goldtexthead = UIDecor(self:GetObject("goldtextheadconta"))
 	local goldtextnumber = UIDecor(self:GetObject("goldtextnumberconta"))
 	if state == 3 then
