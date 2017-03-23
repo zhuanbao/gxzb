@@ -70,12 +70,23 @@ function UpdateDagProgress(self,nProgress)
 	local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 	local strText = ("准备中 "..tostring(nProgress).."%")
 	ObjStartBtnText:SetText(strText)
+	if nProgress == 100 then
+		local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
+		if not ObjMiningSpeed:GetVisible() then
+			ObjMiningSpeed:SetChildrenVisible(true)
+			ObjMiningSpeed:SetVisible(true)
+			TipLog("[UpdateMiningState] ShowAnim")
+			ShowAnim(self, true)
+		end
+	end
 end
 --1:Start,2:Pause,3:Quit
 function OnWorkStateChange(self,nState)
 	if nState == 1 then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(true)
+		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
+		ObjStartBtn:Enable(false)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 		ObjStartBtnText:SetText("准备中......")
 	elseif nState == 2 then
@@ -90,7 +101,7 @@ function ShowAnim(OwnerCtrl, bShow)
 	local ObjAnimImg = OwnerCtrl:GetObject("MiningPanel.Panel.ShowAnim")
 	local ObjStartBtn = OwnerCtrl:GetObject("MiningPanel.Panel.StartBtn")
 	local ObjStartBtnText = OwnerCtrl:GetObject("MiningPanel.Panel.StartBtn.Text")
-	if bShow and not ObjAnimImg then
+	if bShow then
 		ObjStartBtn:Show(false)
 		ObjStartBtnText:SetVisible(false)
 		if not ObjAnimImg then
@@ -135,9 +146,9 @@ end
 
 
 function OnInitControl(self)
-	local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
-	ObjMiningSpeed:SetChildrenVisible(false)
-	ObjMiningSpeed:SetVisible(false)
+	--local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
+	--ObjMiningSpeed:SetChildrenVisible(false)
+	--ObjMiningSpeed:SetVisible(false)
 	
 	ResetUIVisible(self)
 end
@@ -191,12 +202,21 @@ function ResetUIVisible(OwnerCtrl)
 	ObjStartBtnText:SetVisible(true)
 	ObjStartBtnText:SetText("开始赚宝")
 	
+	local ObjTextSpeed = OwnerCtrl:GetControlObject("MiningPanel.Panel.MiningSpeed.Speed")
+	local strSpeed ="0元宝/小时"
+	ObjTextSpeed:SetText(strSpeed)
+	AdjustSpeedTextPosition(OwnerCtrl)
+	
 	local ObjMiningSpeed = OwnerCtrl:GetControlObject("MiningPanel.Panel.MiningSpeed")
 	ObjMiningSpeed:SetChildrenVisible(false)
 	ObjMiningSpeed:SetVisible(false)
+
 	
 	local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 	ObjStopBtn:Show(false)
+	
+	local ObjStartBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StartBtn")
+	ObjStartBtn:Enable(true)
 	--[[
 	local ObjMiningState = OwnerCtrl:GetControlObject("MiningPanel.Panel.MiningState")
 	ObjMiningState:SetVisible(false)
@@ -223,6 +243,7 @@ end
 function OnShowPanel(self, bShow)
 	if bShow then
 		AdjustAmountTextPosition(self)
+		AdjustSpeedTextPosition(self)
 		ChangeBindEntryVisible(self)
 	end
 end

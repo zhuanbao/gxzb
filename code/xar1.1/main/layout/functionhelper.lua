@@ -26,7 +26,8 @@ local g_PreWorkState = 0
 
 --服务端信息
 local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
-local g_PerSpeed = 0 --服务端返回的平均速度(元宝/(M*Hour))
+local g_SpeedSumCounter = 0 --累加的计数器
+local g_PerSpeed = 18 --服务端返回的平均速度((元宝/Hour)/M)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
 
@@ -2407,6 +2408,7 @@ function NotifyPause()
 	UpdateSuspendWndVisible(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(2)
+	g_MiningSpeedPerHour = 0
 end
 
 function NotifyQuit()
@@ -2420,6 +2422,7 @@ function NotifyQuit()
 	UpdateSuspendWndVisible(1)
 	g_PreWorkState = 0
 	OnWorkStateChange(3)
+	g_MiningSpeedPerHour = 0
 end
 
 local MING_CALCULATE_DAG = 2
@@ -2447,7 +2450,7 @@ function GetToolTipInfo()
 	TipLog("[GetToolTipInfo]: g_PreWorkState = " .. tostring(g_PreWorkState) .. ", strText = " .. tostring(strText))
 	return strText,bShowSpeed
 end
-	
+
 function QueryAndUpdateWorkState()
 	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
 	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))
@@ -2466,9 +2469,14 @@ function QueryAndUpdateWorkState()
 		end
 		g_PreWorkState = MING_MINING_SPEED
 		if tonumber(p1) ~= nil then
-			g_SpeedSum = g_SpeedSum + p1
-			g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed*3600)
-			UpdateMiningSpeed(g_MiningSpeedPerHour)
+			if tonumber(p1) > 0 then
+				g_SpeedSum = g_SpeedSum + p1
+				g_SpeedSumCounter = g_SpeedSumCounter + 1
+				g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed)
+				UpdateMiningSpeed(g_MiningSpeedPerHour)
+			else
+				return false
+			end	
 		end	
 		return true
 	elseif nType == MING_MINING_EEEOR then
@@ -2535,7 +2543,8 @@ function WorkingTimerHandle()
 	if type(tServerInterfaceCfg) ~= "table" then
 		tServerInterfaceCfg = {}
 	end
-	local nReportConuter = 1
+	local nReportConuter = 0
+	local nCheckErrorCounter = 0
 	local nReportCalcInterval = tServerInterfaceCfg["nReportCalcInterval"] or 60
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
 	
@@ -2545,16 +2554,25 @@ function WorkingTimerHandle()
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 			local bQuery = QueryAndUpdateWorkState()
+			if not bQuery and nCheckErrorCounter >= 60*5 then
+				--是否需要重启
+				nCheckErrorCounter = 0
+			elseif not bQuery and nCheckErrorCounter >= 60 then
+				--60秒没有数据 检测工作进程是否没有响应了
+				--nReportCalcInterval秒没响应 是否要杀进程
+				UpdateMiningSpeed(0)
+				g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
+				nCheckErrorCounter = nCheckErrorCounter + 1
+			elseif bQuery then
+				nCheckErrorCounter = 0
+			else
+				nCheckErrorCounter = nCheckErrorCounter + 1
+			end
 			if nReportConuter >= nReportCalcInterval then
-				if not bQuery then
-					--借用上报算力的间隔来，检测工作进程是否没有响应了
-					--nReportCalcInterval秒没响应 是否要杀进程
-					--UpdateMiningSpeed(tostring(0))
-					g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
-				end
-				local nAverageSpeed = math.floor(g_SpeedSum/nReportConuter)
+				local nAverageSpeed = math.floor(g_SpeedSum/g_SpeedSumCounter)
 				g_SpeedSum = 0
-				nReportConuter = 1
+				g_SpeedSumCounter = 0
+				nReportConuter = 0
 				QueryClientInfo(nAverageSpeed)
 			else
 				nReportConuter = nReportConuter + 1
