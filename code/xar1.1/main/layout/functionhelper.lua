@@ -2556,10 +2556,12 @@ function WorkingTimerHandle()
 			if not bQuery and nCheckErrorCounter >= 60*5 then
 				--是否需要重启
 				nCheckErrorCounter = 0
-			elseif not bQuery and nCheckErrorCounter >= 60 then
-				--60秒没有数据 检测工作进程是否没有响应了
+			elseif not bQuery and nCheckErrorCounter >= 20 then
+				--20秒没有数据 检测工作进程是否没有响应了
 				--nReportCalcInterval秒没响应 是否要杀进程
-				UpdateMiningSpeed(0)
+				if g_PreWorkState == MING_MINING_SPEED then
+					UpdateMiningSpeed(0)
+				end	
 				g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
 				nCheckErrorCounter = nCheckErrorCounter + 1
 			elseif bQuery then
