@@ -75,13 +75,25 @@ void LuaIPCUtil::RegisterObj( XL_LRT_ENV_HANDLE hEnv )
 
 BOOL LuaIPCUtil::WaitPipeQuitEvent()
 {
-	//故意等一秒，为了让pipe线程挂起一会
-	DWORD dwMilliseconds = 1*1000;
+	//故意等10毫秒，为了让pipe线程挂起一会
+	DWORD dwMilliseconds = 1;
 	if (WAIT_TIMEOUT == ::WaitForSingleObject(m_hPipeQuitEvent, dwMilliseconds))
 	{
 		return FALSE;
 	}
 	return TRUE;
+}
+
+void LuaIPCUtil::Clear()
+{
+	{
+		XMLib::CriticalSectionLockGuard lck(csReadChannel);
+		ZeroMemory(g_pReadBuffer,MAX_PIPE_BUFFIE_LEN);
+	}
+	{
+		XMLib::CriticalSectionLockGuard lck(csWriteChannel);
+		ZeroMemory(g_pWriteBuffer,MAX_PIPE_BUFFIE_LEN);
+	}
 }
 
 UINT WINAPI PipeProc(PVOID pArg)
@@ -238,6 +250,7 @@ UINT WINAPI PipeProc(PVOID pArg)
 
 int LuaIPCUtil::Start(lua_State* pLuaState)
 {
+	Clear();
 	if (NULL == m_hPipeQuitEvent)
 	{
 		m_hPipeQuitEvent = CreateEventA(NULL, TRUE, FALSE, PIPE_QUIT_EVENT);
@@ -304,6 +317,7 @@ int LuaIPCUtil::Pause(lua_State* pLuaState)
 		SendMessageTimeout(hWnd, WM_USER_PAUSE, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	SetEvent(m_hPipeQuitEvent);
+	Clear();
 	/*if (m_hPipeThread)
 	{
 		CloseHandle(m_hPipeThread);
@@ -328,6 +342,7 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 		SendMessageTimeout(hWnd, WM_EXIT, 0, 0, SMTO_ABORTIFHUNG, 200, NULL);
 	}
 	SetEvent(m_hPipeQuitEvent);
+	Clear();
 	/*if (m_hPipeThread)
 	{
 		CloseHandle(m_hPipeThread);

@@ -33,6 +33,7 @@ private:
 	static HANDLE m_hPipeContinueEvent;
 public:
 	static BOOL WaitPipeQuitEvent();
+	static void Clear();
 };
 
 
