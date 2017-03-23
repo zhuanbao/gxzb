@@ -46,10 +46,10 @@
 		<bitmap id="suspend-gold-gray" path="suspend\suspend-gold-gray.png" /> 
 		<bitmap id="suspend-gold-light" path="suspend\suspend-gold-light.png" /> 
 		<!--颜色和字体-->
-		<font id="font.suspend.balancehead" height="13" facename="defaultfont" weight="bold"/> 
-		<font id="font.suspend.balancenumber" height="15" facename="defaultfont" weight="bold"/> 
-		<font id="font.suspend.balancehead.lower" height="14" facename="defaultfont" weight="bold"/> 
-		<font id="font.suspend.speed" height="10" facename="defaultfont" weight="bold"/> 
+		<font id="font.suspend.balancehead" height="12" facename="defaultfont" /> 
+		<font id="font.suspend.balancenumber" height="13" facename="defaultfont" weight="bold"/> 
+		<font id="font.suspend.balancehead.lower" height="13" facename="defaultfont" /> 
+		<font id="font.suspend.speed" height="10" facename="defaultfont" /> 
 		
 		<color id="color.suspend.balance" value="#FFDE01"/>
 		<color id="color.suspend.balanceshadow" value="#511B00"/>

@@ -393,10 +393,18 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 			strShow = tostring(nInte).."w"
 		elseif nInte >=10 then
 			local nDeciHold = math.floor(nDeci*10)
-			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+			strShow = tostring(nInte)
+			if nDeciHold > 0 then
+				strShow = strShow.."."..tostring(nDeciHold)
+			end
+			strShow = strShow.."w"
 		else
 			local nDeciHold = math.floor(nDeci*100)
-			strShow = tostring(nInte).."."..tostring(nDeciHold).."w"
+			strShow = tostring(nInte)
+			if nDeciHold > 0 then
+				strShow = strShow.."."..string.format("%02d", nDeciHold)
+			end
+			strShow = strShow.."w"
 		end
 	end
 	goldtextnumber:SetText(strShow)
