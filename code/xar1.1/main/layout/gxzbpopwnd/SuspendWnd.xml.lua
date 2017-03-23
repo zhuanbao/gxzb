@@ -225,14 +225,12 @@ function SuspendRightDisk_SetState(self, state)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
 		lightdisk:SetChildrenVisible(true)
-		lightdisk:SetResID("suspend-work-rightdisk-hoverright-bottom")
 		stopicon:SetVisible(true)
 	else
 		graydisk:SetVisible(false)
 		graydisk:SetChildrenVisible(false)
 		lightdisk:SetVisible(true)
 		lightdisk:SetChildrenVisible(true)
-		lightdisk:SetResID("suspend-work-rightdisk-hoverleft")
 		stopicon:SetVisible(false)
 	end
 	--重置指针
