@@ -46,12 +46,12 @@ function OnClickTakeCash(self)
 			SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
 		elseif tabInfo["rtn"] == 0 then	
 			local nBalance = tabInfo["data"]["balance"] 
-			tFunctionHelper.SetUserCurrentBalance(nBalance)
-			tFunctionHelper.UpdateUserBalance(nBalance)
-			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
 			local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 			tUserConfig["nLastTakeCashUTC"] = tFunctionHelper.GetCurrentServerTime()
 			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+			tFunctionHelper.SetUserCurrentBalance(nBalance)
+			tFunctionHelper.UpdateUserBalance(nBalance)
+			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
 		else
 			SetMsgToUser(OwnerCtrl, "服务器未知错误，请重试")
 			self:Enable(true)
@@ -118,7 +118,7 @@ function OnEditTextChange(self)
 		bTakeEnable = true
 		self:SetText(tostring(strTakeMoney))
 		g_strLastInput = strTakeMoney
-	elseif string.find(strText,"可提现") == nil then
+	elseif string.find(strText,"可提现") == nil and strText ~= "" then
 		self:SetText(g_strLastInput)
 		bTakeEnable = true
 	end
