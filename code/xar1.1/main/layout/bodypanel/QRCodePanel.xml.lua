@@ -99,7 +99,7 @@ end
 function HandleInfoData(OwnerCtrl,tabInfo)
 	local nExpire = math.floor(tabInfo["data"]["expire"]/1000)
 	-- 20 for test
-	nExpire = 20
+	-- nExpire = 20
 	local ObjBitmap = objGraphicFac:CreateBitmap(tabInfo["data"]["qrcodePath"], "ARGB32")
 	if not ObjBitmap then
 		ResetGlobalParam()

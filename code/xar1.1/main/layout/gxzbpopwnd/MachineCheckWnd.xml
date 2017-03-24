@@ -131,7 +131,7 @@
 								<Font>font.text12</Font>
 								<TextColor>B08756</TextColor>
 								<TextHoverColor>B08756</TextHoverColor>
-								<Underline>false</Underline>
+								<!--Underline>false</Underline-->
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickShare" />
