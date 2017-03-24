@@ -4,6 +4,8 @@
 		<texture id="GXZB.MainWnd.Bkg" type="NineInOne" image="bitmap\GXZB.MainWndBkg.png" />
 		 <!--标题区域-->
 		<bitmap id="GXZB.Caption.Logo" path="bitmap\GXZB.Caption.Logo.png"/>
+		<bitmap id="GXZB.Caption.Warning" path="bitmap\warning.png"/>
+		<bitmap id="GXZB.Share.QRcode" path="bitmap\GXZB.QRCodePanel.QRCode.Default.jpg"/>
 		
 		<texture id="GXZB.Caption.BtnClose.Normal" image="bitmap\GXZB.Caption.BtnClose.png" />
 		<texture id="GXZB.Caption.BtnClose.Hover"  image="bitmap\GXZB.Caption.BtnClose.png" />
