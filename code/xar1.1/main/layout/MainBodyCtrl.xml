@@ -11,6 +11,7 @@
 			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
 			
 			<UpdateClientBindState file="MainBodyCtrl.xml.lua" func="UpdateClientBindState"/>
+			<UpdateClientUnBindFailState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindFailState"/>
 			<UpdateClientUnBindState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MainBodyCtrl.xml.lua" func="UpdateUserBalance"/>
 			<UpdateMiningSpeed file="MainBodyCtrl.xml.lua" func="UpdateMiningSpeed"/>

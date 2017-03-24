@@ -148,8 +148,8 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 				end
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
 					ResetGlobalParam()
-					tFunctionHelper.SetUserBindInfo(tabBindInfo)
 					UpdateBindSuccessUI(OwnerCtrl)
+					tFunctionHelper.SetUserBindInfo(tabBindInfo)
 				end	
 				bQuerying = false
 			end)

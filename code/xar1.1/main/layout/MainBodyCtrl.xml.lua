@@ -180,6 +180,23 @@ function UpdateClientUnBindState(self)
 	return true
 end
 
+function UpdateClientUnBindFailState(self)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateClientUnBindFailState] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateClientUnBindFailState) == "function" then
+			objChild:UpdateClientUnBindFailState()
+		end	
+	end
+	return true
+end
+
 function UpdateUserBalance(self, nBalance)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then

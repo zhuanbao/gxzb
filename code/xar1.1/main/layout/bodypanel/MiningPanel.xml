@@ -5,6 +5,7 @@
 		</attr_def>
 		<method_def>
 			<UpdateClientBindState file="MiningPanel.xml.lua" func="UpdateClientBindState"/>
+			<UpdateClientUnBindFailState file="MiningPanel.xml.lua" func="UpdateClientUnBindFailState"/>
 			<UpdateClientUnBindState file="MiningPanel.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MiningPanel.xml.lua" func="UpdateUserBalance"/>
 			<UpdateMiningSpeed file="MiningPanel.xml.lua" func="UpdateMiningSpeed"/>
@@ -159,21 +160,20 @@
 								</obj>
 							</children>
 						</obj>
-						<!--obj id="MiningPanel.Panel.MiningState" class="TextObject">
+						<obj id="MiningPanel.Panel.State" class="TextObject">
 							<attr>
-								<left>10</left>
-								<top>356+42</top>
-								<width>father.width-20</width>
-								<height>40</height>
+								<left>(father.width-160)/2</left>
+								<top>376+42</top>
+								<width>180</width>
+								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>
 								<textcolor>AF8656</textcolor>
 								<font>font.text13</font>
-								<text>本地基础数据块已过期，正在重新生成。根据你的设备配置情况，该过程大概需要10-30分钟，请耐心等待...</text>
-								<multiline>1</multiline>
+								<text>解除绑定失败，请稍后重试！</text>
 								<visible>0</visible>
 							</attr>
-						</obj-->
+						</obj>
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
 								<left>(father.width-80)/2</left>

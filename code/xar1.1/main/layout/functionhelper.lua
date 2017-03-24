@@ -55,7 +55,6 @@ local g_tConfigFileStruct = {
 	},
 }
 
-
 function LoadJSONHelper()
 	local strJSONHelperPath = __document.."\\..\\JSON.lua"
 	local Module = XLLoadModule(strJSONHelperPath)
@@ -1843,7 +1842,7 @@ function QuerySvrForTakeCashInfo(nMoney)
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&cash=" .. Helper:UrlEncode((tostring(nMoney)))
+	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nMoney)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForTakeCashInfo] strReguestUrl = " .. strReguestUrl)
@@ -2067,6 +2066,7 @@ function QueryClientInfo(nMiningSpeed)
 			if tabInfo["data"]["status"] ~= 1 then
 				if CheckIsBinded() then
 					UnBindingClientFromServer()
+					return
 				end	
 			end
 			if tonumber(tabInfo["data"]["balance"]) ~= nil then
@@ -2192,6 +2192,7 @@ function SetUserBindInfo(tabBindInfo)
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
 	ChangeClientTitle("共享赚宝")
+	QueryClientInfo(0)
 end
 
 function CheckIsBinded()
@@ -2222,8 +2223,35 @@ end
 2.退出挖矿
 3.更新UI
 --]]
-function UnBindingClientFromClient()
-	SendMinerInfoToServer(GetUnBindUrl(),3)
+function SendUnBindInfoToServer()
+	local strUrl = GetUnBindUrl()
+	if not IsRealString(strUrl) then
+		OnUnBindFail()	
+		return
+	end
+	NewAsynGetHttpContent(strUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[SendUnBindInfoToServer] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+				local tabInfo = DeCodeJson(strContent)
+				
+				if type(tabInfo) ~= "table" 
+					or tabInfo["rtn"] ~= 0 then
+					TipLog("[SendUnBindInfoToServer] parse json failed.")
+					OnUnBindFail()
+					return 
+				end
+				OnUnBindSuccess(tabInfo)	
+		else
+			TipLog("[SendUnBindInfoToServer] send unbind info to server failed")
+			OnUnBindFail()
+		end
+	end)	
+end
+
+function OnUnBindSuccess()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tUserInfo"] = nil
 	SaveConfigToFileByKey("tUserConfig")
@@ -2231,20 +2259,29 @@ function UnBindingClientFromClient()
 	if CheckIsWorking() then
 		NotifyQuit()
 	end
+	ChangeMainBodyPanel("MiningPanel")
 	UpdateClientUnBindState()
+end	
+
+function OnUnBindFail()
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateClientUnBindFailState()
+	ChangeMainBodyPanel("MiningPanel")
+end	
+
+function UnBindingClientFromClient()
+	SendUnBindInfoToServer()
 end
 
 function UnBindingClientFromServer()
 	--不用再发统计了
-	--SendMinerInfoToServer(GetUnBindUrl(),3)
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["tUserInfo"] = nil
-	SaveConfigToFileByKey("tUserConfig")
-	ChangeClientTitle("共享赚宝(未绑定)")
-	if CheckIsWorking() then
-		NotifyQuit()
-	end
-	UpdateClientUnBindState()
+	OnUnBindSuccess()
 end
 
 --所有要处理绑定后信息的地方在这里处理
@@ -2288,12 +2325,6 @@ function UpdateUserBalance(nBalance)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	--for test
-	---[[
-	if nBalance ==  0 then
-		nBalance = 9999999
-	end
-	--]]
 	objMainBodyCtrl:UpdateUserBalance(nBalance)
 	--更新球
 	local root = GetSuspendRootCtrol()

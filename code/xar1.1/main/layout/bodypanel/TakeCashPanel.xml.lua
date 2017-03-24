@@ -25,7 +25,7 @@ function OnClickTakeCash(self)
 	--local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	tFunctionHelper.TakeCashToServer(nTakeMoney,function(bRet, tabInfo)
 		--for test
-		---[[
+		--[[
 		bRet = true
 		tabInfo = {}
 		tabInfo["rtn"] = 0

@@ -13,7 +13,6 @@ end
 
 function OnClickUnBind(self)
 	tFunctionHelper.UnBindingClientFromClient()
-	tFunctionHelper.ChangeMainBodyPanel("MiningPanel")
 	DestoryDialog(self)
 end
 

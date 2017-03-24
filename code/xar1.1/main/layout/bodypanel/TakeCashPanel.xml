@@ -160,9 +160,9 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.MsgToUser" class="TextObject">
 							<attr>
-								<left>1</left>
-								<top>250</top>
-								<width>father.width - 2</width>
+								<left>(father.width-176)/2+38</left>
+								<top>194+54+8</top>
+								<width>176</width>
 								<height>16</height>
 								<valign>center</valign>
 								<halign>center</halign>

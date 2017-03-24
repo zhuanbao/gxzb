@@ -3,6 +3,7 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local Helper = XLGetGlobal("Helper")
 local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+local g_UnBindFailTimerId = nil
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
@@ -25,6 +26,18 @@ end
 
 function UpdateClientUnBindState(self)
 	ResetUIVisible(self)
+end
+
+function UpdateClientUnBindFailState(self)
+	ChangeBindEntryVisible(self)
+	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
+	ObjTextState:SetVisible(true)
+	g_UnBindFailTimerId = timeMgr:SetTimer(function(Itm, id)
+		timeMgr:KillTimer(g_UnBindFailTimerId)
+		g_UnBindFailTimerId = nil
+		ObjTextState:SetVisible(false)
+		ChangeBindEntryVisible(self)
+	end,3*1000)
 end
 
 function UpdateUserBalance(self, nBalance)
@@ -222,6 +235,10 @@ function ResetUIVisible(OwnerCtrl)
 	objstopattr.DisableBkgID = "texture.MainPanel.MiniStartMining.normal"
 	objstopbtn:Updata()
 	--]]
+	if g_UnBindFailTimerId then
+		timeMgr:KillTimer(g_UnBindFailTimerId)
+		g_UnBindFailTimerId = nil
+	end
 	ChangeBindEntryVisible(OwnerCtrl)
 end
 
