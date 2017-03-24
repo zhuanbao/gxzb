@@ -187,32 +187,10 @@ function SaveConfigInTimer()
 	end, nTimeSpanInMs)
 end
 
-function GetCommandStrValue(strKey)
-	local bRet, strValue = false, nil
-	local cmdString = tipUtil:GetCommandLine()
-	
-	if string.find(cmdString, strKey .. " ") then
-		local cmdList = tipUtil:CommandLineToList(cmdString)
-		if cmdList ~= nil then	
-			for i = 1, #cmdList, 1 do
-				local strTmp = tostring(cmdList[i])
-				if strTmp == strKey 
-					and not string.find(tostring(cmdList[i + 1]), "^/") then		
-					bRet = true
-					strValue = tostring(cmdList[i + 1])
-					break
-				end
-			end
-		end
-	end
-	return bRet, strValue
-end
-
-
 function SendStartupReport(bShowWnd)
 	local tStatInfo = {}
 	
-	local bRet, strSource = GetCommandStrValue("/sstartfrom")
+	local bRet, strSource = FunctionObj.GetCommandStrValue("/sstartfrom")
 	tStatInfo.strEL = strSource or ""
 	
 	if not bShowWnd then
@@ -442,6 +420,15 @@ end
 function TipMain()	
 	
 	CreateMainTipWnd()
+	
+	FunctionObj.InitMachName()
+	SaveConfigInTimer()
+	if not FunctionObj.CheckIsBinded() then
+		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
+	end
+	CheckMachineBindState()
+	--显示悬浮框
+	FunctionObj.UpdateSuspendWndVisible()
 	if g_ServerConfig == nil then
 		MessageBox(tostring("连接服务器失败"))
 		return
@@ -452,14 +439,7 @@ function TipMain()
 		return
 	end
 	
-	FunctionObj.InitMachName()
-	SaveConfigInTimer()
-	if not FunctionObj.CheckIsBinded() then
-		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
-	end
-	CheckMachineBindState()
-	--显示悬浮框
-	FunctionObj.UpdateSuspendWndVisible()
+	FunctionObj.CheckShoudAutoMining()
 	--ShowPopWndByCommand()
 end
 
