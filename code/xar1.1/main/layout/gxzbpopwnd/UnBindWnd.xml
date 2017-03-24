@@ -114,10 +114,10 @@
 								<top>father.height-38-50</top>
 								<width>102</width>
 								<height>38</height>
-								<NormalBkgID>texture.unbind.confirm.normal</NormalBkgID>
-								<HoverBkgID>texture.unbind.confirm.hover</HoverBkgID>
-								<DownBkgID>texture.unbind.confirm.down</DownBkgID>
-								<DisableBkgID>texture.unbind.confirm.down</DisableBkgID>
+								<NormalBkgID>texture.button.confirm.normal</NormalBkgID>
+								<HoverBkgID>texture.button.confirm.hover</HoverBkgID>
+								<DownBkgID>texture.button.confirm.down</DownBkgID>
+								<DisableBkgID>texture.button.confirm.down</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickUnBind" />
@@ -132,10 +132,10 @@
 								<top>father.height-38-50</top>
 								<width>102</width>
 								<height>38</height>
-								<NormalBkgID>texture.unbind.cancle.normal</NormalBkgID>
-								<HoverBkgID>texture.unbind.cancle.hover</HoverBkgID>
-								<DownBkgID>texture.unbind.cancle.down</DownBkgID>
-								<DisableBkgID>texture.unbind.cancle.down</DisableBkgID>
+								<NormalBkgID>texture.button.cancle.normal</NormalBkgID>
+								<HoverBkgID>texture.button.cancle.hover</HoverBkgID>
+								<DownBkgID>texture.button.cancle.down</DownBkgID>
+								<DisableBkgID>texture.button.cancle.down</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickCancel" />

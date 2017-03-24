@@ -3,159 +3,139 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>500</width>
-			<height>280</height>
+			<width>520</width>
+			<height>298</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>500</width>
-				<height>280</height>
-				<texture>common-bkg</texture>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
 			</attr>	
 			<children>
 				<obj id="MachineCheckWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
+						<left>9</left>
+						<top>9</top>
+						<width>502</width>
+						<height>280</height>
 					</attr>
 					<children>
-						<obj id="MachineCheckWnd.TitleBar" class="LayoutObject">
+						<obj id="MachineCheckWnd.TitleBar.Logo" class="ImageObject">
 							<attr>
-								<left>0</left>
-								<top>0</top>
-								<width>father.width</width>
-								<height>30</height>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
 							</attr>
-							<children>
-								<obj id="MachineCheckWnd.TitleBar.Logo" class="ImageObject">
-									<attr>
-										<left>10</left>
-										<top>5</top>
-										<width>14</width>
-										<height>13</height>
-										<image>GXZB.Caption.Logo</image>
-									</attr>
-								</obj>
-								<obj id="MachineCheckWnd.TitleBar.Title" class="TextObject">
-									<attr>
-										<left>10+20+5</left>
-										<top>0</top>
-										<width>200</width>
-										<height>father.height</height>
-										<text>共享赚宝</text>
-										<textcolor>system.black</textcolor>
-										<font>font.default12</font>
-										<valign>center</valign>
-									</attr>
-								</obj>
-								<obj id="MachineCheckWnd.TitleBar.CloseBtn" class="TipAddin.Button">
-									<attr>
-										<left>father.width-25</left>
-										<top>8</top>
-										<width>15</width>
-										<height>15</height>
-										<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-										<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-										<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-										<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-									</attr>
-									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickClose" />
-										<event name="OnMouseEnter">
-											local self = ...
-											local hoverimage = self:GetObject("hoverimage")
-											if not hoverimage then
-												local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
-												hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
-												self:AddChild(hoverimage)
-												hoverimage:SetObjPos(-5, -9, 20, -6)
-												hoverimage:SetResID("GXZB.Title.Hoverimage")
-											end
-											hoverimage:SetVisible(true)
-										</event>
-										<event name="OnMouseLeave">
-											local self = ...
-											local hoverimage = self:GetObject("hoverimage")
-											if hoverimage then
-												hoverimage:SetVisible(false)
-											end
-										</event>
-									</eventlist>	
-								</obj>
-							</children>
 						</obj>
-						<obj id="MachineCheckWnd.Content" class="LayoutObject">
+						<obj id="MachineCheckWnd.TitleBar.Title" class="TextObject">
 							<attr>
-								<left>0</left>
-								<top>30</top>
-								<width>father.width</width>
-								<height>father.height-30</height>
+								<left>12+14+6</left>
+								<top>8</top>
+								<width>200</width>
+								<height>20</height>
+								<text>共享赚宝</text>
+								<textcolor>6D5539</textcolor>
+								<font>font.default13</font>
+								<valign>top</valign>
+								<halign>left</halign>
 							</attr>
-							<children>
-								<obj id="MachineCheckWnd.Content.Warning" class="ImageObject">
-									<attr>
-										<left>95</left>
-										<top>65</top>
-										<width>35</width>
-										<height>35</height>
-										<image>logo-mid</image>
-										<drawmode>1</drawmode>
-									</attr>
-								</obj>
-								<obj id="MachineCheckWnd.Content.Text" class="TextObject">
-									<attr>
-										<left>95+35+10</left>
-										<top>65+5</top>
-										<width>300</width>
-										<height>24</height>
-										<valign>center</valign>
-										<halign>left</halign>
-										<textcolor>DDDDDD</textcolor>
-										<font>font.text18</font>
-										<text>软件检测到本设备不支持赚宝</text>
-									</attr>
-								</obj>
-								<obj id="MachineCheckWnd.Content.ExitBtn" class="TipAddin.Button">
-									<attr>
-										<Text>退出</Text>
-										<TextFont>font.text16</TextFont>
-										<TextColor>DDDDDD</TextColor>
-										<left>(father.width-73)/2</left>
-										<top>164</top>
-										<width>90</width>
-										<height>30</height>
-										<NormalBkgID>setting-btn-normal</NormalBkgID>
-										<DownBkgID>setting-btn-normal</DownBkgID>
-										<HoverBkgID>setting-btn-hover</HoverBkgID>
-										<DisableBkgID>setting-btn-hover</DisableBkgID>
-									</attr>
-									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickExit" />
-									</eventlist>	
-								</obj>
-								<obj id="MachineCheckWnd.Content.Share" class="TextLinkEx">
-									<attr>
-										<left>father.width-73-18</left>
-										<top>father.height-18-18</top>
-										<width>77</width>
-										<height>18</height>
-										<HAlign>center</HAlign>
-										<VAlign>center</VAlign>
-										<Text>分享赚分成></Text>
-										<Font>font.text13</Font>
-										<TextColor>C4C400</TextColor>
-										<TextHoverColor>C4C400</TextHoverColor>
-										<Underline>false</Underline>
-									</attr>
-									<eventlist>
-										<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickShare" />
-									</eventlist>
-								</obj>
-							</children>
+						</obj>
+						<obj id="MachineCheckWnd.TitleBar.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-12-15</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if not hoverimage then
+										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+										self:AddChild(hoverimage)
+										hoverimage:SetObjPos(-5, -9, 20, -6)
+										hoverimage:SetResID("GXZB.Title.Hoverimage")
+									end
+									hoverimage:SetVisible(true)
+								</event>
+								<event name="OnMouseLeave">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if hoverimage then
+										hoverimage:SetVisible(false)
+									end
+								</event>
+							</eventlist>	
+						</obj>
+						<obj id="MachineCheckWnd.Content.Warning" class="ImageObject">
+							<attr>
+								<left>112</left>
+								<top>106</top>
+								<width>28</width>
+								<height>28</height>
+								<image>GXZB.Caption.Warning</image>
+							</attr>
+						</obj>
+						<obj id="MachineCheckWnd.Content.Text" class="TextObject">
+							<attr>
+								<left>112+28+10</left>
+								<top>113-6</top>
+								<width>300</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
+								<text>软件检测到本设备不支持赚宝</text>
+							</attr>
+						</obj>
+						<obj id="MachineCheckWnd.Content.ExitBtn" class="TipAddin.Button">
+							<attr>
+								<Text>退出</Text>
+								<TextFont>font.text14</TextFont>
+								<TextColor>FFFFFF</TextColor>
+								<left>(father.width-102)/2</left>
+								<top>father.height-38-50</top>
+								<width>102</width>
+								<height>38</height>
+								<NormalBkgID>texture.button.confirm.normal</NormalBkgID>
+								<HoverBkgID>texture.button.confirm.hover</HoverBkgID>
+								<DownBkgID>texture.button.confirm.down</DownBkgID>
+								<DisableBkgID>texture.button.confirm.down</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickExit" />
+							</eventlist>	
+						</obj>
+						<obj id="MachineCheckWnd.Content.Share" class="TextLinkEx">
+							<attr>
+								<left>father.width-69-16</left>
+								<top>father.height-18-18</top>
+								<width>69</width>
+								<height>18</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>分享赚分成></Text>
+								<Font>font.text12</Font>
+								<TextColor>B08756</TextColor>
+								<TextHoverColor>B08756</TextHoverColor>
+								<Underline>false</Underline>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MachineCheckWnd.xml.lua" func="OnClickShare" />
+							</eventlist>
 						</obj>
 					</children>
 				</obj>
@@ -168,8 +148,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>500</width>
-			<height>280</height>
+            <width>520</width>
+			<height>298</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
