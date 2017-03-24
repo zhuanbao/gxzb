@@ -1,7 +1,7 @@
 <XLUE>
 	<resource>
 		<bitmap id="logo-mid" path="popwndbitmap\logo-mid.png" />
-		<bitmap id="GXZB.Caption.Warning" path="bitmap\warning.png"/>
+		<bitmap id="GXZB.Caption.Warning" path="popwndbitmap\warning.png"/>
 		<texture id="process-bar" type="ThreeInOneH" image="popwndbitmap\process-bar.png" />
 		<texture id="process-bkg" type="ThreeInOneH" image="popwndbitmap\process-bkg.png" />
 
