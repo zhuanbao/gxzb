@@ -293,7 +293,7 @@ function OnClickHourBtnBarChart(self)
 	end
 	ChangeBtnState(self, 1)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
-	barobj:SetObjPos("(father.width-191)/2", 70, "(father.width-191)/2 + 191", 70+246+30)
+	barobj:SetObjPos("(father.width-191)/2 + 5", 89, "(father.width-191)/2 + 5 + 191", 89+246+30)
 	attr.currentpanel = 1
 	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
 		attr.Data = tabInfo
@@ -311,7 +311,7 @@ function OnClickDayBtnBarChart(self)
 	end
 	ChangeBtnState(self, 2)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
-	barobj:SetObjPos("(father.width-240)/2", 70, "(father.width-240)/2 + 240", 70+246+30)
+	barobj:SetObjPos("(father.width-240)/2+4", 89, "(father.width-240)/2 + 4 + 240", 89+246+30)
 	attr.currentpanel = 2
 	tFunctionHelper.GetHistoryToServer(1, function(bRet, tabInfo)
 		attr.Data = tabInfo

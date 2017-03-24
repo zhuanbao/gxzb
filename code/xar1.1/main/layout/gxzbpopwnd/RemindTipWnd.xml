@@ -3,30 +3,30 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>360</width>
-			<height>132</height>
+			<width>520</width>
+			<height>298</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>360</width>
-				<height>132</height>
-				<texture>common-bkg</texture>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
 			</attr>	
 			<children>
 				<obj id="RemindTipWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>0</left>
-						<top>0</top>
-						<width>father.width</width>
-						<height>father.height</height>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
 					</attr>
 					<children>
 						<obj id="RemindTipWnd.Caption.CloseBtn" class="TipAddin.Button">
 							<attr>
-								<left>father.width-25</left>
-								<top>9</top>
+								<left>father.width-27</left>
+								<top>10</top>
 								<width>15</width>
 								<height>15</height>
 								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
@@ -57,23 +57,32 @@
 								</event>
 							</eventlist>	
 						</obj>
+						<obj id="AboutWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
 						<obj id="RemindTipWnd.Title" class="TextObject">
 							<attr>
-								<left>18</left>
-								<top>10</top>
+								<left>32</left>
+								<top>8</top>
 								<width>70</width>
 								<height>20</height>
-								<valign>center</valign>
+								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
-								<font>font.text16</font>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
 								<text>恭喜你</text>
 							</attr>
 						</obj>
-						<obj id="RemindTipWnd.Logo" class="ImageObject">
+						<obj id="RemindTipWnd.Icon" class="ImageObject">
 							<attr>
-								<left>28</left>
-								<top>50</top>
+								<left>90</left>
+								<top>100</top>
 								<width>80</width>
 								<height>80</height>
 								<image>logo-mid</image>
@@ -81,14 +90,14 @@
 						</obj>
 						<obj id="RemindTipWnd.Content" class="TextObject">
 							<attr>
-								<left>100</left>
-								<top>48</top>
+								<left>180</left>
+								<top>105</top>
 								<width>215</width>
 								<height>40</height>
 								<multiline>1</multiline>
 								<valign>top</valign>
 								<halign>left</halign>
-								<textcolor>DDDDDD</textcolor>
+								<textcolor>6D5539</textcolor>
 								<font>font.text14</font>
 								<text></text>
 							</attr>
@@ -104,8 +113,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>360</width>
-			<height>132</height>
+            <width>520</width>
+			<height>298</height>
             
             <topmost>0</topmost>
             <visible>1</visible>

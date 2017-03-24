@@ -419,6 +419,7 @@ function SuspendCtrl_UpdateClientUnBindState(self)
 		self:SetState(newState)
 	end
 	--更新余额为0
+	attr.linevalue = 0
 	self:UpdateLine(0)
 	--清除速度显示
 	local RightDisk = self:GetObject("RightDisk")
@@ -427,7 +428,7 @@ function SuspendCtrl_UpdateClientUnBindState(self)
 	--清除灰色余额
 	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
 	local goldtextnumber = UIDecor(LeftGoldBalance:GetObject("goldtextnumberconta"))
-	goldtextnumber:SetText("")
+	goldtextnumber:SetText("0")
 end
 
 local minWidth = 82

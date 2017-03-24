@@ -23,14 +23,14 @@
 						<obj id="TakeCashPanel.Panel.Input" class="LayoutObject">
 							<attr>
 								<left>1</left>
-								<top>100</top>
+								<top>116</top>
 								<width>father.width-2</width>
 								<height>30</height>
 							</attr>
 							<children>
 								<obj id="TakeCashPanel.Panel.Description" class="TextObject">
 									<attr>
-										<left>52</left>
+										<left>46</left>
 										<top>7</top>
 										<width>70</width>
 										<height>20</height>
@@ -43,16 +43,16 @@
 								</obj>
 								<obj id="TakeCashPanel.Panel.EditBkg" class="TextureObject">
 									<attr>
-										<left>130</left>
+										<left>128</left>
 										<top>0</top>
-										<width>150</width>
+										<width>184</width>
 										<height>32</height>
-										<texture>setting-edit-bkg</texture>
+										<texture>GXZB.TakeCashPanel.EditBkg</texture>
 									</attr>	
 									<children>
 										<obj id="TakeCashPanel.Panel.RMB" class="ImageObject">
 											<attr>
-												<left>4</left>
+												<left>10</left>
 												<top>10</top>
 												<width>10</width>
 												<height>12</height>
@@ -66,9 +66,9 @@
 										</obj>
 										<obj id = "TakeCashPanel.Panel.Edit" class = "EditObject">
 											<attr>
-												<left>4+10-4</left>
-												<top>3</top>
-												<width>110</width>
+												<left>20</left>
+												<top>5</top>
+												<width>164</width>
 												<height>24</height>
 												<transparent>1</transparent>
 												<textcolor>BCB9B5</textcolor>
@@ -89,8 +89,8 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.Amount" class="LayoutObject">
 							<attr>
-								<left>114+1</left>
-								<top>136</top>
+								<left>130</left>
+								<top>156</top>
 								<width>father.width-114-2</width>
 								<height>16</height>
 							</attr>
@@ -139,16 +139,17 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.Take" class="TipAddin.Button">
 							<attr>
-								<left>(father.width-185)/2</left>
-								<top>206</top>
-								<width>185</width>
-								<height>55</height>
+								<left>(father.width-185)/2+38</left>
+								<top>194</top>
+								<width>184</width>
+								<height>54</height>
 								<TextFont>font.text20</TextFont>
 								<TextColor>system.white</TextColor>
+								<DisableTextColor>system.white</DisableTextColor>
 								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
 								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
 								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
-								<DisableBkgID>texture.Update.OneKeyUpdate.normal</DisableBkgID>
+								<DisableBkgID>texture.Update.OneKeyUpdate.disable</DisableBkgID>
 								<Visible>true</Visible>
 								<Text>提现</Text>
 								<Enable>false</Enable>
@@ -173,8 +174,8 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.TakeRule" class="TextObject">
 							<attr>
-								<left>25</left>
-								<top>325</top>
+								<left>25+13</left>
+								<top>325+33</top>
 								<width>father.width - 25*2</width>
 								<height>80</height>
 								<valign>top</valign>
@@ -190,8 +191,8 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.UnBindWeiXin" class="TextLinkEx">
 							<attr>
-								<left>255</left>
-								<top>325+50</top>
+								<left>255+13</left>
+								<top>325+33+50</top>
 								<width>60</width>
 								<height>16</height>
 								<HAlign>center</HAlign>

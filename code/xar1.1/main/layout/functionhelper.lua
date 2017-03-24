@@ -1947,13 +1947,13 @@ function GetHistoryToServer(ntype, fnCallBack)
 		return
 	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
-	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	if not strReguestUrl then
 		local tDef = GetLocal()
 		fnCallBack(false, tDef)
 		Save2Local(tDef)
 		return
 	end
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
 	NewAsynGetHttpContent(strReguestUrl, false
 	, function(nRet, strContent, respHeaders)
@@ -1996,6 +1996,11 @@ function QuerySvrForNewGetGold()
 end
 
 function PopTipPre4Hour()
+	--[[local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["nMoneyPer4Hour"] = 21321
+	SaveConfigToFileByKey("tUserConfig")
+	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+	if true then return end]]
 	local nTipPopIntervalMs  = g_ServerConfig["nTipPopIntervalMs"] or 4*3600*1000
 	SetTimer(
 		function(item, id)
@@ -2023,10 +2028,6 @@ function PopTipPre4Hour()
 					end
 				end)
 			end
-			--[[local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-			if tUserConfig["nMoneyPer4Hour"] and tonumber(tUserConfig["nMoneyPer4Hour"]) and tonumber(tUserConfig["nMoneyPer4Hour"]) > 0 then
-				ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-			end]]
 		end,	
 	nTipPopIntervalMs)
 end

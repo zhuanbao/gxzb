@@ -34,6 +34,7 @@
 			<texture id="texture.MainPanel.TakeCash.down"  imagelist="imagelist.MainPanel.TakeCash" index="3" />
 		<bitmap id="GXZB.MainWndBottomBkg" image="bitmap\GXZB.MainWndBottomBkg.png" />
 		<bitmap id="GXZB.Title.Hoverimage" image="bitmap\GXZB.Title.Hoverimage.png" />
+		<texture id="GXZB.TakeCashPanel.EditBkg" type="ThreeInOneH" image="bitmap\GXZB.TakeCashPanel.EditBkg.png" />
 		
 		<imagelist id="imagelist.MainPanel.StartMining" vertical="0" varyblock="0" blocksize="220" image="bitmap\GXZB.MiningPanel.StartMining.png"/>
 			<texture id="texture.MainPanel.StartMining.normal"  imagelist="imagelist.MainPanel.StartMining" index="1" />

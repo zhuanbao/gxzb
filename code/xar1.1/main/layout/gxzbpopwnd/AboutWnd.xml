@@ -3,24 +3,24 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>545</width>
-			<height>338</height>
+			<width>520</width>
+			<height>298</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>545</width>
-				<height>338</height>
-				<texture>GXZB.MainWnd.Bkg</texture>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
 			</attr>	
 			<children>
 				<obj id="AboutWnd.Caption" class="CaptionObject">
 					<attr>
-						<left>26</left>
-						<top>18</top>
-						<width>father.width-52</width>
-						<height>father.height-18-34</height>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
 					</attr>
 					<children>
 						<obj id="AboutWnd.Caption.CloseBtn" class="TipAddin.Button">

@@ -43,7 +43,7 @@
 						</obj>
 						<obj id="BottomLayout" class="LayoutObject">
 							<attr>
-								<left>(father.width-120)/2</left>
+								<left>(father.width-120)/2-22</left>
 								<top>father.height + 20</top>
 								<width>father.width</width>
 								<height>20</height>
@@ -185,7 +185,7 @@
 						<obj id="EarningsPanel.BarChart" class="BarChart">
 							<attr>
 								<left>60</left>
-								<top>30+40</top>
+								<top>30+40+19</top>
 								<width>father.width-60-10</width>
 								<height>father.height-100</height>
 							</attr>	
