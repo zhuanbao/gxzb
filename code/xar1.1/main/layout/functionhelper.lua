@@ -238,6 +238,7 @@ function RegisterFunctionObject(self)
 	obj.UnBindingClientFromServer = UnBindingClientFromServer
 	obj.DownLoadNewVersion = DownLoadNewVersion
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
+	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.GetClientCurrentState = GetClientCurrentState
 	obj.CheckShouldRemindBind = CheckShouldRemindBind
 	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
@@ -2071,7 +2072,7 @@ function QueryClientInfo(nMiningSpeed)
 			end
 			if tonumber(tabInfo["data"]["balance"]) ~= nil then
 				g_Balance = tabInfo["data"]["balance"]
-				UpdateUserBalance(g_Balance)
+				UpdateUserBalance()
 			end
 			if tonumber(tabInfo["data"]["speed"]) ~= nil then
 				g_PerSpeed = tabInfo["data"]["speed"]
@@ -2085,6 +2086,10 @@ end
 --获取当前余额
 function GetUserCurrentBalance()
 	return g_Balance
+end
+
+function SetUserCurrentBalance(nBalance)
+	g_Balance = nBalance
 end
 
 --获取客户端状态
@@ -2305,7 +2310,8 @@ function UpdateClientUnBindState()
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	UpdateUserBalance(0)
+	SetUserCurrentBalance(0)
+	UpdateUserBalance()
 	objMainBodyCtrl:UpdateClientUnBindState()
 	--更新球
 	local root = GetSuspendRootCtrol()
@@ -2315,9 +2321,9 @@ function UpdateClientUnBindState()
 end
 
 --所有要更新账户余额的地方在这里处理
-function UpdateUserBalance(nBalance)
+function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
-	RegSetValue("HKEY_CURRENT_USER\\Software\\gxzb\\balance", nBalance)
+	RegSetValue("HKEY_CURRENT_USER\\Software\\gxzb\\balance", g_Balance)
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
@@ -2325,11 +2331,11 @@ function UpdateUserBalance(nBalance)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	objMainBodyCtrl:UpdateUserBalance(nBalance)
+	objMainBodyCtrl:UpdateUserBalance(g_Balance)
 	--更新球
 	local root = GetSuspendRootCtrol()
 	if root and type(root.UpdateUserBalance) == "function" then
-		root:UpdateUserBalance(nBalance)
+		root:UpdateUserBalance(g_Balance)
 	end
 end
 

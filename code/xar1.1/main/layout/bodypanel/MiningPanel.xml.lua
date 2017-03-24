@@ -192,8 +192,11 @@ function AdjustAmountTextPosition(self)
 	local nMaxLen = width - (nLenDesc+gap) - (nLenUnit+gap)
 	if nLenNum > nMaxLen then
 		nLenNum = nMaxLen
+	else
+		--修正一个像素 "11111"的时候放不下
+		nLenNum = nLenNum + 1
 	end
-	
+
 	local nNewLeft = (width-(nLenDesc+gap)-nLenNum-(nLenUnit+gap))/2
 	ObjTextDesc:SetObjPos(nNewLeft, 0, nNewLeft+nLenDesc, height)
 	ObjTextNum:SetObjPos(nNewLeft+(nLenDesc+gap), 0, nNewLeft+(nLenDesc+gap)+nLenNum, height)

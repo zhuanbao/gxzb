@@ -37,12 +37,16 @@ function OnClickTakeCash(self)
 			self:Enable(true)
 		elseif tabInfo["rtn"] == NOENOUGHMONEY then
 			local nBalance = tabInfo["data"]["balance"] 
+			tFunctionHelper.SetUserCurrentBalance(nBalance)
 			tFunctionHelper.UpdateUserBalance(nBalance)
 		elseif tabInfo["rtn"] == EXCEEDINGTAKETIME then
+			local nBalance = tabInfo["data"]["balance"] 
+			tFunctionHelper.SetUserCurrentBalance(nBalance)
 			tFunctionHelper.UpdateUserBalance(nBalance)
 			SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
 		elseif tabInfo["rtn"] == 0 then	
 			local nBalance = tabInfo["data"]["balance"] 
+			tFunctionHelper.SetUserCurrentBalance(nBalance)
 			tFunctionHelper.UpdateUserBalance(nBalance)
 			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
 			local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
