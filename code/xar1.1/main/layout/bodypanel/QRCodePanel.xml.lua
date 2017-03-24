@@ -212,6 +212,7 @@ end
 function OnShowPanel(self, bShow)
 	gBinding = bShow
 	if bShow then
+		ResetUIVisible(self)
 		GetQRCodeFromServer(self)
 	else
 		ResetGlobalParam()
