@@ -46,6 +46,27 @@ function SetBallSetting(value)
 	tFunctionHelper.UpdateSuspendWndVisible(value == 2 and 1 or 0)
 end
 
+function FetchValueByPath(obj, path)
+	local cursor = obj
+	for i = 1, #path do
+		cursor = cursor[path[i]]
+		if cursor == nil then
+			return nil
+		end
+	end
+	return cursor
+end
+
+function InitSelectIcon(self, id)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local nSelect = FetchValueByPath(tUserConfig, {"tConfig", "ShowBall", "nState"})
+	if ((not nSelect or nSelect == 0) and id == 0) or
+		(nSelect == 1 and id == 1) or
+		(nSelect == 2 and id == 2) then
+		InitIcon(self, "bitmap.menu.select.normal")
+	end
+end
+
 local menuTable = {
 --主界面
 {id="mainui", text = "主界面", OnInitFun = function(self) InitIcon(self, "bitmap.menu.main.normal") end},
@@ -55,14 +76,14 @@ local menuTable = {
 	text = "设置", 
 	OnSelectFun = function(self) end,
 	SubMenuTable = {
-		{id="allwaysshow", text = "始终显示", OnSelectFun = function(self) SetBallSetting(0)  end},
-		{id="allwayshide", text = "始终隐藏", OnSelectFun = function(self) SetBallSetting(1)  end},
-		{id="onlymakemoney", text = "仅赚宝时显示", OnSelectFun = function(self) SetBallSetting(2)  end},
+		{id="allwaysshow", text = "始终显示", OnInitFun = function(self) InitSelectIcon(self, 0) end, OnSelectFun = function(self) SetBallSetting(0)  end},
+		{id="allwayshide", text = "始终隐藏", OnInitFun = function(self) InitSelectIcon(self, 1) end, OnSelectFun = function(self) SetBallSetting(1)  end},
+		{id="onlymakemoney", text = "仅赚宝时显示", OnInitFun = function(self) InitSelectIcon(self, 2) end, OnSelectFun = function(self) SetBallSetting(2)  end},
 	},
 	OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting.normal") end
 },
 --退出
-{id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.main.normal") end},
+{id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.exit.normal") end},
 }
 
 GXZBMenu.SuspendMenu = {}

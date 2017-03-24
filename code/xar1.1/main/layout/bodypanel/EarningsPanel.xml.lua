@@ -26,8 +26,7 @@ end
 
 --相当于强制刷新
 function UpdateClientUnBindState(self)
-	local barobj = self:GetObject("control:EarningsPanel.BarChart")
-	local attr = barobj:GetAttribute()
+	local attr = self:GetAttribute()
 	local reqID = 0
 	if attr.currentpanel == 2 then
 		reqID = 1
@@ -36,7 +35,7 @@ function UpdateClientUnBindState(self)
 			attr.Data = tabInfo
 			attr.Data["reqFailed"] = not bRet
 			attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
-			barobj:Update()
+			self:Update()
 		end)
 end
 
@@ -63,9 +62,9 @@ function BarChartUpdate(self, fnConvert)
 			end
 		end
 	end
-	--最小显示7个刻度
+	--显示7个刻度
 	local minYnumber = 7
-	if ymax == 0 then
+	if ymax < minYnumber then
 		ymax = minYnumber
 	end
 	local l, t, r, b = barchartpanel:GetObjPos()
@@ -108,19 +107,28 @@ function BarChartUpdate(self, fnConvert)
 			xyLineBkg:SetBitmap(xylineFailedBitmap30)
 		end
 	end
-	--显示纵坐标刻度
-	for i = 1, minYnumber do
-		local ytmp = h*i/minYnumber
-		local yreal = h - ytmp
+	local function GetNewTextObj(strText)
 		local newTextObject = objFactory:CreateUIObject("", "TextObject")
-		newTextObject:SetText(tostring(math.floor(ymax*i/minYnumber)))
+		newTextObject:SetText(strText)
 		barchartpanel:AddChild(newTextObject)
-		newTextObject:SetObjPos(-50, yreal-6, 0, yreal+6)
 		newTextObject:SetVAlign("center")
 		newTextObject:SetHAlign("center")
 		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
 		newTextObject:SetTextFont("font.text12")
+		return newTextObject
 	end
+	--显示纵坐标刻度
+	for i = 1, minYnumber do
+		local ytmp = h*i/minYnumber
+		local yreal = h - ytmp
+		local newTextObject = GetNewTextObj(tostring(math.floor(ymax*i/minYnumber)))
+		newTextObject:SetObjPos(-50, yreal-6, 0, yreal+6)
+	end
+	--显示单位
+	local newTextObject = GetNewTextObj("w")
+	newTextObject:SetObjPos(-4, -15, 6, -2)
+	newTextObject = GetNewTextObj(attr.currentpanel == 1 and "h" or "date")
+	newTextObject:SetObjPos("father.width+3", "father.height-12", attr.currentpanel == 1 and "father.width+13" or "father.width+26", "father.height+1")
 	--间隔宽度是柱子的一半
 	local itemw = w/(#attr.Data*3-1)
 	if itemw < 2 then
@@ -195,7 +203,7 @@ function BarChartUpdate(self, fnConvert)
 							tips:GetObject("bkg"):SetBitmap(tipsFailedBitmap)
 						end
 					end
-					tips:SetText(""..dat[2].."\n"..dat[1])
+					tips:SetText(""..dat[2].."w\n"..dat[1])
 					local scal = 1-dat[2]/ymax
 					if scal <= 0.4 then
 						scal = 0.4
@@ -244,9 +252,17 @@ function ChangeColor(self, cl)
 end
 
 function SetText(self, text)
-	local textobj = self:GetObject("text")
+	local _, _, strTop, strBottom = string.find(text, "(%S+)\n(%S+)")
+	if not strTop or not strBottom then
+		return
+	end
+	local textobj = self:GetObject("texttop")
 	if textobj then
-		textobj:SetText(text)
+		textobj:SetText(strTop)
+	end
+	textobj = self:GetObject("textbottom")
+	if textobj then
+		textobj:SetText(strBottom)
 	end
 end
 

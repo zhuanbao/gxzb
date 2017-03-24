@@ -81,8 +81,8 @@
 						</obj>
 						<obj id="AboutWnd.Icon" class="ImageObject">
 							<attr>
-								<left>90</left>
-								<top>100</top>
+								<left>94</left>
+								<top>96</top>
 								<width>80</width>
 								<height>80</height>
 								<image>logo-mid</image>
@@ -91,7 +91,7 @@
 						<obj id="AboutWnd.Content.Version" class="TextObject">
 							<attr>
 								<left>204</left>
-								<top>100</top>
+								<top>95</top>
 								<width>80</width>
 								<height>20</height>
 								<valign>top</valign>
@@ -104,7 +104,7 @@
 						<obj id="AboutWnd.Content.VersionValue" class="TextObject">
 							<attr>
 								<left>284</left>
-								<top>100</top>
+								<top>95</top>
 								<width>84</width>
 								<height>20</height>
 								<valign>top</valign>
@@ -117,7 +117,7 @@
 						<obj id="AboutWnd.Content.Date" class="TextObject">
 							<attr>
 								<left>204</left>
-								<top>125</top>
+								<top>123</top>
 								<width>80</width>
 								<height>20</height>
 								<valign>top</valign>
@@ -130,7 +130,7 @@
 						<obj id="AboutWnd.Content.DateValue" class="TextObject">
 							<attr>
 								<left>284</left>
-								<top>125</top>
+								<top>123</top>
 								<width>84</width>
 								<height>20</height>
 								<valign>top</valign>

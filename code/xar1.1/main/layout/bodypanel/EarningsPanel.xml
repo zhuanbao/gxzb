@@ -114,19 +114,29 @@
 						<image>charttips-bkg</image>
 					</attr>
 					<children>
-						<obj id="text" class="TextObject">
+						<obj id="texttop" class="TextObject">
 							<attr>
 								<left>0</left>
-								<top>0</top>
+								<top>7</top>
 								<width>father.width</width>
-								<height>father.height</height>
+								<height>14</height>
 								<halign>center</halign>
 								<valign>center</valign>
 								<textcolor>system.white</textcolor>
-								<font>font.text12</font>
-								<multiline>1</multiline>
+								<font>font.text14</font>
 							</attr>
-						</obj>	
+						</obj>
+						<obj id="textbottom" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>27</top>
+								<width>father.width</width>
+								<height>12</height>
+								<halign>center</halign>
+								<valign>center</valign>
+								<textcolor>system.white</textcolor>
+							</attr>
+						</obj>
 					</children>
 				</obj>
 			</children>
@@ -135,6 +145,16 @@
 	
 	<!--柱形图面板-->
 	<control class="EarningsPanel">
+		<method_def>
+			<UpdateUserBalance>
+				local self, nBalance = ...
+				self:GetObject("EarningsPanel.BarChart"):UpdateUserBalance(nBalance)
+			</UpdateUserBalance>
+			<UpdateClientUnBindState>
+				local self = ...
+				self:GetObject("EarningsPanel.BarChart"):UpdateClientUnBindState()
+			</UpdateClientUnBindState>
+		</method_def>
 		<objtemplate>
 			<children>
 				<obj id="bkg" class="FillObject">

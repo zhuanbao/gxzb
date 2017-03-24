@@ -337,9 +337,9 @@
 							<children>
 								<obj id="SettingWnd.Buttom.Confirm" class="TipAddin.Button">
 									<attr>
-										<left>366</left>
-										<top>19</top>
-										<width>100</width>
+										<left>362</left>
+										<top>17</top>
+										<width>102</width>
 										<height>36</height>
 										<Text>确定</Text>
 										<TextFont>font.text13</TextFont>
@@ -355,9 +355,9 @@
 								</obj>
 								<obj id="SettingWnd.Buttom.Cancel" class="TipAddin.Button">
 									<attr>
-										<left>366+100+10</left>
-										<top>19</top>
-										<width>100</width>
+										<left>362+102+10</left>
+										<top>17</top>
+										<width>102</width>
 										<height>36</height>
 										<Text>取消</Text>
 										<TextFont>font.text13</TextFont>
