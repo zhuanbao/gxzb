@@ -156,10 +156,32 @@ function GetModuleDir()
 	return strDir
 end
 
+function GetCommandStrValue(strKey)
+	local bRet, strValue = false, nil
+	local cmdString = tipUtil:GetCommandLine()
+	
+	if string.find(cmdString, strKey .. " ") then
+		local cmdList = tipUtil:CommandLineToList(cmdString)
+		if cmdList ~= nil then	
+			for i = 1, #cmdList, 1 do
+				local strTmp = tostring(cmdList[i])
+				if strTmp == strKey 
+					and not string.find(tostring(cmdList[i + 1]), "^/") then		
+					bRet = true
+					strValue = tostring(cmdList[i + 1])
+					break
+				end
+			end
+		end
+	end
+	return bRet, strValue
+end
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	obj.TipLog = TipLog
 	obj.FailExitTipWnd = FailExitTipWnd
+	obj.GetCommandStrValue = GetCommandStrValue
 	obj.TipConvStatistic = TipConvStatistic
 	obj.ReportAndExit = ReportAndExit
 	obj.ShowPopupWndByName = ShowPopupWndByName
@@ -242,6 +264,7 @@ function RegisterFunctionObject(self)
 	obj.GetClientCurrentState = GetClientCurrentState
 	obj.CheckShouldRemindBind = CheckShouldRemindBind
 	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
+	obj.CheckShoudAutoMining = CheckShoudAutoMining
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -1861,7 +1884,7 @@ function TakeCashToServer(nMoney, fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			local tabInfo = DeCodeJson(strContent)	
+			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" then
 				TipLog("[TakeCashToServer] parse info error.")
 				fnCallBack(false)
@@ -2220,6 +2243,15 @@ function CheckIsGettedWorkID()
 		return true
 	end
 	return false
+end
+
+function CheckShoudAutoMining()
+	local bRet, strSource = GetCommandStrValue("/sstartfrom")
+	if bRet and string.lower(strSource) == "sysboot" then
+		if not CheckIsWorking() then
+			NotifyStart()
+		end
+	end
 end
 
 --解绑三步
