@@ -16,6 +16,12 @@ function OnClickClose(self)
 				["Text"] = "您正在升级，是否退出？",
 				["ChangeUI"] = function(objWnd)
 					local objtree = objWnd:GetBindUIObjectTree()
+					local root = objtree:GetUIObject("PanelCaption")
+					if root then
+						root:SetObjPos(73, 38, 73+373, 38+221)
+					end
+					local MainText = objtree:GetUIObject("MainText")
+					MainText:SetObjPos(100, 62, 100+300, 62+20)
 					local btnyes = objtree:GetUIObject("yes")
 					local btnno = objtree:GetUIObject("no")
 					btnyes:SetText("确定")

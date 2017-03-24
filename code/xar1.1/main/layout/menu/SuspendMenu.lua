@@ -29,11 +29,6 @@ function menuFunTable.OnSelect_hideball(self)
 end
 
 function menuFunTable.OnSelect_exit(self)
-	--[[local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-	if wnd then
-		wnd:Show(0)
-	end
-	tFunctionHelper.ReportAndExit()]]
 	GXZBMenu.SettingMenu.menuFunTable.OnSelect_exit()
 end
 

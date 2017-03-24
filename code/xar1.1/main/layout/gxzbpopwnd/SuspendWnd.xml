@@ -20,7 +20,7 @@
 				<obj id="goldtextheadconta" class="TextObject">
 					<attr>
 						<left>0</left>
-						<top>21</top>
+						<top>24</top>
 						<width>82</width>
 						<height>15</height>
 						<valign>center</valign>
@@ -48,7 +48,7 @@
 				<obj id="goldtextnumberconta" class="TextObject">
 					<attr>
 						<left>0</left>
-						<top>36</top>
+						<top>39</top>
 						<width>82</width>
 						<height>30</height>
 						<valign>top</valign>

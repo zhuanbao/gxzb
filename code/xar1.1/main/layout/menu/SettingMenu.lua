@@ -41,17 +41,23 @@ function menuFunTable.OnSelect_exit(self)
 		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
 			{
 				["parentWnd"] = wnd, 
-				["Text"] = "您已赚取了"..tostring(nCurBalance).."个元宝，请及时绑定微信将元宝入账。",
+				["Text"] = "您已赚取了"..tostring(nCurBalance).."个元宝，请及时绑定\n微信将元宝入账。",
 				["ChangeUI"] = function(objWnd)
 					local objtree = objWnd:GetBindUIObjectTree()
 					local btnyes = objtree:GetUIObject("yes")
 					local btnno = objtree:GetUIObject("no")
 					btnyes:SetText("立即绑定")
 					btnno:SetText("下次再说")
+					local MainIcon = objtree:GetUIObject("MainIcon")
+					MainIcon:SetVisible(true)
 				end,
 			}
 		)
 		if nRet == 0 then
+			local mainwnd = tFunctionHelper.GetMainHostWnd()
+			if mainwnd then
+				mainwnd:BringWindowToTop(true)
+			end
 			tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
 			return
 		end

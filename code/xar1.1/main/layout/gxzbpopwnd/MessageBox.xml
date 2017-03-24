@@ -4,8 +4,8 @@
 		<attr>
 			<top>0</top>
 			<left>0</left>
-			<width>354</width>
-			<height>202</height>
+			<width>520</width>
+			<height>298</height>
 		</attr>
 		<children>
 			<obj id="root" class="TextureObject">
@@ -83,24 +83,23 @@
 
 							<obj id="MainText" class="TextObject">
 								<attr>
-									<left>30</left>
-									<top>64</top>
-									<width>father.width-60</width>
+									<left>153</left>
+									<top>106</top>
+									<width>father.width-100</width>
 									<height>father.height-100</height>
 									<multiline>1</multiline>
 									<font>font.text16</font>
 									<text></text>
-									<halign>center</halign>
+									<halign>left</halign>
 									<textcolor>6D5539</textcolor>
 									<wordellipsis>1</wordellipsis>
 									<valign>top</valign>
-									
 								</attr>
 							</obj>
 							<obj id="yes" class="TipAddin.Button">
 								<attr>
-									<left>70</left>
-									<top>113</top>
+									<left>(father.width-210)/2</left>
+									<top>father.height-50-36</top>
 									<height>36</height>
 									<width>100</width>
 									<NormalBkgID>setting-surebtn-normal</NormalBkgID>
@@ -118,8 +117,8 @@
 							</obj>
 							<obj id="no" class="TipAddin.Button">
 								<attr>
-									<left>180</left>
-									<top>113</top>
+									<left>(father.width-210)/2+110</left>
+									<top>father.height-50-36</top>
 									<height>36</height>
 									<width>100</width>
 									<NormalBkgID>setting-cacelbtn-normal</NormalBkgID>
@@ -136,11 +135,11 @@
 							</obj>
 							<obj id="MainIcon" class="ImageObject">
 								<attr>
-									<left>60</left>
-									<top>80</top>
-									<height>80</height>
-									<width>80</width>
-									<image>logo-mid</image>
+									<left>112</left>
+									<top>104</top>
+									<height>28</height>
+									<width>28</width>
+									<image>GXZB.Caption.Warning</image>
 									<visible>0</visible>
 								</attr>
 							</obj>
@@ -157,8 +156,8 @@
 		<layered>1</layered>
 		<left>0</left>
 		<top>0</top>
-		<width>430</width>
-		<height>150</height>
+		<width>520</width>
+		<height>298</height>
 		
 		<topmost>0</topmost>
 		<visible>1</visible>

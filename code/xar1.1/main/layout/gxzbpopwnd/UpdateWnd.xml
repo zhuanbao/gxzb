@@ -182,8 +182,7 @@
 							<eventlist>
 								<event name="OnClick" file="UpdateWnd.xml.lua" func="OnClickUpdateBtn" />
 							</eventlist>	
-						</obj>
-						
+						</obj>		
 					</children>
 				</obj>
 			</children>
