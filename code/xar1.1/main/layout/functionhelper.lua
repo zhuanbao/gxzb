@@ -34,11 +34,16 @@ local g_SpeedSumCounter = 0 --累加的计数器
 local g_PerSpeed = 10 --服务端返回的平均速度((元宝/Hour)/M)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
---限速
+
+------限速
+--函数15秒调一次
 local g_CurrentPerBatch = 0 --当前限速值
---函数5秒调一次
-local g_GlobalWorkSizeMultiplier = 100
-local g_msMaxPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
+local g_GlobalWorkSizeMultiplier_Min = 100
+local g_GlobalWorkSizeMultiplier_Max = 4096
+local g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+local g_msExpectPerBatch = 200 --显卡计算每次循环的期望时间间隔(毫秒)
+------限速
+
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
@@ -2641,7 +2646,7 @@ function LimitSpeedCond()
 	end
 	local hr, dwTime = tipUtil:GetLastInputInfo()
 	local dwTickCount = tipUtil:GetTickCount()
-	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 10*1000 then
+	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 60*1000 then
 		TipLog("[LimitSpeedCond] Last input in 60 second")
 		return true
 	end
@@ -2652,24 +2657,42 @@ function ChangeMiningSpeed()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
 	if nWorkModel ~= 1 then
-		if g_CurrentPerBatch ~= 0 then
+		if g_CurrentPerBatch ~= 0 or g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
 			g_CurrentPerBatch = 0
-			IPCUtil:ControlSpeed(2048,g_CurrentPerBatch)
+			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+			IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
 		end	
 	else
 		if LimitSpeedCond() then
-			if g_CurrentPerBatch < g_msMaxPerBatch then
-				g_CurrentPerBatch = g_CurrentPerBatch+10
-				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier,g_CurrentPerBatch)
-			end
+			if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Min 
+				or g_CurrentPerBatch ~= g_msExpectPerBatch then
+				g_CurrentPerBatch = g_msExpectPerBatch
+				g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Min
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
+			end	
 		else
+			if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max 
+				or g_GlobalWorkSizeMultiplier_Cur > g_GlobalWorkSizeMultiplier_Max then
+				g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Cur*2
+				if g_GlobalWorkSizeMultiplier_Cur > g_GlobalWorkSizeMultiplier_Max then
+					g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+				end
+				if g_GlobalWorkSizeMultiplier_Cur == g_GlobalWorkSizeMultiplier_Max then
+					g_CurrentPerBatch = 0
+				else
+					g_CurrentPerBatch = g_msExpectPerBatch/2  --限速模式在加速过程中，每轮计算的时间还是设置为期望值的一半吧
+				end
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
+			end
+			--[[
 			if g_CurrentPerBatch > 0 then
 				g_CurrentPerBatch = g_CurrentPerBatch - 10
 				if g_CurrentPerBatch < 0 then
 					g_CurrentPerBatch = 0
 				end
-				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier, g_CurrentPerBatch)
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Min, g_CurrentPerBatch)
 			end
+			--]]
 		end	
 	end
 end
@@ -2686,7 +2709,7 @@ function WorkingTimerHandle()
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
 	
 	local nWorkModelConuter = 1
-	local nWorkModelInterval = math.ceil(5/interval)
+	local nWorkModelInterval = math.ceil(15/interval)
 	g_ChangeSpeedCounter = 0
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
