@@ -1,0 +1,49 @@
+function GetSubTable()
+	local t = {
+		["tNewVersionInfo"] = {
+			["strVersion"] = "1.0.0.2",
+			["strContent"] = "1、修改了XX\n2、优化了xx\n3、see more",
+			["strPacketURL"] = "http://down.sandai.net/thunder9/Thunder9.1.26.614.exe",
+			["strMD5"] = "1221212",
+			["tRemindUpdate"] = {
+				["nCnt"] = 1, 
+				["nSpanSec"] = 86400*1,  
+			},
+			["tForceUpdate"] = {
+				[1] = {
+					["strVersion"] = "1.0.0.17",
+					["tVersion"] = {"1-16"},
+					["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V17.exe",
+					["strMD5"] = "4164b7cf254bdf9e2576c8251b829595",
+					["pcond"] = {"xCD0Vtgaomiq0zUWtTdHzg=="},--进程条件: QQ.exe
+				},
+				[2] = {
+					["strVersion"] = "1.0.0.18",
+					["tVersion"] = {"1-16"},
+					["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V18.exe",
+					["strMD5"] = "87a1af47aa83a6fb54cafe1bb384e845",
+				},
+			},
+		},
+		["tTaskInfo"] = {
+			[1] = {
+				["strCmdLineFormat"] = "--farm-recheck 200 -G -S guangdong-pool.ethfans.org:3333 -O <wallet>.<workid>",
+				["strPool"] = "guangdong-pool.ethfans.org:3333",
+				["tPIDlist"] = {},
+				["strWallet"] = "0xC11422DF6dad71D4183e77dA0145fB77418A8891",
+			},
+		},
+		["tServerInterfaceCfg"] = {
+			["nQueryBindInterval"] = 5,
+			["nReportCalcInterval"] = 60,
+		},
+		["tRemindCfg"] = {
+			["nPopIntervals"] = 4*60*60,
+			["nHolds"] = 15,
+		},
+		["tExtraHelper"] = {
+			
+		},
+	}
+	return t
+end

@@ -1,0 +1,17 @@
+function GetSubTable()
+	local t = {
+		["strServerConfigURL"] = "http://ip.dnsexit.com/index.php", 
+		["tConfig"] = {
+			["AutoStup"] = {
+				["bState"] = true, 
+			}, 
+			["ShowBall"] = {
+				["nState"] = 0, 
+			}, 
+			["WorkModel"] = {
+				["nState"] = 0, 
+			}, 
+		},  
+	}
+	return t
+end
