@@ -584,6 +584,7 @@ bool ethash_cl_miner::init(
 	}
 	catch (cl::Error const& err)
 	{
+		hook.setaborted();
 		ETHCL_LOG(err.what() << "(" << err.err() << ")");
 		return false;
 	}
@@ -703,6 +704,7 @@ void ethash_cl_miner::search(uint8_t const* header, uint64_t target, search_hook
 	}
 	catch (cl::Error const& err)
 	{
+		hook.setaborted();
 		ETHCL_LOG(err.what() << "(" << err.err() << ")");
 	}
 }
