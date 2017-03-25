@@ -42,7 +42,7 @@ end
 local xylineFailedBitmap24 = nil
 local xylineFailedBitmap30 = nil
 local tipsFailedBitmap = nil
-function BarChartUpdate(self, fnConvert)
+function BarChartUpdate(self)
 	local attr = self:GetAttribute()
 	if not attr or type(attr.Data) ~= "table" or #attr.Data == 0 then
 		return
@@ -107,28 +107,28 @@ function BarChartUpdate(self, fnConvert)
 			xyLineBkg:SetBitmap(xylineFailedBitmap30)
 		end
 	end
-	local function GetNewTextObj(strText)
+	local function GetNewTextObj(strText, valign, halign)
 		local newTextObject = objFactory:CreateUIObject("", "TextObject")
 		newTextObject:SetText(strText)
 		barchartpanel:AddChild(newTextObject)
-		newTextObject:SetVAlign("center")
-		newTextObject:SetHAlign("center")
+		newTextObject:SetVAlign(valign or "center")
+		newTextObject:SetHAlign(halign or "center")
 		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
 		newTextObject:SetTextFont("font.text12")
-		return newTextObject
+		return newTextObject, newTextObject:GetTextExtent()
 	end
 	--显示纵坐标刻度
 	for i = 1, minYnumber do
 		local ytmp = h*i/minYnumber
 		local yreal = h - ytmp
-		local newTextObject = GetNewTextObj(tostring(math.floor(ymax*i/minYnumber)))
-		newTextObject:SetObjPos(-50, yreal-6, 0, yreal+6)
+		local newTextObject, needWidth = GetNewTextObj(tostring(math.floor(ymax*i/minYnumber)), "center", "right")
+		newTextObject:SetObjPos(-needWidth-17, yreal-6, -7, yreal+6)
 	end
 	--显示单位
-	local newTextObject = GetNewTextObj("w")
-	newTextObject:SetObjPos(-4, -15, 6, -2)
-	newTextObject = GetNewTextObj(attr.currentpanel == 1 and "h" or "date")
-	newTextObject:SetObjPos("father.width+3", "father.height-12", attr.currentpanel == 1 and "father.width+13" or "father.width+26", "father.height+1")
+	local newTextObject = GetNewTextObj(attr.currentpanel == 1 and "每小时元宝总产量(个)" or "每天元宝总产量(个)", nil, "left")
+	newTextObject:SetObjPos(-8, -18, 110, -4)
+	--newTextObject = GetNewTextObj(attr.currentpanel == 1 and "h" or "date")
+	--newTextObject:SetObjPos("father.width+3", "father.height-12", attr.currentpanel == 1 and "father.width+13" or "father.width+26", "father.height+1")
 	--间隔宽度是柱子的1/3
 	local itemw = w/(#attr.Data*4-1)
 	if itemw < 2 then
@@ -137,14 +137,8 @@ function BarChartUpdate(self, fnConvert)
 	
 	--显示横坐标刻度
 	function Drawxline(xreal, text)
-		local newTextObject = objFactory:CreateUIObject("", "TextObject")
-		newTextObject:SetText(tostring(text))
-		barchartpanel:AddChild(newTextObject)
-		newTextObject:SetObjPos(xreal-25, h+10, xreal+25, h+26)
-		newTextObject:SetVAlign("center")
-		newTextObject:SetHAlign("center")
-		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
-		newTextObject:SetTextFont("font.text12")
+		local newTextObject = GetNewTextObj(tostring(text), "top")
+		newTextObject:SetObjPos(xreal-25, h+8, xreal+25, h+21)
 	end
 	--将数据转换为坐标系中的点
 	local function ConvertData2Point(xindex, ydata)
@@ -163,7 +157,7 @@ function BarChartUpdate(self, fnConvert)
 	local xstart=0
 	local function DrawBar()
 		for i, dat in ipairs(attr.Data) do
-			if type(dat) == "table" and i <= #attr.Data and type(dat[1]) == "number" and type(dat[2]) == "number" then
+			if type(dat) == "table" and i <= #attr.Data and type(dat[2]) == "number" then
 				local newFillObject = objFactory:CreateUIObject("", "FillObject")
 				barchartpanel:AddChild(newFillObject)
 				local xsrc, ysrc = ConvertData2Point(i, dat[2])
@@ -203,7 +197,7 @@ function BarChartUpdate(self, fnConvert)
 							tips:GetObject("bkg"):SetBitmap(tipsFailedBitmap)
 						end
 					end
-					tips:SetText(""..dat[2].."w\n"..dat[1])
+					tips:SetText(""..dat[2].."个\n"..dat[1])
 					local scal = 1-dat[2]/ymax
 					if scal <= 0.4 then
 						scal = 0.4

@@ -1997,6 +1997,28 @@ function GetHistoryToServer(ntype, fnCallBack)
 		end
 		return false
 	end
+	local function UINeedTable(t)
+		local tmp = {}
+		local nCurrent = tipUtil:GetCurrentUTCTime() or 0
+		if ntype == 0 then
+			nCurrent = nCurrent - 3600
+		else
+			nCurrent = nCurrent - 86400
+		end
+		for i, v in ipairs(t) do
+			local _, LMonth, LDay, LHour = tipUtil:FormatCrtTime(nCurrent)
+			tmp[#t-i+1] = {}
+			if ntype == 0 then
+				tmp[#t-i+1][1] = string.format("%02d", LHour)..":00"
+				nCurrent = nCurrent - 3600
+			else
+				tmp[#t-i+1][1] = string.format("%02d", LMonth).."/".. string.format("%02d", LDay)
+				nCurrent = nCurrent - 86400
+			end
+			tmp[#t-i+1][2] = v
+		end
+		return tmp
+	end
 	local function GetLocal(tLocal)
 		local t = {}
 		local count = 0
@@ -2013,16 +2035,16 @@ function GetHistoryToServer(ntype, fnCallBack)
 			count = 30
 		end
 		for i = 1, count do
-			t[i] = {i, 0}
+			t[i] = 0
 		end
-		return t
+		return UINeedTable(t)
 	end
 	local function Save2Local(tServer)
 		local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
 		tEarnings["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
 		--TODO:现在不确定服务器返回什么格式， 等确定了再改这里
-		tEarnings["hour24"] = tServer["hour24"]
-		tEarnings["day30"] = tServer["day30"]
+		tEarnings["hour24"] = UINeedTable(tServer["hour24"])
+		tEarnings["day30"] = UINeedTable(tServer["day30"])
 		SaveConfigToFileByKey("tEarnings")
 	end
 	local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
@@ -2034,13 +2056,12 @@ function GetHistoryToServer(ntype, fnCallBack)
 	if not strReguestUrl then
 		local tDef = GetLocal()
 		fnCallBack(false, tDef)
-		Save2Local(tDef)
 		return
 		--[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory.json")
 		local tabInfo = DeCodeJson(strContent)
-		fnCallBack(true, tabInfo[ntype ==0 and "hour24" or "day30"])
-		Save2Local(tabInfo)
+		fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+		Save2Local(tabInfo["data"])
 		return
 		--]]
 	end
@@ -2053,19 +2074,19 @@ function GetHistoryToServer(ntype, fnCallBack)
 		---[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory.json")
 		local tabInfo = DeCodeJson(strContent)
-		fnCallBack(true, tabInfo[ntype ==0 and "hour24" or "day30"])
-		Save2Local(tabInfo)
+		fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+		Save2Local(tabInfo["data"])
 		if true then return end
 		---]]
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
-			if type(tabInfo) ~= "table" then
+			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" then
 				TipLog("[GetHistoryToServer] parse info error.")
 				fnCallBack(false, GetLocal(tEarnings))
 				return
 			end
-			fnCallBack(true, tabInfo)
-			Save2Local(tabInfo)
+			fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+			Save2Local(tabInfo["data"])
 		else
 			TipLog("[GetHistoryToServer] get content failed.")
 			fnCallBack(false, GetLocal(tEarnings))
