@@ -59,6 +59,13 @@ local g_tConfigFileStruct = {
 	},
 }
 
+---[[ forlocal
+function LoadLocalSvrHelper()
+	local strLocalSvrHelper = __document.."\\..\\localcfghelper.lua"
+	local Module = XLLoadModule(strLocalSvrHelper)
+end
+LoadLocalSvrHelper()
+--]]
 function LoadJSONHelper()
 	local strJSONHelperPath = __document.."\\..\\JSON.lua"
 	local Module = XLLoadModule(strJSONHelperPath)
@@ -771,6 +778,9 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 			end
 		end
 		if 0 == bRet then
+			---[[ forlocal
+			strSavePath = GetLocalSvrCfgWithName("ServerConfig.dat", true)
+			--]]
 			fnCallBack(0, strSavePath)
 		else
 			fnCallBack(bRet)
@@ -1925,6 +1935,9 @@ function TakeCashToServer(nMoney, fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
+			---[[ forlocal
+			strContent = GetLocalSvrCfgWithName("takeCash.json")
+			--]]
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" then
 				TipLog("[TakeCashToServer] parse info error.")
@@ -2119,6 +2132,9 @@ function QueryClientInfo(nMiningSpeed)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
+			---[[ forlocal
+			strContent = GetLocalSvrCfgWithName("pushCalc.json")
+			--]]
 			local tabInfo = DeCodeJson(strContent)
 			
 			if type(tabInfo) ~= "table" 
@@ -2313,6 +2329,9 @@ function SendUnBindInfoToServer()
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
+				---[[ forlocal
+				strContent = GetLocalSvrCfgWithName("unbind.json")
+				--]]
 				local tabInfo = DeCodeJson(strContent)
 				
 				if type(tabInfo) ~= "table" 
