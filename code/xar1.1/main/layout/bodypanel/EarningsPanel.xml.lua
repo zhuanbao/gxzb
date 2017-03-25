@@ -129,8 +129,8 @@ function BarChartUpdate(self, fnConvert)
 	newTextObject:SetObjPos(-4, -15, 6, -2)
 	newTextObject = GetNewTextObj(attr.currentpanel == 1 and "h" or "date")
 	newTextObject:SetObjPos("father.width+3", "father.height-12", attr.currentpanel == 1 and "father.width+13" or "father.width+26", "father.height+1")
-	--间隔宽度是柱子的一半
-	local itemw = w/(#attr.Data*3-1)
+	--间隔宽度是柱子的1/3
+	local itemw = w/(#attr.Data*4-1)
 	if itemw < 2 then
 		itemw = 2
 	end
@@ -149,7 +149,7 @@ function BarChartUpdate(self, fnConvert)
 	--将数据转换为坐标系中的点
 	local function ConvertData2Point(xindex, ydata)
 		--local xreal = (#attr.Data == 1 and 0 or w*(xindex-1)/(#attr.Data)) + 2
-		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*3)) + coorWidth 
+		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*4)) + coorWidth 
 		local yreal = h-2
 		if ydata > 0 then
 			yreal = h - h*ydata/ymax
@@ -167,15 +167,15 @@ function BarChartUpdate(self, fnConvert)
 				local newFillObject = objFactory:CreateUIObject("", "FillObject")
 				barchartpanel:AddChild(newFillObject)
 				local xsrc, ysrc = ConvertData2Point(i, dat[2])
-				local l, t, r, b = xsrc, ysrc, xsrc+itemw*2, h
-				if #attr.Data == i then
-					r = w + coorWidth
-				end
+				local l, t, r, b = xsrc, ysrc, xsrc+itemw*3, h
+				--if #attr.Data == i then
+				--	r = w + coorWidth
+				--end
 				if t == b then
 					t = b - 1
 				end
 				if i == 1 or i == #attr.Data/2 or i == #attr.Data  then
-					xstart = xsrc + itemw
+					xstart = xsrc + itemw*3/2
 					Drawxline(xstart, attr.Data[i][1])
 				end
 				local normalColor = attr.Data["reqFailed"] and attr.FailedColor or attr.ColumnColorSrc

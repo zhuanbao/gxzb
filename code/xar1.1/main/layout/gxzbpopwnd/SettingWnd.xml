@@ -398,7 +398,7 @@
             <minwidth>50</minwidth>
             <minheight>50</minheight>
 			<sysmenu>0</sysmenu>
-			<appwindow>1</appwindow>
+			<appwindow>0</appwindow>
             <fps>30</fps>
 			<blur>1</blur>
         </attr>
