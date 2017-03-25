@@ -6,7 +6,11 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local g_bShowWndByTray = false
 local gStatCount = 0
 local gCurrentWorkSpeed = 0
+
 local gnLastReportRunTmUTC = tipUtil:GetCurrentUTCTime()
+local gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
+local g_MiningReportTimerId = nil
+
 local gTimeoutTimerId = nil
 
 local gbLoadCfgSucc = false
@@ -125,7 +129,7 @@ function TipConvStatistic(tStat)
 		strEV = 1
 	end
 
-	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=UA-55122790-1&cid="..tostring(strCID)
+	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid="..tostring(strCID)
 					.."&t=event&ec="..tostring(strEC).."&ea="..tostring(strEA)
 					.."&el="..tostring(strEL).."&ev="..tostring(strEV)
 	TipLog("TipConvStatistic: " .. tostring(strUrl))
@@ -1459,6 +1463,7 @@ function ReportAndExit()
 	local tStatInfo = {}
 		
 	SendRunTimeReport(0, true)
+	SendMiningReport(0, true)
 	tStatInfo.strEC = "exit"	
 	tStatInfo.strEA = GetInstallSrc() or ""
 	tStatInfo.Exit = true
@@ -1492,6 +1497,42 @@ function SendRunTimeReport(nTimeSpanInSec, bExit)
 		nRunTime = math.abs(tipUtil:GetCurrentUTCTime() - gnLastReportRunTmUTC)
 	else
 		nRunTime = nTimeSpanInSec
+	end
+	tStatInfo.strEV = nRunTime
+	
+	TipConvStatistic(tStatInfo)
+end
+
+function StartMiningCountTimer()
+	local nTimeSpanInSec = 10 * 60 
+	local nTimeSpanInMs = nTimeSpanInSec * 1000
+	if g_MiningReportTimerId ~= nil then
+		timeMgr:KillTimer(g_MiningReportTimerId)
+		g_MiningReportTimerId = nil
+	end
+	g_MiningReportTimerId = timeMgr:SetTimer(function(item, id)
+		gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
+		SendMiningReport(nTimeSpanInSec, false)
+	end, nTimeSpanInMs)
+end
+
+function StopMiningCountTimer()
+	if g_MiningReportTimerId ~= nil then
+		timeMgr:KillTimer(g_MiningReportTimerId)
+		g_MiningReportTimerId = nil
+	end
+end
+
+function SendMiningReport(nTimeSpanInSec, bExit)
+	local tStatInfo = {}
+	tStatInfo.strEC = "mining"
+	tStatInfo.strEA = GetInstallSrc() or ""
+	
+	local nMiningTime = 0
+	if bExit and gnLastReportMiningTmUTC ~= 0 then
+		nMiningTime = math.abs(tipUtil:GetCurrentUTCTime() - gnLastReportMiningTmUTC)
+	else
+		nMiningTime = nTimeSpanInSec
 	end
 	tStatInfo.strEV = nRunTime
 	
@@ -2467,6 +2508,7 @@ function NotifyStart()
 		IPCUtil:Start(strCmdLine)
 		WorkingTimerHandle()
 		OnWorkStateChange(1)
+		StartMiningCountTimer()
 	end
 	if g_strCmdLineFormat then
 		StartTask()
@@ -2487,6 +2529,7 @@ function NotifyPause()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
 	OnWorkStateChange(2)
+	StopMiningCountTimer()
 end
 
 function NotifyQuit()

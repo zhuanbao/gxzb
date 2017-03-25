@@ -143,7 +143,7 @@ function ShowMainTipWnd(objMainWnd)
 	end
 	
 	objMainWnd:SetTitle("共享赚宝")
-	SendStartupReport(true)
+	--SendStartupReport(true)
 	WriteLastLaunchTime()
 end
 
