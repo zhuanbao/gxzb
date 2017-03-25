@@ -182,7 +182,8 @@ function FetchValueByPath(obj, path)
 	return cursor
 end
 
-function OnCreate(self)
+function OnShowWindow(self, isShow)
+	if not isShow then return end
 	--是否是自动弹出提醒
 	local isAutoPop = type(self.EndDialog) ~= "function"
 	local objtree = self:GetBindUIObjectTree()
