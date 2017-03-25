@@ -2137,7 +2137,15 @@ function PopTipPre4Hour()
 				, function(nRet, strContent, respHeaders)
 					TipLog("[PopTipPre4Hour] nRet:"..tostring(nRet)
 							.." strContent:"..tostring(strContent))
-							
+					---[[forlocal
+					strContent = GetLocalSvrCfgWithName("newGetGold.json")
+					local tabInfo = DeCodeJson(strContent)
+					local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+					tUserConfig["nMoneyPer4Hour"] = tabInfo["data"]["newgetgold"]
+					SaveConfigToFileByKey("tUserConfig")
+					ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+					if true then return end
+					--]]
 					if 0 == nRet then
 						local tabInfo = DeCodeJson(strContent)
 						if type(tabInfo) ~= "table" 
