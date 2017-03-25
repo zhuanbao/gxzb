@@ -2521,6 +2521,12 @@ function NotifyStart()
 		local strDir = GetModuleDir()
 		local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
 		local strCmdLine = strWorkExe .. " " .. g_strCmdLineFormat
+		
+		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+		local strUserCmd =tUserConfig["strUserCmd"]
+		if IsRealString(strUserCmd) then
+			strCmdLine = strCmdLine .. " " .. strUserCmd
+		end
 		g_bWorking = true
 		--更新球的显示状态
 		UpdateSuspendWndVisible(1)
