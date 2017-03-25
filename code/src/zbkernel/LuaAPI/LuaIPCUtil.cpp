@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <Tlhelp32.h>
 #include "LuaIPCUtil.h"
 #include "../Utility/IPCInterface.h"
 #include "../Utility/StringOperation.h"
@@ -10,6 +11,8 @@ XMLib::CriticalSection csWriteChannel;
 
 char g_pReadBuffer[MAX_PIPE_BUFFIE_LEN] = {0};
 char g_pWriteBuffer[MAX_PIPE_BUFFIE_LEN] = {0};
+
+TCHAR *szMiningProcessName = _T("gzminer.exe");
 
 LuaIPCUtil::LuaIPCUtil(void)
 {
@@ -271,6 +274,7 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 		::CloseHandle(m_hWorkProcess);
 		m_hWorkProcess = NULL;
 	}
+	TerminateMiningProcess();
 	long lRet = 0;
 	const char* pParams = lua_tostring(pLuaState, 2);
 	CComBSTR bstrParams;
@@ -472,3 +476,23 @@ int LuaIPCUtil::ControlSpeed(lua_State* pLuaState)
 	return 0;
 }
 
+void LuaIPCUtil::TerminateMiningProcess()
+{
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			if(_tcsicmp(pe.szExeFile, szMiningProcessName) == 0 && pe.th32ProcessID != 0)
+			{
+				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+				::TerminateProcess(hProcess, 4);
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
+	}
+}

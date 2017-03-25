@@ -34,6 +34,7 @@ private:
 public:
 	static BOOL WaitPipeQuitEvent();
 	static void Clear();
+	static void TerminateMiningProcess();
 };
 
 
