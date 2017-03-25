@@ -143,7 +143,7 @@ function ShowMainTipWnd(objMainWnd)
 	end
 	
 	objMainWnd:SetTitle("共享赚宝")
-	--SendStartupReport(true)
+	SendStartupReport(true)
 	WriteLastLaunchTime()
 end
 
@@ -481,7 +481,6 @@ function PreTipMain()
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
 	CheckMachineSuitable(function(bCheck)
-		bCheck = true
 		if not bCheck then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
