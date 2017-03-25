@@ -360,6 +360,8 @@ function AnalyzeServerConfig(nDownServer, strServerPath)
 	TryExecuteExtraCode(tServerConfig)
 	
 	TipMain()
+	--升级提醒
+	FunctionObj.PopRemindUpdateWnd()
 	--增加处理/noliveup命令行
 	SetOnceTimer(function()
 					local cmdString = tipUtil:GetCommandLine()
@@ -413,8 +415,36 @@ function CheckMachineBindState()
 	end
 end
 
-function CheckMachineSuitable()
-	return FunctionObj.GetSystemBits() == 64
+function CheckMachineSuitable(callback)
+	if FunctionObj.GetSystemBits() ~= 64 then
+		LOG("CheckMachineSuitable GetSystemBits ~= 64")
+		return callback(false)
+	end
+	local strExePath = tipUtil:GetModuleExeName()
+	if not IsRealString(strExePath) then
+		LOG("CheckMachineSuitable strExePath is nil")
+		return callback(false)
+	end
+	local strClCheckPath = strExePath.."\\..\\zbsetuphelper-cl.exe"
+	if not tipUtil:QueryFileExists(strClCheckPath) then
+		LOG("CheckMachineSuitable not exist path :strClCheckPath="..tostring(strClCheckPath))
+		return callback(false)
+	end
+	tipAsynUtil:AsynCreateProcess("", strClCheckPath, "", 32, 0, 
+		function (nRet, tProcDetail)
+			LOG("CheckMachineSuitable AsynCreateProcess callback:nRet="..tostring(nRet)..", type(tProcDetail)="..type(tProcDetail))
+			if nRet == 0 and tProcDetail and tProcDetail.hProcess then
+				tipAsynUtil:AsynWaitForSingleObject(tProcDetail.hProcess, 5000, 
+					function(nRet)
+						local ExitCode = tipUtil:GetProcessExitCode(tProcDetail.hProcess)
+						LOG("CheckMachineSuitable AsynWaitForSingleObject callback:ExitCode="..tostring(ExitCode))
+						callback(ExitCode == 0)
+					end)
+			else
+				LOG("CheckMachineSuitable AsynCreateProcess callback failed")
+				callback(false)
+			end
+		end)
 end
 
 function TipMain()	
@@ -450,11 +480,14 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
-	if not CheckMachineSuitable() then
-		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-		return
-	end
-	FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
+	CheckMachineSuitable(function(bCheck)
+		bCheck = true
+		if not bCheck then
+			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		else
+			FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
+		end
+	end)
 end
 
 PreTipMain()

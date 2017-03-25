@@ -60,12 +60,12 @@ function OnShowWindow(self, bShow)
 				self:Show(0)
 			end
 		end
-		local nTipHoldMs = 15000
-		if type(g_ServerConfig) == "table" and type(g_ServerConfig["nTipHoldMs"]) == "number" then
-			nTipHoldMs = g_ServerConfig["nTipHoldMs"]
+		local nTipHolds = 15
+		if type(g_ServerConfig) == "table" and type(g_ServerConfig["tRemindCfg"]) == "table" and type(g_ServerConfig["tRemindCfg"]["nHolds"]) == "number" then
+			nTipHolds = g_ServerConfig["tRemindCfg"]["nHolds"]
 		end
 		SetOnceTimer(function(item, id)
 			self:Show(0)
-		end, nTipHoldMs)
+		end, nTipHolds*1000)
 	end
 end

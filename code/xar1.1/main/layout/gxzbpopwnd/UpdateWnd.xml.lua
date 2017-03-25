@@ -1,7 +1,7 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local g_tNewVersionInfo = nil
---0未更新， 1正在更新
+--0未更新， 1正在更新， 2弹出对话框， 3弹出对话框时已下载完成
 local g_UpdateState = 0
 --是否被取消
 local g_UpdateCancel = false
@@ -10,6 +10,7 @@ function OnClickClose(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	if g_UpdateState == 1 then
+		g_UpdateState = 2
 		local nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
 			{
 				["parentWnd"] = objHostWnd, 
@@ -31,6 +32,11 @@ function OnClickClose(self)
 		)
 		--点了取消或关闭
 		if nRet == 1 then
+			if g_UpdateState == 3 then
+				OnClickUpdateBtn(self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn"))
+			else
+				g_UpdateState = 1
+			end
 			return
 		--点了退出
 		else
@@ -38,16 +44,21 @@ function OnClickClose(self)
 			g_UpdateCancel = true
 		end
 	end
-	objHostWnd:EndDialog(0)
+	if type(objHostWnd.EndDialog) == "function" then
+		objHostWnd:EndDialog(0)
+	else
+		objHostWnd:Show(0)
+	end
 end
 
 function CheckPacketMD5(strPacketPath)
 	local strServerMD5 = g_tNewVersionInfo["strMD5"]
-	return FunctionObj.CheckMD5(strPacketPath, strServerMD5)
+	return tFunctionHelper.CheckMD5(strPacketPath, strServerMD5)
 end
 
 
 local progress, progrBar, progrText
+local needSetPos = true
 function OnClickUpdateBtn(self)
 	if not g_tNewVersionInfo then 
 		return 
@@ -67,12 +78,15 @@ function OnClickUpdateBtn(self)
 	TextBig:SetObjPos(144, 100, 159+260, 107+25)
 	local bigicon = self:GetObject("tree:UpdateWnd.Icon")
 	bigicon:SetObjPos(50, 70, 50+80, 70+80)
-	local wnd = self:GetOwner():GetBindHostWnd()
-	local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
-	wnd:Move(wndL, wndT, wndL+450, wndT+298)
-	local root = self:GetOwner():GetUIObject("root")
-	root:SetObjPos(0, 0, 450, 298)
-	wnd:SetMaxTrackSize(450, 298)
+	if needSetPos then
+		needSetPos = false
+		local wnd = self:GetOwner():GetBindHostWnd()
+		local wndL, wndT, wndR, wndB = wnd:GetWindowRect()
+		wnd:Move(wndL+70, wndT, 450, 298)
+		local root = self:GetOwner():GetUIObject("root")
+		root:SetObjPos(0, 0, 450, 298)
+		wnd:SetMaxTrackSize(450, 298)
+	end
 	--正在更新
 	g_UpdateState = 1
 	if g_UpdateCancel then
@@ -103,17 +117,27 @@ function OnClickUpdateBtn(self)
 			tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress g_UpdateCancel = "..tostring(g_UpdateCancel))
 			return
 		end
+		if g_UpdateState == 2 then
+			if nRet == 0 then
+				g_UpdateState = 3
+			end
+			return
+		end
+		local l, t, r, b = progrBar:GetObjPos()
+		local fl, ft, fr, fb = progress:GetObjPos()
+		local w = fr - fl
 		tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress nRet = "..tostring(nRet)..", ulProgress = "..tostring(ulProgress)..", ulProgressMax = "..tostring(ulProgressMax))
 		if nRet == -2 and type(ulProgress) == "number" and type(ulProgressMax) == "number" and ulProgress < ulProgressMax and ulProgress > 0 then
 			local rate = ulProgress/ulProgressMax
 			local rateText = tostring(math.floor(rate*100)).."%"
-			local l, t, r, b = progrBar:GetObjPos()
-			local fl, ft, fr, fb = progress:GetObjPos()
-			local w = fr - fl - 2
 			progrBar:SetObjPos(l, t, l + w*rate, b)
 			progrText:SetText("正在下载"..rateText)
-		elseif nRet == 0 and  Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
-			tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
+		elseif nRet == 0 then
+			progrBar:SetObjPos(l, t, l + w, b)
+			progrText:SetText("下载完成")
+			if Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
+				Helper.tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
+			end
 		end
 	end)
 end
@@ -132,97 +156,139 @@ function GetPacketSavePath(strURL)
 	return strSavePath
 end
 
-function OnCreate(self)
-	local userData = self:GetUserData()
-	if userData and userData.parentWnd then
-		local objtree = self:GetBindUIObjectTree()
-		local objRootLayout = objtree:GetUIObject("root")
-		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
-		local nLayoutWidth  = nLayoutR - nLayoutL
-		local nLayoutHeight = nLayoutB - nLayoutT
+function PopupInDeskRight(self)
+	local objtree = self:GetBindUIObjectTree()
+	local objRootLayout = objtree:GetUIObject("root")
+    local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
 	
-		local parentLeft, parentTop, parentRight, parentBottom = userData.parentWnd:GetWindowRect()
-		local parentWidth  = parentRight - parentLeft
-		local parentHeight = parentBottom - parentTop
-		self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
+	local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
+	local nLayoutWidth = nLayoutR - nLayoutL
+	local nLayoutHeight = nLayoutB - nLayoutT
+	
+	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
+	self:Move( workright - nLayoutWidth+9, workbottom - nLayoutHeight+9, nLayoutWidth, nLayoutHeight)
+	return true
+end
+
+function FetchValueByPath(obj, path)
+	if obj == nil then return end
+	local cursor = obj
+	for i = 1, #path do
+		cursor = cursor[path[i]]
+		if cursor == nil then
+			return nil
+		end
+	end
+	return cursor
+end
+
+function OnCreate(self)
+	--是否是自动弹出提醒
+	local isAutoPop = type(self.EndDialog) ~= "function"
+	local objtree = self:GetBindUIObjectTree()
+	local objRootLayout = objtree:GetUIObject("root")
+	if isAutoPop then
+		PopupInDeskRight(self)
+	else
+		local userData = self:GetUserData()
+		if userData and userData.parentWnd then
+			local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
+			local nLayoutWidth  = nLayoutR - nLayoutL
+			local nLayoutHeight = nLayoutB - nLayoutT
 		
-		local TextBig = objtree:GetUIObject("UpdateWnd.Content.TextBig")
-		local TextMain = objtree:GetUIObject("UpdateWnd.Content.TextMain")
-		local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
-		local BtnUpdate = objtree:GetUIObject("UpdateWnd.OneKeyUpdate.Btn")
-		TextMain:SetMultilineTextLimitWidth(260)
-		--查询更新
-		TextBig:SetVisible(false)
-		BtnUpdate:Show(false)
-		--TextVersion:SetVisible(false)
-		TextMain:SetText("正在为您检查更新，请稍后...")
-		
-		local function ShowNoUpdate()
+			local parentLeft, parentTop, parentRight, parentBottom = userData.parentWnd:GetWindowRect()
+			local parentWidth  = parentRight - parentLeft
+			local parentHeight = parentBottom - parentTop
+			self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
+		end
+	end
+	
+	local TextBig = objtree:GetUIObject("UpdateWnd.Content.TextBig")
+	local TextMain = objtree:GetUIObject("UpdateWnd.Content.TextMain")
+	local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
+	local BtnUpdate = objtree:GetUIObject("UpdateWnd.OneKeyUpdate.Btn")
+	TextMain:SetMultilineTextLimitWidth(260)
+	--查询更新
+	TextBig:SetVisible(false)
+	BtnUpdate:Show(false)
+	--TextVersion:SetVisible(false)
+	TextMain:SetText("正在为您检查更新，请稍后...")
+	
+	local function ShowNoUpdate()
+		if not isAutoPop then
 			--已经是最新
 			TextMain:SetObjPos(159, 107, 159+260, 107+25)
 			TextMain:SetText("您的共享赚宝已经是最新版本。")
+		else
+			self:Show(0)
 		end
-		
-		local function ShowReadyUpdate(strVersion, strContent)
-			--发现新版本
-			TextBig:SetVisible(true)
-			TextBig:SetText("发现共享赚宝新版本"..tostring(strVersion))
-			TextMain:SetVisible(false)
-			TextVersion:SetVisible(true)
-			BtnUpdate:Show(true)
-			TextVersion:SetText(strContent)
-			local w, h = TextVersion:GetTextExtent()
-			local Hoffset =  h - 130
-			if Hoffset > 0 then
-				TextVersion:SetObjPos(158, 98, 158+260, 95 + h + 10)
-				local wndL, wndT, wndR, wndB = self:GetWindowRect()
-				self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset)
-				objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset)
-				self:SetMaxTrackSize(wndR - wndL, wndB - wndT + Hoffset)
-			end
-		end
-		
-		local function InitMainWnd(nRet, strCfgPath)			
-			--[[tNewVersionInfo = {
-				strVersion = "v1.0.0.2",
-				strContent = "1、修改了XX\n2、优化了xx\n3、see more",
-				strPacketURL = "http://down.sandai.net/thunder9/Thunder9.1.26.614.exe",
-				strMD5 = "1221212",
-			}
-			ShowReadyUpdate(tNewVersionInfo["strVersion"] or "V3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
-			g_tNewVersionInfo = tNewVersionInfo
-			if true then return end]]
-			
-			if 0 ~= nRet then
-				ShowNoUpdate()
-				return
-			end	
-
-			local tServerConfig = tFunctionHelper.LoadTableFromFile(strCfgPath) or {}
-			local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
-			local strPacketURL = tNewVersionInfo["strPacketURL"]
-			if not Helper:IsRealString(strPacketURL) then
-				ShowNoUpdate()
-				return 
-			end
-			
-			local strCurVersion = tFunctionHelper.GetGXZBVersion()
-			local strNewVersion = tNewVersionInfo.strVersion
-			if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
-				or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
-				ShowNoUpdate(objRootCtrl)
-				return
-			end
-			local strSavePath = GetPacketSavePath(strPacketURL)
-			if Helper:IsRealString(tNewVersionInfo.strMD5) 
-				and tFunctionHelper.CheckMD5(strSavePath, tNewVersionInfo.strMD5) then
-				--ShowInstallPanel(objRootCtrl, strSavePath, tNewVersionInfo)
-				tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
-				return
-			end
-			ShowReadyUpdate(tNewVersionInfo["strVersion"] or "V3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
-			g_tNewVersionInfo = tNewVersionInfo
-		end
-		tFunctionHelper.DownLoadServerConfig(InitMainWnd)
 	end
+	
+	local function ShowReadyUpdate(strVersion, strContent)
+		--发现新版本
+		TextBig:SetVisible(true)
+		TextBig:SetText("发现共享赚宝新版本v"..tostring(strVersion))
+		TextMain:SetVisible(false)
+		TextVersion:SetVisible(true)
+		BtnUpdate:Show(true)
+		TextVersion:SetText(strContent)
+		local w, h = TextVersion:GetTextExtent()
+		local Hoffset =  h - 130
+		if Hoffset > 0 then
+			TextVersion:SetObjPos(158, 98, 158+260, 95 + h + 10)
+			local wndL, wndT, wndR, wndB = self:GetWindowRect()
+			self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset)
+			objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset)
+			self:SetMaxTrackSize(wndR - wndL, wndB - wndT + Hoffset)
+		end
+		if isAutoPop then
+			local nHolds  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nHolds"}) or 30
+			SetOnceTimer(
+				function(item, id)
+					self:Show(0)
+				end, 
+				nHolds*1000)
+		end
+	end
+	
+	local function InitMainWnd(nRet, strCfgPath)			
+		--[[local tNewVersionInfo = {
+			strVersion = "1.0.0.2",
+			strContent = "1、修改了XX\n2、优化了xx\n3、see more",
+			strPacketURL = "http://xmp.down.sandai.net/xmp/XMPSetup_5.2.14.5672-dl.exe",
+			strMD5 = "1221212",
+		}
+		g_tNewVersionInfo = tNewVersionInfo
+		ShowReadyUpdate(tNewVersionInfo["strVersion"] or "3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
+		if true then return end]]
+		if 0 ~= nRet then
+			ShowNoUpdate()
+			return
+		end	
+
+		local tServerConfig = tFunctionHelper.LoadTableFromFile(strCfgPath) or {}
+		local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
+		local strPacketURL = tNewVersionInfo["strPacketURL"]
+		if not Helper:IsRealString(strPacketURL) then
+			ShowNoUpdate()
+			return 
+		end
+		
+		local strCurVersion = tFunctionHelper.GetGXZBVersion()
+		local strNewVersion = tNewVersionInfo.strVersion
+		if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
+			or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
+			ShowNoUpdate(objRootCtrl)
+			return
+		end
+		--[[local strSavePath = GetPacketSavePath(strPacketURL)
+		if Helper:IsRealString(tNewVersionInfo.strMD5) 
+			and tFunctionHelper.CheckMD5(strSavePath, tNewVersionInfo.strMD5) then
+			Helper.tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
+			return
+		end]]
+		g_tNewVersionInfo = tNewVersionInfo
+		ShowReadyUpdate(tNewVersionInfo["strVersion"] or "3.4.56.1", tNewVersionInfo["strContent"] or "1、修改了XX\n2、优化了xx\n3、see more")
+	end
+	tFunctionHelper.DownLoadServerConfig(InitMainWnd)
 end

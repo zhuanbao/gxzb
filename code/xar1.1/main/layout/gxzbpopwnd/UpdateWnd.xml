@@ -213,4 +213,29 @@
 			<event name="OnCreate" file="UpdateWnd.xml.lua" func="OnCreate" />
         </eventlist>
     </hostwndtemplate>
+	
+	<hostwndtemplate id="GXZB.UpdateFrameWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>520</width>
+            <height>298</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="UpdateWnd.xml.lua" func="OnCreate" />
+        </eventlist>
+    </hostwndtemplate>
 </xlue>

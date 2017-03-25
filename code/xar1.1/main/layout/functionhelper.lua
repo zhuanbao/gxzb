@@ -50,6 +50,7 @@ local g_tPopupWndList = {
 	[2] = {"GXZB.SuspendWnd", "GXZB.SuspendWndTree"},
 	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
 	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
+	[5] = {"GXZB.UpdateFrameWnd", "GXZB.UpdateWndTree"},
 }
 
 local g_tConfigFileStruct = {
@@ -117,7 +118,7 @@ end
 function TipConvStatistic(tStat)
 	local rdRandom = tipUtil:GetCurrentUTCTime()
 	local tStatInfo = tStat or {}
-	local strDefaultNil = "gs_null"
+	local strDefaultNil = "zb_null"
 	
 	local strCID = GetPeerID()
 	local strEC = tStatInfo.strEC 
@@ -256,6 +257,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachName = InitMachName
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
+	obj.PopRemindUpdateWnd = PopRemindUpdateWnd
 	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
 	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
@@ -573,7 +575,7 @@ end
 function GetMachineID()
 	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\machineid")
 	if IsRealString(strGUID) then
-		return string.upper(strPeerID)
+		return string.upper(strGUID)
 	end
 end
 
@@ -589,7 +591,7 @@ end
 
 function GetExePath()
 	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\Path")
-	if not IsRealString(strExePath) then
+	if IsRealString(strExePath) then
 		return tostring(strExePath)
 	else
 		return tipUtil:GetModuleExeName()
@@ -2019,8 +2021,8 @@ function GetHistoryToServer(ntype, fnCallBack)
 		local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
 		tEarnings["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
 		--TODO:现在不确定服务器返回什么格式， 等确定了再改这里
-		tEarnings["hour24"] = tServer
-		tEarnings["day30"] = tServer
+		tEarnings["hour24"] = tServer["hour24"]
+		tEarnings["day30"] = tServer["day30"]
 		SaveConfigToFileByKey("tEarnings")
 	end
 	local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
@@ -2030,10 +2032,17 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
 	if not strReguestUrl then
-		local tDef = GetLocal()
+		--[[local tDef = GetLocal()
 		fnCallBack(false, tDef)
 		Save2Local(tDef)
+		return]]
+		---[[forlocal
+		strContent = GetLocalSvrCfgWithName("getHistory.json")
+		local tabInfo = DeCodeJson(strContent)
+		fnCallBack(true, tabInfo[ntype ==0 and "hour24" or "day30"])
+		Save2Local(tabInfo)
 		return
+		--]]
 	end
 	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
@@ -2041,7 +2050,13 @@ function GetHistoryToServer(ntype, fnCallBack)
 	, function(nRet, strContent, respHeaders)
 		TipLog("[GetHistoryToServer] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
-				
+		---[[forlocal
+		strContent = GetLocalSvrCfgWithName("getHistory.json")
+		local tabInfo = DeCodeJson(strContent)
+		fnCallBack(true, tabInfo[ntype ==0 and "hour24" or "day30"])
+		Save2Local(tabInfo)
+		if true then return end
+		---]]
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
 			if type(tabInfo) ~= "table" then
@@ -2077,13 +2092,43 @@ function QuerySvrForNewGetGold()
 	return strReguestUrl
 end
 
+function PopRemindUpdateWnd()
+	local nTipPopCnt  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nCnt"}) or 0
+	local nTipPopInterval  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nSpanSec"}) or 0
+	local strVersion = GetGXZBVersion()
+	if not IsRealString(strVersion) then
+		strVersion = "1.0.0.1"
+	end
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local nLocalCnt = FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nCnt"}) or 0
+	local nLocaLastUtc = FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nLastUTC"}) or 0
+	local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
+	local strNewVersion = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "strVersion"}) or "1.0.0.1"
+	LOG("PopRemindUpdateWnd strVersion="..tostring(strVersion)
+		.."\n strNewVersion="..tostring(strNewVersion)
+		.."\n nLocalCnt="..tostring(nLocalCnt)
+		.."\n nTipPopCnt="..tostring(nTipPopCnt)
+		.."\n nLocaLastUtc="..tostring(nLocaLastUtc)
+		.."\n nCurrentUtc="..tostring(nCurrentUtc)
+		.."\n nTipPopInterval="..tostring(nTipPopInterval))
+	if CheckIsNewVersion(strNewVersion, strVersion) and nLocalCnt < nTipPopCnt and nCurrentUtc - nLocaLastUtc > nTipPopInterval then
+		ShowPopupWndByName("GXZB.UpdateFrameWnd.Instance", true)
+		tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
+		tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
+		tUserConfig["tRemindUpdateCfg"][strVersion] ["nCnt"] = nLocalCnt + 1
+		tUserConfig["tRemindUpdateCfg"][strVersion] ["nLastUTC"] = nCurrentUtc
+		SaveConfigToFileByKey("tUserConfig")
+	end
+end
+
 function PopTipPre4Hour()
 	--[[local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["nMoneyPer4Hour"] = 21321
 	SaveConfigToFileByKey("tUserConfig")
 	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
 	if true then return end]]
-	local nTipPopIntervalMs  = g_ServerConfig["nTipPopIntervalMs"] or 4*3600*1000
+	
+	local nTipPopIntervals  = FetchValueByPath(g_ServerConfig, {"tRemindCfg", "nPopIntervals"}) or 4*3600
 	SetTimer(
 		function(item, id)
 			local strUrl = QuerySvrForNewGetGold()
@@ -2111,7 +2156,7 @@ function PopTipPre4Hour()
 				end)
 			end
 		end,	
-	nTipPopIntervalMs)
+	nTipPopIntervals*1000)
 end
 
 --挖矿信息
