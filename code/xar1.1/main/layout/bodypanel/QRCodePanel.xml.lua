@@ -8,6 +8,11 @@ local gBinding = false
 local gQRTimeoutId = nil
 local gChangePanelTimeoutId = nil
 local gMinTakeCashBalance = 10000
+
+local gLastExpireTime = 0
+local gLastQRCodeBitmap = nil
+local gLastTabInfo = {}
+
 local tabCtrl = {
 	"QRCodePanel.Panel.QRCode.GenFailed",
 	"QRCodePanel.Panel.QRCode.Success",
@@ -96,16 +101,8 @@ function ResetUIVisible(OwnerCtrl)
 	ObjTextLinkUnBind:Show(true)
 end
 
-function HandleInfoData(OwnerCtrl,tabInfo)
+function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 	local nExpire = math.floor(tabInfo["data"]["expire"]/1000)
-	-- 20 for test
-	-- nExpire = 20
-	local ObjBitmap = objGraphicFac:CreateBitmap(tabInfo["data"]["qrcodePath"], "ARGB32")
-	if not ObjBitmap then
-		ResetGlobalParam()
-		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
-		return
-	end
 	local ImgTmpCode= OwnerCtrl:GetControlObject("QRCodePanel.Panel.QRCode.TmpCode")
 	ImgTmpCode:SetBitmap(ObjBitmap)
 	local tServerConfig = g_ServerConfig
@@ -162,6 +159,23 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 		end, 1000)
 end
 
+function HandleInfoData(OwnerCtrl,tabInfo)
+	-- 20 for test
+	-- nExpire = 20
+	local ObjBitmap = objGraphicFac:CreateBitmap(tabInfo["data"]["qrcodePath"], "ARGB32")
+	if not ObjBitmap then
+		ResetGlobalParam()
+		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
+		return
+	end
+	
+	gLastQRCodeBitmap = ObjBitmap
+	gLastTabInfo = tabInfo
+	local nExpire = math.floor(tabInfo["data"]["expire"]/1000)
+	gLastExpireTime = nExpire + tFunctionHelper.GetCurrentServerTime()
+	CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
+end
+
 function GetQRCodeFromServer(OwnerCtrl)
 	ResetGlobalParam()
 	tFunctionHelper.DownLoadTempQrcode(function(bRet,info)
@@ -208,12 +222,28 @@ function OnVisibleChange(self, bVisible)
 	end
 	--]]
 end
+--如果上一个二维码的有效期超过20秒 则继续用
+function GetGetQRCode(self)
+	if gLastQRCodeBitmap ~= nil 
+		and type(gLastTabInfo) == "table" 
+		and type(gLastTabInfo["data"]) == "table"
+		and gLastExpireTime - tFunctionHelper.GetCurrentServerTime() >= 20 then
+		gLastTabInfo["data"]["expire"] = (gLastExpireTime - tFunctionHelper.GetCurrentServerTime())*1000
+		ResetGlobalParam()
+		CycleQueryBindState(self,gLastTabInfo,gLastQRCodeBitmap)
+		return
+	end	
+	gLastQRCodeBitmap = nil
+	gLastTabInfo = {}
+	gLastExpireTime = 0
+	GetQRCodeFromServer(self)
+end
 
 function OnShowPanel(self, bShow)
 	gBinding = bShow
 	if bShow then
 		ResetUIVisible(self)
-		GetQRCodeFromServer(self)
+		GetGetQRCode(self)
 	else
 		ResetGlobalParam()
 		ResetUIVisible(self)
