@@ -2032,11 +2032,11 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
 	if not strReguestUrl then
-		--[[local tDef = GetLocal()
+		local tDef = GetLocal()
 		fnCallBack(false, tDef)
 		Save2Local(tDef)
-		return]]
-		---[[forlocal
+		return
+		--[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory.json")
 		local tabInfo = DeCodeJson(strContent)
 		fnCallBack(true, tabInfo[ntype ==0 and "hour24" or "day30"])
