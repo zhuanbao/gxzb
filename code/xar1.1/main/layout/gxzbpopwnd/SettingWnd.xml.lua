@@ -17,7 +17,7 @@ end
 
 function SetAutoRun()
 	local strExePath = tFunctionHelper.GetExePath()
-	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding"
+	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
 	Helper:SetRegValue(strAutoRunRegPath, strValue)
 end
 
