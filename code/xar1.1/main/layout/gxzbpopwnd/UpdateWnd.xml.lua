@@ -270,7 +270,9 @@ function OnShowWindow(self, isShow)
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strCfgPath) or {}
 		local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
 		local strPacketURL = tNewVersionInfo["strPacketURL"]
-		if not Helper:IsRealString(strPacketURL) then
+		if not Helper:IsRealString(strPacketURL) or
+			not Helper:IsRealString(tNewVersionInfo["strVersion"]) or
+			not Helper:IsRealString(tNewVersionInfo["strContent"] ) then
 			ShowNoUpdate()
 			return 
 		end

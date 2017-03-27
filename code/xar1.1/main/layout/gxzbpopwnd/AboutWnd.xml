@@ -105,7 +105,7 @@
 							<attr>
 								<left>284</left>
 								<top>95</top>
-								<width>84</width>
+								<width>120</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
@@ -131,7 +131,7 @@
 							<attr>
 								<left>284</left>
 								<top>123</top>
-								<width>84</width>
+								<width>120</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
@@ -148,7 +148,7 @@
 								<height>20</height>
 								<HAlign>left</HAlign>
 								<VAlign>center</VAlign>
-								<Text>http://www.baidu.com</Text>
+								<Text>http://www.eastredm.com/</Text>
 								<Font>font.yahei13.underline</Font>
 								<TextColor>AF8656</TextColor>
 								<TextHoverColor>AF8656</TextHoverColor>
