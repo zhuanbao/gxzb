@@ -2386,8 +2386,8 @@ function CheckIsGettedWorkID()
 end
 
 function CheckShoudAutoMining()
-	local bRet, strSource = GetCommandStrValue("/sstartfrom")
-	if bRet and string.lower(strSource) == "sysboot" then
+	local strCmdline = tipUtil:GetCommandLine()
+	if string.find(string.lower(tostring(strCmdline)), "/mining") then
 		if not CheckIsWorking() then
 			NotifyStart()
 		end
