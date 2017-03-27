@@ -2054,8 +2054,8 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end
 	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
 	if not strReguestUrl then
-		local tDef = GetLocal()
-		fnCallBack(false, tDef)
+		local tDefault = GetLocal()
+		fnCallBack(false, tDefault)
 		return
 		--[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory.json")
@@ -2074,8 +2074,12 @@ function GetHistoryToServer(ntype, fnCallBack)
 		---[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory.json")
 		local tabInfo = DeCodeJson(strContent)
-		fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
-		Save2Local(tabInfo["data"])
+		if type(tabInfo) == "table" and type(tabInfo["data"]) == "table" and type(tabInfo["data"]["hour24"]) == "table" and type(tabInfo["data"]["day30"]) == "table" then
+			fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+			Save2Local(tabInfo["data"])
+		else
+			fnCallBack(false, GetLocal())
+		end
 		if true then return end
 		---]]
 		if 0 == nRet then
