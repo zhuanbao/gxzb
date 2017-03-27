@@ -110,11 +110,15 @@
     <ClInclude Include="MinerHelper.h" />
     <ClInclude Include="MsgWndIPC.h" />
     <ClInclude Include="PhoneHome.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MinerAux.cpp" />
     <ClCompile Include="MsgWndIPC.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ethminer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
