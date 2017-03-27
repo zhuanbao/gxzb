@@ -309,6 +309,13 @@ function ChangeClientTitle(strTitle)
 end
 
 function CheckShouldRemindBind()
+	if CheckIsBinded() then
+		return false
+	end
+	local strCmdline = tipUtil:GetCommandLine()
+	if string.find(string.lower(tostring(strCmdline)), "/mining") then
+		return false
+	end
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if tUserConfig["nLastRemindBindUTC"] ~= nil then
 		return false
