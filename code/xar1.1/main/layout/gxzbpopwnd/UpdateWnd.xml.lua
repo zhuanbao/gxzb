@@ -5,6 +5,8 @@ local g_tNewVersionInfo = nil
 local g_UpdateState = 0
 --是否被取消
 local g_UpdateCancel = false
+--是否可以重新开1个下载线程
+local g_CanRetry = false
 
 function OnClickClose(self)
 	local objTree = self:GetOwner()
@@ -89,7 +91,7 @@ function OnClickUpdateBtn(self)
 	end
 	--正在更新
 	g_UpdateState = 1
-	if g_UpdateCancel then
+	if not g_CanRetry and g_UpdateCancel then
 		g_UpdateCancel = false
 		return
 	end
@@ -108,8 +110,13 @@ function OnClickUpdateBtn(self)
 	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
 	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
 	
+	g_UpdateCancel = false
+	g_CanRetry = false
 	tFunctionHelper.TipLog("[OnClickUpdateBtn] strUrl = "..tostring(strUrl)..", strSavePath = "..tostring(strSavePath))
 	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
+		if nRet == 0 then
+			g_CanRetry = true
+		end
 		if g_UpdateCancel then
 			if nRet == 0 then
 				g_UpdateCancel = false

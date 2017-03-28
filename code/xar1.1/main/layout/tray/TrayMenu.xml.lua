@@ -10,34 +10,27 @@ end
 
 
 function OnInit_MainUI(self)
-	--[[local attr = self:GetAttribute()
-	if Helper:QueryRegValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb") then
-		attr.Icon = "bitmap.menu.setting_check.normal"
-	else
-		attr.Icon = ""
-	end]]
 end
 
 function OnInit_Pause(self)
-	--[[local attr = self:GetAttribute()
-	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
-	if objHostWnd and objHostWnd:GetVisible() then
-		attr.Text = "隐藏悬浮球"
+	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+	local attr = self:GetAttribute()
+	if tFunctionHelper.CheckIsWorking() then
+		attr.Text = "暂停"
+		attr.Icon = "bitmap.menu.pause.normal"
 	else
-		attr.Text = "显示悬浮球"
-	end]]
+		attr.Text = "开始"
+		attr.Icon = "bitmap.menu.start.normal"
+	end
 end
 
 function OnSelect_Pause(self)
-	--GXZBMenu.SettingMenu.menuFunTable.OnInit_hideball()
-	--[[local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
-	if objHostWnd then
-		if objHostWnd:GetVisible() then
-			objHostWnd:Show(0)
-		else
-			objHostWnd:Show(1)
-		end
-	end]]
+	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+	if tFunctionHelper.CheckIsWorking() then
+		tFunctionHelper.NotifyPause()
+	else
+		tFunctionHelper.NotifyStart()
+	end
 end
 
 function OnSelect_Update(self)

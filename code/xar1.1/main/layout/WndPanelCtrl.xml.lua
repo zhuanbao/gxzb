@@ -64,7 +64,18 @@ function CreateListener(objRootCtrl)
 			tFunctionHelper.TipLog("[CreateListener] key: " .. tostring(key))
 			local tParam = {...}	
 			if tostring(key) == "OnCommandLine" then
-				OnCommandLine(tParam)
+				--OnCommandLine(tParam)
+				--再次拉起时置顶
+				local bHide = false
+				if type(tParam) == "table" and type(tParam[1]) == "string" and string.find(tParam[1], "/embedding") then
+					bHide = true
+				end
+				if not bHide then
+					local mainwnd = tFunctionHelper.GetMainHostWnd()
+					if mainwnd then
+						mainwnd:BringWindowToTop(true)
+					end
+				end
 			end		
 		end
 	)

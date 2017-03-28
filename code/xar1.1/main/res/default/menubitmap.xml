@@ -25,6 +25,9 @@
 		<imagelist id="imagelist.menu.pause" vertical="0" varyblock="0" blocksize="16" image="menu\pause.png"/>
 			<bitmap id="bitmap.menu.pause.normal"  imagelist="imagelist.menu.pause" index="1" />
 			<bitmap id="bitmap.menu.pause.hover"  imagelist="imagelist.menu.pause" index="2" />
+		<imagelist id="imagelist.menu.start" vertical="0" varyblock="0" blocksize="16" image="menu\start.png"/>
+			<bitmap id="bitmap.menu.start.normal"  imagelist="imagelist.menu.start" index="1" />
+			<bitmap id="bitmap.menu.start.hover"  imagelist="imagelist.menu.start" index="2" />
 		<imagelist id="imagelist.menu.select" vertical="0" varyblock="0" blocksize="16" image="menu\select.png"/>
 			<bitmap id="bitmap.menu.select.normal"  imagelist="imagelist.menu.select" index="1" />
 			<bitmap id="bitmap.menu.select.hover"  imagelist="imagelist.menu.select" index="2" />	

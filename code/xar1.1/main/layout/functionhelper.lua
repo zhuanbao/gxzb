@@ -2091,7 +2091,7 @@ function GetHistoryToServer(ntype, fnCallBack)
 		---]]
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
-			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" then
+			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" or type(tabInfo["data"]["hour24"]) ~= "table" or type(tabInfo["data"]["day30"]) ~= "table" then
 				TipLog("[GetHistoryToServer] parse info error.")
 				fnCallBack(false, GetLocal(tEarnings))
 				return
@@ -2664,7 +2664,7 @@ local MING_MINING_EEEOR_TIMEOUT = 100
 function GetToolTipInfo()
 	local bShowSpeed = false
 	local strText = ""
-	if g_PreWorkState == MING_CALCULATE_DAG then
+	if g_PreWorkState == MING_CALCULATE_DAG or g_bWorking then
 		strText = "准备中"
 		bShowSpeed = true
 	elseif g_PreWorkState == MING_MINING_SPEED
