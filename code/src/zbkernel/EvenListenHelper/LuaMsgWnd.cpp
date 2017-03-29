@@ -145,6 +145,42 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 	return 0;
 }
 
+LRESULT LuaMsgWindow::OnMiningCount(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+;
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (int)lParam;
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnMiningCount", &params);
+	return 0;
+}
+
+LRESULT LuaMsgWindow::OnConnectFail(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (int)lParam;
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnConnectFail", &params);
+	return 0;
+}
+
+LRESULT LuaMsgWindow::OnInitDagRet(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (int)lParam;
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnInitDagRet", &params);
+	return 0;
+}
+
 void LuaMsgWindow::SetKeyboardHook()
 {
 	if (NULL==m_hKeyboardHook)
