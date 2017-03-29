@@ -40,7 +40,7 @@ local g_CurrentPerBatch = 0 --当前限速值
 local g_GlobalWorkSizeMultiplier_Min = 100
 local g_GlobalWorkSizeMultiplier_Max = 4096
 local g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
-local g_msExpectPerBatch = 200 --显卡计算每次循环的期望时间间隔(毫秒)
+local g_msExpectPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
 ------限速
 
 --local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"

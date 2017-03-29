@@ -225,12 +225,12 @@ function OnVisibleChange(self, bVisible)
 	end
 	--]]
 end
---如果上一个二维码的有效期超过20秒 则继续用
+--如果上一个二维码的有效期超过30秒 则继续用
 function GetGetQRCode(self)
 	if gLastQRCodeBitmap ~= nil 
 		and type(gLastTabInfo) == "table" 
 		and type(gLastTabInfo["data"]) == "table"
-		and gLastExpireTime - tFunctionHelper.GetCurrentServerTime() >= 20 then
+		and gLastExpireTime - tFunctionHelper.GetCurrentServerTime() >= 30 then
 		gLastTabInfo["data"]["expire"] = (gLastExpireTime - tFunctionHelper.GetCurrentServerTime())*1000
 		ResetGlobalParam()
 		CycleQueryBindState(self,gLastTabInfo,gLastQRCodeBitmap)
