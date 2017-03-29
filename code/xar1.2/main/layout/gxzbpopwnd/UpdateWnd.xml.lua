@@ -189,10 +189,15 @@ function FetchValueByPath(obj, path)
 	return cursor
 end
 
+local isAutoPopFirstEntry = true
 function OnShowWindow(self, isShow)
 	if not isShow then return end
 	--是否是自动弹出提醒
 	local isAutoPop = type(self.EndDialog) ~= "function"
+	if isAutoPopFirstEntry and isAutoPop then
+		isAutoPopFirstEntry = false
+		return
+	end
 	local objtree = self:GetBindUIObjectTree()
 	local objRootLayout = objtree:GetUIObject("root")
 	if isAutoPop then
@@ -245,9 +250,9 @@ function OnShowWindow(self, isShow)
 		if Hoffset > 0 then
 			TextVersion:SetObjPos(158, 98, 158+260, 95 + h + 10)
 			local wndL, wndT, wndR, wndB = self:GetWindowRect()
-			self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset)
-			objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset)
-			self:SetMaxTrackSize(wndR - wndL, wndB - wndT + Hoffset)
+			self:Move(wndL, wndT, wndR - wndL, wndB - wndT + Hoffset+10)
+			objRootLayout:SetObjPos(0, 0, wndR - wndL, wndB - wndT + Hoffset+10)
+			self:SetMaxTrackSize(wndR - wndL, wndB - wndT + Hoffset+10)
 		end
 		if isAutoPop then
 			local nHolds  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nHolds"}) or 30

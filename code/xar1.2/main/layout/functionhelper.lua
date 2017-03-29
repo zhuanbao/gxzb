@@ -764,18 +764,32 @@ function UpdateTimeCalibration(nLocalUTCInSec, nSvrUTCInSec)
 	SaveConfigToFileByKey("tUserConfig")
 end
 
+local bDownloadIng = false
+local tCallBacks = {}
 function DownLoadServerConfig(fnCallBack, nTimeInMs)
+	local function callbackwrap(nRet, strPath)
+		for _, cb in ipairs(tCallBacks) do
+			cb(nRet, strPath)
+		end
+		tCallBacks = {}
+		bDownloadIng = false
+	end
+	tCallBacks[#tCallBacks+1] = fnCallBack
+	if bDownloadIng then
+		return
+	end
+	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
 	local strConfigURL = tUserConfig["strServerConfigURL"]
 	if not IsRealString(strConfigURL) then
-		fnCallBack(-1)
+		callbackwrap(-1)
 		return
 	end
 	
 	local strSavePath = GetCfgPathWithName("ServerConfig.dat")
 	if not IsRealString(strSavePath) then
-		fnCallBack(-1)
+		callbackwrap(-1)
 		return
 	end
 	
@@ -803,9 +817,9 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 			---[[ forlocal
 			strSavePath = GetLocalSvrCfgWithName("ServerConfig.dat", true)
 			--]]
-			fnCallBack(0, strSavePath)
+			callbackwrap(0, strSavePath)
 		else
-			fnCallBack(bRet)
+			callbackwrap(bRet)
 		end		
 	end, nTime)
 end
@@ -2155,8 +2169,8 @@ function PopRemindUpdateWnd()
 		ShowPopupWndByName("GXZB.UpdateFrameWnd.Instance", true)
 		tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
 		tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
-		tUserConfig["tRemindUpdateCfg"][strVersion] ["nCnt"] = nLocalCnt + 1
-		tUserConfig["tRemindUpdateCfg"][strVersion] ["nLastUTC"] = nCurrentUtc
+		tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
+		tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
 		SaveConfigToFileByKey("tUserConfig")
 	end
 end
@@ -2905,19 +2919,21 @@ function CheckIsWorking()
 end
 
 --尝试去连接服务器
+local gtest = 0
 function TryToConnectServer(fnCallBack)
 	DownLoadServerConfig(function(nDownServer, strServerPath)
-		if nDownServer ~= 0 or not tipUtil:QueryFileExists(tostring(strServerPath)) then
-			TipLog("[TryToConnectServer] Download server config failed , try reconnect ")
+		if nDownServer ~= 0 or not IsRealString(strServerPath) or  not tipUtil:QueryFileExists(tostring(strServerPath)) then
+			TipLog("[TryToConnectServer] Download server config failed , try reconnect nDownServer="..tostring(nDownServer)..", strServerPath="..tostring(strServerPath))
 			--处理)
 			gtest = gtest + 1
 			fnCallBack(false)
-			SetStateInfoToUser("连接服务器失败")
+			SetStateInfoToUser("正在连接服务器")
 			SetOnceTimer(function()
 				TryToConnectServer(fnCallBack)
 			end, 3000)
 			return	
 		end
+		TipLog("[TryToConnectServer] Download server config success")
 		SetStateInfoToUser(nil)
 		OnDownLoadSvrCfgSuccess(strServerPath)
 		fnCallBack(true,strServerPath)

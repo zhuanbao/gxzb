@@ -383,37 +383,9 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 end
 XLSetGlobal("OnDownLoadSvrCfgSuccess", OnDownLoadSvrCfgSuccess)
 
-function TryShowNonSysBubble(strCmd)
-	if string.find(tostring(strCmd), "/showbubble") then
-		FunctionObj.ShowPopupWndByName("TipBubbleWnd.Instance", true)
-	end
-end
-
-function TryShowSysBootRemind(strCmd)
-	if string.find(tostring(strCmd), "/showsysboot") then
-		FunctionObj.ShowPopupWndByName("TipSysbootWnd.Instance", true)
-	end
-end
-
-
-function TryShowIntroduceWnd(strCmd)
-	if not string.find(tostring(strCmd), "/showintroduce") then
-		return
-	end
-
-	FunctionObj.ShowIntroduceOnce()
-end
-
 function LoadDynamicFont()
 	local strFontPath = __document.."\\..\\dynamicfont.lua"
 	local Module = XLLoadModule(strFontPath)
-end
-
-function ShowPopWndByCommand()
-	local cmdString = tipUtil:GetCommandLine()
-	TryShowNonSysBubble(cmdString)
-	TryShowIntroduceWnd(cmdString)
-	TryShowSysBootRemind(cmdString)
 end
 
 function CheckMachineSuitable(callback)
@@ -471,7 +443,6 @@ function TipMain()
 	end
 	--]]
 	--FunctionObj.CheckShoudAutoMining()
-	--ShowPopWndByCommand()
 	FunctionObj.TryToConnectServer(function(bConnect,strPath)
 		FunctionObj.TipLog("[TipMain] Try to connect server, bConnect = " .. tostring(bConnect))
 	end)
