@@ -184,6 +184,7 @@ function BarChartUpdate(self)
 					if not tips then
 						tips = objFactory:CreateUIObject("tips", "BarChartTips")
 						barchartpanel:AddChild(tips)
+						tips:SetZorder(100000)
 						tips:GetObject("bkg"):SetResID(attr.TipRes)
 						--tip变色
 						if attr.Data["reqFailed"] then
