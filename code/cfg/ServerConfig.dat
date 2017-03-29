@@ -27,10 +27,19 @@ function GetSubTable()
 		},
 		["tTaskInfo"] = {
 			[1] = {
-				["strCmdLineFormat"] = "--farm-recheck 200 -G -S guangdong-pool.ethfans.org:3333 -O <wallet>.<workid>",
-				["strPool"] = "guangdong-pool.ethfans.org:3333",
 				["tPIDlist"] = {},
-				["strWallet"] = "0xC11422DF6dad71D4183e77dA0145fB77418A8891",
+				["tPool"] = {
+					[1] = {
+						["strCmdLineFormat"] = "--farm-recheck 200 -G -S guangdong-pool.ethfans.org:3333 -O <wallet>.<workid>",
+						["strPool"] = "guangdong-pool.ethfans.org:3333",
+						["strWallet"] = "0xC11422DF6dad71D4183e77dA0145fB77418A8891",
+					},
+					[2] = {
+						["strCmdLineFormat"] = "--farm-recheck 200 -G -S huabei-pool.ethfans.org:3333 -O <wallet>.<workid>",
+						["strPool"] = "huabei-pool.ethfans.org:3333",
+						["strWallet"] = "0xC11422DF6dad71D4183e77dA0145fB77418A889F",
+					},
+				},
 			},
 		},
 		["tServerInterfaceCfg"] = {
