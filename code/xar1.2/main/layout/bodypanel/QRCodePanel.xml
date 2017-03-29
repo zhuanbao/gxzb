@@ -56,8 +56,8 @@
 							<children>
 								<obj id="QRCodePanel.Panel.QRCode.TmpCode" class="ImageObject">
 									<attr>
-										<left>5</left>
-										<top>5</top>
+										<left>6</left>
+										<top>6</top>
 										<width>182</width>
 										<height>182</height>
 										<image></image>
@@ -69,8 +69,8 @@
 								</obj>
 								<obj id="QRCodePanel.Panel.QRCode.GenFailed" class="LayoutObject">
 									<attr>
-										<left>5</left>
-										<top>5</top>
+										<left>6</left>
+										<top>6</top>
 										<width>182</width>
 										<height>182</height>
 										<!--visible>false</visible-->
@@ -122,8 +122,8 @@
 								
 								<obj id="QRCodePanel.Panel.QRCode.Expire" class="LayoutObject">
 									<attr>
-										<left>5</left>
-										<top>5</top>
+										<left>6</left>
+										<top>6</top>
 										<width>182</width>
 										<height>182</height>
 										<!--visible>false</visible-->
@@ -177,8 +177,8 @@
 								</obj>
 								<obj id="QRCodePanel.Panel.QRCode.BindFailed" class="LayoutObject">
 									<attr>
-										<left>5</left>
-										<top>5</top>
+										<left>6</left>
+										<top>6</top>
 										<width>182</width>
 										<height>182</height>
 										<!--visible>false</visible-->
@@ -233,8 +233,8 @@
 								
 								<obj id="QRCodePanel.Panel.QRCode.Success" class="LayoutObject">
 									<attr>
-										<left>5</left>
-										<top>5</top>
+										<left>6</left>
+										<top>6</top>
 										<width>182</width>
 										<height>182</height>
 										<!--visible>false</visible-->

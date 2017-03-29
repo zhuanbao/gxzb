@@ -25,6 +25,12 @@ function TipLog(strLog)
 	end
 end
 
+function ResetLastQRCodeInfo()
+	gLastExpireTime = 0
+	gLastQRCodeBitmap = nil
+	gLastTabInfo = {}
+end
+
 function ResetGlobalParam()
 	if gQRTimeoutId ~= nil then
 		timerManager:KillTimer(gQRTimeoutId)
@@ -123,6 +129,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 		end
 		if nExpire < 1 then
 			bQuerying = false
+			ResetLastQRCodeInfo()
 			ResetGlobalParam()
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Expire")
 			return
@@ -142,6 +149,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 				if not bRet then
 					TipLog("Cycle query  sever for bind result return false")
 					bQuerying = false
+					ResetLastQRCodeInfo()
 					ResetGlobalParam()
 					ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
 					return 
@@ -150,6 +158,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					ResetGlobalParam()
 					UpdateBindSuccessUI(OwnerCtrl)
 					tFunctionHelper.SetUserBindInfo(tabBindInfo)
+					ResetLastQRCodeInfo()
 				end	
 				bQuerying = false
 			end)
@@ -236,9 +245,7 @@ function GetGetQRCode(self)
 		CycleQueryBindState(self,gLastTabInfo,gLastQRCodeBitmap)
 		return
 	end	
-	gLastQRCodeBitmap = nil
-	gLastTabInfo = {}
-	gLastExpireTime = 0
+	ResetLastQRCodeInfo()
 	GetQRCodeFromServer(self)
 end
 
