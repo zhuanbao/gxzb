@@ -1029,6 +1029,9 @@ function RegSetValue(sPath, value)
 	if IsRealString(sPath) then
 		local sRegRoot, sRegPath, sRegKey = string.match(sPath, "^(.-)[\\/](.*)[\\/](.-)$")
 		if IsRealString(sRegRoot) and IsRealString(sRegPath) then
+			if not tipUtil:QueryRegKeyExists(sRegRoot, sRegPath) then
+				tipUtil:CreateRegKey(sRegRoot, sRegPath)
+			end
 			return tipUtil:SetRegValue(sRegRoot, sRegPath, sRegKey or "", value or "")
 		end
 	end
