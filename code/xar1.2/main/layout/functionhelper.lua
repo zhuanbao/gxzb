@@ -2208,9 +2208,17 @@ function PopTipPre4Hour()
 end
 
 --挖矿信息
-function InitMinerInfoToServer()
-	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
-	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+local g_bReported = false
+function InitMinerInfoToServer(bReportPool)
+	if not g_bReported then
+		SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
+	end
+	if not g_bReported or bReportPool then
+		SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+	end
+	if not g_bReported then
+		g_bReported = true
+	end	
 	--[[
 	SendMinerInfoToServer(QuerySvrForPushCalcInfo(0),1,function(tabInfo)
 		
@@ -2628,7 +2636,7 @@ function StartTask()
 	WorkingTimerHandle()
 	OnWorkStateChange(1)
 	StartMiningCountTimer()
-	InitMinerInfoToServer()
+	InitMinerInfoToServer(false)
 end
 
 function NotifyStart()
@@ -2696,7 +2704,7 @@ function NotifyStartNewPool()
 	WorkingTimerHandle()
 	OnWorkStateChange(1)
 	StartMiningCountTimer()
-	InitMinerInfoToServer()
+	InitMinerInfoToServer(true)
 end
 
 local MING_CALCULATE_DAG = 2
