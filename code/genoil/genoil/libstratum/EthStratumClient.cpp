@@ -3,7 +3,7 @@
 #include <libdevcore/Log.h>
 #include <libethash/endian.h>
 using boost::asio::ip::tcp;
-
+#include "ethminer/MinerHelper.h"
 
 static void diffToTarget(uint32_t *target, double diff)
 {
@@ -49,6 +49,7 @@ EthStratumClient::EthStratumClient(GenericFarm<EthashProofOfWork> * f, MinerType
 	m_CheckQuitHandler = _handler;
 	p_farm = f;
 	p_worktimer = nullptr;
+	m_reconnectCount = 0;
 	connect();
 }
 
@@ -120,10 +121,11 @@ void EthStratumClient::reconnect()
 			m_retries = 0;
 		}
 	}
-	
 	cnote << "Reconnecting in 3 seconds...";
 	boost::asio::deadline_timer     timer(m_io_service, boost::posix_time::seconds(3));
 	timer.wait();
+	m_reconnectCount++;
+	PostMessageToUserWnd(WM_CONNECT_FAIL, m_reconnectCount, 0);
 
 	connect();
 }
@@ -132,6 +134,7 @@ void EthStratumClient::disconnect()
 {
 	cnote << "Disconnecting";
 	m_connected = false;
+	m_reconnectCount = 0;
 	if (p_farm->isMining())
 	{
 		cnote << "Stopping farm";
@@ -173,6 +176,7 @@ void EthStratumClient::connect_handler(const boost::system::error_code& ec, tcp:
 	}
 	if (!ec)
 	{
+		m_reconnectCount = 0;
 		m_connected = true;
 		cnote << "Connected to stratum server " << i->host_name() << ":" << p_active->port;
 		if (!p_farm->isMining())

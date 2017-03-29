@@ -93,4 +93,6 @@ private:
 
 	void processExtranonce(std::string& enonce);
 	std::function<bool()> m_CheckQuitHandler;
+
+	int m_reconnectCount;
 };

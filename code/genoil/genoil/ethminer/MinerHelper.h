@@ -175,3 +175,16 @@ inline BOOL AllowMessageToRecv(UINT uiMsg, BOOL bAllowed)
 	}
 	return bSuc;
 };
+
+#define WM_MINING_COUNT		WM_USER+800
+#define WM_CONNECT_FAIL		WM_USER+801
+#define WM_INITDAG_RET		WM_USER+802
+
+inline void PostMessageToUserWnd(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static HWND hUserWnd = FindWindowA("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", NULL);;
+	if (hUserWnd)
+	{
+		PostMessageA(hUserWnd, uMsg, wParam, lParam);
+	}
+}

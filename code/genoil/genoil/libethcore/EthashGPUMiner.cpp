@@ -31,6 +31,8 @@ using namespace std;
 using namespace dev;
 using namespace eth;
 
+#include "ethminer/MinerHelper.h"
+
 namespace dev
 {
 namespace eth
@@ -199,7 +201,10 @@ void EthashGPUMiner::workLoop()
 			bytesConstRef lightData = light->data();
 			
 			cnote << "begain calculate full dag data";
-			m_miner->init(light->light, lightData.data(), lightData.size(), s_platformId, device, *m_hook,s_OnDAGProgess);
+			bool bInit = m_miner->init(light->light, lightData.data(), lightData.size(), s_platformId, device, *m_hook,s_OnDAGProgess);
+			int nRet = bInit ? 1 : 0;
+			PostMessageToUserWnd(WM_INITDAG_RET, index(), nRet);
+
 			cnote << "end calculate full dag data";
 			s_dagLoadIndex++;
 		}
