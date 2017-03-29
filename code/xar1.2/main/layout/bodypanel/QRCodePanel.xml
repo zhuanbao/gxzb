@@ -1,0 +1,332 @@
+<xlue>
+	<control class="QRCodePanel">
+		<attr_def>
+			<attr name="bHasInit" type="bool"/>
+		</attr_def>
+		<method_def>
+			<OnShowPanel file="QRCodePanel.xml.lua" func="OnShowPanel"/>
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="QRCodePanel.Panel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="QRCodePanel.Panel.Title" class="TextObject">
+							<attr>
+								<left>(father.width-130)/2</left>
+								<top>49</top>
+								<width>130</width>
+								<height>24</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text20</font>
+								<text>绑定微信账号</text>
+							</attr>
+						</obj>
+						<obj id="QRCodePanel.Panel.Description" class="TextObject">
+							<attr>
+								<left>(father.width-230)/2</left>
+								<top>85</top>
+								<width>230</width>
+								<height>24</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text20</font>
+								<text>实时查询收益与元宝提现</text>
+							</attr>
+						</obj>
+						<obj id="QRCodePanel.Panel.QRCode.Bkg" class="TextureObject">
+							<attr>
+								<left>(father.width-194)/2</left>
+								<top>138</top>
+								<width>194</width>
+								<height>194</height>
+								<texture>GXZB.QRCodePanel.QRCodeBkg</texture>
+							</attr>
+							<children>
+								<obj id="QRCodePanel.Panel.QRCode.TmpCode" class="ImageObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>182</width>
+										<height>182</height>
+										<image></image>
+										<valign>center</valign>
+										<halign>center</halign>
+										<drawmode>1</drawmode>
+										<antialias>2</antialias>
+									</attr>
+								</obj>
+								<obj id="QRCodePanel.Panel.QRCode.GenFailed" class="LayoutObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>182</width>
+										<height>182</height>
+										<!--visible>false</visible-->
+									</attr>
+									<children>
+										<obj id="QRCodePanel.Panel.QRCode.GenFailed.Bkg" class="TextureObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<texture>GXZB.QRCodePanel.QRCode.FailedBKG</texture>
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.GenFailed.Desc" class="TextObject">
+											<attr>
+												<left>1</left>
+												<top>64</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<valign>center</valign>
+												<halign>center</halign>
+												<textcolor>system.white</textcolor>
+												<font>font.text13</font>
+												<text>二维码生成失败</text>
+												<!--visible>false</visible-->
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.GenFailed.Refresh" class="TipAddin.Button">
+											<attr>
+												<left>(father.width-102)/2</left>
+												<top>84</top>
+												<width>102</width>
+												<height>36</height>
+												<Text>刷新</Text>
+												<TextFont>font.text14</TextFont>
+												<TextColor>system.white</TextColor>
+												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
+												<DownBkgID>setting-surebtn-normal</DownBkgID>
+												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
+												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+								
+								<obj id="QRCodePanel.Panel.QRCode.Expire" class="LayoutObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>182</width>
+										<height>182</height>
+										<!--visible>false</visible-->
+									</attr>
+									<children>
+										<obj id="QRCodePanel.Panel.QRCode.Expire.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.Expire.Desc" class="TextObject">
+											<attr>
+												<left>1</left>
+												<top>64</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<valign>center</valign>
+												<halign>center</halign>
+												<textcolor>system.white</textcolor>
+												<font>font.text13</font>
+												<text>二维码已过期</text>
+												<!--visible>false</visible-->
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.Expire.Refresh" class="TipAddin.Button">
+											<attr>
+												<left>(father.width-102)/2</left>
+												<top>84</top>
+												<width>102</width>
+												<height>36</height>
+												<Text>刷新</Text>
+												<TextFont>font.text14</TextFont>
+												<TextColor>system.white</TextColor>
+												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
+												<DownBkgID>setting-surebtn-normal</DownBkgID>
+												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
+												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+								<obj id="QRCodePanel.Panel.QRCode.BindFailed" class="LayoutObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>182</width>
+										<height>182</height>
+										<!--visible>false</visible-->
+									</attr>
+									<children>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Desc" class="TextObject">
+											<attr>
+												<left>1</left>
+												<top>64</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<valign>center</valign>
+												<halign>center</halign>
+												<textcolor>system.white</textcolor>
+												<font>font.text13</font>
+												<text>二维码绑定失败</text>
+												<!--visible>false</visible-->
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.BindFailed.Refresh" class="TipAddin.Button">
+											<attr>
+												<left>(father.width-102)/2</left>
+												<top>84</top>
+												<width>102</width>
+												<height>36</height>
+												<Text>重新绑定</Text>
+												<TextFont>font.text14</TextFont>
+												<TextColor>system.white</TextColor>
+												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
+												<DownBkgID>setting-surebtn-normal</DownBkgID>
+												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
+												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+								
+								<obj id="QRCodePanel.Panel.QRCode.Success" class="LayoutObject">
+									<attr>
+										<left>5</left>
+										<top>5</top>
+										<width>182</width>
+										<height>182</height>
+										<!--visible>false</visible-->
+									</attr>
+									<children>
+										<obj id="QRCodePanel.Panel.QRCode.Success.Mask" class="FillObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<filltype>Monochrome</filltype>
+												<blendtype>Source</blendtype>
+												<srccolor>RGBA(0,0,0,220)</srccolor>
+												<destcolor>RGBA(0,0,0,220)</destcolor>
+											</attr>
+										</obj>
+										<obj id="QRCodePanel.Panel.QRCode.Success.Desc" class="TextObject">
+											<attr>
+												<left>1</left>
+												<top>(father.height-16)/2</top>
+												<width>father.width - 2</width>
+												<height>16</height>
+												<valign>center</valign>
+												<halign>center</halign>
+												<textcolor>system.white</textcolor>
+												<font>font.text16</font>
+												<text>绑定成功</text>
+												<!--visible>false</visible-->
+											</attr>
+										</obj>
+									</children>
+								</obj>
+							</children>
+						</obj>
+						<!--obj id="QRCodePanel.Panel.BegainMining" class="TipAddin.Button">
+							<attr>
+								<left>(father.width-160)/2</left>
+								<top>305</top>
+								<width>160</width>
+								<height>46</height>
+								<NormalBkgID>GXZB.Panel.Button</NormalBkgID>
+								<DownBkgID>GXZB.Panel.Button</DownBkgID>
+								<HoverBkgID>GXZB.Panel.Button</HoverBkgID>
+								<DisableBkgID>GXZB.Panel.Button</DisableBkgID>
+								<TextFont>font.text18</TextFont>
+								<Text>开始赚宝</Text>
+								<Visible>false</Visible>
+							</attr>									
+							<eventlist>
+								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickBegainMining" />
+							</eventlist>
+						</obj-->
+						<obj id="QRCodePanel.Panel.ActiveTime" class="TextObject">
+							<attr>
+								<left>10</left>
+								<top>346</top>
+								<width>father.width - 10</width>
+								<height>16</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>AF8656</textcolor>
+								<font>font.text13</font>
+								<text>二维码有效时间0秒</text>
+								<visible>false</visible>
+							</attr>
+						</obj>
+						<obj id="QRCodePanel.Panel.UnBind" class="TextLinkEx">
+							<attr>
+								<left>(father.width-80)/2</left>
+								<top>424</top>
+								<width>80</width>
+								<height>16</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>暂不绑定</Text>
+								<Font>font.yahei13</Font>
+								<TextColor>A9A9A9</TextColor>
+								<TextHoverColor>system.black</TextHoverColor>
+								<Show>true</Show>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickUnBindWeiXin" />
+							</eventlist>
+						</obj>
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnInitControl" file="QRCodePanel.xml.lua" func="OnInitControl" />
+				<event name="OnVisibleChange" file="QRCodePanel.xml.lua" func="OnVisibleChange" />
+			</eventlist>
+		</objtemplate>
+	</control>	
+</xlue>

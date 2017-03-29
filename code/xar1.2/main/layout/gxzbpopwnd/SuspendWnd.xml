@@ -1,0 +1,279 @@
+<xlue>
+	<control class="SuspendLeftGoldBalance">
+		<method_def>
+			<SetState file="SuspendWnd.xml.lua" func="LeftGoldBalance_SetState"/>
+			<Click file="SuspendWnd.xml.lua" func="LeftGoldBalance_Click"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="goldicon" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>15</top>
+						<width>82</width>
+						<height>48</height>
+						<image>suspend-gold-gray</image>
+						<valign>center</valign>
+						<halign>center</halign>
+					</attr>
+				</obj>
+				<obj id="goldtextheadconta" class="TextObject">
+					<attr>
+						<left>0</left>
+						<top>24</top>
+						<width>82</width>
+						<height>15</height>
+						<valign>center</valign>
+						<halign>center</halign>
+						<textcolor>color.suspend.balanceshadow</textcolor>
+						<font>font.suspend.balancehead</font>
+						<text>金库余额</text>
+					</attr>
+					<children>
+						<obj id="goldtexthead" class="TextObject">
+							<attr>
+								<left>-1</left>
+								<top>-1</top>
+								<width>father.width</width>
+								<height>15</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>color.suspend.balance</textcolor>
+								<font>font.suspend.balancehead</font>
+								<text>金库余额</text>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+				<obj id="goldtextnumberconta" class="TextObject">
+					<attr>
+						<left>0</left>
+						<top>39</top>
+						<width>82</width>
+						<height>30</height>
+						<valign>top</valign>
+						<halign>center</halign>
+						<textcolor>color.suspend.balanceshadow</textcolor>
+						<font>font.suspend.balancenumber</font>
+						<text>0</text>
+					</attr>
+					<children>
+						<obj id="goldtextnumber" class="TextObject">
+							<attr>
+								<left>-1</left>
+								<top>-1</top>
+								<width>father.width</width>
+								<height>30</height>
+								<valign>top</valign>
+								<halign>center</halign>
+								<textcolor>color.suspend.balance</textcolor>
+								<font>font.suspend.balancenumber</font>
+								<text>0</text>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<control class="SuspendRightDisk">
+		<method_def>
+			<SetState file="SuspendWnd.xml.lua" func="SuspendRightDisk_SetState"/>
+			<UpdateSpeed file="SuspendWnd.xml.lua" func="SuspendRightDisk_UpdateSpeed"/>
+			<Click file="SuspendWnd.xml.lua" func="SuspendRightDisk_Click"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="graydisk" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>5</top>
+						<width>father.width</width>
+						<height>father.height-5</height>
+						<image>suspend-nowork-rightdisk-hoverleft</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+					<children>
+						<obj id="graydisk.needle" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-nowork-rightdisk-needlegray</image>
+								<valign>center</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+						<obj id="starticon" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-nowork-rightdisk-hoverright</image>
+								<valign>top</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+				<obj id="lightdisk" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>5</top>
+						<width>82</width>
+						<height>father.height-5</height>
+						<image>suspend-work-rightdisk-hoverleft</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+					<children>
+						<obj id="lightdisk.needle" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-needle-needle1</image>
+								<valign>center</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+						<obj id="speedtext" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>40</top>
+								<width>father.width</width>
+								<height>12</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>color.suspend.speed</textcolor>
+								<font>font.suspend.speed</font>
+								<shadow>1</shadow>
+								<shadowoffset>1,1</shadowoffset>
+								<shadowcolor>color.suspend.speedshadow</shadowcolor>
+								<text></text>
+							</attr>
+						</obj>
+						<obj id="stopicon" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<image>suspend-work-rightdisk-hoverright</image>
+								<valign>top</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<control class="SuspendCtrl">
+		<method_def>
+			<!--设置状态： 0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边-->
+			<SetState file="SuspendWnd.xml.lua" func="SuspendCtrl_SetState"/>
+			<!--更新水平线， 其实就是换图-->
+			<UpdateLine file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateLine"/>
+			<OnWorkStateChange file="SuspendWnd.xml.lua" func="SuspendCtrl_OnWorkStateChange"/>
+			<UpdateMiningState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateMiningState"/>
+			<UpdateMiningSpeed file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateMiningSpeed"/>
+			<UpdateUserBalance file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateUserBalance"/>
+			<UpdateClientUnBindState file="SuspendWnd.xml.lua" func="SuspendCtrl_UpdateClientUnBindState"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="bkg" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="strip" class="TextureObject">
+							<attr>
+								<left>father.width-82</left>
+								<top>0</top>
+								<width>82</width>
+								<height>father.height</height>
+								<texture>suspend-nowork-bkg0</texture>
+							</attr>
+							<children>
+								<obj id="RightDisk" class="SuspendRightDisk">
+									<attr>
+										<left>father.width-82</left>
+										<top>0</top>
+										<width>82</width>
+										<height>father.height</height>
+									</attr>
+								</obj>	
+								<obj id="LeftGoldBalance" class="SuspendLeftGoldBalance">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>82</width>
+										<height>father.height</height>
+									</attr>
+								</obj>	
+							</children>
+						</obj>	
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnLButtonDown" file="SuspendWnd.xml.lua" func="OnLButtonDown" />
+				<event name="OnLButtonUp" file="SuspendWnd.xml.lua" func="OnLButtonUp" />
+				<event name="OnMouseMove" file="SuspendWnd.xml.lua" func="OnMouseMove" />
+				<event name="OnMouseLeave" file="SuspendWnd.xml.lua" func="OnMouseLeave" />
+				<!--event name="OnLButtonDbClick" file="SuspendWnd.xml.lua" func="OnLButtonDbClickSuspend" /-->
+				<!--event name="OnMouseHover" file="SuspendWnd.xml.lua" func="OnMouseHover" /-->
+				<event name="OnRButtonUp" file="SuspendWnd.xml.lua" func="OnRButtonUpSuspend" />
+				<event name="OnInitControl" file="SuspendWnd.xml.lua" func="OnInitControl" />
+			</eventlist>
+		</objtemplate>
+	</control>
+	
+	<objtreetemplate id="GXZB.SuspendWndTree" class="ObjectTreeTemplate">
+		<obj id="root" class="SuspendCtrl">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>154</width>
+				<height>82</height>
+				<cursor>IDC_HAND</cursor>
+			</attr>	
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.SuspendWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>154</width>
+            <height>82</height>
+            
+            <topmost>1</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+             <event name="OnCreate" file="SuspendWnd.xml.lua" func="OnCreate"/>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

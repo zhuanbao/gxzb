@@ -1,0 +1,220 @@
+<xlue>
+	<control class="TakeCashPanel">
+		<attr_def>
+			<attr name="bHasInit" type="bool"/>
+		</attr_def>
+		<method_def>
+			<UpdateUserBalance file="TakeCashPanel.xml.lua" func="UpdateUserBalance"/>
+			<OnShowPanel file="TakeCashPanel.xml.lua" func="OnShowPanel"/>
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="TakeCashPanel.Panel" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="TakeCashPanel.Panel.Input" class="LayoutObject">
+							<attr>
+								<left>1</left>
+								<top>116</top>
+								<width>father.width-2</width>
+								<height>30</height>
+							</attr>
+							<children>
+								<obj id="TakeCashPanel.Panel.Description" class="TextObject">
+									<attr>
+										<left>46</left>
+										<top>7</top>
+										<width>70</width>
+										<height>20</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<text>提取金额</text>
+									</attr>
+								</obj>
+								<obj id="TakeCashPanel.Panel.EditBkg" class="TextureObject">
+									<attr>
+										<left>128</left>
+										<top>0</top>
+										<width>184</width>
+										<height>32</height>
+										<texture>GXZB.TakeCashPanel.EditBkg</texture>
+									</attr>	
+									<children>
+										<obj id="TakeCashPanel.Panel.RMB" class="ImageObject">
+											<attr>
+												<left>10</left>
+												<top>10</top>
+												<width>10</width>
+												<height>12</height>
+												<image>GXZB.TakeCashPanel.RMB</image>
+												<valign>center</valign>
+												<halign>center</halign>
+												<zorder>50</zorder>
+												<drawmode>1</drawmode>
+												<antialias>2</antialias>
+											</attr>
+										</obj>
+										<obj id = "TakeCashPanel.Panel.Edit" class = "EditObject">
+											<attr>
+												<left>20</left>
+												<top>5</top>
+												<width>164</width>
+												<height>24</height>
+												<transparent>1</transparent>
+												<textcolor>BCB9B5</textcolor>
+												<font>font.text16</font>
+												<number>0</number>
+												<text>可提现0元</text>
+												<enable>0</enable>
+												<maxlength>6</maxlength>
+											</attr>
+											<eventlist>
+												<event name="OnFocusChange" file="TakeCashPanel.xml.lua" func="OnEditFocusChange" />
+												<event name="OnChange" file="TakeCashPanel.xml.lua" func="OnEditTextChange" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+							</children>
+						</obj>
+						<obj id="TakeCashPanel.Panel.Amount" class="LayoutObject">
+							<attr>
+								<left>130</left>
+								<top>156</top>
+								<width>father.width-114-2</width>
+								<height>16</height>
+							</attr>
+							<children>
+								<obj id="TakeCashPanel.Panel.Amount.Description" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>66</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>您的库存有</text>
+									</attr>
+								</obj>
+								<obj id="TakeCashPanel.Panel.Amount.Num" class="TextObject">
+									<attr>
+										<left>66+1</left>
+										<top>0</top>
+										<width>father.width-(66+1)-(41+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>E39C29</textcolor>
+										<font>font.text13</font>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+								<obj id="TakeCashPanel.Panel.Amount.Unit" class="TextObject">
+									<attr>
+										<left>father.width-(41+1)</left>
+										<top>0</top>
+										<width>41</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>right</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>个元宝</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="TakeCashPanel.Panel.Take" class="TipAddin.Button">
+							<attr>
+								<left>(father.width-185)/2+38</left>
+								<top>194</top>
+								<width>184</width>
+								<height>54</height>
+								<TextFont>font.text20</TextFont>
+								<TextColor>system.white</TextColor>
+								<DisableTextColor>system.white</DisableTextColor>
+								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
+								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
+								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
+								<DisableBkgID>texture.Update.OneKeyUpdate.disable</DisableBkgID>
+								<Visible>true</Visible>
+								<Text>提现</Text>
+								<Enable>false</Enable>
+							</attr>									
+							<eventlist>
+								<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickTakeCash" />
+							</eventlist>
+						</obj>
+						<obj id="TakeCashPanel.Panel.MsgToUser" class="TextObject">
+							<attr>
+								<left>(father.width-176)/2+38</left>
+								<top>194+54+8</top>
+								<width>176</width>
+								<height>16</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>B08756</textcolor>
+								<font>font.text12</font>
+								<text>今天已提现，请明天再来~</text>
+								<visible>0</visible>
+							</attr>
+						</obj>
+						<obj id="TakeCashPanel.Panel.TakeRule" class="TextObject">
+							<attr>
+								<left>25+13</left>
+								<top>325+33</top>
+								<width>father.width - 25*2</width>
+								<height>80</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>B0A69C</textcolor>
+								<font>font.text12</font>
+								<multiline>1</multiline>
+								<text>提现规则 ：
+								1. 提现通过微信红包发放，10000元宝可提现1元人民币
+								2. 提现金额最小1元，最大200元，每天只能提现1次
+								3. 红包将发到您已绑定的微信账号（**）中,</text>
+							</attr>
+						</obj>
+						<obj id="TakeCashPanel.Panel.UnBindWeiXin" class="TextLinkEx">
+							<attr>
+								<left>255+13</left>
+								<top>325+33+50</top>
+								<width>60</width>
+								<height>16</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>点此解绑</Text>
+								<Font>font.yahei12.underline</Font>
+								<TextColor>317FFF</TextColor>
+								<TextHoverColor>317FFF</TextHoverColor>
+								<Underline>false</Underline>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickUnBindWeiXin" />
+							</eventlist>
+						</obj>
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnInitControl" file="TakeCashPanel.xml.lua" func="OnInitControl" />
+				<event name="OnVisibleChange" file="TakeCashPanel.xml.lua" func="OnVisibleChange" />
+				<event name="OnLButtonDown" file="TakeCashPanel.xml.lua" func="OnLButtonDownPanel" />
+			</eventlist>
+		</objtemplate>
+	</control>	
+</xlue>

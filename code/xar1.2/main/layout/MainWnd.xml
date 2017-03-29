@@ -1,0 +1,71 @@
+<xlue>
+	<animationtemplate id="wnd.pos.animation" class="PosChangeAnimation">
+		<attr>
+			<totaltime>800</totaltime>
+		</attr>
+	</animationtemplate>
+
+	<control class="MainWndRootCtrl">
+		<attr_def>
+		    <attr name="popanitime" type="int">
+				<default>800</default>
+			</attr>
+			<attr name="hidanitime" type="int">
+				<default>3000</default>
+			</attr>
+			<attr name="holdseconds" type="int">
+				<default>15</default>
+			</attr>
+		</attr_def>
+    	<objtemplate>
+    		<children>
+
+    		</children>
+    	</objtemplate>
+    </control>
+
+	<objtreetemplate id="MainWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>690</width>
+			<height>422</height>
+		</attr>
+
+		<obj id="root.layout" class="MainWndRootCtrl">
+		    <attr>
+			    <left>0</left>
+				<top>0</top>
+				<width>690</width>
+				<height>422</height>
+			</attr>		
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="MainWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>420</width>
+            <height>652</height>
+            
+            <topmost>0</topmost>
+            <visible>0</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+            <event name="OnCreate" file="MainWnd.xml.lua" func="OnCreate"/>
+			<event name="OnShowWindow" file="MainWnd.xml.lua" func="OnShowWindow"/>
+			<event name="OnDestroy" file="MainWnd.xml.lua" func="OnDestroy"/>
+			<event name="OnClose" file="MainWnd.xml.lua" func="OnClose"/>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

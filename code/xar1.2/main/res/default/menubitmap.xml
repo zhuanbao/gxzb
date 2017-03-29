@@ -1,0 +1,36 @@
+﻿<XLUE>
+	<resource>
+		<!--菜单-->
+		<imagelist id="imagelist.menu.item.bkg" splitter="1" varyblock="1" image="menu\imagelist.menu.item.bkg.png"/>
+			<texture id="texture.menu.container.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="1" />
+			<texture id="texture.menu.item.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="2" />
+			
+		<bitmap id="bitmap.menu.arrow.normal"  path="menu\bitmap.menu.submenu.arrow.png" />
+		
+		<imagelist id="imagelist.menu.setting" vertical="0" varyblock="0" blocksize="16" image="menu\setting.png"/>
+			<bitmap id="bitmap.menu.setting.normal"  imagelist="imagelist.menu.setting" index="1" />
+			<bitmap id="bitmap.menu.setting.hover"  imagelist="imagelist.menu.setting" index="2" />
+		<imagelist id="imagelist.menu.exit" vertical="0" varyblock="0" blocksize="16" image="menu\exit.png"/>
+			<bitmap id="bitmap.menu.exit.normal"  imagelist="imagelist.menu.exit" index="1" />
+			<bitmap id="bitmap.menu.exit.hover"  imagelist="imagelist.menu.exit" index="2" />
+		<imagelist id="imagelist.menu.main" vertical="0" varyblock="0" blocksize="16" image="menu\main.png"/>
+			<bitmap id="bitmap.menu.main.normal"  imagelist="imagelist.menu.main" index="1" />
+			<bitmap id="bitmap.menu.main.hover"  imagelist="imagelist.menu.main" index="2" />
+		<imagelist id="imagelist.menu.about" vertical="0" varyblock="0" blocksize="16" image="menu\about.png"/>
+			<bitmap id="bitmap.menu.about.normal"  imagelist="imagelist.menu.about" index="1" />
+			<bitmap id="bitmap.menu.about.hover"  imagelist="imagelist.menu.about" index="2" />
+		<imagelist id="imagelist.menu.update" vertical="0" varyblock="0" blocksize="16" image="menu\update.png"/>
+			<bitmap id="bitmap.menu.update.normal"  imagelist="imagelist.menu.update" index="1" />
+			<bitmap id="bitmap.menu.update.hover"  imagelist="imagelist.menu.update" index="2" />
+		<imagelist id="imagelist.menu.pause" vertical="0" varyblock="0" blocksize="16" image="menu\pause.png"/>
+			<bitmap id="bitmap.menu.pause.normal"  imagelist="imagelist.menu.pause" index="1" />
+			<bitmap id="bitmap.menu.pause.hover"  imagelist="imagelist.menu.pause" index="2" />
+		<imagelist id="imagelist.menu.start" vertical="0" varyblock="0" blocksize="16" image="menu\start.png"/>
+			<bitmap id="bitmap.menu.start.normal"  imagelist="imagelist.menu.start" index="1" />
+			<bitmap id="bitmap.menu.start.hover"  imagelist="imagelist.menu.start" index="2" />
+		<imagelist id="imagelist.menu.select" vertical="0" varyblock="0" blocksize="16" image="menu\select.png"/>
+			<bitmap id="bitmap.menu.select.normal"  imagelist="imagelist.menu.select" index="1" />
+			<bitmap id="bitmap.menu.select.hover"  imagelist="imagelist.menu.select" index="2" />	
+		<!--菜单-->
+	</resource>
+</XLUE>

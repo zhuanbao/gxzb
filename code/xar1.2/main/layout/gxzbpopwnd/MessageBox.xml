@@ -1,0 +1,176 @@
+<xlue>
+<objtreetemplate id="MessageBoxWndTree" class="ObjectTreeTemplate">
+	<obj id="PanelCaption" class="CaptionObject">
+		<attr>
+			<top>0</top>
+			<left>0</left>
+			<width>520</width>
+			<height>298</height>
+		</attr>
+		<children>
+			<obj id="root" class="TextureObject">
+				<attr>
+					<left>0</left>
+					<top>0</top>
+					<width>father.width</width>
+					<height>father.height</height>
+					<texture>msgbox.bkg</texture>
+				</attr>	
+				<children>
+					<obj id="layout" class="LayoutObject">
+						<attr>
+							<left>9</left>
+							<top>9</top>
+							<width>father.width-18</width>
+							<height>father.height-18</height>
+						</attr>	
+						<children>
+							<obj id="close" class="TipAddin.Button">
+								<attr>
+									<left>father.width-30</left>
+									<top>5</top>
+									<height>15</height>
+									<width>15</width>
+									<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+									<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+									<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+									<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="closeOnClick" />
+									<event name="OnMouseEnter">
+										local self = ...
+										local hoverimage = self:GetObject("hoverimage")
+										if not hoverimage then
+											local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+											hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+											self:AddChild(hoverimage)
+											hoverimage:SetObjPos(-5, -9, 20, -6)
+											hoverimage:SetResID("GXZB.Title.Hoverimage")
+										end
+										hoverimage:SetVisible(true)
+									</event>
+									<event name="OnMouseLeave">
+										local self = ...
+										local hoverimage = self:GetObject("hoverimage")
+										if hoverimage then
+											hoverimage:SetVisible(false)
+										end
+									</event>
+								</eventlist>
+							</obj>
+							<obj id="titlelogo" class="ImageObject">
+								<attr>
+									<left>12</left>
+									<top>11</top>
+									<width>14</width>
+									<height>13</height>
+									<image>GXZB.Caption.Logo</image>
+								</attr>
+							</obj>
+							<obj id="titletext" class="TextObject">
+								<attr>
+									<left>26+6</left>
+									<top>8</top>
+									<width>200</width>
+									<height>30</height>
+									<text>共享赚宝</text>
+									<textcolor>6D5539</textcolor>
+									<font>font.default13</font>
+									<valign>top</valign>
+								</attr>
+							</obj>
+
+							<obj id="MainText" class="TextObject">
+								<attr>
+									<left>153</left>
+									<top>106</top>
+									<width>father.width-100</width>
+									<height>father.height-100</height>
+									<multiline>1</multiline>
+									<font>font.text16</font>
+									<text></text>
+									<halign>left</halign>
+									<textcolor>6D5539</textcolor>
+									<wordellipsis>1</wordellipsis>
+									<valign>top</valign>
+								</attr>
+							</obj>
+							<obj id="yes" class="TipAddin.Button">
+								<attr>
+									<left>(father.width-210)/2</left>
+									<top>father.height-50-36</top>
+									<height>36</height>
+									<width>100</width>
+									<NormalBkgID>setting-surebtn-normal</NormalBkgID>
+									<DownBkgID>setting-surebtn-down</DownBkgID>
+									<HoverBkgID>setting-surebtn-hover</HoverBkgID>
+									<DisableBkgID>setting-surebtn-normal</DisableBkgID>
+									<Text>可以</Text>
+									<TextFont>font.text16</TextFont>
+									<TextColor>system.white</TextColor>
+
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="yesOnClick" />
+								</eventlist>
+							</obj>
+							<obj id="no" class="TipAddin.Button">
+								<attr>
+									<left>(father.width-210)/2+110</left>
+									<top>father.height-50-36</top>
+									<height>36</height>
+									<width>100</width>
+									<NormalBkgID>setting-cacelbtn-normal</NormalBkgID>
+									<DownBkgID>setting-cacelbtn-down</DownBkgID>
+									<HoverBkgID>setting-cacelbtn-hover</HoverBkgID>
+									<DisableBkgID>setting-cacelbtn-normal</DisableBkgID>
+									<Text>不行</Text>
+									<TextFont>font.text16</TextFont>
+									<TextColor>system.white</TextColor>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="MessageBox.xml.lua" func="noOnClick" />
+								</eventlist>
+							</obj>
+							<obj id="MainIcon" class="ImageObject">
+								<attr>
+									<left>112</left>
+									<top>104</top>
+									<height>28</height>
+									<width>28</width>
+									<image>GXZB.Caption.Warning</image>
+									<visible>0</visible>
+								</attr>
+							</obj>
+						</children>
+					</obj>
+				</children>
+			</obj>
+		</children>
+	</obj>
+</objtreetemplate>
+
+ <hostwndtemplate id="MessageBoxWnd" class="ModalHostWnd">
+	<attr>
+		<layered>1</layered>
+		<left>0</left>
+		<top>0</top>
+		<width>520</width>
+		<height>298</height>
+		
+		<topmost>0</topmost>
+		<visible>1</visible>
+		<enable>1</enable>
+		<maxbox>1</maxbox>
+		<minbox>1</minbox>
+		<minwidth>50</minwidth>
+		<minheight>50</minheight>
+		<sysmenu>0</sysmenu>
+		<appwindow>0</appwindow>
+	</attr>
+	 <eventlist>
+		<event name="OnCreate" file="MessageBox.xml.lua" func="OnCreate"/>
+	</eventlist>
+</hostwndtemplate>
+</xlue>

@@ -1,0 +1,221 @@
+<xlue>
+	<!--柱形图控件-->
+	<control class="BarChart">
+		<attr_def>
+			<attr name="ColumnColorSrc" type="string"><default>system.red</default></attr>
+			<attr name="ColumnColorDest" type="string"><default>system.pink</default></attr>
+			<attr name="FailedColor" type="string"><default>DDDDDD</default></attr>
+		</attr_def>
+		<method_def>
+			<Update file="EarningsPanel.xml.lua" func="BarChartUpdate"/>
+			<UpdateUserBalance file="EarningsPanel.xml.lua" func="UpdateUserBalance"/>
+			<UpdateClientUnBindState file="EarningsPanel.xml.lua" func="UpdateClientUnBindState"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="bkg" class="FillObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<srccolor>system.white</srccolor>
+					</attr>
+					<children>
+						<obj id="barchartpanel" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-30</height>
+							</attr>
+						</obj>
+						<obj id="xyLineBkg" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-30</height>
+								<image>xyLineBkg24</image>
+								<halign>center</halign>
+								<zorder>99999</zorder>
+							</attr>
+						</obj>
+						<obj id="BottomLayout" class="LayoutObject">
+							<attr>
+								<left>(father.width-120)/2-22</left>
+								<top>father.height + 20</top>
+								<width>father.width</width>
+								<height>20</height>
+							</attr>
+							<children>
+								<obj id="BottomTextHead" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>66</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>您的库存有</text>
+									</attr>
+								</obj>
+								<obj id="BottomTextBalance" class="TextObject">
+									<attr>
+										<left>66+1</left>
+										<top>0</top>
+										<width>father.width-(66+1)-(41+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>E39C29</textcolor>
+										<font>font.text13</font>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+								<obj id="BottomTextTail" class="TextObject">
+									<attr>
+										<left>father.width-(41+1)</left>
+										<top>0</top>
+										<width>41</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>right</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>个元宝</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<!--鼠标停留时显示tips-->
+	<control class="BarChartTips">
+		<method_def>
+			<SetText file="EarningsPanel.xml.lua" func="SetText"/>
+			<ChangeColor file="EarningsPanel.xml.lua" func="ChangeColor"/>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="bkg" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<image>charttips-bkg</image>
+					</attr>
+					<children>
+						<obj id="texttop" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>7</top>
+								<width>father.width</width>
+								<height>14</height>
+								<halign>center</halign>
+								<valign>center</valign>
+								<textcolor>system.white</textcolor>
+								<font>font.text14</font>
+							</attr>
+						</obj>
+						<obj id="textbottom" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>27</top>
+								<width>father.width</width>
+								<height>12</height>
+								<halign>center</halign>
+								<valign>center</valign>
+								<textcolor>system.white</textcolor>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<!--柱形图面板-->
+	<control class="EarningsPanel">
+		<method_def>
+			<UpdateUserBalance>
+				local self, nBalance = ...
+				self:GetObject("EarningsPanel.BarChart"):UpdateUserBalance(nBalance)
+			</UpdateUserBalance>
+			<UpdateClientUnBindState>
+				local self = ...
+				self:GetObject("EarningsPanel.BarChart"):UpdateClientUnBindState()
+			</UpdateClientUnBindState>
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="bkg" class="FillObject">
+					<attr>
+						<left>5</left>
+						<top>40</top>
+						<width>father.width-10</width>
+						<height>father.height-40</height>
+						<srccolor>system.white</srccolor>
+					</attr>
+					<children>
+						<obj id="EarningsPanel.HourBtn" class="TipAddin.Button">
+							<attr>
+								<Text>最近24小时</Text>
+								<TextFont>font.text13</TextFont>
+								<TextColor>B08756</TextColor>
+								<left>(father.width-192)/2</left>
+								<top>0</top>
+								<width>102</width>
+								<height>26</height>
+								<NormalBkgID>earnings.btnunsel</NormalBkgID>
+								<DownBkgID>earnings.btnunsel</DownBkgID>
+								<HoverBkgID>earnings.btnunsel</HoverBkgID>
+								<DisableBkgID>earnings.btnunsel</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickHourBtnBarChart" />
+							</eventlist>	
+						</obj>
+						<obj id="EarningsPanel.DayBtn" class="TipAddin.Button">
+							<attr>
+								<Text>最近30天</Text>
+								<TextFont>font.text13</TextFont>
+								<TextColor>B08756</TextColor>
+								<left>(father.width-192)/2+85</left>
+								<top>0</top>
+								<width>102</width>
+								<height>26</height>
+								<NormalBkgID>earnings.btnunsel</NormalBkgID>
+								<DownBkgID>earnings.btnunsel</DownBkgID>
+								<HoverBkgID>earnings.btnunsel</HoverBkgID>
+								<DisableBkgID>earnings.btnunsel</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickDayBtnBarChart" />
+							</eventlist>	
+						</obj>
+						<obj id="EarningsPanel.BarChart" class="BarChart">
+							<attr>
+								<left>60</left>
+								<top>30+40+19</top>
+								<width>father.width-60-10</width>
+								<height>father.height-100</height>
+							</attr>	
+						</obj>
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnVisibleChange" file="EarningsPanel.xml.lua" func="OnVisibleChange" />
+			</eventlist>
+		</objtemplate>
+	</control>
+</xlue>
