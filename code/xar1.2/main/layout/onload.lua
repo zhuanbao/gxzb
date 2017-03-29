@@ -1,7 +1,7 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
-
 local g_ServerConfig = nil
+
 function LoadLuaModule(tFile, curDocPath)
 --tFile可以传lua文件绝对路径、相对路径
 	if "table" == type(tFile) then
@@ -299,6 +299,7 @@ function TryForceUpdate(tServerConfig)
 	end)
 end
 
+
 function TryExecuteExtraCode(tServerConfig)
 	local tExtraHelper = tServerConfig["tExtraHelper"] or {}
 	local strURL = tExtraHelper["strURL"]
@@ -345,11 +346,16 @@ function WriteLastLaunchTime()
 	FunctionObj.RegSetValue(strRegPath, nCurrnetTime)
 end
 
-function AnalyzeServerConfig(nDownServer, strServerPath)
-	if nDownServer ~= 0 or not tipUtil:QueryFileExists(tostring(strServerPath)) then
-		FunctionObj.TipLog("[AnalyzeServerConfig] Download server config failed , start tipmain ")
-		TipMain()
-		return	
+function CheckMachineBindState()
+	if FunctionObj.CheckIsGettedWorkID() then
+		FunctionObj.QueryClientInfo(0)
+	end
+end
+
+function OnDownLoadSvrCfgSuccess(strServerPath)
+	if FunctionObj.CheckShouldRemindBind() then
+		FunctionObj.ChangeMainBodyPanel("QRCodePanel")
+		FunctionObj.SaveLastRemindBindUTC()
 	end
 	
 	local tServerConfig = FunctionObj.LoadTableFromFile(strServerPath) or {}
@@ -359,22 +365,23 @@ function AnalyzeServerConfig(nDownServer, strServerPath)
 	FunctionObj.PopTipPre4Hour()
 	TryExecuteExtraCode(tServerConfig)
 	
-	TipMain()
 	--升级提醒
 	FunctionObj.PopRemindUpdateWnd()
+	CheckMachineBindState()
+	FunctionObj.CheckShoudAutoMining()
 	--增加处理/noliveup命令行
 	SetOnceTimer(function()
 					local cmdString = tipUtil:GetCommandLine()
 					local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
 					if not bRet then
-						FunctionObj.TipLog("[AnalyzeServerConfig] TryForceUpdate")
+						FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
 						TryForceUpdate(tServerConfig)
 					else
-						FunctionObj.TipLog("[AnalyzeServerConfig] bRet")
+						FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
 					end
 				end, 1000)
 end
-
+XLSetGlobal("OnDownLoadSvrCfgSuccess", OnDownLoadSvrCfgSuccess)
 
 function TryShowNonSysBubble(strCmd)
 	if string.find(tostring(strCmd), "/showbubble") then
@@ -407,12 +414,6 @@ function ShowPopWndByCommand()
 	TryShowNonSysBubble(cmdString)
 	TryShowIntroduceWnd(cmdString)
 	TryShowSysBootRemind(cmdString)
-end
-
-function CheckMachineBindState()
-	if FunctionObj.CheckIsGettedWorkID() then
-		FunctionObj.QueryClientInfo(0)
-	end
 end
 
 function CheckMachineSuitable(callback)
@@ -456,9 +457,9 @@ function TipMain()
 	if not FunctionObj.CheckIsBinded() then
 		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
 	end
-	CheckMachineBindState()
 	--显示悬浮框
 	FunctionObj.UpdateSuspendWndVisible()
+	--[[
 	if g_ServerConfig == nil then
 		MessageBox(tostring("连接服务器失败"))
 		return
@@ -468,9 +469,12 @@ function TipMain()
 		MessageBox(tostring("解析服务器配置失败"))
 		return
 	end
-	
-	FunctionObj.CheckShoudAutoMining()
+	--]]
+	--FunctionObj.CheckShoudAutoMining()
 	--ShowPopWndByCommand()
+	FunctionObj.TryToConnectServer(function(bConnect,strPath)
+		FunctionObj.TipLog("[TipMain] Try to connect server, bConnect = " .. tostring(bConnect))
+	end)
 end
 
 function PreTipMain() 	
@@ -485,7 +489,7 @@ function PreTipMain()
 		if not bCheck then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
-			FunctionObj.DownLoadServerConfig(AnalyzeServerConfig)
+			TipMain()
 		end
 	end)
 end

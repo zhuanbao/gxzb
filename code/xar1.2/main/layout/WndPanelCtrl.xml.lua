@@ -1,5 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tMiningMsgProc = XLGetGlobal("Global.MiningMsgProc")
 
 local g_tPanelCtrlList = {
 	"EarningsPanel",
@@ -35,10 +36,12 @@ function InitMainBodyCtrl(objRootCtrl)
 		return false
 	end
 	local strPanel = "MiningPanel"
+	--[[
 	if tFunctionHelper.CheckShouldRemindBind() then
 		strPanel = "QRCodePanel"
 		tFunctionHelper.SaveLastRemindBindUTC()
 	end
+	--]]
 	local bSucc = objMainBodyCtrl:ChangePanel(strPanel)
 	if not bSucc then
 		return false
@@ -76,7 +79,13 @@ function CreateListener(objRootCtrl)
 						mainwnd:BringWindowToTop(true)
 					end
 				end
-			end		
+			elseif tostring(key) == "OnMiningCount" then
+				tMiningMsgProc.OnMiningCount(tParam)
+			elseif tostring(key) == "OnConnectFail" then
+				tMiningMsgProc.OnConnectFail(tParam)
+			elseif tostring(key) == "OnInitDagRet" then
+				tMiningMsgProc.OnInitDagRet(tParam)
+			end				
 		end
 	)
 end

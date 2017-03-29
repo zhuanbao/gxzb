@@ -106,6 +106,9 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 	local ImgTmpCode= OwnerCtrl:GetControlObject("QRCodePanel.Panel.QRCode.TmpCode")
 	ImgTmpCode:SetBitmap(ObjBitmap)
 	local tServerConfig = g_ServerConfig
+	if type(tServerConfig) ~= "table" then
+		tServerConfig = {}
+	end
 	local tServerInterfaceCfg = tServerConfig["tServerInterfaceCfg"]
 	if type(tServerInterfaceCfg) ~= "table" then
 		tServerInterfaceCfg = {}

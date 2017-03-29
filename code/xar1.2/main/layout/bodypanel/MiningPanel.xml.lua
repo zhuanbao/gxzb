@@ -12,6 +12,10 @@ function TipLog(strLog)
 end
 
 function ChangeBindEntryVisible(OwnerCtrl)
+	local ObjTextState = OwnerCtrl:GetControlObject("MiningPanel.Panel.State")
+	if ObjTextState:GetVisible() then
+		return
+	end
 	local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")
 	if not tFunctionHelper.CheckIsBinded() then
 		ObjBindWeiXinEntry:Show(true)
@@ -29,13 +33,20 @@ function UpdateClientUnBindState(self)
 end
 
 function UpdateClientUnBindFailState(self)
+	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
+	if ObjTextState:GetVisible() then
+		return
+	end
 	ChangeBindEntryVisible(self)
 	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
+	local strPreText = ObjTextState:GetText()
+	ObjTextState:SetText("解除绑定失败，请稍后重试！")
 	ObjTextState:SetVisible(true)
 	g_UnBindFailTimerId = timeMgr:SetTimer(function(Itm, id)
 		timeMgr:KillTimer(g_UnBindFailTimerId)
 		g_UnBindFailTimerId = nil
 		ObjTextState:SetVisible(false)
+		ObjTextState:SetText(strPreText or "")
 		ChangeBindEntryVisible(self)
 	end,3*1000)
 end
@@ -260,7 +271,19 @@ function OnShowPanel(self, bShow)
 end
 
 
-
+function SetStateInfoToUser(self, strInfo)
+	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
+	if strInfo ~= nil then
+		local ObjBindWeiXinEntry = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+		ObjBindWeiXinEntry:Show(false)
+		ObjTextState:SetText(strInfo)
+		ObjTextState:SetVisible(true)
+	else
+		ObjTextState:SetText("")
+		ObjTextState:SetVisible(false)
+		ChangeBindEntryVisible(self)
+	end
+end
 
 
 

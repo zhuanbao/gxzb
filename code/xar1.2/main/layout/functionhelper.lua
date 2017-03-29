@@ -2,6 +2,7 @@ local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local IPCUtil = XLGetObject("IPC.Util")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+--local g_ServerConfig = nil
 
 local g_bShowWndByTray = false
 local gStatCount = 0
@@ -17,10 +18,8 @@ local gbLoadCfgSucc = false
 local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
+local tMiningMsgProc = nil
 
-local g_strCmdLineFormat = nil
-local g_strWallet = nil
-local g_strPool = nil
 local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
@@ -78,6 +77,14 @@ function LoadJSONHelper()
 	JsonFun = XLGetGlobal("Clent.Json")
 end
 LoadJSONHelper()
+
+function LoadMiningMsgProc()
+	local strMiningProcPath = __document.."\\..\\miningmsgprocess.lua"
+	local Module = XLLoadModule(strMiningProcPath)
+	tMiningMsgProc = XLGetGlobal("Global.MiningMsgProc")
+end
+LoadMiningMsgProc()
+
 
 
 local tryCatch=function(fnFail)  
@@ -283,6 +290,7 @@ function RegisterFunctionObject(self)
 	obj.CheckShouldRemindBind = CheckShouldRemindBind
 	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
+	obj.TryToConnectServer = TryToConnectServer
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -1893,8 +1901,8 @@ function QuerySvrForReportPoolInfo()
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_strPool)))
-	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_strWallet)))
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(tMiningMsgProc.GetCurrentPool())))
+	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(tMiningMsgProc.GetCurrentWallet())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
@@ -2326,30 +2334,10 @@ end
 
 
 function GeneratTaskInfo(fnCallBack)
-	if type(g_ServerConfig) ~= "table" then
-		fnCallBack(false)
-		return
-	end
 	GetUserWorkID(function(bWorkID, strInfo)
 		if bWorkID then
-			local strWorkID = strInfo
-			local tTaskInfo = g_ServerConfig["tTaskInfo"]
-			for i=1,#tTaskInfo do
-				local tabItem = tTaskInfo[i]
-				if type(tabItem) == "table" and CheckPeerIDList(tabItem["tPIDlist"]) then
-					local strWorkID = strInfo
-					local strCmdLineFormat = tabItem["strCmdLineFormat"]
-					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<wallet>)",tabItem["strWallet"])
-					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<workid>)",strWorkID)
-					if IsRealString(strWorkID) and IsRealString(strCmdLineFormat) then
-						g_strCmdLineFormat = strCmdLineFormat
-						g_strWallet = tabItem["strWallet"]
-						g_strPool = tabItem["strPool"]
-						InitMinerInfoToServer()
-						fnCallBack(true)
-					end
-				end
-			end
+			--tMiningMsgProc.GetNewMiningCmdInfo()
+			fnCallBack(true)
 		else
 			fnCallBack(false)
 		end	
@@ -2401,6 +2389,18 @@ function CheckShoudAutoMining()
 	end
 end
 
+function SetStateInfoToUser(strInfo)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	objMiningPanel:SetStateInfoToUser(strInfo)
+	TipLog("[SetStateInfoToUser] strInfo = " .. tostring(strInfo))
+end
 --解绑三步
 --[[
 1.清空绑定数据
@@ -2605,36 +2605,52 @@ function GetSuspendRootCtrol()
 		return root
 	end
 end
+----------------
+function StartTask()
+	local strPoolCmd = tMiningMsgProc.GetCurrentMiningCmdLine()
+	if strPoolCmd == nil then
+		SetStateInfoToUser("获取任务失败")
+		return
+	end
+	local strDir = GetModuleDir()
+	local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
+	local strCmdLine = strWorkExe .. " " .. tMiningMsgProc.GetCurrentMiningCmdLine()
+	
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strUserCmd =tUserConfig["strUserCmd"]
+	if IsRealString(strUserCmd) then
+		strCmdLine = strCmdLine .. " " .. strUserCmd
+	end
+	g_bWorking = true
+	--更新球的显示状态
+	UpdateSuspendWndVisible(1)
+	IPCUtil:Start(strCmdLine)
+	WorkingTimerHandle()
+	OnWorkStateChange(1)
+	StartMiningCountTimer()
+	InitMinerInfoToServer()
+end
 
 function NotifyStart()
-	local function StartTask()
-		local strDir = GetModuleDir()
-		local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
-		local strCmdLine = strWorkExe .. " " .. g_strCmdLineFormat
-		
-		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-		local strUserCmd =tUserConfig["strUserCmd"]
-		if IsRealString(strUserCmd) then
-			strCmdLine = strCmdLine .. " " .. strUserCmd
+	local function Prepare()
+		if CheckIsGettedWorkID() then
+			SetStateInfoToUser(nil)
+			StartTask()
+		else
+			GeneratTaskInfo(function(bTask)
+				if bTask then
+					SetStateInfoToUser(nil)
+					StartTask()
+				else
+					SetStateInfoToUser("获取任务ID，请稍后再试")
+				end
+			end)
 		end
-		g_bWorking = true
-		--更新球的显示状态
-		UpdateSuspendWndVisible(1)
-		IPCUtil:Start(strCmdLine)
-		WorkingTimerHandle()
-		OnWorkStateChange(1)
-		StartMiningCountTimer()
 	end
-	if g_strCmdLineFormat then
-		StartTask()
+	if g_ServerConfig == nil then
+		SetStateInfoToUser("连接服务器失败，请稍后")
 	else
-		GeneratTaskInfo(function(bTask)
-			if bTask then
-				StartTask()
-			else
-				MessageBox("获取任务失败")
-			end
-		end)
+		Prepare()
 	end
 end
 
@@ -2653,6 +2669,34 @@ function NotifyQuit()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
 	OnWorkStateChange(3)
+end
+
+function NotifyStartNewPool()
+	IPCUtil:Quit()
+	ResetGlobalParam()
+	OnWorkStateChange(2)
+	StopMiningCountTimer()
+	local strNewPoolCmd = tMiningMsgProc.GetNewMiningCmdInfo()
+	if strNewPoolCmd == nil then
+		SetStateInfoToUser("连接任务服务器失败，请稍后再试")
+		return
+	end
+	TipLog("[NotifyStartNewPool]: strNewPoolCmd = " .. tostring(strNewPoolCmd))
+	local strDir = GetModuleDir()
+	local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
+	local strCmdLine = strWorkExe .. " " .. strNewPoolCmd
+	
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strUserCmd =tUserConfig["strUserCmd"]
+	if IsRealString(strUserCmd) then
+		strCmdLine = strCmdLine .. " " .. strUserCmd
+	end
+	g_bWorking = true
+	IPCUtil:Start(strCmdLine)
+	WorkingTimerHandle()
+	OnWorkStateChange(1)
+	StartMiningCountTimer()
+	InitMinerInfoToServer()
 end
 
 local MING_CALCULATE_DAG = 2
@@ -2799,9 +2843,20 @@ function WorkingTimerHandle()
 	if g_WorkingTimerId == nil then
 		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 			local bQuery = QueryAndUpdateWorkState()
-			if not bQuery and nCheckErrorCounter >= 60*5 then
+			if not bQuery and nCheckErrorCounter >= 60 then
 				--是否需要重启
-				nCheckErrorCounter = 0
+				if tMiningMsgProc.CheckIsConnectPoolFail() then
+					tMiningMsgProc.ResetGlobalParam()
+					NotifyStartNewPool()
+					nCheckErrorCounter = 0
+				elseif tMiningMsgProc.CheckIsAllDeviceInitDagFail() then
+					SetStateInfoToUser("显存分配失败，请稍后再试")
+					NotifyQuit()
+					tMiningMsgProc.ResetGlobalParam()
+					nCheckErrorCounter = 0
+				end
+				nCheckErrorCounter = nCheckErrorCounter + 1	
+				--nCheckErrorCounter = 0
 			elseif not bQuery and nCheckErrorCounter >= 20 then
 				--20秒没有数据 检测工作进程是否没有响应了
 				--nReportCalcInterval秒没响应 是否要杀进程
@@ -2815,7 +2870,7 @@ function WorkingTimerHandle()
 			else
 				nCheckErrorCounter = nCheckErrorCounter + 1
 			end
-			if nReportConuter >= nReportCalcInterval then
+			if nReportConuter >= nReportCalcInterval and g_SpeedSumCounter > 0 then
 				local nAverageSpeed = math.floor(g_SpeedSum/g_SpeedSumCounter)
 				g_SpeedSum = 0
 				g_SpeedSumCounter = 0
@@ -2839,6 +2894,26 @@ end
 
 function CheckIsWorking()
 	return g_bWorking
+end
+
+--尝试去连接服务器
+function TryToConnectServer(fnCallBack)
+	DownLoadServerConfig(function(nDownServer, strServerPath)
+		if nDownServer ~= 0 or not tipUtil:QueryFileExists(tostring(strServerPath)) then
+			TipLog("[TryToConnectServer] Download server config failed , try reconnect ")
+			--处理)
+			gtest = gtest + 1
+			fnCallBack(false)
+			SetStateInfoToUser("连接服务器失败")
+			SetOnceTimer(function()
+				TryToConnectServer(fnCallBack)
+			end, 3000)
+			return	
+		end
+		SetStateInfoToUser(nil)
+		OnDownLoadSvrCfgSuccess(strServerPath)
+		fnCallBack(true,strServerPath)
+	end)
 end
 
 RegisterFunctionObject()

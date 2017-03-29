@@ -13,6 +13,7 @@
 			<UpdateDagProgress file="MiningPanel.xml.lua" func="UpdateDagProgress"/>
 			<OnWorkStateChange file="MiningPanel.xml.lua" func="OnWorkStateChange"/>
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
+			<SetStateInfoToUser file="MiningPanel.xml.lua" func="SetStateInfoToUser"/>
 		</method_def>
 		<event_def>
 			
@@ -162,9 +163,9 @@
 						</obj>
 						<obj id="MiningPanel.Panel.State" class="TextObject">
 							<attr>
-								<left>(father.width-160)/2</left>
+								<left>(father.width-210)/2</left>
 								<top>376+42</top>
-								<width>180</width>
+								<width>210</width>
 								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>
