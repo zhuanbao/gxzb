@@ -263,6 +263,9 @@ end
 
 function OnVisibleChange(self, bVisible)
 	if not bVisible then return end
+	local barobj = self:GetObject("EarningsPanel.BarChart")
+	local attr = barobj:GetAttribute()
+	attr.currentpanel = nil --初始化面板标记，使得点击按钮可以重新去请求数据
 	local btn = self:GetObject("EarningsPanel.HourBtn")
 	if btn then
 		btn:FireExtEvent("OnClick", 0, 0)

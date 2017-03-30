@@ -149,6 +149,7 @@
 			<UpdateUserBalance>
 				local self, nBalance = ...
 				self:GetObject("EarningsPanel.BarChart"):UpdateUserBalance(nBalance)
+				self:UpdateClientUnBindState()
 			</UpdateUserBalance>
 			<UpdateClientUnBindState>
 				local self = ...
