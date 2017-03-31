@@ -566,6 +566,11 @@ function OnMouseMove(self, x, y)
 end
 
 function OnMouseLeave(self)
+	--鼠标没弹起不处理离开事件
+	local attr = self:GetAttribute()
+	if attr.hitpoint then
+		return
+	end
 	CheckStripAnim(self, true)
 	local tree = self:GetOwner()
 	local wnd = tree:GetBindHostWnd() 
