@@ -449,6 +449,7 @@ function TipMain()
 end
 
 function PreTipMain() 	
+	tipUtil:SetApplicationId("IconAppID_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 	LoadDynamicFont()
 	FunctionObj.StartRunCountTimer()
 	SendStartupReport(false)
