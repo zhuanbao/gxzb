@@ -1,7 +1,9 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "stdafx.h"
 #include <string>
+#include <comdef.h>
 #include <atlbase.h>
+using namespace std;
 #include <WTL/atlapp.h>
 #include <Urlmon.h>
 #pragma comment(lib, "Urlmon.lib")
@@ -11,6 +13,8 @@
 #include <tlhelp32.h>
 #include <atlstr.h>
 #include "..\zbkernel\Utility\PeeIdHelper.h"
+extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
+#include "shortcut/Shortcut.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -175,21 +179,6 @@ extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *e
 	//SendHttpStatThread((LPVOID)szURL);
 }
 
-extern "C" __declspec(dllexport)  HWND FindClockWindow()
-{
-	HWND hWnd = ::FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
-	if (::IsWindow(hWnd)) {
-		hWnd = ::FindWindowEx(hWnd, 0, L"TrayNotifyWnd", NULL);
-		if (::IsWindow(hWnd)) {
-			hWnd = ::FindWindowEx(hWnd, 0, L"TrayClockWClass", NULL);
-			if (::IsWindow(hWnd)) {
-				return hWnd;
-			}
-		}
-	}
-	return NULL;
-}
-
 extern "C" __declspec(dllexport) void GetFileVersionString(CHAR* pszFileName, CHAR * pszVersionString)
 {
 	if(pszFileName == NULL || pszVersionString == NULL)
@@ -221,15 +210,15 @@ extern "C" __declspec(dllexport) void GetFileVersionString(CHAR* pszFileName, CH
 extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 {
 	HKEY hKEY;
-	LPCSTR data_Set= "Software\\kuaikantu";
+	LPCSTR data_Set= "Software\\gxzb";
 	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE,data_Set,0,KEY_READ,&hKEY))
 	{
 		char szValue[260] = {0};
 		DWORD dwSize = sizeof(szValue);
 		DWORD dwType = REG_SZ;
-		if (::RegQueryValueExA(hKEY,"PeerId", 0, &dwType, (LPBYTE)szValue, &dwSize) == ERROR_SUCCESS)
-		{
+		if (::RegQueryValueExA(hKEY,"PeerId", 0, &dwType, (LPBYTE)szValue, &dwSize) == ERROR_SUCCESS){
 			strcpy(pszPeerID, szValue);
+			::RegCloseKey(hKEY);
 			return;
 		}
 		::RegCloseKey(hKEY);
@@ -243,7 +232,7 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 	HKEY hKey, hTempKey;
 	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software",0,KEY_SET_VALUE, &hKey))
 	{
-		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "kuaikantu", &hTempKey))
+		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "gxzb", &hTempKey))
 		{
 			::RegSetValueExA(hTempKey, "PeerId", 0, REG_SZ, (LPBYTE)pszPeerID, strlen(pszPeerID)+1);
 		}
@@ -281,9 +270,6 @@ DEFINE_KNOWN_FOLDER(FOLDERID_Public, 0xDFDF76A2, 0xC82A, 0x4D63, 0x90, 0x6A, 0x5
 
 EXTERN_C const GUID DECLSPEC_SELECTANY FOLDERID_UserPin \
 	= { 0x9E3995AB, 0x1F9C, 0x4F13, { 0xB8, 0x27,  0x48,  0xB2,  0x4B,  0x6C,  0x71,  0x74 } };
-
-
-extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
 
 
 extern "C" __declspec(dllexport) bool GetProfileFolder(char* szMainDir)	// Ê§°Ü·µ»Ø'\0'
