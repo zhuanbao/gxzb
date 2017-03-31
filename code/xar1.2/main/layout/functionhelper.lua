@@ -896,6 +896,7 @@ function ExitTipWnd(statInfo)
 	SaveAllConfig()		
 	NotifyQuit()
 	TipLog("************ Exit ************")
+	tipUtil:CloseSingletonMutex()
 	tipUtil:Exit("Exit")
 end
 
