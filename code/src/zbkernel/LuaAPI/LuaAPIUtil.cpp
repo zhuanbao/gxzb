@@ -221,6 +221,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetDiskFreeSpace", FnGetDiskFreeSpaceEx},
 	{"GetLastWord", GetLastWord},
 	{"GetLastInputInfo", FGetLastInputInfo},
+	{"SetApplicationId", SetApplicationId},
 	{NULL, NULL}
 };
 
@@ -5567,4 +5568,51 @@ int LuaAPIUtil::FGetLastInputInfo(lua_State *pLuaState)
 	lua_pushinteger(pLuaState, iRet);
 	lua_pushnumber(pLuaState, dwTime);
 	return 2;
+}
+
+int LuaAPIUtil::SetApplicationId(lua_State *pLuaState)
+{
+	TSAUTO();
+	BOOL bRet = FALSE;
+	const char* utf8AppID = luaL_checkstring(pLuaState, 2);
+	std::wstring wstrAppID = ultra::_UTF2T(utf8AppID);
+	TCHAR szAppID[1024] = {0};
+	_tcscpy_s(szAppID,1024,wstrAppID.c_str());
+	//WINAPI 
+	typedef HRESULT (WINAPI *pfnSetCurrentProcessExplicitAppUserModelID)(TCHAR *);
+	typedef HRESULT (WINAPI *pfnGetCurrentProcessExplicitAppUserModelID)(PWSTR *AppID);
+
+	HMODULE hModule = ::LoadLibrary(_T("Shell32.dll"));
+	if (hModule)
+	{
+		pfnSetCurrentProcessExplicitAppUserModelID fnSet = (pfnSetCurrentProcessExplicitAppUserModelID)GetProcAddress(hModule,"SetCurrentProcessExplicitAppUserModelID");
+
+		pfnGetCurrentProcessExplicitAppUserModelID fnGet = (pfnGetCurrentProcessExplicitAppUserModelID)GetProcAddress(hModule,"GetCurrentProcessExplicitAppUserModelID");
+		if (fnSet&&fnGet)
+		{
+			TSDEBUG4CXX("SetCurrentProcessExplicitAppUserModelID RUNNING");
+			fnSet(szAppID);
+
+#ifdef _DEBUG
+			//TCHAR szAppid[1024] = {0}; //
+			WCHAR *pszAppID = new WCHAR[1024];
+			memset(pszAppID,0,sizeof(WCHAR)*1024);
+
+			fnGet((PWSTR *)&pszAppID);
+			TSDEBUG4CXX("Current appid:"<<pszAppID);
+			//delete []pszAppID; //
+#endif
+			bRet = TRUE;
+		}
+		else
+		{
+			TSDEBUG4CXX("GetProcAddress SetCurrentProcessExplicitAppUserModelID ERROR");
+		}
+	}
+	else
+	{
+		TSDEBUG4CXX("Load shell32.dll error ERROR ");
+	}
+	lua_pushboolean(pLuaState,bRet);
+	return 1;
 }
