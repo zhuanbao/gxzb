@@ -482,7 +482,8 @@ BOOL SetAppID4Shortcut(CONST TCHAR* szShortcutPath,CONST TCHAR* szAppID )
 	typedef BOOL (__cdecl *PFUN_SetAppIDForShortCut)(CONST TCHAR*,TCHAR*);
 	BOOL ret = FALSE;
 	static PFUN_SetAppIDForShortCut pFun_SetAppIDForShortCut = SetAppIDForShortcut;
-	if (pFun_SetAppIDForShortCut)
+	//安装的时候快捷方式和主程序起来的时候都不设置APPID就能使得图标重合
+	if (NULL)
 	{
 		TSDEBUG4CXX("<gxzbsetup>pFun_SetAppIDForShortCut initialted");
 		//多次尝试
