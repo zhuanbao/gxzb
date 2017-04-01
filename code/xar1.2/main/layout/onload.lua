@@ -448,8 +448,9 @@ function TipMain()
 	end)
 end
 
-function PreTipMain() 	
-	tipUtil:SetApplicationId("IconAppID_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
+function PreTipMain()
+	--安装的时候快捷方式和这里都不设置APPID就能使得图标重合
+	--tipUtil:SetApplicationId("{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 	LoadDynamicFont()
 	FunctionObj.StartRunCountTimer()
 	SendStartupReport(false)
