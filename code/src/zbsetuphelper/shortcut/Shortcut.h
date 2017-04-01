@@ -18,7 +18,7 @@
 
 DEFINE_KNOWN_FOLDER(FOLDERID_UserPinned, 0x9E3995AB, 0x1F9C, 0x4F13, 0xB8, 0x27, 0x48, 0xB2, 0x4B, 0x6C, 0x71, 0x74);
 
-BOOL SetAppID4Shortcut(CONST TCHAR* szShortcutPath,CONST TCHAR* szAppID = L"{44E0EF3B-380C-4eb0-9568-9196CC7765B9}_XL.XMP5");
+BOOL SetAppID4Shortcut(CONST TCHAR* szShortcutPath,CONST TCHAR* szAppID = L"IconAppID_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}");
 BOOL BuildShortcut(CONST TCHAR* szFilePath, CONST TCHAR* szTargetPath, CONST TCHAR* szDescription, CONST TCHAR* szParam = NULL, CONST TCHAR* szIcon = NULL)
 {
 	TSAUTO();
@@ -294,7 +294,7 @@ extern "C" __declspec(dllexport) BOOL Pin2Taskbar(BOOL bPin)
 {
 	TSAUTO();
 	BOOL ret = FALSE;
-	std::wstring strXmpPath = g_strInstDir + (_T("\\gxzb.exe"));
+	std::wstring strGxzbPath = g_strInstDir + (_T("\\gxzb.exe"));
 	std::wstring strShortcutPath = g_strInstDir + (_T("\\共享赚宝.lnk"));
 	
 	std::wstring strPinShortcutPath = GetUserPinPath() + _T("\\TaskBar\\共享赚宝.lnk");
@@ -315,7 +315,7 @@ extern "C" __declspec(dllexport) BOOL Pin2Taskbar(BOOL bPin)
 
 	if (bPin)
 	{
-		ret = BuildShortcut(strShortcutPath.c_str(),strXmpPath.c_str(),
+		ret = BuildShortcut(strShortcutPath.c_str(),strGxzbPath.c_str(),
 			_T(""),_T("/sstartfrom toolbar"));
 
 		SetAppID4Shortcut(strShortcutPath.c_str());
@@ -368,8 +368,8 @@ extern "C" __declspec(dllexport) BOOL Pin2StartMenu(BOOL bPin)
 	BOOL ret = TRUE;
 	if (bPin)
 	{
-		std::wstring strXmpPath = g_strInstDir + _T("\\gxzb.exe");
-		ret = BuildShortcut(tszShortcutPath,strXmpPath.c_str(),
+		std::wstring strGxzbPath = g_strInstDir + _T("\\gxzb.exe");
+		ret = BuildShortcut(tszShortcutPath,strGxzbPath.c_str(),
 			_T(""), _T("/sstartfrom startbar"));
 		
 		// 更新一下图标再pin
