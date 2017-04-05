@@ -79,11 +79,11 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "深圳市开心豆豆科技有限公司"
-            VALUE "FileDescription", "gxzb Application"
+            VALUE "FileDescription", "Share2Gain Application"
             VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "gxzb"
+            VALUE "InternalName", "Share2Gain"
             VALUE "LegalCopyright", "Copyright (c) 2016-2017 深圳市开心豆豆科技有限公司"
-            VALUE "OriginalFilename", "gxzb.exe"
+            VALUE "OriginalFilename", "Share2Gain.exe"
             VALUE "ProductName", "共享赚宝"
             VALUE "ProductVersion", "1, 0, 0, 1"
         END

@@ -5572,6 +5572,7 @@ int LuaAPIUtil::FGetLastInputInfo(lua_State *pLuaState)
 
 int LuaAPIUtil::SetApplicationId(lua_State *pLuaState)
 {
+
 	TSAUTO();
 	BOOL bRet = FALSE;
 	const char* utf8AppID = luaL_checkstring(pLuaState, 2);
