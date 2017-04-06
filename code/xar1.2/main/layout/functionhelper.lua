@@ -204,6 +204,8 @@ end
 function RegisterFunctionObject(self)
 	local obj = {}
 	obj.TipLog = TipLog
+	obj.NumberToFormatMoney = NumberToFormatMoney
+	obj.FormatMoneyToNumber = FormatMoneyToNumber
 	obj.FailExitTipWnd = FailExitTipWnd
 	obj.GetCommandStrValue = GetCommandStrValue
 	obj.TipConvStatistic = TipConvStatistic
@@ -292,6 +294,26 @@ function RegisterFunctionObject(self)
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
 	obj.TryToConnectServer = TryToConnectServer
 	XLSetGlobal("Global.FunctionHelper", obj)
+end
+
+function NumberToFormatMoney(Num)
+	local strNum = tostring(Num)
+	if string.len(strNum) <= 4 then
+		return Num
+	end
+	local strLeft = string.sub(strNum, 1, string.len(strNum)-4);
+	local strRight = string.sub(strNum, -4); 
+	local strFormat = strLeft .. "," .. strRight
+	TipLog("[NumberToFormatMoney] strFormat = "..tostring(strFormat))
+	return strFormat
+end
+
+function FormatMoneyToNumber(strMoney)
+	if not IsRealString(strMoney) then
+		return strMoney
+	end
+	local strNum = string.gsub(strMoney, ",","")
+	return tonumber(strNum)
 end
 
 function ChangeMainBodyPanel(strPanelName)

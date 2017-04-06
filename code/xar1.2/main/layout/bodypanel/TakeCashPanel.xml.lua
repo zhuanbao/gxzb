@@ -17,7 +17,7 @@ function OnClickTakeCash(self)
 	local ObjEdit = self:GetObject("control:TakeCashPanel.Panel.Edit")
 	local OwnerCtrl = self:GetOwnerControl()
 	local strText = ObjEdit:GetText()
-	local nTakeMoney = tonumber(strText)
+	local nTakeMoney = tFunctionHelper.FormatMoneyToNumber(strText)
 	if nTakeMoney == nil then
 		return
 	end
@@ -205,7 +205,8 @@ end
 function UpdateUserBalance(self, nBalance)
 	gBalance = nBalance
 	local ObjTextNum = self:GetControlObject("TakeCashPanel.Panel.Amount.Num")
-	ObjTextNum:SetText(nBalance)
+	local strFormatBalance = tFunctionHelper.NumberToFormatMoney(nBalance)
+	ObjTextNum:SetText(strFormatBalance)
 	AdjustAmountTextPosition(self)
 	UpdateUIByBalance(self, nBalance)
 end
@@ -245,3 +246,4 @@ function OnShowPanel(self, bShow)
 	end
 	UpdateUIByBalance(self,gBalance)
 end
+
