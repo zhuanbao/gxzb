@@ -3,7 +3,7 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 function UpdateUserBalance(self, nBalance)
 	local bottomText = self:GetObject("BottomTextBalance")
 	if bottomText then
-		bottomText:SetText(tostring(nBalance or 0))
+		bottomText:SetText(tFunctionHelper.NumberToFormatMoney(nBalance or 0))
 		local textHead = self:GetObject("BottomTextHead")
 		local textTail = self:GetObject("BottomTextTail")
 		local fater = self:GetObject("BottomLayout")
@@ -62,15 +62,27 @@ function BarChartUpdate(self)
 			end
 		end
 	end
-	--显示7个刻度
-	local minYnumber = 7
+	--收益界面，纵向坐标刻度，建议分为10格
+	--满格大小建议为10、5、2打头、后跟若干0的整数
+	local ymaxBit = string.len(tostring(ymax))
+	local ymaxBase = math.pow(10, ymaxBit-1)
+	if ymax <= ymaxBase*2 then
+		ymax = ymaxBase*2
+	elseif ymax <= ymaxBase*5 then
+		ymax = ymaxBase*5
+	else
+		ymax = ymaxBase*10
+	end
+	--显示10个刻度
+	local minYnumber = 10
 	if ymax < minYnumber then
 		ymax = minYnumber
 	end
+	
 	local l, t, r, b = barchartpanel:GetObjPos()
-	local coorWidth = 1
+	local coorXWidth, coorYWidth = 1, 7
 	--减去横纵坐标的宽度
-	local w, h = r - l - coorWidth, b - t - coorWidth
+	local w, h = r - l - coorYWidth, b - t - coorXWidth
 	local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 	
 	--初始化一些颜色配置
@@ -125,7 +137,7 @@ function BarChartUpdate(self)
 		newTextObject:SetObjPos(-needWidth-17, yreal-6, -7, yreal+6)
 	end
 	--显示单位
-	local newTextObject = GetNewTextObj(attr.currentpanel == 1 and "每小时元宝总产量(个)" or "每天元宝总产量(个)", nil, "left")
+	local newTextObject = GetNewTextObj(attr.currentpanel == 1 and "每小时元宝产量(个)" or "每天元宝产量(个)", nil, "left")
 	newTextObject:SetObjPos(-8, -18, 110, -4)
 	--newTextObject = GetNewTextObj(attr.currentpanel == 1 and "h" or "date")
 	--newTextObject:SetObjPos("father.width+3", "father.height-12", attr.currentpanel == 1 and "father.width+13" or "father.width+26", "father.height+1")
@@ -143,7 +155,7 @@ function BarChartUpdate(self)
 	--将数据转换为坐标系中的点
 	local function ConvertData2Point(xindex, ydata)
 		--local xreal = (#attr.Data == 1 and 0 or w*(xindex-1)/(#attr.Data)) + 2
-		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*4)) + coorWidth 
+		local xreal = (#attr.Data == 1 and 0 or (xindex-1)*(itemw*4)) + coorYWidth 
 		local yreal = h-2
 		if ydata > 0 then
 			yreal = h - h*ydata/ymax
@@ -163,7 +175,7 @@ function BarChartUpdate(self)
 				local xsrc, ysrc = ConvertData2Point(i, dat[2])
 				local l, t, r, b = xsrc, ysrc, xsrc+itemw*3, h
 				--if #attr.Data == i then
-				--	r = w + coorWidth
+				--	r = w + coorYWidth
 				--end
 				if t == b then
 					t = b - 1
@@ -178,8 +190,7 @@ function BarChartUpdate(self)
 				newFillObject:SetSrcPt(0, 0)
 				newFillObject:SetDestPt(r-l, b-t)
 				newFillObject:SetObjPos(l, t, r, b)
-				newFillObject:AttachListener("OnMouseEnter", false, 
-				function(self, x, y)
+				local function event_mousenter(self, x, y)
 					local tips = barchartpanel:GetObject("tips")
 					if not tips then
 						tips = objFactory:CreateUIObject("tips", "BarChartTips")
@@ -217,10 +228,8 @@ function BarChartUpdate(self)
 					tips:SetObjPos(l + itemw - 35, t - 55, l + itemw + 36, t-1)
 					tips:SetVisible(true)
 					tips:SetChildrenVisible(true)
-				end)
-				
-				newFillObject:AttachListener("OnMouseLeave", false, 
-				function(self)
+				end
+				local function event_mouseleave(self)
 					newFillObject:SetSrcColor(normalColor)
 					newFillObject:SetDestColor(normalColor)
 					local tips = barchartpanel:GetObject("tips")
@@ -228,8 +237,22 @@ function BarChartUpdate(self)
 						tips:SetVisible(false)
 						tips:SetChildrenVisible(false)
 					end
-				end)
+				end
+				newFillObject:AttachListener("OnMouseEnter", false, event_mousenter)		
+				newFillObject:AttachListener("OnMouseLeave", false, event_mouseleave)
 				
+				--收益界面，柱子较短时，鼠标hover较高位置时，也应显示hover状态；
+				if dat[2] < ymax then
+					local blankL, blankT, blamkR, blankB = l, 0, r, t
+					local newBlankObject = objFactory:CreateUIObject("", "LayoutObject")
+					barchartpanel:AddChild(newBlankObject)
+					newBlankObject:SetObjPos(blankL, blankT, blamkR, blankB)
+					newBlankObject:AttachListener("OnMouseEnter", false, 
+					function(self, x, y)
+						event_mousenter(newFillObject, x, y)
+					end)
+					newBlankObject:AttachListener("OnMouseLeave", false, event_mouseleave)
+				end
 				--newFillObject:SetFillType("Line")
 			end
 		end
@@ -307,7 +330,7 @@ function OnClickHourBtnBarChart(self)
 	end
 	ChangeBtnState(self, 1)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
-	barobj:SetObjPos("(father.width-191)/2 + 5", 89, "(father.width-191)/2 + 5 + 191", 89+246+30)
+	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
 	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
 		attr.Data = tabInfo
@@ -325,7 +348,7 @@ function OnClickDayBtnBarChart(self)
 	end
 	ChangeBtnState(self, 2)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
-	barobj:SetObjPos("(father.width-240)/2+4", 89, "(father.width-240)/2 + 4 + 240", 89+246+30)
+	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
 	tFunctionHelper.GetHistoryToServer(1, function(bRet, tabInfo)
 		attr.Data = tabInfo

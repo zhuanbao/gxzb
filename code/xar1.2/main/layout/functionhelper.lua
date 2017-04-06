@@ -595,7 +595,7 @@ function FormatByteUnit(nFileSizeInByte, nPrecision)
 end
 
 function GetPeerID()
-	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId")
+	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId")
 	if IsRealString(strPeerID) then
 		return string.upper(strPeerID)
 	end
@@ -605,12 +605,12 @@ function GetPeerID()
 		return ""
 	end
 	
-	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId", strRandPeerID)
+	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId", strRandPeerID)
 	return string.upper(strRandPeerID)
 end
 
 function GetMachineID()
-	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\machineid")
+	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\machineid")
 	if IsRealString(strGUID) then
 		return string.upper(strGUID)
 	end
@@ -618,7 +618,7 @@ end
 
 --渠道
 function GetInstallSrc()
-	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\InstallSource")
+	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\InstallSource")
 	if not IsNilString(strInstallSrc) then
 		return tostring(strInstallSrc)
 	end
@@ -627,7 +627,7 @@ function GetInstallSrc()
 end
 
 function GetExePath()
-	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\Path")
+	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\Path")
 	if IsRealString(strExePath) then
 		return tostring(strExePath)
 	else
@@ -995,7 +995,7 @@ end
 
 
 function GetGXZBVersion()
-	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\path")
+	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\path")
 	if not IsRealString(strgxzbPath) or not tipUtil:QueryFileExists(strgxzbPath) then
 		return ""
 	end
@@ -1172,7 +1172,7 @@ end
 function ShowIntroduceOnce()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\ShowIntroduce"
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share2Gain\\ShowIntroduce"
 	
 	if not IsNilString(nLastShowIntroduce) then
 		RegDeleteValue(strRegPath)
@@ -1278,7 +1278,7 @@ function SetNotifyIconState(strText)
 	local strShowText = "共享赚宝  状态："..strState
 	
 	local nBalance = GetUserCurrentBalance()
-	strShowText = strShowText .. "\r\n金库余额：" .. tostring(nBalance) .. "元宝"
+	strShowText = strShowText .. "\r\n金库余额：" .. NumberToFormatMoney(nBalance) .. "元宝"
 	if bShowSpeed then
 		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(g_MiningSpeedPerHour) .. "元宝/小时"
 	end
@@ -1425,7 +1425,7 @@ function GetCfgPathWithName(strCfgName)
 		return ""
 	end
 	
-	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "gxzb\\"..tostring(strCfgName))
+	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share2Gain\\"..tostring(strCfgName))
 	return strCfgFilePath or ""
 end
 
@@ -1435,7 +1435,7 @@ function GetResSavePath(strName)
 		return ""
 	end
 	
-	local strPath = tipUtil:PathCombine(strBaseDir, "gxzb\\res\\"..tostring(strName))
+	local strPath = tipUtil:PathCombine(strBaseDir, "Share2Gain\\res\\"..tostring(strName))
 	return strPath or ""
 end
 
@@ -2553,7 +2553,7 @@ end
 --所有要更新账户余额的地方在这里处理
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
-	RegSetValue("HKEY_CURRENT_USER\\Software\\gxzb\\balance", g_Balance)
+	RegSetValue("HKEY_CURRENT_USER\\Software\\Share2Gain\\balance", g_Balance)
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
@@ -2756,7 +2756,7 @@ local MING_MINING_EEEOR_TIMEOUT = 100
 function GetToolTipInfo()
 	local bShowSpeed = false
 	local strText = ""
-	if g_PreWorkState == MING_CALCULATE_DAG or g_bWorking then
+	if g_PreWorkState == MING_CALCULATE_DAG then
 		strText = "准备中"
 		bShowSpeed = true
 	elseif g_PreWorkState == MING_MINING_SPEED
@@ -2765,6 +2765,9 @@ function GetToolTipInfo()
 		bShowSpeed = true
 	elseif g_PreWorkState == MING_MINING_EEEOR or g_PreWorkState == MING_MINING_EEEOR_TIMEOUT then
 		strText = "出错了"
+		bShowSpeed = true
+	elseif g_bWorking then
+		strText = "准备中"
 		bShowSpeed = true
 	else
 		strText = "未开启"

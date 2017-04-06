@@ -138,7 +138,7 @@
 								<width>father.width</width>
 								<height>father.height</height>
 								<image>suspend-needle-needle1</image>
-								<valign>center</valign>
+								<valign>top</valign>
 								<halign>center</halign>
 							</attr>
 						</obj>

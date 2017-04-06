@@ -47,10 +47,10 @@ function ChangeBtnState(self)
 			local attr = self:GetAttribute()
 			if not attr.bakimage then
 				attr.bakimage = {attr.NormalBkgID, attr.HoverBkgID, attr.DownBkgID, attr.DisableBkgID}
-				attr.NormalBkgID = attr.HoverBkgID
-				attr.DownBkgID = attr.HoverBkgID
-				attr.HoverBkgID = attr.HoverBkgID
-				attr.DisableBkgID = attr.HoverBkgID
+				attr.NormalBkgID = attr.DownBkgID
+				attr.DownBkgID = attr.DownBkgID
+				attr.HoverBkgID = attr.DownBkgID
+				attr.DisableBkgID = attr.DownBkgID
 				self:Updata()
 			end
 		else

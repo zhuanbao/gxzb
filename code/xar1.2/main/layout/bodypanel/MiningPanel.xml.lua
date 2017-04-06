@@ -53,7 +53,7 @@ end
 
 function UpdateUserBalance(self, nBalance)
 	local ObjTextNum = self:GetControlObject("MiningPanel.Panel.Amount.Num")
-	ObjTextNum:SetText(nBalance)
+	ObjTextNum:SetText(tFunctionHelper.NumberToFormatMoney(nBalance))
 	AdjustAmountTextPosition(self)
 end
 
@@ -129,7 +129,7 @@ function ShowAnim(OwnerCtrl, bShow)
 			ObjAnimImg:SetObjPos(l-offsetW, t-offsetH, r+offsetW, b+offsetH)
 		end
 		ObjAnimImg:SetVisible(true)
-		imageOpenAni = Helper.Ani:RunSeqFrameAni(ObjAnimImg, "GXZB.MainPanel.WorkingAnim", nil, 4000, true)
+		imageOpenAni = Helper.Ani:RunSeqFrameAni(ObjAnimImg, "GXZB.MainPanel.WorkingAnim", nil, 8000, true)
 	else
 		if imageOpenAni then
 			imageOpenAni:Stop()

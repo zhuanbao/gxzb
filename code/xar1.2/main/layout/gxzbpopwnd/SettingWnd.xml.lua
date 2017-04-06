@@ -1,6 +1,6 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\gxzb"
+local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share2Gain"
 
 local g_AutoRunState = false
 local g_nWorkModel = 0

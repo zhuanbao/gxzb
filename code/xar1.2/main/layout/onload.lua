@@ -67,7 +67,7 @@ function MessageBox(str)
 end
 
 function GetPeerID()
-	local strPeerID = FunctionObj.RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId")
+	local strPeerID = FunctionObj.RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId")
 	if IsRealString(strPeerID) then
 		return string.upper(strPeerID)
 	end
@@ -77,7 +77,7 @@ function GetPeerID()
 		return ""
 	end
 	
-	FunctionObj.RegSetValue("HKEY_LOCAL_MACHINE\\Software\\gxzb\\PeerId", strRandPeerID)
+	FunctionObj.RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId", strRandPeerID)
 	return string.upper(strRandPeerID)
 end
 
@@ -342,7 +342,7 @@ end
 
 function WriteLastLaunchTime()
 	local nCurrnetTime = tipUtil:GetCurrentUTCTime()
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\gxzb\\LastLaunchTime"
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share2Gain\\LastLaunchTime"
 	FunctionObj.RegSetValue(strRegPath, nCurrnetTime)
 end
 

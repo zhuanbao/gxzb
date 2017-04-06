@@ -2,7 +2,7 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 
 function GenerateFont()
 	local XARManager = XLGetObject("Xunlei.UIEngine.XARManager")
-	local xar = XARManager:GetXAR("main")
+	local xar = XARManager:GetXARByIndex(0)
 	
 	local strFaceName = "微软雅黑"
 	local bIsUAC = tFunctionHelper.IsUACOS()
