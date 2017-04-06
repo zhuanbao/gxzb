@@ -103,7 +103,7 @@
 								<width>father.width</width>
 								<height>father.height</height>
 								<image>suspend-nowork-rightdisk-needlegray</image>
-								<valign>center</valign>
+								<valign>top</valign>
 								<halign>center</halign>
 							</attr>
 						</obj>
