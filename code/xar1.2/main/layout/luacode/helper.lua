@@ -523,7 +523,7 @@ function Helper:CalcMenuPopPosition(x, y, curContainer, parentContainer)
 		parentL, parentT, parentR, parentB = parentContainer:GetObjPos()
 		if screenRight - x < menuWidth then
 			--太靠右，则子菜单显示到父菜单的左侧
-			tarContainerL = parentL - menuWidth
+			tarContainerL = parentL - menuWidth - 1
 			tarContainerR = tarContainerL + menuWidth
 		end
 		if screenBottom - y < menuHeight then

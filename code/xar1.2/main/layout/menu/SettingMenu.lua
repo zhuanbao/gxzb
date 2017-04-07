@@ -8,8 +8,11 @@ end
 
 function InitIcon(self, resid)
 	local icon = self:GetControlObject("menu.item.icon")
-	icon:SetObjPos2(9, "(father.height - 16)/2", 16, 16)
+	icon:SetObjPos2(24, "(father.height - 16)/2", 16, 16)
 	icon:SetResID(resid)
+	--顺便调整文字位置
+	local text = self:GetControlObject("menu.item.text")
+	text:SetObjPos2(47, 0, "father.width - 47", "father.height")
 end
 
 local menuFunTable = {}
@@ -41,7 +44,7 @@ function menuFunTable.OnSelect_exit(self)
 		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
 			{
 				["parentWnd"] = wnd, 
-				["Text"] = "您已赚取了"..tostring(nCurBalance).."个元宝，请及时绑定\n微信将元宝入账。",
+				["Text"] = "您已赚取了"..tFunctionHelper.NumberToFormatMoney(nCurBalance).."个元宝，请及时绑定\n微信将元宝入账。",
 				["ChangeUI"] = function(objWnd)
 					local objtree = objWnd:GetBindUIObjectTree()
 					local btnyes = objtree:GetUIObject("yes")

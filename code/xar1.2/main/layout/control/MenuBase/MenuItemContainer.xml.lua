@@ -10,7 +10,6 @@ local function AdjustContainerBkg(self)
 	
 	local bkgWidth = attr.LeftOffSet + attr.RightOffSet + itemWidth
 	local bkgHeight = attr.TopOffSet + attr.BottomOffSet + attr.totalItemHeight
-	
 	self:SetObjPos2(0, 0, bkgWidth, bkgHeight)
 	container:SetObjPos2(0, 0, bkgWidth, bkgHeight)
 end

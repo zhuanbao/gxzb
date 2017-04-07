@@ -55,6 +55,12 @@ function PreSelect(self)
 		resid = string.gsub(resid, "normal", "hover")
 		iconobj:SetResID(resid)
 	end
+	--在这里设置变色
+	local textObj = self:GetControlObject("menu.item.text")
+	if attr.HoverTextColor ~= nil and textObj then
+		textObj:SetTextColorResID(attr.HoverTextColor)
+	end
+		
 	local tree = self:GetOwner()
 	local menuWnd = tree:GetBindHostWnd()
 	local userData = menuWnd:GetUserData()
@@ -85,7 +91,8 @@ function PreSelect(self)
 	local _, curItemT, _, _ = self:GetObjPos()
 	local _, curContainerT, curContainerR, _ = curContainer:GetObjPos()
 	local x, y = curContainerR, curContainerT + curItemT
-	local subContainerL, subContainerT, subContainerR, subContainerB = Helper:CalcMenuPopPosition(x, y, subContainer, curContainer)
+	--如果背景图不做阴影，这里就会和腹肌菜单挨在一起，加1留点间隔
+	local subContainerL, subContainerT, subContainerR, subContainerB = Helper:CalcMenuPopPosition(x+1, y, subContainer, curContainer)
 		
 	subContainer:SetObjPos(subContainerL, subContainerT, subContainerR, subContainerB)
 end
@@ -160,6 +167,12 @@ function OnMouseLeave(self)
 		resid = string.gsub(resid, "hover", "normal")
 		iconobj:SetResID(resid)
 	end
+	--在这里设置变色
+	local textObj = self:GetObject("menu.item.text")
+	if attr.NormalTextColor ~= nil and textObj then
+		textObj:SetTextColorResID(attr.NormalTextColor)
+	end
+	
 	if attr.bPreSelect then
 		attr.bPreSelect = false
 	end

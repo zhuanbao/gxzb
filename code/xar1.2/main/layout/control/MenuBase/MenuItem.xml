@@ -12,7 +12,9 @@
 			<attr name="TextFont"    type="string" desc="该条目的字体，Hover/Normal都用同一种字体"/>
 			<attr name="NormalTextColor"  type="string" />
 			<attr name="DisableTextColor" type="string" />
-			
+			<attr name="HoverTextColor" type="string" desc="鼠标停留时文字颜色">
+				<default>basecontrol.white</default>
+			</attr>
 			<attr name="Bkg4In1ID" type="string" desc="四态合一的背景ID，每个状态都是一个九宫格"/>
 			<attr name="NormalBkgID" type="string" />
 			<attr name="DownBkgID" type="string" />

@@ -1,7 +1,8 @@
 <xlue>
 	<objtemplate id="menu.context" class="MenuObject" templateid="menu.object.template">
 		<attr>
-			<ItemTop>2</ItemTop>
+			<ItemTop>1</ItemTop>
+			<ItemLeft>-5</ItemLeft>
 		</attr>
 		<children>
 			<obj id="openmainui" class="MenuItemObject" templateid="menu.context.item">
@@ -10,7 +11,8 @@
 					<Icon>bitmap.menu.main.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_MainUI" />
@@ -23,7 +25,8 @@
 					<Icon>bitmap.menu.pause.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Pause" />
@@ -37,7 +40,8 @@
 					<Icon>bitmap.menu.setting.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Setting" />
@@ -49,7 +53,8 @@
 					<Icon>bitmap.menu.update.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Update" />
@@ -61,7 +66,8 @@
 					<Icon>bitmap.menu.about.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_About" />
@@ -73,7 +79,8 @@
 					<Icon>bitmap.menu.exit.normal</Icon>
 					<IconWidth>16</IconWidth>
 					<IconHeight>16</IconHeight>
-					<IconPos>8</IconPos>
+					<IconPos>15</IconPos>
+					<TextPos>40</TextPos>
 				</attr>
 				<eventlist>
 					<event name="OnSelect" file="TrayMenu.xml.lua" function="OnSelect_Exit" />
@@ -86,16 +93,16 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>140</width>
-			<height>204</height>
+			<width>138</width>
+			<height>194</height>
 		</attr>
 		
 		<obj id="TrayMenu.Main" class="LayoutObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>140</width>
-				<height>204</height>
+				<width>138</width>
+				<height>194</height>
 			</attr>
 			<children>
 				<obj id="TrayMenu.Context" class="NormalMenu">
@@ -105,7 +112,7 @@
 						<width>father.width</width>
 						<height>father.height</height>
 						<ContextID>menu.context</ContextID>
-						<BknID>texture.menu.container.bkg</BknID>
+						<BknID>texture.traymenu.container.bkg</BknID>
 					</attr>
 				</obj>
 			</children>

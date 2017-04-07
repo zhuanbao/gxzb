@@ -47,12 +47,12 @@
 		<!--颜色和字体-->
 		<font id="font.suspend.balancehead" height="12" facename="defaultfont" /> 
 		<font id="font.suspend.balancenumber" height="13" facename="defaultfont" weight="bold"/> 
-		<font id="font.suspend.balancehead.lower" height="13" facename="defaultfont" /> 
+		<font id="font.suspend.balancehead.lower" height="12" facename="defaultfont" /> 
 		<font id="font.suspend.speed" height="10" facename="defaultfont" /> 
 		
 		<color id="color.suspend.balance" value="#FFDE01"/>
 		<color id="color.suspend.balanceshadow" value="#511B00"/>
-		<color id="color.suspend.balance.lower" value="#FFFFFF"/>
+		<color id="color.suspend.balance.lower" value="#E1E1E1"/>
 		<color id="color.suspend.speed" value="#FFFFFF"/>
 		<color id="color.suspend.speedshadow" value="#93690F"/>
 	</resource>

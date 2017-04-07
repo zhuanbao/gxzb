@@ -4,7 +4,9 @@
 		<imagelist id="imagelist.menu.item.bkg" splitter="1" varyblock="1" image="menu\imagelist.menu.item.bkg.png"/>
 			<texture id="texture.menu.container.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="1" />
 			<texture id="texture.menu.item.bkg" type="ThreeInOneH" imagelist="imagelist.menu.item.bkg" index="2" />
-			
+		
+		<texture id="texture.traymenu.container.bkg" type="NineInOne" image="menu\traybkg.png" />
+		
 		<bitmap id="bitmap.menu.arrow.normal"  path="menu\bitmap.menu.submenu.arrow.png" />
 		
 		<imagelist id="imagelist.menu.setting" vertical="0" varyblock="0" blocksize="16" image="menu\setting.png"/>

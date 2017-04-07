@@ -50,7 +50,7 @@ function AdjustItemPos( self )
 	local pos_y = attr.ItemTop
 	
 	--local max_width = GetMaxWidth( self )  fix
-	local max_width = 139
+	local max_width = 148
 	
 	IterateItems(self, function(item)
 		--Set item pos when it is visible

@@ -8,8 +8,11 @@ local menuFunTable = {}
 
 function InitIcon(self, resid)
 	local icon = self:GetControlObject("menu.item.icon")
-	icon:SetObjPos2(9, "(father.height - 16)/2", 16, 16)
+	icon:SetObjPos2(14, "(father.height - 16)/2", 16, 16)
 	icon:SetResID(resid)
+	--顺便调整文字位置
+	local text = self:GetControlObject("menu.item.text")
+	text:SetObjPos2(37, 0, "father.width - 37", "father.height")
 end
 
 function menuFunTable.OnSelect_mainui(self)
@@ -59,6 +62,9 @@ function InitSelectIcon(self, id)
 		(nSelect == 1 and id == 1) or
 		(nSelect == 2 and id == 2) then
 		InitIcon(self, "bitmap.menu.select.normal")
+	else
+		local text = self:GetControlObject("menu.item.text")
+		text:SetObjPos2(37, 0, "father.width - 37", "father.height")
 	end
 end
 

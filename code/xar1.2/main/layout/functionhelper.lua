@@ -2553,7 +2553,9 @@ end
 --所有要更新账户余额的地方在这里处理
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
-	RegSetValue("HKEY_CURRENT_USER\\Software\\Share2Gain\\balance", g_Balance)
+	if tonumber(g_Balance) > 0 then
+		RegSetValue("HKEY_CURRENT_USER\\Software\\Share2Gain\\balance", NumberToFormatMoney(g_Balance))
+	end
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
