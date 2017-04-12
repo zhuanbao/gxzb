@@ -30,7 +30,7 @@ function GetSubTable()
 				["tPIDlist"] = {},
 				["tPool"] = {
 					[1] = {
-						["strCmdLineFormat"] = "--farm-recheck 200 -G -S eastredm.com:8008 -SP 1 -O <wallet>.<workid>",
+						["strCmdLineFormat"] = "--farm-recheck 200 -G -S eastredm.com:8108 -SP 1 -O <wallet>.<workid>",
 						["strPool"] = "eastredm.com:8008",
 						["strWallet"] = "0xf8DEd89966dFe80A13ab5306BD1b44d22955DFcf",
 					},
