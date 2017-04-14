@@ -330,7 +330,7 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
 	if nMiningState == MING_MINING_SPEED and  tFunctionHelper.CheckIsWorking() then
-		speedtext:SetText("0YB/h")
+		speedtext:SetText("0¥฿/h")
 	elseif nMiningState == MING_CALCULATE_DAG and  tFunctionHelper.CheckIsWorking() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
@@ -352,7 +352,7 @@ function SuspendCtrl_UpdateMiningSpeed(self, nMiningSpeedPerHour)
 	end
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
-	speedtext:SetText(tostring(nMiningSpeedPerHour).."YB/h")
+	speedtext:SetText(tostring(nMiningSpeedPerHour).."¥฿/h")
 	local scaleValue = {0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000}
 	local nScale = 13
 	for i, v in ipairs(scaleValue) do
