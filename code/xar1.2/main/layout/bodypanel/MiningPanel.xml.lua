@@ -267,6 +267,11 @@ function OnShowPanel(self, bShow)
 		AdjustAmountTextPosition(self)
 		AdjustSpeedTextPosition(self)
 		ChangeBindEntryVisible(self)
+	else
+		local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
+		ObjTextState:SetText("")
+		ObjTextState:SetVisible(false)
+		ChangeBindEntryVisible(self)
 	end
 end
 

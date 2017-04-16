@@ -2446,6 +2446,7 @@ function SetStateInfoToUser(strInfo)
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
 	objMiningPanel:SetStateInfoToUser(strInfo)
 	TipLog("[SetStateInfoToUser] strInfo = " .. tostring(strInfo))
+	ChangeMainBodyPanel("MiningPanel")
 end
 --解绑三步
 --[[
