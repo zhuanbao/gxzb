@@ -2038,7 +2038,6 @@ end
 --不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
 function GetHistoryToServer(ntype, fnCallBack)
-	XLMessageBox(11)
 	local function CheckLastUTC(utc)
 		if type(utc) ~= "number" then
 			return true
@@ -2277,7 +2276,7 @@ function QueryClientInfo(nMiningSpeed)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			---[[ forlocal
+			--[[ forlocal
 			strContent = GetLocalSvrCfgWithName("pushCalc.json")
 			--]]
 			local tabInfo = DeCodeJson(strContent)
@@ -2466,7 +2465,7 @@ function SendUnBindInfoToServer()
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-				---[[ forlocal
+				--[[ forlocal
 				strContent = GetLocalSvrCfgWithName("unbind.json")
 				--]]
 				local tabInfo = DeCodeJson(strContent)
