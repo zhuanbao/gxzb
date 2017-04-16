@@ -1,0 +1,59 @@
+﻿<XLUE>
+	<resource>
+		<!--指针-->
+		<bitmap id="suspend-needle-needle1" path="suspend\needle\needle1.png" /> 
+		<bitmap id="suspend-needle-needle10" path="suspend\needle\needle10.png" /> 
+		<bitmap id="suspend-needle-needle11" path="suspend\needle\needle11.png" /> 
+		<bitmap id="suspend-needle-needle12" path="suspend\needle\needle12.png" /> 
+		<bitmap id="suspend-needle-needle13" path="suspend\needle\needle13.png" /> 
+		<bitmap id="suspend-needle-needle8" path="suspend\needle\needle8.png" /> 
+		<bitmap id="suspend-needle-needle2" path="suspend\needle\needle2.png" /> 
+		<bitmap id="suspend-needle-needle3" path="suspend\needle\needle3.png" /> 
+		<bitmap id="suspend-needle-needle4" path="suspend\needle\needle4.png" /> 
+		<bitmap id="suspend-needle-needle5" path="suspend\needle\needle5.png" /> 
+		<bitmap id="suspend-needle-needle6" path="suspend\needle\needle6.png" /> 
+		<bitmap id="suspend-needle-needle7" path="suspend\needle\needle7.png" /> 
+		<bitmap id="suspend-needle-needle9" path="suspend\needle\needle9.png" /> 
+		<!--未工作时背景-->
+		<texture id="suspend-nowork-bkg0" type="ThreeInOneH" image="suspend\nowork\bkg0.png" /> 
+		<texture id="suspend-nowork-bkg1" type="ThreeInOneH" image="suspend\nowork\bkg1.png" /> 
+		<texture id="suspend-nowork-bkg2" type="ThreeInOneH" image="suspend\nowork\bkg2.png" /> 
+		<texture id="suspend-nowork-bkg3" type="ThreeInOneH" image="suspend\nowork\bkg3.png" /> 
+		<texture id="suspend-nowork-bkg4" type="ThreeInOneH" image="suspend\nowork\bkg4.png" /> 
+		<texture id="suspend-nowork-bkg5" type="ThreeInOneH" image="suspend\nowork\bkg5.png" /> 
+		<texture id="suspend-nowork-bkg6" type="ThreeInOneH" image="suspend\nowork\bkg6.png" /> 
+		<texture id="suspend-nowork-bkg7" type="ThreeInOneH" image="suspend\nowork\bkg7.png" /> 
+		<texture id="suspend-nowork-bkg8" type="ThreeInOneH" image="suspend\nowork\bkg8.png" /> 
+		<!--未工作时右侧圆盘-->
+		<bitmap id="suspend-nowork-rightdisk-hoverleft" path="suspend\nowork\hoverleft.png" /> 
+		<bitmap id="suspend-nowork-rightdisk-hoverright" path="suspend\nowork\hoverright.png" /> 
+		<bitmap id="suspend-nowork-rightdisk-needlegray" path="suspend\nowork\needlegray.png" /> 
+		<!--工作时背景-->
+		<texture id="suspend-work-bkg0" type="ThreeInOneH" image="suspend\work\bkg0.png" /> 
+		<texture id="suspend-work-bkg1" type="ThreeInOneH" image="suspend\work\bkg1.png" /> 
+		<texture id="suspend-work-bkg2" type="ThreeInOneH" image="suspend\work\bkg2.png" /> 
+		<texture id="suspend-work-bkg3" type="ThreeInOneH" image="suspend\work\bkg3.png" /> 
+		<texture id="suspend-work-bkg4" type="ThreeInOneH" image="suspend\work\bkg4.png" /> 
+		<texture id="suspend-work-bkg5" type="ThreeInOneH" image="suspend\work\bkg5.png" /> 
+		<texture id="suspend-work-bkg6" type="ThreeInOneH" image="suspend\work\bkg6.png" /> 
+		<texture id="suspend-work-bkg7" type="ThreeInOneH" image="suspend\work\bkg7.png" /> 
+		<texture id="suspend-work-bkg8" type="ThreeInOneH" image="suspend\work\bkg8.png" /> 
+		<!--工作时右侧圆盘-->
+		<bitmap id="suspend-work-rightdisk-hoverleft" path="suspend\work\hoverleft.png" /> 
+		<bitmap id="suspend-work-rightdisk-hoverright" path="suspend\work\hoverright.png" /> 
+		<!--元宝图标-->
+		<bitmap id="suspend-gold-gray" path="suspend\suspend-gold-gray.png" /> 
+		<bitmap id="suspend-gold-light" path="suspend\suspend-gold-light.png" /> 
+		<!--颜色和字体-->
+		<font id="font.suspend.balancehead" height="12" facename="defaultfont" /> 
+		<font id="font.suspend.balancenumber" height="13" facename="defaultfont" weight="bold"/> 
+		<font id="font.suspend.balancehead.lower" height="12" facename="defaultfont" /> 
+		<font id="font.suspend.speed" height="10" facename="defaultfont" /> 
+		
+		<color id="color.suspend.balance" value="#FFDE01"/>
+		<color id="color.suspend.balanceshadow" value="#511B00"/>
+		<color id="color.suspend.balance.lower" value="#E1E1E1"/>
+		<color id="color.suspend.speed" value="#FFFFFF"/>
+		<color id="color.suspend.speedshadow" value="#93690F"/>
+	</resource>
+</XLUE>
