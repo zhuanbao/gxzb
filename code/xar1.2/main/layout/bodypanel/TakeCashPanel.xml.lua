@@ -2,8 +2,11 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local gCanTakeMoney = 0
 local gBalance = 0
 --提现错误码
-local NOENOUGHMONEY = 401
-local EXCEEDINGTAKETIME = 402
+local ERROR_INPUT = -1
+local ERROR_EXCEEDING_TAKE_TIME = -2
+local ERROR_WORKID = -3
+local ERROR_NO_ENOUGH_MONEY = -4
+local ERROR_BIND = -5
 
 function SetMsgToUser(OwnerCtrl, strText)
 	local ObjMsgToUser = OwnerCtrl:GetControlObject("TakeCashPanel.Panel.MsgToUser")
@@ -24,26 +27,9 @@ function OnClickTakeCash(self)
 	self:Enable(false)
 	--local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	tFunctionHelper.TakeCashToServer(nTakeMoney,function(bRet, tabInfo)
-		--for test
-		--[[
-		bRet = true
-		tabInfo = {}
-		tabInfo["rtn"] = 0
-		tabInfo["data"] = {}
-		tabInfo["data"]["balance"]  = 87980
-		--]]
 		if not bRet then
 			SetMsgToUser(OwnerCtrl, "连接服务器失败，请重试")
-			self:Enable(true)
-		elseif tabInfo["rtn"] == NOENOUGHMONEY then
-			local nBalance = tabInfo["data"]["balance"] 
-			tFunctionHelper.SetUserCurrentBalance(nBalance)
-			tFunctionHelper.UpdateUserBalance(nBalance)
-		elseif tabInfo["rtn"] == EXCEEDINGTAKETIME then
-			local nBalance = tabInfo["data"]["balance"] 
-			tFunctionHelper.SetUserCurrentBalance(nBalance)
-			tFunctionHelper.UpdateUserBalance(nBalance)
-			SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
+			--self:Enable(true)
 		elseif tabInfo["rtn"] == 0 then	
 			local nBalance = tabInfo["data"]["balance"] 
 			local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -53,9 +39,29 @@ function OnClickTakeCash(self)
 			tFunctionHelper.UpdateUserBalance(nBalance)
 			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
 		else
-			SetMsgToUser(OwnerCtrl, "服务器未知错误，请重试")
-			self:Enable(true)
-		end
+			local nErrorCode = tabInfo["data"]["errCode"]
+			if nErrorCode == ERROR_WORKID or nErrorCode == ERROR_BIND then
+				SetMsgToUser(OwnerCtrl, "绑定信息错误，无法提现")
+			elseif nErrorCode == ERROR_NO_ENOUGH_MONEY then
+				local nBalance = tabInfo["data"]["balance"] or 0
+				--self:Enable(true)
+				tFunctionHelper.SetUserCurrentBalance(nBalance)
+				tFunctionHelper.UpdateUserBalance(nBalance)
+				SetMsgToUser(OwnerCtrl, "余额不足，无法提现")
+			elseif nErrorCode == ERROR_EXCEEDING_TAKE_TIME then
+				local nBalance = tabInfo["data"]["balance"] 
+				tFunctionHelper.SetUserCurrentBalance(nBalance)
+				tFunctionHelper.UpdateUserBalance(nBalance)
+				SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
+			else
+				if nErrorCode == ERROR_INPUT then
+					SetMsgToUser(OwnerCtrl, "输入金额错误，请重新输入")
+				else
+					SetMsgToUser(OwnerCtrl, "服务器未知错误，请重试")
+				end	
+				--self:Enable(true)
+			end
+		end	
 	end)
 end
 
@@ -183,9 +189,8 @@ function UpdateUIByBalance(self, nBalance)
 	nTakeMoney = Integer+Decimal
 	if nTakeMoney < 1 then
 		nTakeMoney = 0
-		ObjEdit:SetEnable(false)
 	end	
-	if CheckCanTakeCash() then
+	if CheckCanTakeCash() and nTakeMoney > 0 then
 		ObjEdit:SetEnable(true)
 	else
 		ObjEdit:SetEnable(false)

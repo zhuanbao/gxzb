@@ -105,7 +105,7 @@
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
 										<font>font.text13</font>
-										<text>您的库存有</text>
+										<text>您的金库有</text>
 									</attr>
 								</obj>
 								<obj id="TakeCashPanel.Panel.Amount.Num" class="TextObject">

@@ -13,7 +13,7 @@ end
 
 function ChangeBindEntryVisible(OwnerCtrl)
 	local ObjTextState = OwnerCtrl:GetControlObject("MiningPanel.Panel.State")
-	if ObjTextState:GetVisible() then
+	if Helper:IsRealString(ObjTextState:GetText()) then
 		return
 	end
 	local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")

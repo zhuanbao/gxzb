@@ -30,7 +30,7 @@ local g_PreWorkState = 0
 --服务端信息
 local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
 local g_SpeedSumCounter = 0 --累加的计数器
-local g_PerSpeed = 10 --服务端返回的平均速度((元宝/Hour)/M)
+local g_PerSpeed = 0 --服务端返回的平均速度((元宝/Hour)/M)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
 
@@ -1961,7 +1961,8 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nSpeed)))
+	local strSpeed = string.format("%0.2f",nSpeed)
+	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
@@ -1973,13 +1974,13 @@ function QuerySvrForTakeCashInfo(nMoney)
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
-	local strInterfaceName = "pushCalc"
+	local strInterfaceName = "drawout"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(nMoney)))
+	strInterfaceParam = strInterfaceParam .. "&amount=" .. Helper:UrlEncode((tostring(nMoney)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForTakeCashInfo] strReguestUrl = " .. strReguestUrl)
@@ -1997,9 +1998,6 @@ function TakeCashToServer(nMoney, fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			---[[ forlocal
-			strContent = GetLocalSvrCfgWithName("takeCash.json")
-			--]]
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" then
 				TipLog("[TakeCashToServer] parse info error.")
@@ -2040,6 +2038,7 @@ end
 --不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
 function GetHistoryToServer(ntype, fnCallBack)
+	XLMessageBox(11)
 	local function CheckLastUTC(utc)
 		if type(utc) ~= "number" then
 			return true
@@ -2300,8 +2299,8 @@ function QueryClientInfo(nMiningSpeed)
 				g_Balance = tabInfo["data"]["balance"]
 				UpdateUserBalance()
 			end
-			if tonumber(tabInfo["data"]["speed"]) ~= nil then
-				g_PerSpeed = tabInfo["data"]["speed"]
+			if tonumber(tabInfo["data"]["rate"]) ~= nil then
+				g_PerSpeed = tabInfo["data"]["rate"]
 			end
 		else
 			TipLog("[QueryClientInfo] query sever failed.")
@@ -2726,7 +2725,8 @@ function NotifyStartNewPool()
 	ResetGlobalParam()
 	OnWorkStateChange(2)
 	StopMiningCountTimer()
-	local strNewPoolCmd = tMiningMsgProc.GetNewMiningCmdInfo()
+	tMiningMsgProc.GetNewMiningCmdInfo()
+	local strNewPoolCmd = tMiningMsgProc.GetCurrentMiningCmdLine()
 	if strNewPoolCmd == nil then
 		SetStateInfoToUser("连接任务服务器失败，请稍后再试")
 		return
@@ -2799,7 +2799,7 @@ function QueryAndUpdateWorkState()
 			if tonumber(p1) > 0 then
 				g_SpeedSum = g_SpeedSum + p1
 				g_SpeedSumCounter = g_SpeedSumCounter + 1
-				g_MiningSpeedPerHour = math.floor((p1/(1024*1024))*g_PerSpeed)
+				g_MiningSpeedPerHour = math.floor((p1/(1000*1000))*g_PerSpeed)
 				UpdateMiningSpeed(g_MiningSpeedPerHour)
 			else
 				return false
@@ -2924,7 +2924,9 @@ function WorkingTimerHandle()
 				nCheckErrorCounter = nCheckErrorCounter + 1
 			end
 			if nReportConuter >= nReportCalcInterval and g_SpeedSumCounter > 0 then
-				local nAverageSpeed = math.floor(g_SpeedSum/g_SpeedSumCounter)
+				local nSpeedSum = g_SpeedSum/(1000*1000)
+				local nAverageSpeed = nSpeedSum/g_SpeedSumCounter
+				TipLog("[WorkingTimerHandle] nSpeedSum = " .. tostring(nSpeedSum) .. ", nAverageSpeed = " .. tostring(nAverageSpeed))
 				g_SpeedSum = 0
 				g_SpeedSumCounter = 0
 				nReportConuter = 0

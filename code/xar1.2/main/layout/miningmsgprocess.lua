@@ -8,6 +8,7 @@ local g_MiningThreads = 1
 local g_tabDeviceDagState = {}
 local g_PoolIndex = 0
 
+--命令行处理
 local g_strCmdLineFormat = nil
 local g_strWallet = nil
 local g_strPool = nil
@@ -106,11 +107,12 @@ function GetNewMiningCmdInfo()
 			if g_PoolIndex <= #tabPoolInfo then
 				tabPoolItem = tabPoolInfo[g_PoolIndex]
 				if type(tabPoolItem) == "table" then
-					local strCmdLineFormat = tabPoolItem["strCmdLineFormat"]
-					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<wallet>)",tabPoolItem["strWallet"])
-					strCmdLineFormat = string.gsub(strCmdLineFormat,"(<workid>)",strWorkID)
-					if IsRealString(strCmdLineFormat) then
-						g_strCmdLineFormat = strCmdLineFormat
+					--local strCmdLineFormat = tabPoolItem["strCmdLineFormat"]
+					--strCmdLineFormat = string.gsub(strCmdLineFormat,"(<wallet>)",tabPoolItem["strWallet"])
+					--strCmdLineFormat = string.gsub(strCmdLineFormat,"(<workid>)",strWorkID)
+					--这里只是判断下 能不能正常匹配
+					if IsRealString(tabPoolItem["strCmdLineFormat"]) then
+						g_strCmdLineFormat = tabPoolItem["strCmdLineFormat"]
 						g_strWallet = tabPoolItem["strWallet"]
 						g_strPool = tabPoolItem["strPool"]
 						break
@@ -134,10 +136,25 @@ function GetCurrentPool()
 end
 
 function GetCurrentMiningCmdLine()
-	if g_strCmdLineFormat == nil then
-		return GetNewMiningCmdInfo()
+	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
 	end
-	return g_strCmdLineFormat
+	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
+	if not IsRealString(strWorkID) then
+		return nil
+	end
+	if g_strCmdLineFormat == nil then
+		GetNewMiningCmdInfo()
+	end
+	if g_strCmdLineFormat == nil then
+		return nil
+	end
+	local strCmdLine = g_strCmdLineFormat
+	strCmdLine = string.gsub(strCmdLine,"(<wallet>)",g_strWallet)
+	strCmdLine = string.gsub(strCmdLine,"(<workid>)",strWorkID)
+	return strCmdLine
 end
 
 function ResetGlobalParam()
