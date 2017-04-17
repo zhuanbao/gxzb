@@ -311,7 +311,7 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 			self:SetState(newState)
 		end
 		speedtext:SetText("准备中")
-	elseif state == 2 or state == 3 then
+	elseif state == 2 then
 		if attr.currentstate  >= 3 then
 			local newState = attr.currentstate - 3
 			self:SetState(newState)

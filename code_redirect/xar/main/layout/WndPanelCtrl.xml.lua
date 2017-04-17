@@ -79,12 +79,8 @@ function CreateListener(objRootCtrl)
 						mainwnd:BringWindowToTop(true)
 					end
 				end
-			elseif tostring(key) == "OnMiningCount" then
-				tMiningMsgProc.OnMiningCount(tParam)
-			elseif tostring(key) == "OnConnectFail" then
-				tMiningMsgProc.OnConnectFail(tParam)
-			elseif tostring(key) == "OnInitDagRet" then
-				tMiningMsgProc.OnInitDagRet(tParam)
+			elseif tostring(key) == "OnGenOilMsg" then
+				tMiningMsgProc.OnGenOilMsg(tParam)
 			end				
 		end
 	)
