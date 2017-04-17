@@ -223,7 +223,7 @@ end
 function ChangeMiningSpeed()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local nWorkModel = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
-	if nWorkModel == 0 then
+	if nWorkModel ~= 1 then
 		if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
 			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
 			SetControlSpeedCmdLine(nil)
@@ -307,6 +307,7 @@ function Start()
 	if IsRealString(g_ControlSpeedCmdLine) then
 		strCmdLine = strCmdLine .. " " .. g_ControlSpeedCmdLine
 	end
+	TipLog("[Start] strCmdLine = " .. GTV(strCmdLine))
 	IPCUtil:Start(strCmdLine)
 	StartGenOilTimer()
 	return 0
