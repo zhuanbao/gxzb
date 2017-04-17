@@ -142,7 +142,9 @@ void LuaIPCUtil::CycleHandleInfoFromPipe()
 		//dosomeing
 		char szPipeOutBuffer[PIPE_BUFFER_SIZE] = {0};  
 		DWORD dwBytesRead = 0;  
+		TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] begain read " ); 
 		BOOL bRead = ReadFile(m_hStdOutRead, szPipeOutBuffer, PIPE_BUFFER_SIZE, &dwBytesRead, NULL);  
+		TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] end read ,dwBytesRead = " <<  dwBytesRead);
 		if(!bRead || dwBytesRead <= 0)
 		{
 			DWORD dwLastError = ::GetLastError();
@@ -193,7 +195,7 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 
 		ZeroMemory(&pi, sizeof(pi));
 
-		if(!CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, FALSE, NULL, NULL, NULL,&si,	&pi ))
+		if(!CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
 		{
 			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
 			break; 
