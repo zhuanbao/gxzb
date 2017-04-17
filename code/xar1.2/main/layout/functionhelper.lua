@@ -2336,6 +2336,10 @@ function GetUnBindUrl()
 	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 				.."&workerID=" .. Helper:UrlEncode(tostring(strWorkID))
 				.. "&openID=" .. Helper:UrlEncode(tostring(strOpenID))
+	local strGUID = GetMachineID()
+	if IsRealString(strGUID) then
+		strOgriParam = strOgriParam .. "&param1=" .. Helper:UrlEncode(strGUID)
+	end	
 	local strTarParam = MakeInterfaceMd5(strAPIName, strOgriParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strTarParam
 	TipLog("[GetUnBindUrl] strReguestUrl = " .. strReguestUrl)
