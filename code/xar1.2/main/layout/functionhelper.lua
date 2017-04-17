@@ -223,7 +223,6 @@ function RegisterFunctionObject(self)
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGXZBMinorVer = GetGXZBMinorVer
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
-	obj.PopupBubbleOneDay = PopupBubbleOneDay
 	obj.NewAsynGetHttpFile = NewAsynGetHttpFile
 	obj.DownLoadFileWithCheck = DownLoadFileWithCheck
 	obj.DownLoadServerConfig = DownLoadServerConfig
@@ -235,7 +234,6 @@ function RegisterFunctionObject(self)
 	obj.CheckCommonUpdateTime = CheckCommonUpdateTime
 	obj.CheckAutoUpdateTime = CheckAutoUpdateTime
 	obj.SaveCommonUpdateUTC = SaveCommonUpdateUTC
-	obj.SaveAutoUpdateUTC = SaveAutoUpdateUTC
 	obj.CheckMD5 = CheckMD5
 	obj.GetSpecifyFilterTableFromMem = GetSpecifyFilterTableFromMem
 	obj.SaveSpecifyFilterTableToMem = SaveSpecifyFilterTableToMem
@@ -895,6 +893,7 @@ function ReadAllConfigInfo()
 			--读失败了不用返回
 			--return false
 		end
+		infoTable = infoTable or {}
 		
 		local tContent = infoTable
 		local bMerge = false
@@ -1303,26 +1302,6 @@ function PopupNotifyIconTip(strText, bShowWndByTray)
 	g_bShowWndByTray = bShowWndByTray
 end
 
-
-function PopupBubbleOneDay()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local nLastBubbleUTC = tonumber(tUserConfig["nLastBubbleUTC"]) 
-	
-	if not IsNilString(nLastBubbleUTC) and not CheckTimeIsAnotherDay(nLastBubbleUTC) then
-		return
-	end
-	
-	local nNoShowFilterBubble = tonumber(tUserConfig["nNoShowFilterBubble"]) 
-	if not IsNilString(nNoShowFilterBubble) then
-		return
-	end
-	
-	ShowPopupWndByName("TipFilterBubbleWnd.Instance", true)
-	tUserConfig["nLastBubbleUTC"] = tipUtil:GetCurrentUTCTime()
-	SaveConfigToFileByKey("tUserConfig")
-end
-
-
 function CreateTrayTipWnd(objHostWnd)
 	local uTempltMgr = XLGetObject("Xunlei.UIEngine.TemplateManager")
 	local uHostWndMgr = XLGetObject("Xunlei.UIEngine.HostWndManager")
@@ -1480,22 +1459,12 @@ function MergeOldUserCfg(tCurrentCfg, strFileName)
 		return false, tCurrentCfg
 	end
 	
-	tCurrentCfg["nLastAutoUpdateUTC"] = tOldCfg["nLastAutoUpdateUTC"]
-	tCurrentCfg["nLastBubbleUTC"] = tOldCfg["nLastBubbleUTC"]
-
-	tCurrentCfg["nLastCommonUpdateUTC"] = tOldCfg["nLastCommonUpdateUTC"]
-	
-	if type(tCurrentCfg["tConfig"]) ~= "table" then
-		tCurrentCfg["tConfig"] = {}
-	end
-	
-	local tOldStateConfig = tOldCfg["tConfig"] or {}
-	for strKey, tStateInfo in pairs(tOldStateConfig) do
-		--是否开机启动以安装时选择为准
-		if strKey ~= "AutoStup" then
-			tCurrentCfg["tConfig"][strKey] = tStateInfo
+	for k, v in pairs(tOldCfg) do
+		--除了strServerConfigURL，其他都用老的
+		if k ~= "strServerConfigURL" then
+			tCurrentCfg[k] = v
 		end
-	end	
+	end
 	
 	tipUtil:DeletePathFile(strOldCfgPath)
 	return true, tCurrentCfg
@@ -1671,14 +1640,6 @@ function CheckUpdateTimeSpan(nTimeInDay, strUpdateType)
 	
 	return false
 end
-
-function SaveAutoUpdateUTC()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["nLastAutoUpdateUTC"] = tipUtil:GetCurrentUTCTime()
-	SaveConfigToFileByKey("tUserConfig")
-end
-
-
 
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
