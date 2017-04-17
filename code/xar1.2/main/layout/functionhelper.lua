@@ -2448,9 +2448,9 @@ function SetStateInfoToUser(strInfo)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	ChangeMainBodyPanel("MiningPanel")
 	objMiningPanel:SetStateInfoToUser(strInfo)
 	TipLog("[SetStateInfoToUser] strInfo = " .. tostring(strInfo))
-	ChangeMainBodyPanel("MiningPanel")
 end
 --解绑三步
 --[[
