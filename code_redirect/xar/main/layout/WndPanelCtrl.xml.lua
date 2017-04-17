@@ -1,6 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
-local tMiningMsgProc = XLGetGlobal("Global.MiningMsgProc")
 
 local g_tPanelCtrlList = {
 	"EarningsPanel",
@@ -80,7 +79,8 @@ function CreateListener(objRootCtrl)
 					end
 				end
 			elseif tostring(key) == "OnGenOilMsg" then
-				tMiningMsgProc.OnGenOilMsg(tParam)
+				local ObjWorkClient = tFunctionHelper.GetWorkClient()
+				ObjWorkClient.OnGenOilMsg(tParam)
 			end				
 		end
 	)

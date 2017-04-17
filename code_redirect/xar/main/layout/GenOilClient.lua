@@ -252,11 +252,12 @@ function StartGenOilTimer()
 		timeMgr:KillTimer(g_GenOilWorkingTimerId)
 		g_GenOilWorkingTimerId = nil
 	end
+	g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 	g_GenOilWorkingTimerId = timeMgr:SetTimer(function(Itm, id)
-		timeMgr:KillTimer(g_GenOilWorkingTimerId)
-		g_GenOilWorkingTimerId = nil
 		local nCurrentTime = tipUtil:GetCurrentUTCTime()
-		if nCurrentTime - g_LastClientOutputRightInfoTime > 60*3 then
+		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
+			ReTryStartClient()
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*3 then
 			ReTryStartClient()
 		end
 		ChangeMiningSpeed()
@@ -337,7 +338,8 @@ end
 function ReTryStartClient()
 	Quit()
 	g_ClientReTryCnt = g_ClientReTryCnt + 1
-	if g_ClientReTryCnt > g_ClientMaxReTryCnt then
+	TipLog("[ReTryStartClient] g_ClientReTryCnt = " .. GTV(g_ClientReTryCnt))
+	if g_ClientReTryCnt >= g_ClientMaxReTryCnt then
 		tFunctionHelper.SetStateInfoToUser("赚宝进程运行失败")
 		tFunctionHelper.HandleOnQuit()
 		return
@@ -378,6 +380,7 @@ end
 function RegisterFunctionObject(self)
 	local obj = {}
 	obj.InitClient = InitClient
+	obj.OnGenOilMsg = OnGenOilMsg
 	obj.Start = Start
 	obj.Quit = Quit
 	obj.Pause = Pause

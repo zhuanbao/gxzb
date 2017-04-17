@@ -291,6 +291,7 @@ function RegisterFunctionObject(self)
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
+	obj.GetWorkClient = GetWorkClient
 	
 	obj.UpdateMiningSpeed = UpdateMiningSpeed
 	obj.UpdateMiningState = UpdateMiningState
@@ -2334,6 +2335,10 @@ function CheckIsWorking()
 	return g_bWorking
 end
 
+function GetWorkClient()
+	return g_WorkClient
+end
+
 --返回当前挖矿速度的比例系数
 function GetSvrAverageMiningSpeed()
 	return g_SvrAverageMiningSpeed
@@ -2465,9 +2470,9 @@ function SetStateInfoToUser(strInfo)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	ChangeMainBodyPanel("MiningPanel")
 	objMiningPanel:SetStateInfoToUser(strInfo)
 	TipLog("[SetStateInfoToUser] strInfo = " .. tostring(strInfo))
-	ChangeMainBodyPanel("MiningPanel")
 end
 --解绑三步
 --[[
@@ -2750,7 +2755,7 @@ function WorkingTimerHandle()
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
 	g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nAverageHashRate = g_WorkClient.GetAverageHashRate()
-		QueryClientInfo(nAverageSpeed)
+		QueryClientInfo(nAverageHashRate)
 	end, nReportCalcInterval*1000)
 end
 
@@ -2763,12 +2768,12 @@ end
 
 --尝试去连接服务器
 function TryToConnectServer(fnCallBack)
+	SetStateInfoToUser("正在连接服务器")
 	DownLoadServerConfig(function(nDownServer, strServerPath)
 		if nDownServer ~= 0 or not IsRealString(strServerPath) or  not tipUtil:QueryFileExists(tostring(strServerPath)) then
 			TipLog("[TryToConnectServer] Download server config failed , try reconnect nDownServer="..tostring(nDownServer)..", strServerPath="..tostring(strServerPath))
 			--处理)
 			fnCallBack(false)
-			SetStateInfoToUser("正在连接服务器")
 			SetOnceTimer(function()
 				TryToConnectServer(fnCallBack)
 			end, 3000)
