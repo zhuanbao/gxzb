@@ -8,7 +8,7 @@
 #include "../EvenListenHelper/LuaMsgWnd.h"
 
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\GenOil.ini")
-#define CLIENT_NAME _T("Share2Genoil.exe")
+#define CLIENT_NAME _T("ShareGenoil.exe")
 
 CClientGenOil::CClientGenOil(void)
 {
