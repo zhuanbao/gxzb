@@ -431,8 +431,18 @@ function TipMain()
 	end
 	--显示悬浮框
 	FunctionObj.UpdateSuspendWndVisible()
+	--[[
+	if g_ServerConfig == nil then
+		MessageBox(tostring("连接服务器失败"))
+		return
+	end
+	local tTaskInfo = g_ServerConfig["tTaskInfo"]
+	if type(tTaskInfo) ~= "table" or #tTaskInfo < 0 then
+		MessageBox(tostring("解析服务器配置失败"))
+		return
+	end
+	--]]
 	--FunctionObj.CheckShoudAutoMining()
-	FunctionObj.InitMiningClient()
 	FunctionObj.TryToConnectServer(function(bConnect,strPath)
 		FunctionObj.TipLog("[TipMain] Try to connect server, bConnect = " .. tostring(bConnect))
 	end)

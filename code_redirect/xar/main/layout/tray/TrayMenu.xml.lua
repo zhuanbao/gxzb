@@ -27,7 +27,7 @@ end
 function OnSelect_Pause(self)
 	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 	if tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyQuit()
+		tFunctionHelper.NotifyPause()
 	else
 		tFunctionHelper.NotifyStart()
 	end

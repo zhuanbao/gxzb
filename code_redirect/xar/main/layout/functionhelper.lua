@@ -4,9 +4,9 @@ local IPCUtil = XLGetObject("IPC.Util")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 --local g_ServerConfig = nil
 
-local g_WorkClient = nil
 local g_bShowWndByTray = false
 local gStatCount = 0
+local gCurrentWorkSpeed = 0
 
 local gnLastReportRunTmUTC = tipUtil:GetCurrentUTCTime()
 local gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
@@ -18,24 +18,32 @@ local gbLoadCfgSucc = false
 local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
+local tMiningMsgProc = nil
 
 local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
 local g_bWorking = false
 local g_WorkingTimerId = nil
-local g_SvrAverageMiningSpeed = 0
+local g_PreWorkState = 0
 
+--服务端信息
+local g_SpeedSum = 0 --累加速度，一分钟上报一次时，取这一分钟的平均速度
+local g_SpeedSumCounter = 0 --累加的计数器
+local g_PerSpeed = 0 --服务端返回的平均速度((元宝/Hour)/M)
+local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 local g_Balance = 0
 
---常量
---客户端状态
-local CLIENT_STATE_CALCULATE = 0
-local CLIENT_STATE_PREPARE = 1
-local CLIENT_STATE_EEEOR = 2
-local CLIENT_STATE_AUTO_EXIT = 3
+------限速
+--函数15秒调一次
+local g_CurrentPerBatch = 0 --当前限速值
+local g_GlobalWorkSizeMultiplier_Min = 100
+local g_GlobalWorkSizeMultiplier_Max = 4096
+local g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+local g_msExpectPerBatch = 100 --显卡计算每次循环的期望时间间隔(毫秒)
+------限速
 
-
+--local g_WorkWndClass = "WorkWnd_{EFBE3E9F-DEC0-4A65-B87C-BAD1145762FD}"
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
 	[2] = {"GXZB.SuspendWnd", "GXZB.SuspendWndTree"},
@@ -70,10 +78,14 @@ function LoadJSONHelper()
 end
 LoadJSONHelper()
 
-function LoadGenOilClient()
-	local strClientPath = __document.."\\..\\GenOilClient.lua"
-	local Module = XLLoadModule(strClientPath)
+function LoadMiningMsgProc()
+	local strMiningProcPath = __document.."\\..\\miningmsgprocess.lua"
+	local Module = XLLoadModule(strMiningProcPath)
+	tMiningMsgProc = XLGetGlobal("Global.MiningMsgProc")
 end
+LoadMiningMsgProc()
+
+
 
 local tryCatch=function(fnFail)  
     local ret,errMessage=pcall(fun); 
@@ -191,120 +203,94 @@ end
 
 function RegisterFunctionObject(self)
 	local obj = {}
-	--通用功能函数
 	obj.TipLog = TipLog
-	obj.FetchValueByPath = FetchValueByPath
 	obj.NumberToFormatMoney = NumberToFormatMoney
 	obj.FormatMoneyToNumber = FormatMoneyToNumber
 	obj.FailExitTipWnd = FailExitTipWnd
 	obj.GetCommandStrValue = GetCommandStrValue
 	obj.TipConvStatistic = TipConvStatistic
 	obj.ReportAndExit = ReportAndExit
+	obj.ShowPopupWndByName = ShowPopupWndByName
+	obj.GetCfgPathWithName = GetCfgPathWithName
 	obj.LoadTableFromFile = LoadTableFromFile
+	obj.ShowExitRemindWnd = ShowExitRemindWnd
 	obj.RegQueryValue = RegQueryValue
 	obj.RegSetValue = RegSetValue
 	obj.RegDeleteValue = RegDeleteValue
 	obj.GetPeerID = GetPeerID
 	obj.GetSystemBits = GetSystemBits
 	obj.FormatByteUnit = FormatByteUnit
-	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
-	obj.NewAsynGetHttpFile = NewAsynGetHttpFile
-	obj.GetFileSaveNameFromUrl = GetFileSaveNameFromUrl
-	obj.DownLoadFileWithCheck = DownLoadFileWithCheck
-	obj.CheckMD5 = CheckMD5
-	obj.GetTimeStamp = GetTimeStamp
-	obj.IsUACOS = IsUACOS
-	obj.GetCurrentServerTime = GetCurrentServerTime
-	obj.CheckIsAnotherDay = CheckIsAnotherDay
-	obj.CheckPeerIDList = CheckPeerIDList
-	
-	--业务辅助函数
-	obj.GetModuleDir = GetModuleDir
-	obj.GetExePath = GetExePath
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGXZBMinorVer = GetGXZBMinorVer
-	obj.GetInstallSrc = GetInstallSrc
+	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
+	obj.NewAsynGetHttpFile = NewAsynGetHttpFile
+	obj.DownLoadFileWithCheck = DownLoadFileWithCheck
 	obj.DownLoadServerConfig = DownLoadServerConfig
 	obj.CheckIsNewVersion = CheckIsNewVersion
+	obj.GetFileSaveNameFromUrl = GetFileSaveNameFromUrl
+	obj.SetNotifyIconState = SetNotifyIconState
+	obj.SetWndForeGround = SetWndForeGround
+	obj.PopupNotifyIconTip = PopupNotifyIconTip
 	obj.CheckCommonUpdateTime = CheckCommonUpdateTime
 	obj.CheckAutoUpdateTime = CheckAutoUpdateTime
 	obj.SaveCommonUpdateUTC = SaveCommonUpdateUTC
-	obj.SaveAutoUpdateUTC = SaveAutoUpdateUTC
+	obj.CheckMD5 = CheckMD5
+	obj.GetSpecifyFilterTableFromMem = GetSpecifyFilterTableFromMem
+	obj.SaveSpecifyFilterTableToMem = SaveSpecifyFilterTableToMem
 	obj.SaveConfigToFileByKey = SaveConfigToFileByKey
 	obj.ReadConfigFromMemByKey = ReadConfigFromMemByKey
 	obj.CheckIsUpdating = CheckIsUpdating
 	obj.SetIsUpdating = SetIsUpdating
+	obj.GetTimeStamp = GetTimeStamp
 	obj.CheckForceVersion = CheckForceVersion
-	obj.ReadAllConfigInfo = ReadAllConfigInfo
-	obj.StartRunCountTimer = StartRunCountTimer
-	obj.SaveAllConfig = SaveAllConfig
-	obj.DownLoadNewVersion = DownLoadNewVersion
-	
-	
-	obj.TryToConnectServer = TryToConnectServer
-	obj.InitMiningClient = InitMiningClient
-	--UI函数
-	obj.GetMainHostWnd = GetMainHostWnd
-	obj.ShowPopupWndByName = ShowPopupWndByName
-	obj.GetCfgPathWithName = GetCfgPathWithName
-	obj.ShowExitRemindWnd = ShowExitRemindWnd
-	obj.PopupBubbleOneDay = PopupBubbleOneDay
-	obj.SetNotifyIconState = SetNotifyIconState
-	obj.SetWndForeGround = SetWndForeGround
-	obj.PopupNotifyIconTip = PopupNotifyIconTip
-	obj.InitTrayTipWnd = InitTrayTipWnd 
-	obj.CreatePopupTipWnd = CreatePopupTipWnd
-	obj.ShowIntroduceOnce = ShowIntroduceOnce
-	obj.PopRemindUpdateWnd = PopRemindUpdateWnd
-	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
-	obj.DestroyPopupWnd = DestroyPopupWnd
-	obj.ChangeMainBodyPanel = ChangeMainBodyPanel
-	obj.ChangeClientTitle = ChangeClientTitle
-	obj.CheckShouldRemindBind = CheckShouldRemindBind
-	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
-	obj.SetStateInfoToUser = SetStateInfoToUser
-	
-	
-	--服务器相关函数
-	obj.InitMachName = InitMachName
-	obj.GeneratTaskInfo = GeneratTaskInfo
-	obj.GetUserWorkID = GetUserWorkID
-	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
+	obj.IsUACOS = IsUACOS
 	obj.DownLoadTempQrcode = DownLoadTempQrcode
 	obj.CycleQuerySeverForBindResult = CycleQuerySeverForBindResult
 	obj.SetUserBindInfo = SetUserBindInfo
-	obj.ReportClientInfoToServer = ReportClientInfoToServer
-	obj.ReportMiningPoolInfoToServer = ReportMiningPoolInfoToServer
+	obj.InitTrayTipWnd = InitTrayTipWnd 
+	obj.ReadAllConfigInfo = ReadAllConfigInfo
+	obj.StartRunCountTimer = StartRunCountTimer
+	obj.CreatePopupTipWnd = CreatePopupTipWnd
+	obj.InitMinerInfoToServer = InitMinerInfoToServer
 	obj.QueryClientInfo = QueryClientInfo
 	obj.TakeCashToServer = TakeCashToServer
 	obj.GetHistoryToServer = GetHistoryToServer
+	obj.GetInstallSrc = GetInstallSrc
+	obj.GetExePath = GetExePath
+	obj.SaveAllConfig = SaveAllConfig
+	obj.GetCurrentServerTime = GetCurrentServerTime
+	obj.CheckIsAnotherDay = CheckIsAnotherDay
+	obj.CheckPeerIDList = CheckPeerIDList
+	obj.InitMachName = InitMachName
+	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopTipPre4Hour = PopTipPre4Hour
+	obj.PopRemindUpdateWnd = PopRemindUpdateWnd
+	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
+	obj.DestroyPopupWnd = DestroyPopupWnd
 	obj.SetMachineNameChangeInfo = SetMachineNameChangeInfo
+	obj.UpdateMiningSpeed = UpdateMiningSpeed
+	obj.GetUserWorkID = GetUserWorkID
+	obj.GetMainHostWnd = GetMainHostWnd
+	obj.ChangeMainBodyPanel = ChangeMainBodyPanel
+	obj.ChangeClientTitle = ChangeClientTitle
+	obj.CheckIsBinded = CheckIsBinded
+	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
+	obj.UpdateUserBalance = UpdateUserBalance
+	obj.NotifyPause = NotifyPause
+	obj.NotifyQuit = NotifyQuit
+	obj.NotifyStart = NotifyStart
+	obj.CheckIsWorking = CheckIsWorking
+	obj.GeneratTaskInfo = GeneratTaskInfo
 	obj.UnBindingClientFromClient = UnBindingClientFromClient
 	obj.UnBindingClientFromServer = UnBindingClientFromServer
-	obj.CheckIsBinded = CheckIsBinded
-	
-	--挖矿ing相关	
-	obj.GetSvrAverageMiningSpeed = GetSvrAverageMiningSpeed
-	obj.GetClientCurrentState = GetClientCurrentState
-	obj.CheckIsWorking = CheckIsWorking
+	obj.DownLoadNewVersion = DownLoadNewVersion
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
+	obj.GetClientCurrentState = GetClientCurrentState
+	obj.CheckShouldRemindBind = CheckShouldRemindBind
+	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
-	obj.GetWorkClient = GetWorkClient
-	
-	obj.UpdateMiningSpeed = UpdateMiningSpeed
-	obj.UpdateMiningState = UpdateMiningState
-	obj.UpdateDagProgress = UpdateDagProgress
-	obj.UpdateUserBalance = UpdateUserBalance
-	
-	obj.NotifyStart = NotifyStart
-	obj.NotifyQuit = NotifyQuit
-	obj.NotifyPause = NotifyPause
-	obj.NotifyResume = NotifyResume
-	obj.HandleOnStart = HandleOnStart
-	obj.HandleOnQuit = HandleOnQuit
-
+	obj.TryToConnectServer = TryToConnectServer
 	XLSetGlobal("Global.FunctionHelper", obj)
 end
 
@@ -848,7 +834,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 			end
 		end
 		if 0 == bRet then
-			---[[ forlocal
+			--[[ forlocal
 			strSavePath = GetLocalSvrCfgWithName("ServerConfig.dat", true)
 			--]]
 			callbackwrap(0, strSavePath)
@@ -907,6 +893,7 @@ function ReadAllConfigInfo()
 			--读失败了不用返回
 			--return false
 		end
+		infoTable = infoTable or {}
 		
 		local tContent = infoTable
 		local bMerge = false
@@ -1278,28 +1265,6 @@ function ShowMainPanleByTray(objHostWnd)
 	end
 end
 
-function GetToolTipInfo()
-	local nPreWorkState = GetClientCurrentState()
-	local bShowSpeed = false
-	local strText = ""
-	if nPreWorkState == CLIENT_STATE_PREPARE then
-		strText = "准备中"
-		bShowSpeed = true
-	elseif nPreWorkState == CLIENT_STATE_CALCULATE then
-		strText = "运行中"
-		bShowSpeed = true
-	elseif nPreWorkState == CLIENT_STATE_EEEOR or nPreWorkState == CLIENT_STATE_AUTO_EXIT then
-		strText = "出错了"
-		bShowSpeed = true
-	elseif g_bWorking then
-		strText = "准备中"
-		bShowSpeed = true
-	else
-		strText = "未开启"
-	end	
-	TipLog("[GetToolTipInfo]: nPreWorkState = " .. tostring(nPreWorkState) .. ", strText = " .. tostring(strText))
-	return strText,bShowSpeed
-end
 
 function SetNotifyIconState(strText)
 	if not g_tipNotifyIcon then
@@ -1314,11 +1279,12 @@ function SetNotifyIconState(strText)
 	local nBalance = GetUserCurrentBalance()
 	strShowText = strShowText .. "\r\n金库余额：" .. NumberToFormatMoney(nBalance) .. "元宝"
 	if bShowSpeed then
-		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(GetClientMiningSpeed()) .. "元宝/小时"
+		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(g_MiningSpeedPerHour) .. "元宝/小时"
 	end
 
 	g_tipNotifyIcon:SetIcon(nil, strShowText)
 end
+
 
 function PopupNotifyIconTip(strText, bShowWndByTray)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -1335,26 +1301,6 @@ function PopupNotifyIconTip(strText, bShowWndByTray)
 	
 	g_bShowWndByTray = bShowWndByTray
 end
-
-
-function PopupBubbleOneDay()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local nLastBubbleUTC = tonumber(tUserConfig["nLastBubbleUTC"]) 
-	
-	if not IsNilString(nLastBubbleUTC) and not CheckTimeIsAnotherDay(nLastBubbleUTC) then
-		return
-	end
-	
-	local nNoShowFilterBubble = tonumber(tUserConfig["nNoShowFilterBubble"]) 
-	if not IsNilString(nNoShowFilterBubble) then
-		return
-	end
-	
-	ShowPopupWndByName("TipFilterBubbleWnd.Instance", true)
-	tUserConfig["nLastBubbleUTC"] = tipUtil:GetCurrentUTCTime()
-	SaveConfigToFileByKey("tUserConfig")
-end
-
 
 function CreateTrayTipWnd(objHostWnd)
 	local uTempltMgr = XLGetObject("Xunlei.UIEngine.TemplateManager")
@@ -1472,6 +1418,28 @@ function GetResSavePath(strName)
 	return strPath or ""
 end
 
+function GetSpecifyFilterTableFromMem(strTableName)
+	local tFilterTable = ReadConfigFromMemByKey("tFilterConfig") or {}
+
+	if not IsRealString(strTableName) then
+		return tFilterTable
+	end
+
+	return tFilterTable[strTableName]
+end
+
+
+function SaveSpecifyFilterTableToMem(tNewTable, strTableName)
+	local tFilterTable = ReadConfigFromMemByKey("tFilterConfig") or {}
+
+	if not IsRealString(strTableName) then
+		tFilterTable = tNewTable
+	else
+		tFilterTable[strTableName] = tNewTable
+	end
+end
+
+
 function SaveConfigToFileByKey(strKey)
 	if not IsRealString(strKey) or type(g_tConfigFileStruct[strKey])~="table" then
 		return
@@ -1491,22 +1459,12 @@ function MergeOldUserCfg(tCurrentCfg, strFileName)
 		return false, tCurrentCfg
 	end
 	
-	tCurrentCfg["nLastAutoUpdateUTC"] = tOldCfg["nLastAutoUpdateUTC"]
-	tCurrentCfg["nLastBubbleUTC"] = tOldCfg["nLastBubbleUTC"]
-
-	tCurrentCfg["nLastCommonUpdateUTC"] = tOldCfg["nLastCommonUpdateUTC"]
-	
-	if type(tCurrentCfg["tConfig"]) ~= "table" then
-		tCurrentCfg["tConfig"] = {}
-	end
-	
-	local tOldStateConfig = tOldCfg["tConfig"] or {}
-	for strKey, tStateInfo in pairs(tOldStateConfig) do
-		--是否开机启动以安装时选择为准
-		if strKey ~= "AutoStup" then
-			tCurrentCfg["tConfig"][strKey] = tStateInfo
+	for k, v in pairs(tOldCfg) do
+		--除了strServerConfigURL，其他都用老的
+		if k ~= "strServerConfigURL" then
+			tCurrentCfg[k] = v
 		end
-	end	
+	end
 	
 	tipUtil:DeletePathFile(strOldCfgPath)
 	return true, tCurrentCfg
@@ -1682,14 +1640,6 @@ function CheckUpdateTimeSpan(nTimeInDay, strUpdateType)
 	
 	return false
 end
-
-function SaveAutoUpdateUTC()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["nLastAutoUpdateUTC"] = tipUtil:GetCurrentUTCTime()
-	SaveConfigToFileByKey("tUserConfig")
-end
-
-
 
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
@@ -1952,8 +1902,8 @@ function QuerySvrForReportPoolInfo()
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
-	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentWallet())))
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(tMiningMsgProc.GetCurrentPool())))
+	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(tMiningMsgProc.GetCurrentWallet())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
@@ -2009,9 +1959,6 @@ function TakeCashToServer(nMoney, fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			--[[ forlocal
-			strContent = GetLocalSvrCfgWithName("takeCash.json")
-			--]]
 			local tabInfo = DeCodeJson(strContent)
 			if type(tabInfo) ~= "table" then
 				TipLog("[TakeCashToServer] parse info error.")
@@ -2124,6 +2071,13 @@ function GetHistoryToServer(ntype, fnCallBack)
 		local tDefault = GetLocal()
 		fnCallBack(false, tDefault)
 		return
+		--[[forlocal
+		strContent = GetLocalSvrCfgWithName("getHistory.json")
+		local tabInfo = DeCodeJson(strContent)
+		fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+		Save2Local(tabInfo["data"])
+		return
+		--]]
 	end
 	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
@@ -2253,13 +2207,23 @@ function PopTipPre4Hour()
 end
 
 --挖矿信息
-
-function ReportClientInfoToServer()
-	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
-end
-
-function ReportMiningPoolInfoToServer()
-	SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+local g_bReported = false
+function InitMinerInfoToServer(bReportPool)
+	if not g_bReported then
+		SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
+	end
+	if not g_bReported or bReportPool then
+		SendMinerInfoToServer(QuerySvrForReportPoolInfo(),3)
+	end
+	if not g_bReported then
+		g_bReported = true
+	end	
+	--[[
+	SendMinerInfoToServer(QuerySvrForPushCalcInfo(0),1,function(tabInfo)
+		
+	end)
+	--]]
+	QueryClientInfo(0)
 end
 
 --上报并且查询客户端信息
@@ -2296,8 +2260,7 @@ function QueryClientInfo(nMiningSpeed)
 				UpdateUserBalance()
 			end
 			if tonumber(tabInfo["data"]["rate"]) ~= nil then
-				--g_PerSpeed = tabInfo["data"]["rate"]
-				g_SvrAverageMiningSpeed = tabInfo["data"]["rate"]
+				g_PerSpeed = tabInfo["data"]["rate"]
 			end
 		else
 			TipLog("[QueryClientInfo] query sever failed.")
@@ -2316,32 +2279,7 @@ end
 
 --获取客户端状态
 function GetClientCurrentState()
-	if g_WorkClient == nil then
-		return nil
-	end
-	return g_WorkClient.GetCurrentClientWorkState()
-end
-
---获取当前客户端挖矿速度
-function GetClientMiningSpeed()
-	if g_WorkClient == nil then
-		return 0
-	end
-	return g_WorkClient.GetCurrentMiningSpeed()
-end
-
---是否在工作
-function CheckIsWorking()
-	return g_bWorking
-end
-
-function GetWorkClient()
-	return g_WorkClient
-end
-
---返回当前挖矿速度的比例系数
-function GetSvrAverageMiningSpeed()
-	return g_SvrAverageMiningSpeed
+	return g_PreWorkState
 end
 
 --客户端解绑
@@ -2370,7 +2308,7 @@ function GetUnBindUrl()
 end
 
 function SetMachineNameChangeInfo()
-	ReportClientInfoToServer()
+	SendMinerInfoToServer(QuerySvrForReportClientInfo(),3)
 end
 
 function InitMachName()
@@ -2409,6 +2347,7 @@ end
 function GeneratTaskInfo(fnCallBack)
 	GetUserWorkID(function(bWorkID, strInfo)
 		if bWorkID then
+			--tMiningMsgProc.GetNewMiningCmdInfo()
 			fnCallBack(true)
 		else
 			fnCallBack(false)
@@ -2643,7 +2582,7 @@ function UpdateMiningState(nMiningState)
 end
 ------------
 --所有要更新工作状态的地方在这里处理
---1:正在运行,2:不在运行
+--1:Start,2:Pause,3:Quit
 function OnWorkStateChange(nState)
 	local wnd = GetMainHostWnd()
 	if not wnd then
@@ -2664,8 +2603,11 @@ function ResetGlobalParam()
 	if g_WorkingTimerId then
 		timeMgr:KillTimer(g_WorkingTimerId)
 		g_WorkingTimerId = nil
-	end
+	end	
+	g_PreWorkState = 0
+	g_MiningSpeedPerHour = 0
 	g_bWorking = false
+	g_CurrentPerBatch = 0
 end
 -----------
 function GetSuspendRootCtrol()
@@ -2678,45 +2620,41 @@ function GetSuspendRootCtrol()
 	end
 end
 ----------------
-function HandleOnStart()
+function StartTask()
+	local strPoolCmd = tMiningMsgProc.GetCurrentMiningCmdLine()
+	if strPoolCmd == nil then
+		SetStateInfoToUser("获取任务失败")
+		return
+	end
+	local strDir = GetModuleDir()
+	local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
+	local strCmdLine = strWorkExe .. " " .. tMiningMsgProc.GetCurrentMiningCmdLine()
+	
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strUserCmd =tUserConfig["strUserCmd"]
+	if IsRealString(strUserCmd) then
+		strCmdLine = strCmdLine .. " " .. strUserCmd
+	end
+	g_bWorking = true
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
+	IPCUtil:Start(strCmdLine)
 	WorkingTimerHandle()
 	OnWorkStateChange(1)
 	StartMiningCountTimer()
-end
-
-function HandleOnQuit()
-	ResetGlobalParam()
-	--更新球的显示状态
-	UpdateSuspendWndVisible(1)
-	OnWorkStateChange(2)
-	StopMiningCountTimer()
-end
-
-function StartClient()
-	local nRet = g_WorkClient.Start()
-	if nRet ~= 0 then
-		if nRet == 1 then
-			SetStateInfoToUser("连接赚宝矿场失败")
-		end	
-		return
-	end
-	g_bWorking = true
-	HandleOnStart()
-	ReportClientInfoToServer()
+	InitMinerInfoToServer(false)
 end
 
 function NotifyStart()
 	local function Prepare()
 		if CheckIsGettedWorkID() then
 			SetStateInfoToUser(nil)
-			StartClient()
+			StartTask()
 		else
 			GeneratTaskInfo(function(bTask)
 				if bTask then
 					SetStateInfoToUser(nil)
-					StartClient()
+					StartTask()
 				else
 					SetStateInfoToUser("获取任务ID，请稍后再试")
 				end
@@ -2731,18 +2669,179 @@ function NotifyStart()
 end
 
 function NotifyPause()
-	g_WorkClient.Pause()
-	HandleOnQuit()
-end
-
-function NotifyResume()
-	g_WorkClient.Resume()
-	HandleOnStart()
+	IPCUtil:Pause()
+	ResetGlobalParam()
+	--更新球的显示状态
+	UpdateSuspendWndVisible(1)
+	OnWorkStateChange(2)
+	StopMiningCountTimer()
 end
 
 function NotifyQuit()
-	g_WorkClient.Quit()
-	HandleOnQuit()
+	IPCUtil:Quit()
+	ResetGlobalParam()
+	--更新球的显示状态
+	UpdateSuspendWndVisible(1)
+	OnWorkStateChange(3)
+end
+
+function NotifyStartNewPool()
+	IPCUtil:Quit()
+	ResetGlobalParam()
+	OnWorkStateChange(2)
+	StopMiningCountTimer()
+	tMiningMsgProc.GetNewMiningCmdInfo()
+	local strNewPoolCmd = tMiningMsgProc.GetCurrentMiningCmdLine()
+	if strNewPoolCmd == nil then
+		SetStateInfoToUser("连接任务服务器失败，请稍后再试")
+		return
+	end
+	TipLog("[NotifyStartNewPool]: strNewPoolCmd = " .. tostring(strNewPoolCmd))
+	local strDir = GetModuleDir()
+	local strWorkExe = tipUtil:PathCombine(strDir,"gzminer\\gzminer.exe")
+	local strCmdLine = strWorkExe .. " " .. strNewPoolCmd
+	
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strUserCmd =tUserConfig["strUserCmd"]
+	if IsRealString(strUserCmd) then
+		strCmdLine = strCmdLine .. " " .. strUserCmd
+	end
+	g_bWorking = true
+	IPCUtil:Start(strCmdLine)
+	WorkingTimerHandle()
+	OnWorkStateChange(1)
+	StartMiningCountTimer()
+	InitMinerInfoToServer(true)
+end
+
+local MING_CALCULATE_DAG = 2
+local MING_MINING_SPEED = 3
+local MING_MINING_EEEOR = 4
+local MING_SOLUTION_FIND = 5
+local MING_MINING_EEEOR_TIMEOUT = 100
+
+function GetToolTipInfo()
+	local bShowSpeed = false
+	local strText = ""
+	if g_PreWorkState == MING_CALCULATE_DAG then
+		strText = "准备中"
+		bShowSpeed = true
+	elseif g_PreWorkState == MING_MINING_SPEED
+		or g_PreWorkState == MING_SOLUTION_FIND then
+		strText = "运行中"
+		bShowSpeed = true
+	elseif g_PreWorkState == MING_MINING_EEEOR or g_PreWorkState == MING_MINING_EEEOR_TIMEOUT then
+		strText = "出错了"
+		bShowSpeed = true
+	elseif g_bWorking then
+		strText = "准备中"
+		bShowSpeed = true
+	else
+		strText = "未开启"
+	end	
+	TipLog("[GetToolTipInfo]: g_PreWorkState = " .. tostring(g_PreWorkState) .. ", strText = " .. tostring(strText))
+	return strText,bShowSpeed
+end
+
+function QueryAndUpdateWorkState()
+	local nType,p1,p2,p3 = IPCUtil:QueryWorkState()
+	TipLog("[QueryWorkState] nType = " .. tostring(nType) .. ", p1 = " .. tostring(p1))
+	if nType == MING_CALCULATE_DAG then
+		if g_PreWorkState ~= MING_CALCULATE_DAG then
+			UpdateMiningState(MING_CALCULATE_DAG)
+		end
+		g_PreWorkState = MING_CALCULATE_DAG
+		if tonumber(p1) ~= nil then
+			UpdateDagProgress(p1)
+		end
+		return true
+	elseif nType == MING_MINING_SPEED then
+		if g_PreWorkState ~= MING_MINING_SPEED then
+			UpdateMiningState(MING_MINING_SPEED)
+		end
+		g_PreWorkState = MING_MINING_SPEED
+		if tonumber(p1) ~= nil then
+			if tonumber(p1) > 0 then
+				g_SpeedSum = g_SpeedSum + p1
+				g_SpeedSumCounter = g_SpeedSumCounter + 1
+				g_MiningSpeedPerHour = math.floor((p1/(1000*1000))*g_PerSpeed)
+				UpdateMiningSpeed(g_MiningSpeedPerHour)
+			else
+				return false
+			end	
+		end	
+		return true
+	elseif nType == MING_MINING_EEEOR then
+		g_PreWorkState = MING_MINING_EEEOR
+		TipLog("[QueryWorkState] Work process error, error code = " .. tostring(p1))
+		return false
+	elseif nType == MING_SOLUTION_FIND then
+		g_PreWorkState = MING_SOLUTION_FIND
+		TipLog("[QueryWorkState] solution find ")	
+		return true
+	end
+	return false
+end
+--[[
+0 全速，1智能
+--]]
+
+function LimitSpeedCond()
+	if tipUtil:IsNowFullScreen() then
+		TipLog("[LimitSpeedCond] full screen")
+		return true
+	end
+	local hr, dwTime = tipUtil:GetLastInputInfo()
+	local dwTickCount = tipUtil:GetTickCount()
+	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 60*1000 then
+		TipLog("[LimitSpeedCond] Last input in 60 second")
+		return true
+	end
+	return false
+end
+
+function ChangeMiningSpeed()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
+	if nWorkModel ~= 1 then
+		if g_CurrentPerBatch ~= 0 or g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
+			g_CurrentPerBatch = 0
+			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+			IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
+		end	
+	else
+		if LimitSpeedCond() then
+			if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Min 
+				or g_CurrentPerBatch ~= g_msExpectPerBatch then
+				g_CurrentPerBatch = g_msExpectPerBatch
+				g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Min
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
+			end	
+		else
+			if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max 
+				or g_GlobalWorkSizeMultiplier_Cur > g_GlobalWorkSizeMultiplier_Max then
+				g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Cur*2
+				if g_GlobalWorkSizeMultiplier_Cur > g_GlobalWorkSizeMultiplier_Max then
+					g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+				end
+				if g_GlobalWorkSizeMultiplier_Cur == g_GlobalWorkSizeMultiplier_Max then
+					g_CurrentPerBatch = 0
+				else
+					g_CurrentPerBatch = g_msExpectPerBatch/2  --限速模式在加速过程中，每轮计算的时间还是设置为期望值的一半吧
+				end
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Cur,g_CurrentPerBatch)
+			end
+			--[[
+			if g_CurrentPerBatch > 0 then
+				g_CurrentPerBatch = g_CurrentPerBatch - 10
+				if g_CurrentPerBatch < 0 then
+					g_CurrentPerBatch = 0
+				end
+				IPCUtil:ControlSpeed(g_GlobalWorkSizeMultiplier_Min, g_CurrentPerBatch)
+			end
+			--]]
+		end	
+	end
 end
 
 function WorkingTimerHandle()
@@ -2751,29 +2850,82 @@ function WorkingTimerHandle()
 	if type(tServerInterfaceCfg) ~= "table" then
 		tServerInterfaceCfg = {}
 	end
+	local nReportConuter = 0
+	local nCheckErrorCounter = 0
 	local nReportCalcInterval = tServerInterfaceCfg["nReportCalcInterval"] or 60
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
-	g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
-		local nAverageHashRate = g_WorkClient.GetAverageHashRate()
-		QueryClientInfo(nAverageHashRate)
-	end, nReportCalcInterval*1000)
+	
+	local nWorkModelConuter = 1
+	local nWorkModelInterval = math.ceil(15/interval)
+	g_ChangeSpeedCounter = 0
+	if g_WorkingTimerId == nil then
+		g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
+			local bQuery = QueryAndUpdateWorkState()
+			if not bQuery and nCheckErrorCounter >= 60 then
+				--是否需要重启
+				if tMiningMsgProc.CheckIsConnectPoolFail() then
+					tMiningMsgProc.ResetGlobalParam()
+					NotifyStartNewPool()
+					nCheckErrorCounter = 0
+				elseif tMiningMsgProc.CheckIsAllDeviceInitDagFail() then
+					SetStateInfoToUser("显存分配失败，请稍后再试")
+					NotifyQuit()
+					tMiningMsgProc.ResetGlobalParam()
+					nCheckErrorCounter = 0
+				end
+				nCheckErrorCounter = nCheckErrorCounter + 1	
+				--nCheckErrorCounter = 0
+			elseif not bQuery and nCheckErrorCounter >= 20 then
+				--20秒没有数据 检测工作进程是否没有响应了
+				--nReportCalcInterval秒没响应 是否要杀进程
+				if g_PreWorkState == MING_MINING_SPEED then
+					UpdateMiningSpeed(0)
+				end	
+				g_PreWorkState = MING_MINING_EEEOR_TIMEOUT
+				nCheckErrorCounter = nCheckErrorCounter + 1
+			elseif bQuery then
+				nCheckErrorCounter = 0
+			else
+				nCheckErrorCounter = nCheckErrorCounter + 1
+			end
+			if nReportConuter >= nReportCalcInterval and g_SpeedSumCounter > 0 then
+				local nSpeedSum = g_SpeedSum/(1000*1000)
+				local nAverageSpeed = nSpeedSum/g_SpeedSumCounter
+				TipLog("[WorkingTimerHandle] nSpeedSum = " .. tostring(nSpeedSum) .. ", nAverageSpeed = " .. tostring(nAverageSpeed))
+				g_SpeedSum = 0
+				g_SpeedSumCounter = 0
+				nReportConuter = 0
+				QueryClientInfo(nAverageSpeed)
+			else
+				nReportConuter = nReportConuter + 1
+			end	
+			--智能限速
+			if g_PreWorkState == MING_MINING_SPEED then
+				if nWorkModelConuter > nWorkModelInterval then
+					ChangeMiningSpeed()
+					nWorkModelConuter = 1
+				else
+					nWorkModelConuter = nWorkModelConuter + 1
+				end
+			end	
+		end, interval*1000)
+	end	
 end
 
---初始化客户端,根据需要
-function InitMiningClient()
-	LoadGenOilClient()
-	g_WorkClient = XLGetGlobal("Global.GenOilClient")
-	g_WorkClient.InitClient()
+function CheckIsWorking()
+	return g_bWorking
 end
 
 --尝试去连接服务器
+local gtest = 0
 function TryToConnectServer(fnCallBack)
-	SetStateInfoToUser("正在连接服务器")
 	DownLoadServerConfig(function(nDownServer, strServerPath)
 		if nDownServer ~= 0 or not IsRealString(strServerPath) or  not tipUtil:QueryFileExists(tostring(strServerPath)) then
 			TipLog("[TryToConnectServer] Download server config failed , try reconnect nDownServer="..tostring(nDownServer)..", strServerPath="..tostring(strServerPath))
 			--处理)
+			gtest = gtest + 1
 			fnCallBack(false)
+			SetStateInfoToUser("正在连接服务器")
 			SetOnceTimer(function()
 				TryToConnectServer(fnCallBack)
 			end, 3000)
@@ -2785,6 +2937,5 @@ function TryToConnectServer(fnCallBack)
 		fnCallBack(true,strServerPath)
 	end)
 end
-
 
 RegisterFunctionObject()

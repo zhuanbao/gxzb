@@ -1,5 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tMiningMsgProc = XLGetGlobal("Global.MiningMsgProc")
 
 local g_tPanelCtrlList = {
 	"EarningsPanel",
@@ -78,9 +79,12 @@ function CreateListener(objRootCtrl)
 						mainwnd:BringWindowToTop(true)
 					end
 				end
-			elseif tostring(key) == "OnGenOilMsg" then
-				local ObjWorkClient = tFunctionHelper.GetWorkClient()
-				ObjWorkClient.OnGenOilMsg(tParam)
+			elseif tostring(key) == "OnMiningCount" then
+				tMiningMsgProc.OnMiningCount(tParam)
+			elseif tostring(key) == "OnConnectFail" then
+				tMiningMsgProc.OnConnectFail(tParam)
+			elseif tostring(key) == "OnInitDagRet" then
+				tMiningMsgProc.OnInitDagRet(tParam)
 			end				
 		end
 	)
