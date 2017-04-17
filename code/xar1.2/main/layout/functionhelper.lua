@@ -834,7 +834,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 			end
 		end
 		if 0 == bRet then
-			---[[ forlocal
+			--[[ forlocal
 			strSavePath = GetLocalSvrCfgWithName("ServerConfig.dat", true)
 			--]]
 			callbackwrap(0, strSavePath)
