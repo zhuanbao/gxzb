@@ -167,6 +167,8 @@ function OnGenOilMsg(tParam)
 			tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
+			--多乘了100
+			nParam = nParam/100
 			g_HashRateSum = g_HashRateSum + nParam
 			g_HashRateSumCounter = g_HashRateSumCounter + 1
 			UpdateSpeed(nParam)

@@ -143,7 +143,7 @@ end
 
 function OnClickStopMining(self)
 	if tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyPause()
+		tFunctionHelper.NotifyQuit()
 	end
 end
 

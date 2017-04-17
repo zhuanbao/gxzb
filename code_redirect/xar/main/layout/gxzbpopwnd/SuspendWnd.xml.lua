@@ -188,7 +188,7 @@ function SuspendRightDisk_Click(self)
 	elseif attr.currentstate == 4 then
 		--self:GetOwnerControl():OnWorkStateChange(2)
 		if tFunctionHelper.CheckIsWorking() then
-			tFunctionHelper.NotifyPause()
+			tFunctionHelper.NotifyQuit()
 		end
 	end
 end
