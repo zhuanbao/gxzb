@@ -95,7 +95,7 @@ function UpdateDagProgress(self,nProgress)
 	local strText = ("准备中 "..tostring(nProgress).."%")
 	ObjStartBtnText:SetText(strText)
 end
---1:Start,2:Pause,3:Quit
+--1:正在运行,2:不在运行
 function OnWorkStateChange(self,nState)
 	if nState == 1 then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
@@ -105,8 +105,6 @@ function OnWorkStateChange(self,nState)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 		ObjStartBtnText:SetText("准备中......")
 	elseif nState == 2 then
-		ResetUIVisible(self)
-	elseif nState == 3 then
 		ResetUIVisible(self)
 	end
 end
@@ -145,7 +143,7 @@ end
 
 function OnClickStopMining(self)
 	if tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyPause()
+		tFunctionHelper.NotifyQuit()
 	end
 end
 
