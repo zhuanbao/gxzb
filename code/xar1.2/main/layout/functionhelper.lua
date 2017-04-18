@@ -2112,25 +2112,6 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end)
 end
 
-function QuerySvrForNewGetGold()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["tUserInfo"] = tUserConfig["tUserInfo"] or {}
-	if not tUserConfig["tUserInfo"]["strWorkID"] then
-		TipLog("[QuerySvrForNewGetGold] strWorkID = nil")
-		return
-	end
-	local strInterfaceName = "getNewGetGold"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
-	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
-	end
-	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
-	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
-	TipLog("[QuerySvrForNewGetGold] strReguestUrl = " .. strReguestUrl)
-	return strReguestUrl
-end
-
 function PopRemindUpdateWnd()
 	local nTipPopCnt  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nCnt"}) or 0
 	local nTipPopInterval  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nSpanSec"}) or 0
@@ -2170,38 +2151,18 @@ function PopTipPre4Hour()
 	local nTipPopIntervals  = FetchValueByPath(g_ServerConfig, {"tRemindCfg", "nPopIntervals"}) or 4*3600
 	SetTimer(
 		function(item, id)
-			local strUrl = QuerySvrForNewGetGold()
-			if IsRealString(strUrl) then
-				NewAsynGetHttpContent(strUrl, false
-				, function(nRet, strContent, respHeaders)
-					TipLog("[PopTipPre4Hour] nRet:"..tostring(nRet)
-							.." strContent:"..tostring(strContent))
-					---[[forlocal
-					strContent = GetLocalSvrCfgWithName("newGetGold.json")
-					local tabInfo = DeCodeJson(strContent)
+			GetHistoryToServer(0, function(bRet, tabInfo)
+				if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
 					local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-					tUserConfig["nMoneyPer4Hour"] = tabInfo["data"]["newgetgold"]
+					local newgetgold = 0
+					for i = 1, 4 do
+						newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]
+					end
+					tUserConfig["nMoneyPer4Hour"] = newgetgold
 					SaveConfigToFileByKey("tUserConfig")
 					ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-					if true then return end
-					--]]
-					if 0 == nRet then
-						local tabInfo = DeCodeJson(strContent)
-						if type(tabInfo) ~= "table" 
-							or tabInfo["rtn"] ~= 0
-							or type(tabInfo["data"]) ~= "table" then
-							TipLog("[PopTipPre4Hour] tabInfo not right")
-							return
-						end
-						local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-						tUserConfig["nMoneyPer4Hour"] = tabInfo["data"]["newgetgold"]
-						SaveConfigToFileByKey("tUserConfig")
-						ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-					else
-						TipLog("[PopTipPre4Hour] nRet = "..tostring(nRet))
-					end
-				end)
-			end
+				end
+			end)
 		end,	
 	nTipPopIntervals*1000)
 end
