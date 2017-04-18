@@ -39,7 +39,7 @@ function GetLocalSvrCfgWithName(strCfgFileName,bGetPath)
 		return ""
 	end
 	
-	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share2Gain\\localsvrcfg\\"..tostring(strCfgFileName))
+	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share4Money\\localsvrcfg\\"..tostring(strCfgFileName))
 	if not tipUtil:QueryFileExists(strCfgFilePath) then
 		MessageBox("获取本地服务器配置文件路径失败\r\n文件名：" .. tostring(strCfgFileName))
 		return nil
