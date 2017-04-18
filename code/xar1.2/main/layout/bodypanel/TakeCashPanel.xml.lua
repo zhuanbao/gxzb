@@ -183,26 +183,28 @@ function UpdateUIByBalance(self, nBalance)
 	UpdateTakeRule(self)
 	local ObjEdit = self:GetControlObject("TakeCashPanel.Panel.Edit")
 	local ObjBtnTake = self:GetControlObject("TakeCashPanel.Panel.Take")
-	ObjBtnTake:Enable(false)
 	local Integer,Decimal = math.modf(nBalance/10000)
 	Decimal = math.floor(Decimal*100)/100
 	nTakeMoney = Integer+Decimal
 	if nTakeMoney < 1 then
 		nTakeMoney = 0
 	end	
-	if CheckCanTakeCash() and nTakeMoney > 0 then
-		ObjEdit:SetEnable(true)
-	else
-		ObjEdit:SetEnable(false)
-	end
 	if nTakeMoney > 200 then
 		nTakeMoney = 200
 	end
 	gCanTakeMoney = nTakeMoney
-	ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
+	if CheckCanTakeCash() and nTakeMoney > 0 then
+		ObjEdit:SetEnable(true)
+		if not ObjEdit:GetFocus() then
+			ObjBtnTake:Enable(false)
+			ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
+		end	
+	else
+		ObjEdit:SetEnable(false)
+		ObjBtnTake:Enable(false)
+		ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
+	end
 	if not CheckCanTakeCash() then
-		--local OwnerCtrl = self:GetOwnerControl()
-		--SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
 		SetMsgToUser(self, "今天已提现，请明天再来~")
 	end
 end
