@@ -815,13 +815,13 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	
 	local strConfigURL = tUserConfig["strServerConfigURL"]
 	if not IsRealString(strConfigURL) then
-		callbackwrap(-1)
+		callbackwrap(-2)
 		return
 	end
 	
 	local strSavePath = GetCfgPathWithName("ServerConfig.dat")
 	if not IsRealString(strSavePath) then
-		callbackwrap(-1)
+		callbackwrap(-3)
 		return
 	end
 	
@@ -2693,6 +2693,10 @@ function TryToConnectServer(fnCallBack)
 	SetStateInfoToUser("正在连接服务器")
 	DownLoadServerConfig(function(nDownServer, strServerPath)
 		if nDownServer ~= 0 or not IsRealString(strServerPath) or  not tipUtil:QueryFileExists(tostring(strServerPath)) then
+			if nDownServer == -2 or nDownServer == -3 then
+				SetStateInfoToUser("获取服务器配置失败")
+				return
+			end
 			TipLog("[TryToConnectServer] Download server config failed , try reconnect nDownServer="..tostring(nDownServer)..", strServerPath="..tostring(strServerPath))
 			--处理)
 			fnCallBack(false)
