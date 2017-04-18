@@ -124,7 +124,9 @@ void LuaIPCUtil::Clear()
 	CLOSE_HANDLE(m_hStdOutWrite);
 	if (NULL != g_pClient)
 	{
+		//TSDEBUG4CXX(L"Try clear client param");
 		g_pClient->RetSet();
+		
 	}
 }
 
@@ -140,7 +142,7 @@ void LuaIPCUtil::CycleHandleInfoFromPipe()
 			break;
 		}
 		//dosomeing
-		char szPipeOutBuffer[PIPE_BUFFER_SIZE] = {0};  
+		char szPipeOutBuffer[PIPE_BUFFER_SIZE+1] = {0};  
 		DWORD dwBytesRead = 0;  
 		TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] begain read " ); 
 		BOOL bRead = ReadFile(m_hStdOutRead, szPipeOutBuffer, PIPE_BUFFER_SIZE, &dwBytesRead, NULL);  

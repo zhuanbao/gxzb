@@ -12,7 +12,9 @@
 
 CClientGenOil::CClientGenOil(void)
 {
-	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);;
+	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
+	m_strLastLeft = "";
+	m_DagProgress = -1;
 }
 
 CClientGenOil::~CClientGenOil(void)
@@ -75,33 +77,58 @@ void CClientGenOil::OnAutoExit(DWORD dwExitCode)
 
 void CClientGenOil::RetSet()
 {
-	m_DagProgress = -1;
+	TSDEBUG4CXX(L"RetSet GenOil client Param");
+	m_DagProgress = -1; 
+	m_strLastLeft = "";
 }
 
 
 void CClientGenOil::ProcessString(const char *szBuffer)
 {
-	LogString(szBuffer);
+	
+	//LogString(szBuffer);
 	RegexString(szBuffer);
 }
 
 void CClientGenOil::RegexString(const char *szBuffer)
 {
-	std::string strBuffer = szBuffer;
+	std::string strBuffer = m_strLastLeft;
+	strBuffer.append(szBuffer);
+	LogString(strBuffer.c_str());
 	std::string::const_iterator start = strBuffer.begin();
 	std::string::const_iterator end = strBuffer.end();
 	boost::regex exp("",boost::regex::icase);
 	boost::smatch what;
+	do 
+	{
+		m_strLastLeft = "";
+		if (boost::iends_with(strBuffer.c_str(),"\r\n"))
+		{
+			break;
+		}
+		exp.assign(".*\\r\\n(.*)", boost::regex::icase);
+		if(!boost::regex_search(start,end,what,exp))
+		{
+			break;
+		} 
+		if (what.size() == 2 && what[1].matched )
+		{
+			m_strLastLeft = what[1];
+			std::wstring wstrInfo = ultra::_A2T(m_strLastLeft);
+			TSDEBUG4CXX(L"[RegexString]: m_strLastLeft = " << wstrInfo.c_str());
+
+		}
+	} while (FALSE);
 
 	//提交share成功
 	//成功 示例："B-) Submitted and accepted."
 	//失败 示例："B-) Submitted and accepted."
-	if (boost::icontains(szBuffer,"B-) Submitted and accepted."))
+	if (boost::icontains(strBuffer,"B-) Submitted and accepted."))
 	{
 		PostWndMsg(WP_GENOIL_SHARE, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"B-) Submitted and accepted");
 	}
-	else if (boost::icontains(szBuffer,":-( Not accepted."))
+	else if (boost::icontains(strBuffer,":-( Not accepted."))
 	{
 		PostWndMsg(WP_GENOIL_SHARE, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L":-( Not accepted");
@@ -143,6 +170,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	
 	//计算DAG
 	//示例："OPENCL#0: 0%"
+	//TSDEBUG4CXX(L"[RegexString]: " << L"m_DagProgress = "<< m_DagProgress);
 	if (m_DagProgress < 101)
 	{
 		exp.assign("OPENCL#[0-9]+: ([0-9]+)%", boost::regex::icase);
@@ -171,7 +199,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 		if (m_DagProgress >= 0)
 		{
 			PostWndMsg(WP_GENOIL_DAG, m_DagProgress);
-			TSDEBUG4CXX(L"[RegexString]: " << L"iCurrentProgress = "<< m_DagProgress);
+			TSDEBUG4CXX(L"[RegexString]: " << L"m_DagProgress = "<< m_DagProgress);
 			return;
 		}
 	}
@@ -179,7 +207,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 
 	//连接矿次成功
 	//1:"Connected!" 2:"Connected to stratum server "
-	if (boost::icontains(szBuffer,"Connected!") || boost::icontains(szBuffer,"Connected to stratum server "))
+	if (boost::icontains(strBuffer,"Connected!") || boost::icontains(strBuffer,"Connected to stratum server "))
 	{
 		PostWndMsg(WP_GENOIL_CONNECT_POOL, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Connecte server success");
@@ -189,12 +217,12 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	//命令行参数错误："Invalid argument:"
 	//找不到合适的显卡："No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument"
 
-	if (boost::icontains(szBuffer,"Invalid argument:"))
+	if (boost::icontains(strBuffer,"Invalid argument:"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
-	else if(boost::icontains(szBuffer,"No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument"))
+	else if(boost::icontains(strBuffer,"No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 2);
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
@@ -205,22 +233,22 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	//opencl 内部执行错误："error: invalid storage-class specifiers in OpenCL"
 
 
-	if(boost::icontains(szBuffer,"Reconnecting in 3 seconds..."))
+	if(boost::icontains(strBuffer,"Reconnecting in 3 seconds..."))
 	{
 		PostWndMsg(WP_GENOIL_CONNECT_POOL, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Connecte server fail, try to reconnect");
 	}
-	else if (boost::icontains(szBuffer,"error: front end compiler failed build"))
+	else if (boost::icontains(strBuffer,"error: front end compiler failed build"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 3);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: front end compiler failed build");
 	}
-	else if (boost::icontains(szBuffer,"error: invalid storage-class specifiers in OpenCL"))
+	else if (boost::icontains(strBuffer,"error: invalid storage-class specifiers in OpenCL"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 4);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: invalid storage-class specifiers in OpenCL");
 	}
-	else if (boost::icontains(szBuffer,"error: "))
+	else if (boost::icontains(strBuffer,"error: "))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 5);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: new resone");
