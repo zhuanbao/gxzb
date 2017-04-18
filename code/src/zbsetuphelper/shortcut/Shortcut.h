@@ -294,7 +294,7 @@ extern "C" __declspec(dllexport) BOOL Pin2Taskbar(BOOL bPin)
 {
 	TSAUTO();
 	BOOL ret = FALSE;
-	std::wstring strGxzbPath = g_strInstDir + (_T("\\Share2Gain.exe"));
+	std::wstring strGxzbPath = g_strInstDir + (_T("\\Share4Money.exe"));
 	std::wstring strShortcutPath = g_strInstDir + (_T("\\¹²Ïí×¬±¦.lnk"));
 	
 	std::wstring strPinShortcutPath = GetUserPinPath() + _T("\\TaskBar\\¹²Ïí×¬±¦.lnk");
@@ -368,7 +368,7 @@ extern "C" __declspec(dllexport) BOOL Pin2StartMenu(BOOL bPin)
 	BOOL ret = TRUE;
 	if (bPin)
 	{
-		std::wstring strGxzbPath = g_strInstDir + _T("\\Share2Gain.exe");
+		std::wstring strGxzbPath = g_strInstDir + _T("\\Share4Money.exe");
 		ret = BuildShortcut(tszShortcutPath,strGxzbPath.c_str(),
 			_T(""), _T("/sstartfrom startbar"));
 		
