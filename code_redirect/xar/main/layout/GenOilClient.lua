@@ -278,10 +278,6 @@ end
 function ResetGlobalErrorParam()
 	g_ConnectFailCnt = 0
 	g_ClientReTryCnt = 0
-	if g_GenOilWorkingTimerId then
-		timeMgr:KillTimer(g_GenOilWorkingTimerId)
-		g_GenOilWorkingTimerId = nil
-	end
 	g_LastClientOutputErrorTime = 0
 end
 
