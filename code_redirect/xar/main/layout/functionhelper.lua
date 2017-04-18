@@ -605,7 +605,7 @@ function FormatByteUnit(nFileSizeInByte, nPrecision)
 end
 
 function GetPeerID()
-	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId")
+	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
 	if IsRealString(strPeerID) then
 		return string.upper(strPeerID)
 	end
@@ -615,12 +615,12 @@ function GetPeerID()
 		return ""
 	end
 	
-	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\PeerId", strRandPeerID)
+	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strRandPeerID)
 	return string.upper(strRandPeerID)
 end
 
 function GetMachineID()
-	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\machineid")
+	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\machineid")
 	if IsRealString(strGUID) then
 		return string.upper(strGUID)
 	end
@@ -628,7 +628,7 @@ end
 
 --渠道
 function GetInstallSrc()
-	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\InstallSource")
+	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\InstallSource")
 	if not IsNilString(strInstallSrc) then
 		return tostring(strInstallSrc)
 	end
@@ -637,7 +637,7 @@ function GetInstallSrc()
 end
 
 function GetExePath()
-	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\Path")
+	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\Path")
 	if IsRealString(strExePath) then
 		return tostring(strExePath)
 	else
@@ -1006,7 +1006,7 @@ end
 
 
 function GetGXZBVersion()
-	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share2Gain\\path")
+	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\path")
 	if not IsRealString(strgxzbPath) or not tipUtil:QueryFileExists(strgxzbPath) then
 		return ""
 	end
@@ -1183,7 +1183,7 @@ end
 function ShowIntroduceOnce()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share2Gain\\ShowIntroduce"
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\ShowIntroduce"
 	
 	if not IsNilString(nLastShowIntroduce) then
 		RegDeleteValue(strRegPath)
@@ -1437,7 +1437,7 @@ function GetCfgPathWithName(strCfgName)
 		return ""
 	end
 	
-	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share2Gain\\"..tostring(strCfgName))
+	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share4Money\\"..tostring(strCfgName))
 	return strCfgFilePath or ""
 end
 
@@ -1447,7 +1447,7 @@ function GetResSavePath(strName)
 		return ""
 	end
 	
-	local strPath = tipUtil:PathCombine(strBaseDir, "Share2Gain\\res\\"..tostring(strName))
+	local strPath = tipUtil:PathCombine(strBaseDir, "Share4Money\\res\\"..tostring(strName))
 	return strPath or ""
 end
 
@@ -2501,7 +2501,7 @@ end
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
 	if tonumber(g_Balance) > 0 then
-		RegSetValue("HKEY_CURRENT_USER\\Software\\Share2Gain\\balance", NumberToFormatMoney(g_Balance))
+		RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", NumberToFormatMoney(g_Balance))
 	end
 	local wnd = GetMainHostWnd()
 	if not wnd then
