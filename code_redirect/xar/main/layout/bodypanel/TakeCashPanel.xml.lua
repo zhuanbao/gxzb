@@ -199,7 +199,9 @@ function UpdateUIByBalance(self, nBalance)
 		nTakeMoney = 200
 	end
 	gCanTakeMoney = nTakeMoney
-	ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
+	if not ObjEdit:GetFocus() then
+		ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
+	end	
 	if not CheckCanTakeCash() then
 		--local OwnerCtrl = self:GetOwnerControl()
 		--SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
