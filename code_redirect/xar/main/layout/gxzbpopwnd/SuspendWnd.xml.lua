@@ -188,7 +188,7 @@ function SuspendRightDisk_Click(self)
 	elseif attr.currentstate == 4 then
 		--self:GetOwnerControl():OnWorkStateChange(2)
 		if tFunctionHelper.CheckIsWorking() then
-			tFunctionHelper.NotifyPause()
+			tFunctionHelper.NotifyQuit()
 		end
 	end
 end
@@ -299,7 +299,7 @@ function SuspendCtrl_UpdateLine(self, nLineValue)
 	strip:SetTextureID(strResHead..tostring(nLineValue))
 end
 
---1:Start,2:Pause,3:Quit
+--1:正在运行,2:不在运行t
 function SuspendCtrl_OnWorkStateChange(self, state)
 	local attr = self:GetAttribute()
 	attr.currentstate = attr.currentstate or 0
@@ -311,7 +311,7 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 			self:SetState(newState)
 		end
 		speedtext:SetText("准备中")
-	elseif state == 2 or state == 3 then
+	elseif state == 2 then
 		if attr.currentstate  >= 3 then
 			local newState = attr.currentstate - 3
 			self:SetState(newState)
