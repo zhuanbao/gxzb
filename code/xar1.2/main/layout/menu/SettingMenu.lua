@@ -37,10 +37,10 @@ end
 
 function menuFunTable.OnSelect_exit(self)
 	local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-	local nLocalState, nRet, nCurBalance = tFunctionHelper.GetClientCurrentState(), 0, tFunctionHelper.GetUserCurrentBalance()
+	local nRet, nCurBalance = 0, tFunctionHelper.GetUserCurrentBalance()
 	local bBind = tFunctionHelper.CheckIsBinded()
 	--未绑定微信且元宝余额不为0
-	if nLocalState ~= 2 and nCurBalance > 0 and not bBind then
+	if nCurBalance > 0 and not bBind then
 		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
 			{
 				["parentWnd"] = wnd, 
