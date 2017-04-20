@@ -674,3 +674,54 @@ extern "C" __declspec(dllexport) void CreateGuid(char* szOutPut){
 		guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
 	}
 }
+
+extern "C" __declspec(dllexport) BOOL FindProcessByName(const char* szProName)
+{
+	BOOL bRet = FALSE;
+	wchar_t* wszProName = AnsiToUnicode(szProName);
+	TSDEBUG4CXX("Find process by name:"<< wszProName);
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			if(_tcsicmp(pe.szExeFile, wszProName) == 0)
+			{
+				bRet = TRUE;
+				break;
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
+	}
+	return bRet;
+}
+
+extern "C" __declspec(dllexport) void TerminateProcessByName(const char* szProName)
+{
+	wchar_t* wszProName = AnsiToUnicode(szProName);
+	TSDEBUG4CXX("Terminate process by name:"<< wszProName);
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			if(_tcsicmp(pe.szExeFile, wszProName) == 0 && pe.th32ProcessID != 0)
+			{
+				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+				TSDEBUG4CXX("Terminate process hProcess = "<< hProcess);
+				BOOL bRet = ::TerminateProcess(hProcess, -4);
+				TSDEBUG4CXX("Terminate process bRet = "<< bRet);
+				break;
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
+	}
+}
