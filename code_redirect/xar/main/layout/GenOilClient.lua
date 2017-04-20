@@ -245,7 +245,7 @@ function StartGenOilTimer()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
 			TipLog("[StartGenOilTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
-		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*3 then
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
 			TipLog("[StartGenOilTimer] output time out, try to restart")
 			ReTryStartClient()
 		end
