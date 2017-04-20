@@ -70,21 +70,16 @@ function UpdateMiningSpeed(self, nSpeed)
 	ObjTextSpeed:SetText(strSpeed)
 	AdjustSpeedTextPosition(self)
 end
-local MING_CALCULATE_DAG = 2
-local MING_MINING_SPEED = 3
-local MING_MINING_EEEOR = 4
-local MING_SOLUTION_FIND = 5
-local MING_MINING_EEEOR_TIMEOUT = 100
 
 function UpdateMiningState(self,nMiningState)
-	if nMiningState == MING_MINING_SPEED and  tFunctionHelper.CheckIsWorking() then
+	if tFunctionHelper.CheckIsCalculate() then
 		local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
 		if not ObjMiningSpeed:GetVisible() then
 			ObjMiningSpeed:SetChildrenVisible(true)
 			ObjMiningSpeed:SetVisible(true)
 			ShowAnim(self, true)
 		end
-	elseif nMiningState == MING_CALCULATE_DAG and  tFunctionHelper.CheckIsWorking() then
+	elseif tFunctionHelper.CheckIsPrepare() then
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 		ObjStartBtnText:SetText("准备中......")
 	end
@@ -142,6 +137,8 @@ function ShowAnim(OwnerCtrl, bShow)
 end
 
 function OnClickStopMining(self)
+	local OwnerCtrl = self:GetOwnerControl()
+	SetStateInfoToUser(OwnerCtrl,nil)
 	if tFunctionHelper.CheckIsWorking() then
 		tFunctionHelper.NotifyQuit()
 	end

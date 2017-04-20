@@ -22,7 +22,19 @@ local JsonFun = nil
 local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
 
 -- 工作中用到的
-local g_bWorking = false
+--local g_bWorking = false
+
+--UI界面工作状态
+--
+local UI_STATE_STOPPED = 0
+local UI_STATE_STARTING = 1
+local UI_STATE_PREPARE_WORKID = 2
+local UI_STATE_PREPARE_POOL = 3
+local UI_STATE_CALCULATE = 4
+
+local g_UIWorkState = UI_STATE_STOPPED
+--
+
 local g_WorkingTimerId = nil
 local g_SvrAverageMiningSpeed = 0
 
@@ -265,7 +277,6 @@ function RegisterFunctionObject(self)
 	
 	--服务器相关函数
 	obj.InitMachName = InitMachName
-	obj.GeneratTaskInfo = GeneratTaskInfo
 	obj.GetUserWorkID = GetUserWorkID
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.DownLoadTempQrcode = DownLoadTempQrcode
@@ -285,7 +296,10 @@ function RegisterFunctionObject(self)
 	--挖矿ing相关	
 	obj.GetSvrAverageMiningSpeed = GetSvrAverageMiningSpeed
 	obj.GetClientCurrentState = GetClientCurrentState
+	obj.GetUIWorkState = GetUIWorkState
 	obj.CheckIsWorking = CheckIsWorking
+	obj.CheckIsPrepare = CheckIsPrepare
+	obj.CheckIsCalculate = CheckIsCalculate
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
@@ -617,6 +631,23 @@ function GetPeerID()
 	
 	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strRandPeerID)
 	return string.upper(strRandPeerID)
+end
+
+function CheckPeerIDList(tPIDlist)
+	if type(tPIDlist) == "table" and #tPIDlist > 0 then
+		local bCheckPid = false
+		local strPeerId = GetPeerID()
+		local strPeerId12 = string.sub(tostring(strPeerId), 1, 12)
+		for i = 1, #tPIDlist do
+			if string.find(string.lower(tostring(strPeerId12)), ".*" .. string.lower(tostring(tPIDlist[i])) .. "$", 1) then
+				bCheckPid = true
+				break
+			end
+		end
+		return bCheckPid
+	else
+		return true
+	end	
 end
 
 function GetMachineID()
@@ -1278,20 +1309,16 @@ function ShowMainPanleByTray(objHostWnd)
 end
 
 function GetToolTipInfo()
-	local nPreWorkState = GetClientCurrentState()
+	local nUIWorkState = GetUIWorkState()
 	local bShowSpeed = false
 	local strText = ""
-	if nPreWorkState == CLIENT_STATE_PREPARE then
+	if nUIWorkState == UI_STATE_STARTING
+		or nUIWorkState == UI_STATE_PREPARE_WORKID 
+		or nUIWorkState == UI_STATE_PREPARE_POOL then
 		strText = "准备中"
 		bShowSpeed = true
-	elseif nPreWorkState == CLIENT_STATE_CALCULATE then
+	elseif nUIWorkState == UI_STATE_CALCULATE then
 		strText = "运行中"
-		bShowSpeed = true
-	elseif nPreWorkState == CLIENT_STATE_EEEOR or nPreWorkState == CLIENT_STATE_AUTO_EXIT then
-		strText = "出错了"
-		bShowSpeed = true
-	elseif g_bWorking then
-		strText = "准备中"
 		bShowSpeed = true
 	else
 		strText = "未开启"
@@ -1700,8 +1727,117 @@ function GetUserWorkID(fnCallBack)
 	end
 end
 
+function CheckSvrPoolCfg(nLastCfg)
+	local bRet = false
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
+		tUserConfig["tSvrPoolInfo"] = {}
+	end
+	local tPoolList = tUserConfig["tSvrPoolInfo"]["tPoolList"]
+	if type(tPoolList) ~= "table" or #tPoolList < 1 then
+		return false
+	end
+	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"]
+	if nLastCfg ~= nLastUpdateCfgTime then
+		return false
+	end
+	return true
+end
+
+function MakeSvrPoolCfgRequestUrl()
+	local strStamp = GetTimeStamp()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
+		tUserConfig["tSvrPoolInfo"] = {}
+	end
+	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"]
+	if nLastUpdateCfgTime ~= nil then
+		strStamp = "?stamp=" .. tostring(nLastUpdateCfgTime)
+	end
+	local strReguestUrl = "http://www.eastredm.com/static/svrpoolcfg.json" .. strStamp
+	---[[ forlocal
+	strReguestUrl = "http://www.eastredm.com/static/ServerConfig.dat" .. strStamp
+	--]]
+	TipLog("[QuerySvrForPoolCfg] strReguestUrl = " .. tostring(strReguestUrl))
+	return strReguestUrl
+end
+
+function GetSvrPoolCfg(nLastCfg)
+	local strUrl = MakeSvrPoolCfgRequestUrl()
+	NewAsynGetHttpContent(strUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[GetWorkPoolCfg] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 ~= nRet then
+			TipLog("[GetSvrPoolCfg] query sever failed")
+			OnSvrPoolCfgUpdate(false, false, nLastCfg)
+			return
+		end
+		---[[ forlocal
+		strContent = GetLocalSvrCfgWithName("poolcfg.json")
+		--]]
+		local tabInfo = DeCodeJson(strContent)
+		if type(tabInfo) ~= "table" 
+			or type(tabInfo["data"]) ~= "table" 
+			or type(tabInfo["data"]["pool"]) ~= "table" 
+			or #tabInfo["data"]["pool"] == 0 then
+			TipLog("[GetSvrPoolCfg] parse Json failed.")
+			OnSvrPoolCfgUpdate(false, false, nLastCfg)
+			return 
+		end
+		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+		if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
+			tUserConfig["tSvrPoolInfo"] = {}
+		end
+		
+		local tabPool = tabInfo["data"]["pool"]
+		local tabUserPool = {}
+		for index = 1, #tabPool do
+			if type(tabPool[index]) == "table" and CheckPeerIDList(tabPool[index]["pidlist"]) then
+				tabUserPool[#tabUserPool+1] = tabPool[index]
+			end
+		end
+		tUserConfig["tSvrPoolInfo"]["tPoolList"] = tabUserPool
+		
+		if nLastCfg ~= nil then
+			tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"] = nLastCfg
+		end	
+		SaveConfigToFileByKey("tUserConfig")
+		OnSvrPoolCfgUpdate(true, true, nLastCfg)
+	end)
+end
+
+function UpdateSvrPoolCfg(tabInfo)
+	local nLastCfg = tonumber(tabInfo["data"]["lastCfg"])
+	local bRet = CheckSvrPoolCfg(nLastCfg)
+	if bRet then
+		OnSvrPoolCfgUpdate(true,false,nLastCfg)
+	else
+		GetSvrPoolCfg(nLastCfg)
+	end
+end
+
+function OnSvrPoolCfgUpdate(bGet, bUpdated,nLastCfg)
+	if GetUIWorkState() == UI_STATE_PREPARE_POOL then
+		if not bGet then
+			SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				GetSvrPoolCfg(nLastCfg)
+			end, 5*1000)
+			return
+		end
+		StartClient()
+	elseif GetUIWorkState() == UI_STATE_CALCULATE then
+		if bUpdated then
+			g_WorkClient.ReStartClientByNewPoolList()
+		end
+	end
+end
+
+
 function QuerySvrForLoginInfo()
-	--这里保证workID不位空
+	--这里保证workID不为空
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
@@ -1935,6 +2071,8 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	end
 	local strSpeed = string.format("%0.2f",nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
+	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentWallet())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
@@ -2185,7 +2323,7 @@ function ReportMiningPoolInfoToServer()
 end
 
 --上报并且查询客户端信息
-function QueryClientInfo(nMiningSpeed)
+function QueryClientInfo(nMiningSpeed, fnCallBack)
 	local strReguestUrl = QuerySvrForPushCalcInfo(nMiningSpeed)
 	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[QueryClientInfo] strReguestUrl = " .. strReguestUrl)
@@ -2195,22 +2333,28 @@ function QueryClientInfo(nMiningSpeed)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			--[[ forlocal
+			---[[ forlocal
 			strContent = GetLocalSvrCfgWithName("pushCalc.json")
 			--]]
 			local tabInfo = DeCodeJson(strContent)
-			
 			if type(tabInfo) ~= "table" 
 				or tabInfo["rtn"] ~= 0 
 				or type(tabInfo["data"]) ~= "table" then
 				TipLog("[QueryClientInfo] parse info error.")
+				if fnCallBack ~= nil then
+					fnCallBack(false)
+				end
 				return 
+			end
+			UpdateSvrPoolCfg(tabInfo)
+			if fnCallBack ~= nil then
+				fnCallBack(true)
 			end
 			-- 绑定 未绑定 解绑 是否 status 不一样
 			if tabInfo["data"]["status"] ~= 1 then
 				if CheckIsBinded() then
 					UnBindingClientFromServer()
-					return
+					--return
 				end	
 			end
 			if tonumber(tabInfo["data"]["balance"]) ~= nil then
@@ -2222,8 +2366,11 @@ function QueryClientInfo(nMiningSpeed)
 				g_SvrAverageMiningSpeed = tabInfo["data"]["rate"]
 			end
 		else
+			if fnCallBack ~= nil then
+				fnCallBack(false)
+			end
 			TipLog("[QueryClientInfo] query sever failed.")
-		end		
+		end
 	end)
 end
 
@@ -2252,11 +2399,39 @@ function GetClientMiningSpeed()
 	return g_WorkClient.GetCurrentMiningSpeed()
 end
 
+function GetUIWorkState()
+	return g_UIWorkState
+end
 --是否在工作
 function CheckIsWorking()
-	return g_bWorking
+	if GetUIWorkState() == UI_STATE_STOPPED then
+		return false
+	else
+		return true
+	end
 end
 
+--是否在准备
+function CheckIsPrepare()
+	local nUIWorkState = GetUIWorkState()
+	if nUIWorkState == UI_STATE_STARTING
+		or nUIWorkState == UI_STATE_PREPARE_WORKID 
+		or nUIWorkState == UI_STATE_PREPARE_POOL then
+		return true
+	end
+	return false
+end
+
+--是否在计算
+function CheckIsCalculate()
+	if GetUIWorkState() == UI_STATE_CALCULATE then
+		return true
+	else
+		return false
+	end
+end
+
+--获取UI状态
 function GetWorkClient()
 	return g_WorkClient
 end
@@ -2307,35 +2482,6 @@ function InitMachName()
 		tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
 		SaveConfigToFileByKey("tUserConfig")
 	end
-end
-
-
-function CheckPeerIDList(tPIDlist)
-	if type(tPIDlist) == "table" and #tPIDlist > 0 then
-		local bCheckPid = false
-		local strPeerId = GetPeerID()
-		local strPeerId12 = string.sub(tostring(strPeerId), 1, 12)
-		for i = 1, #tPIDlist do
-			if string.find(string.lower(tostring(strPeerId12)), ".*" .. string.lower(tostring(tPIDlist[i])) .. "$", 1) then
-				bCheckPid = true
-				break
-			end
-		end
-		return bCheckPid
-	else
-		return true
-	end	
-end
-
-
-function GeneratTaskInfo(fnCallBack)
-	GetUserWorkID(function(bWorkID, strInfo)
-		if bWorkID then
-			fnCallBack(true)
-		else
-			fnCallBack(false)
-		end	
-	end)	
 end
 
 function SetUserBindInfo(tabBindInfo)
@@ -2601,6 +2747,7 @@ function GetSuspendRootCtrol()
 end
 ----------------
 function HandleOnStart()
+	g_UIWorkState = UI_STATE_WORKING
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
 	WorkingTimerHandle()
@@ -2609,6 +2756,7 @@ function HandleOnStart()
 end
 
 function HandleOnQuit()
+	g_UIWorkState = UI_STATE_STOPPED
 	ResetGlobalParam()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
@@ -2617,39 +2765,54 @@ function HandleOnQuit()
 end
 
 function StartClient()
+	SetStateInfoToUser(nil)
 	local nRet = g_WorkClient.Start()
 	if nRet ~= 0 then
 		if nRet == 1 then
-			SetStateInfoToUser("连接赚宝矿场失败")
+			SetStateInfoToUser("连接赚宝矿场失败,请重试")
 		end	
 		return
 	end
-	g_bWorking = true
 	HandleOnStart()
 	ReportClientInfoToServer()
 end
 
 function NotifyStart()
-	local function Prepare()
-		if CheckIsGettedWorkID() then
-			SetStateInfoToUser(nil)
-			StartClient()
-		else
-			GeneratTaskInfo(function(bTask)
-				if bTask then
-					SetStateInfoToUser(nil)
-					StartClient()
-				else
-					SetStateInfoToUser("获取任务ID，请稍后再试")
-				end
-			end)
+	g_UIWorkState = UI_STATE_STARTING
+	UpdateSuspendWndVisible(1)
+	OnWorkStateChange(1)
+	local function OnQueryClientInfo(bRet)
+		if GetUIWorkState() ~= UI_STATE_PREPARE_POOL then
+			return 
 		end
+		if not bRet then
+			SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				QueryClientInfo(0, OnQueryClientInfo)
+			end, 5*1000)
+			return
+		end	
+		SetStateInfoToUser(nil)
 	end
-	if g_ServerConfig == nil then
-		SetStateInfoToUser("连接服务器失败，请稍后")
-	else
-		Prepare()
+	local function OnGetUserWorkID(bWorkID, strInfo)
+		if GetUIWorkState() ~= UI_STATE_PREPARE_WORKID then
+			return 
+		end
+		if not bWorkID then
+			SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				GetUserWorkID(OnGetUserWorkID)
+			end, 5*1000)
+			
+			return
+		end
+		--获取矿池信息
+		g_UIWorkState = UI_STATE_PREPARE_POOL
+		QueryClientInfo(0, OnQueryClientInfo)
+		SetStateInfoToUser(nil)
 	end
+	g_UIWorkState = UI_STATE_PREPARE_WORKID
+	GetUserWorkID(OnGetUserWorkID)
 end
 
 function NotifyPause()
@@ -2688,25 +2851,27 @@ function InitMiningClient()
 	g_WorkClient.InitClient()
 end
 
---尝试去连接服务器
+--尝试去连接服务器获取更新信息
 function TryToConnectServer(fnCallBack)
-	SetStateInfoToUser("正在连接服务器")
+	--SetStateInfoToUser("正在连接服务器")
 	DownLoadServerConfig(function(nDownServer, strServerPath)
 		if nDownServer ~= 0 or not IsRealString(strServerPath) or  not tipUtil:QueryFileExists(tostring(strServerPath)) then
+			--[[
 			if nDownServer == -2 or nDownServer == -3 then
 				SetStateInfoToUser("获取服务器配置失败")
 				return
 			end
+			--]]
 			TipLog("[TryToConnectServer] Download server config failed , try reconnect nDownServer="..tostring(nDownServer)..", strServerPath="..tostring(strServerPath))
 			--处理)
 			fnCallBack(false)
 			SetOnceTimer(function()
 				TryToConnectServer(fnCallBack)
-			end, 3000)
+			end, 60*1000)
 			return	
 		end
 		TipLog("[TryToConnectServer] Download server config success")
-		SetStateInfoToUser(nil)
+		--SetStateInfoToUser(nil)
 		OnDownLoadSvrCfgSuccess(strServerPath)
 		fnCallBack(true,strServerPath)
 	end)

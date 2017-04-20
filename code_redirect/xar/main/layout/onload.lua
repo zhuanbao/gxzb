@@ -367,8 +367,10 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	
 	--升级提醒
 	FunctionObj.PopRemindUpdateWnd()
+	--[[
 	CheckMachineBindState()
 	FunctionObj.CheckShoudAutoMining()
+	--]]
 	--增加处理/noliveup命令行
 	SetOnceTimer(function()
 					local cmdString = tipUtil:GetCommandLine()
@@ -431,11 +433,12 @@ function TipMain()
 	end
 	--显示悬浮框
 	FunctionObj.UpdateSuspendWndVisible()
-	--FunctionObj.CheckShoudAutoMining()
 	FunctionObj.InitMiningClient()
 	FunctionObj.TryToConnectServer(function(bConnect,strPath)
 		FunctionObj.TipLog("[TipMain] Try to connect server, bConnect = " .. tostring(bConnect))
 	end)
+	CheckMachineBindState()
+	FunctionObj.CheckShoudAutoMining()
 end
 
 function PreTipMain()

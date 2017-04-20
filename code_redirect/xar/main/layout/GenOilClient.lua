@@ -81,7 +81,7 @@ function LimitSpeedCond()
 	end
 	local hr, dwTime = tipUtil:GetLastInputInfo()
 	local dwTickCount = tipUtil:GetTickCount()
-	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 5*60*1000 then
+	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 3*60*1000 then
 		TipLog("[LimitSpeedCond] Last input in 60 second")
 		return true
 	end
@@ -94,35 +94,20 @@ function GetNewMiningCmdInfo()
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
+	local tPoolList = tUserConfig["tSvrPoolInfo"]["tPoolList"]
 	g_strCmdLineFormat = nil
 	g_strWallet = nil
 	g_strPool = nil
-	local tTaskInfo = g_ServerConfig["tTaskInfo"]
-	for i=1,#tTaskInfo do
-		local tabTaskItem = tTaskInfo[i]
-		if type(tabTaskItem) == "table" and tFunctionHelper.CheckPeerIDList(tabTaskItem["tPIDlist"]) then
-			local tabPoolInfo = tabTaskItem["tPool"]
-			if type(tabPoolInfo) ~= "table" then
-				tabPoolInfo = {}
+	g_PoolIndex = g_PoolIndex + 1
+	if g_PoolIndex <= #tPoolList then
+		local tabPoolItem = tPoolList[g_PoolIndex]
+		if type(tabPoolItem) == "table" then
+			if IsRealString(tabPoolItem["cmdlineformat"]) then
+				g_strCmdLineFormat = tabPoolItem["cmdlineformat"]
+				g_strWallet = tabPoolItem["wallet"]
+				g_strPool = tabPoolItem["pool"]
 			end
-			g_PoolIndex = g_PoolIndex + 1
-			TipLog("[GetNewMiningCmdInfo] g_PoolIndex = " .. tostring(g_PoolIndex))
-			if g_PoolIndex <= #tabPoolInfo then
-				tabPoolItem = tabPoolInfo[g_PoolIndex]
-				if type(tabPoolItem) == "table" then
-					--local strCmdLineFormat = tabPoolItem["strCmdLineFormat"]
-					--strCmdLineFormat = string.gsub(strCmdLineFormat,"(<wallet>)",tabPoolItem["strWallet"])
-					--strCmdLineFormat = string.gsub(strCmdLineFormat,"(<workid>)",strWorkID)
-					--这里只是判断下 能不能正常匹配
-					if IsRealString(tabPoolItem["strCmdLineFormat"]) then
-						g_strCmdLineFormat = tabPoolItem["strCmdLineFormat"]
-						g_strWallet = tabPoolItem["strWallet"]
-						g_strPool = tabPoolItem["strPool"]
-						break
-					end
-				end	
-			end	
-		end
+		end	
 	end
 	if g_strCmdLineFormat == nil then
 		g_PoolIndex = 0
@@ -164,7 +149,7 @@ function OnGenOilMsg(tParam)
 			ResetGlobalErrorParam()
 			g_PreWorkState = CLIENT_STATE_CALCULATE
 			tFunctionHelper.UpdateMiningState(CLIENT_STATE_CALCULATE)
-			tFunctionHelper.ReportMiningPoolInfoToServer()
+			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
 			--多乘了100
@@ -194,12 +179,12 @@ function OnGenOilMsg(tParam)
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
 			if g_ConnectFailCnt > g_MaxConnectFailCnt then
-				ReStartClientByNewPool()
+				ReStartClientByNextPool()
 			end
 		end
 	elseif nMsgType == WP_GENOIL_AUTOEXIT then
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
-		ReStartClient()
+		ReTryStartClient()
 	elseif nMsgType == WP_GENOIL_ERROR_INFO then
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
@@ -323,7 +308,16 @@ function Resume()
 	IPCUtil:Resume()
 end
 
-function ReStartClientByNewPool()
+function ReStartClientByNewPoolList()
+	Quit()
+	g_strCmdLineFormat = nil
+	g_strWallet = nil
+	g_strPool = nil
+	g_PoolIndex = 0
+	Start()
+end
+
+function ReStartClientByNextPool()
 	Quit()
 	--连接下一个矿池
 	GetNewMiningCmdInfo()
@@ -384,8 +378,7 @@ function RegisterFunctionObject(self)
 	obj.Quit = Quit
 	obj.Pause = Pause
 	obj.Resume = Resume
-	obj.ReStartClientByNewPool = ReStartClientByNewPool
-	obj.ReStartClient = ReStartClient
+	obj.ReStartClientByNewPoolList = ReStartClientByNewPoolList
 	obj.GetAverageHashRate = GetAverageHashRate
 	obj.GetCurrentClientWorkState = GetCurrentClientWorkState
 	obj.GetCurrentMiningSpeed = GetCurrentMiningSpeed

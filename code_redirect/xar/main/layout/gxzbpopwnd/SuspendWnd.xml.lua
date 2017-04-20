@@ -319,19 +319,14 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 	end
 end
 
-local MING_CALCULATE_DAG = 2
-local MING_MINING_SPEED = 3
-local MING_MINING_EEEOR = 4
-local MING_SOLUTION_FIND = 5
-local MING_MINING_EEEOR_TIMEOUT = 100
 function SuspendCtrl_UpdateMiningState(self, nMiningState)
 	local attr = self:GetAttribute()
 	attr.currentstate = attr.currentstate or 0
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
-	if nMiningState == MING_MINING_SPEED and  tFunctionHelper.CheckIsWorking() then
+	if tFunctionHelper.CheckIsCalculate() then
 		speedtext:SetText("0¥฿/h")
-	elseif nMiningState == MING_CALCULATE_DAG and  tFunctionHelper.CheckIsWorking() then
+	elseif tFunctionHelper.CheckIsPrepare() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
