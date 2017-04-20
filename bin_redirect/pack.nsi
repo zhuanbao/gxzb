@@ -222,11 +222,12 @@ FunctionEnd
 	${GetOptions} $CMDLINE "/s"  $R0
 	IfErrors 0 +2
 	StrCpy $R1 1
-	
 	${For} $R3 0 6
-		FindProcDLL::FindProc "${strProcName}.exe"
-		${If} $R0 != 0
-			KillProcDLL::KillProc "${strProcName}.exe"
+		;FindProcDLL::FindProc "${strProcName}.exe"
+		System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t '${strProcName}.exe') i.r0 ? u"
+		${If} $0 != 0
+			;KillProcDLL::KillProc "${strProcName}.exe"
+			System::Call "$PLUGINSDIR\zbsetuphelper::TerminateProcessByName(t '${strProcName}.exe')"
 			Sleep 250
 		${Else}
 			${Break}
@@ -329,6 +330,8 @@ SectionEnd
 
 Function CloseExe
 	${FKillProc} "Share4Money"
+	${FKillProc} "ShareGenoil"
+	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
 Function CheckHasInstall
@@ -361,14 +364,16 @@ Function CheckHasInstall
 FunctionEnd
 
 Function CheckExeProcExist
-	StrCpy $R0 0
-	FindProcDLL::FindProc "Share4Money.exe"
-	${If} $R0 != 0
+	StrCpy $0 0
+	;FindProcDLL::FindProc "Share4Money.exe"
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	${If} $0 != 0
 		MessageBox MB_YESNO "检测到${PRODUCT_NAME}正在运行，是否强制结束？" /SD IDYES IDYES +2
 		Abort
 		${FKillProc} "Share4Money"
-		Return
 	${EndIf}
+	${FKillProc} "ShareGenoil"
+	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
 !macro InitBaseCfgDir
@@ -423,14 +428,16 @@ Function .onInit
 		StrCpy $IsSilentInst 1
 		SetSilent silent
 		SetAutoClose true
-	Call CheckHasInstall
-	Call CheckExeProcExist
-	
 	InitPluginsDir
 	IfFileExists $PLUGINSDIR 0 +2
 	RMDir /r $PLUGINSDIR
 	SetOutPath "$PLUGINSDIR"
 	SetOverwrite on
+		File "zbsetuphelper.dll"
+	Call CheckHasInstall
+	Call CheckExeProcExist
+	
+	
 	File "res\Error.ico"
 	File "res\warning.bmp"
 	File "res\2weima.bmp"
@@ -438,7 +445,7 @@ Function .onInit
 	Call InitFont
 	${If} ${RunningX64}
 		File "zbsetuphelper-cl.exe"
-		File "zbsetuphelper.dll"
+		;File "zbsetuphelper.dll"
 		File "main\program\Microsoft.VC90.CRT.manifest"
 		File "main\program\msvcp90.dll"
 		File "main\program\msvcr90.dll"
@@ -1123,9 +1130,9 @@ Function NSD_TimerAutoRun
 	${NSD_SetText} $Lbl_TimerAutoRun "$Int_TimerCount秒后将自动开始"
 	ShowWindow $Lbl_TimerAutoRun ${SW_HIDE}
 	ShowWindow $Lbl_TimerAutoRun ${SW_SHOW}
-	StrCpy $R0 0
-	FindProcDLL::FindProc "Share4Money.exe"
-	${If} $R0 != 0
+	StrCpy $0 0
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	${If} $0 != 0
 		GetFunctionAddress $0 NSD_TimerAutoRun
 		nsDialogs::KillTimer $0
 		HideWindow
@@ -1174,12 +1181,14 @@ Function un.onInit
 		Abort
 	${EndIf}
 	
-	FindProcDLL::FindProc "Share4Money.exe"
-	${If} $R0 != 0
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	${If} $0 != 0
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "检测到${PRODUCT_NAME}正在运行，是否强制结束？" IDYES +2
 		Abort
 		${FKillProc} "Share4Money"
 	${EndIf}
+	${FKillProc} "ShareGenoil"
+	${FKillProc} "zbsetuphelper-cl"
 	Call un.UpdateChanel
 	InitPluginsDir
 	IfFileExists $PLUGINSDIR 0 +2
