@@ -1312,12 +1312,10 @@ function GetToolTipInfo()
 	local nUIWorkState = GetUIWorkState()
 	local bShowSpeed = false
 	local strText = ""
-	if nUIWorkState == UI_STATE_STARTING
-		or nUIWorkState == UI_STATE_PREPARE_WORKID 
-		or nUIWorkState == UI_STATE_PREPARE_POOL then
+	if CheckIsPrepare() then
 		strText = "准备中"
 		bShowSpeed = true
-	elseif nUIWorkState == UI_STATE_CALCULATE then
+	elseif CheckIsCalculate() then
 		strText = "运行中"
 		bShowSpeed = true
 	else
@@ -2416,7 +2414,8 @@ function CheckIsPrepare()
 	local nUIWorkState = GetUIWorkState()
 	if nUIWorkState == UI_STATE_STARTING
 		or nUIWorkState == UI_STATE_PREPARE_WORKID 
-		or nUIWorkState == UI_STATE_PREPARE_POOL then
+		or nUIWorkState == UI_STATE_PREPARE_POOL 
+		or (nUIWorkState == UI_STATE_CALCULATE and GetClientCurrentState() ~= CLIENT_STATE_CALCULATE) then
 		return true
 	end
 	return false
@@ -2424,7 +2423,7 @@ end
 
 --是否在计算
 function CheckIsCalculate()
-	if GetUIWorkState() == UI_STATE_CALCULATE then
+	if GetUIWorkState() == UI_STATE_CALCULATE and GetClientCurrentState() ~= CLIENT_STATE_CALCULATE then
 		return true
 	else
 		return false
@@ -2747,7 +2746,7 @@ function GetSuspendRootCtrol()
 end
 ----------------
 function HandleOnStart()
-	g_UIWorkState = UI_STATE_WORKING
+	g_UIWorkState = UI_STATE_CALCULATE
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
 	WorkingTimerHandle()
