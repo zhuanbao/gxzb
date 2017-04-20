@@ -2423,7 +2423,7 @@ end
 
 --是否在计算
 function CheckIsCalculate()
-	if GetUIWorkState() == UI_STATE_CALCULATE and GetClientCurrentState() ~= CLIENT_STATE_CALCULATE then
+	if GetUIWorkState() == UI_STATE_CALCULATE and GetClientCurrentState() == CLIENT_STATE_CALCULATE then
 		return true
 	else
 		return false
