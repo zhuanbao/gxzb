@@ -1587,6 +1587,7 @@ function StartMiningCountTimer()
 		timeMgr:KillTimer(g_MiningReportTimerId)
 		g_MiningReportTimerId = nil
 	end
+	gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
 	g_MiningReportTimerId = timeMgr:SetTimer(function(item, id)
 		gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
 		SendMiningReport(nTimeSpanInSec, false)
@@ -1598,6 +1599,7 @@ function StopMiningCountTimer()
 		timeMgr:KillTimer(g_MiningReportTimerId)
 		g_MiningReportTimerId = nil
 	end
+	gnLastReportMiningTmUTC = 0
 end
 
 function SendMiningReport(nTimeSpanInSec, bExit)
@@ -1608,11 +1610,14 @@ function SendMiningReport(nTimeSpanInSec, bExit)
 	local nMiningTime = 0
 	if bExit and gnLastReportMiningTmUTC ~= 0 then
 		nMiningTime = math.abs(tipUtil:GetCurrentUTCTime() - gnLastReportMiningTmUTC)
+		gnLastReportMiningTmUTC = 0
 	else
 		nMiningTime = nTimeSpanInSec
 	end
-	tStatInfo.strEV = nRunTime
-	
+	tStatInfo.strEV = nMiningTime
+	if nMiningTime == 0 then
+		return
+	end
 	TipConvStatistic(tStatInfo)
 end
 
@@ -2760,6 +2765,7 @@ function HandleOnQuit()
 	--更新球的显示状态
 	UpdateSuspendWndVisible(1)
 	OnWorkStateChange(2)
+	SendMiningReport(0, true)
 	StopMiningCountTimer()
 end
 
