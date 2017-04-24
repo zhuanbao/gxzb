@@ -27,9 +27,9 @@ end
 --相当于强制刷新
 function UpdateClientUnBindState(self)
 	local attr = self:GetAttribute()
-	local reqID = 0
+	local reqID = "h24"
 	if attr.currentpanel == 2 then
-		reqID = 1
+		reqID = "d30"
 	end
 	tFunctionHelper.GetHistoryToServer(reqID, function(bRet, tabInfo)
 			attr.Data = tabInfo
@@ -332,7 +332,7 @@ function OnClickHourBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
-	tFunctionHelper.GetHistoryToServer(0, function(bRet, tabInfo)
+	tFunctionHelper.GetHistoryToServer("h24", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet
 		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
@@ -350,7 +350,7 @@ function OnClickDayBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
-	tFunctionHelper.GetHistoryToServer(1, function(bRet, tabInfo)
+	tFunctionHelper.GetHistoryToServer("d30", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet
 		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()

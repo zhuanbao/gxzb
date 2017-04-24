@@ -2130,7 +2130,7 @@ function TakeCashToServer(nMoney, fnCallBack)
 	end)
 end
 
-function QuerySvrForGetHistoryInfo(ntype)
+function QuerySvrForGetHistoryInfo(strtype)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
@@ -2145,17 +2145,17 @@ function QuerySvrForGetHistoryInfo(ntype)
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(ntype)))
+	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(strtype)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForGetHistoryInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
---查询收益接口,ntype = 0 最近24小时，1 最近1个月
+--查询收益接口,strtype = 0 最近24小时，1 最近1个月
 --不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
-function GetHistoryToServer(ntype, fnCallBack)
+function GetHistoryToServer(strtype, fnCallBack)
 	local function CheckLastUTC(utc)
 		if type(utc) ~= "number" then
 			return true
@@ -2171,22 +2171,22 @@ function GetHistoryToServer(ntype, fnCallBack)
 	local function UINeedTable(t)
 		local tmp = {}
 		local nCurrent = tipUtil:GetCurrentUTCTime() or 0
-		if ntype == 0 then
+		if strtype == "h24" then
 			nCurrent = nCurrent - 3600
 		else
 			nCurrent = nCurrent - 86400
 		end
-		for i, v in ipairs(t) do
+		for i=#t, 1, -1 do
 			local _, LMonth, LDay, LHour = tipUtil:FormatCrtTime(nCurrent)
-			tmp[#t-i+1] = {}
-			if ntype == 0 then
-				tmp[#t-i+1][1] = string.format("%02d", LHour)..":00"
+			tmp[i] = {}
+			if strtype == "h24" then
+				tmp[i][1] = string.format("%02d", LHour)..":00"
 				nCurrent = nCurrent - 3600
 			else
-				tmp[#t-i+1][1] = string.format("%02d", LMonth).."/".. string.format("%02d", LDay)
+				tmp[i][1] = string.format("%02d", LMonth).."/".. string.format("%02d", LDay)
 				nCurrent = nCurrent - 86400
 			end
-			tmp[#t-i+1][2] = v
+			tmp[i][2] = t[i]
 		end
 		return tmp
 	end
@@ -2194,7 +2194,7 @@ function GetHistoryToServer(ntype, fnCallBack)
 		local t = {}
 		local count = 0
 		tLocal = tLocal or {}
-		if ntype == 0 then
+		if strtype == "h24" then
 			if type(tLocal["hour24"]) == "table" and #tLocal["hour24"] == 24 then
 				return tLocal["hour24"]
 			end
@@ -2212,18 +2212,19 @@ function GetHistoryToServer(ntype, fnCallBack)
 	end
 	local function Save2Local(tServer)
 		local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
-		tEarnings["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
+		tEarnings[strtype] = tEarnings[strtype] or {}
+		tEarnings[strtype]["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
 		--TODO:现在不确定服务器返回什么格式， 等确定了再改这里
-		tEarnings["hour24"] = UINeedTable(tServer["hour24"])
-		tEarnings["day30"] = UINeedTable(tServer["day30"])
+		tEarnings[strtype == "h24" and "hour24" or "day30"] = UINeedTable(tServer)
 		SaveConfigToFileByKey("tEarnings")
 	end
 	local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
-	if not CheckLastUTC(tEarnings["lastutc"]) then
+	tEarnings[strtype] = tEarnings[strtype] or {}
+	if not CheckLastUTC(tEarnings[strtype]["lastutc"]) then
 		fnCallBack(true, GetLocal(tEarnings))
 		return
 	end
-	local strReguestUrl = QuerySvrForGetHistoryInfo(ntype)
+	local strReguestUrl = QuerySvrForGetHistoryInfo(strtype)
 	if not strReguestUrl then
 		local tDefault = GetLocal()
 		fnCallBack(false, tDefault)
@@ -2236,10 +2237,10 @@ function GetHistoryToServer(ntype, fnCallBack)
 		TipLog("[GetHistoryToServer] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
 		---[[forlocal
-		strContent = GetLocalSvrCfgWithName("getHistory.json")
+		strContent = GetLocalSvrCfgWithName("getHistory"..strtype..".json")
 		local tabInfo = DeCodeJson(strContent)
-		if type(tabInfo) == "table" and type(tabInfo["data"]) == "table" and type(tabInfo["data"]["hour24"]) == "table" and type(tabInfo["data"]["day30"]) == "table" then
-			fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+		if type(tabInfo) == "table" and type(tabInfo["data"]) == "table" then
+			fnCallBack(true, UINeedTable(tabInfo["data"]))
 			Save2Local(tabInfo["data"])
 		else
 			fnCallBack(false, GetLocal())
@@ -2253,7 +2254,7 @@ function GetHistoryToServer(ntype, fnCallBack)
 				fnCallBack(false, GetLocal(tEarnings))
 				return
 			end
-			fnCallBack(true, UINeedTable(tabInfo["data"][ntype ==0 and "hour24" or "day30"]))
+			fnCallBack(true, UINeedTable(tabInfo["data"][strtype ==0 and "hour24" or "day30"]))
 			Save2Local(tabInfo["data"])
 		else
 			TipLog("[GetHistoryToServer] get content failed.")
@@ -2301,7 +2302,7 @@ function PopTipPre4Hour()
 	local nTipPopIntervals  = FetchValueByPath(g_ServerConfig, {"tRemindCfg", "nPopIntervals"}) or 4*3600
 	SetTimer(
 		function(item, id)
-			GetHistoryToServer(0, function(bRet, tabInfo)
+			GetHistoryToServer("h24", function(bRet, tabInfo)
 				if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
 					local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 					local newgetgold = 0
