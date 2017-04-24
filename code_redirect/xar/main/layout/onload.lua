@@ -410,11 +410,11 @@ function CheckMachineSuitable(callback)
 		function (nRet, tProcDetail)
 			LOG("CheckMachineSuitable AsynCreateProcess callback:nRet="..tostring(nRet)..", type(tProcDetail)="..type(tProcDetail))
 			if nRet == 0 and tProcDetail and tProcDetail.hProcess then
-				tipAsynUtil:AsynWaitForSingleObject(tProcDetail.hProcess, 5000, 
+				tipAsynUtil:AsynWaitForSingleObject(tProcDetail.hProcess, 60*1000, 
 					function(nRet)
 						local ExitCode = tipUtil:GetProcessExitCode(tProcDetail.hProcess)
 						LOG("CheckMachineSuitable AsynWaitForSingleObject callback:ExitCode="..tostring(ExitCode))
-						callback(ExitCode == 0)
+						callback(ExitCode == 0 or ExitCode == 259)
 					end)
 			else
 				LOG("CheckMachineSuitable AsynCreateProcess callback failed")
@@ -452,7 +452,7 @@ function PreTipMain()
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
 	CheckMachineSuitable(function(bCheck)
-		--bCheck = true
+		bCheck = true
 		if not bCheck then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
