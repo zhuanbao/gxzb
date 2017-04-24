@@ -434,6 +434,12 @@ Function .onInit
 	SetOutPath "$PLUGINSDIR"
 	SetOverwrite on
 		File "zbsetuphelper.dll"
+		File "main\program\Microsoft.VC90.CRT.manifest"
+		File "main\program\msvcp90.dll"
+		File "main\program\msvcr90.dll"
+		File "main\program\Microsoft.VC90.ATL.manifest"
+		File "main\program\ATL90.dll"
+		
 	Call CheckHasInstall
 	Call CheckExeProcExist
 	
@@ -446,11 +452,11 @@ Function .onInit
 	${If} ${RunningX64}
 		File "zbsetuphelper-cl.exe"
 		;File "zbsetuphelper.dll"
-		File "main\program\Microsoft.VC90.CRT.manifest"
-		File "main\program\msvcp90.dll"
-		File "main\program\msvcr90.dll"
-		File "main\program\Microsoft.VC90.ATL.manifest"
-		File "main\program\ATL90.dll"
+		;File "main\program\Microsoft.VC90.CRT.manifest"
+		;File "main\program\msvcp90.dll"
+		;File "main\program\msvcr90.dll"
+		;File "main\program\Microsoft.VC90.ATL.manifest"
+		;File "main\program\ATL90.dll"
 		
 		File "license.txt"
 		Call UpdateChanel
@@ -1181,6 +1187,17 @@ Function un.onInit
 		Abort
 	${EndIf}
 	
+	InitPluginsDir
+	IfFileExists $PLUGINSDIR 0 +2
+	RMDir /r $PLUGINSDIR
+	SetOutPath "$PLUGINSDIR"
+	SetOverwrite on
+		File "zbsetuphelper.dll"
+		File "main\program\Microsoft.VC90.CRT.manifest"
+		File "main\program\msvcp90.dll"
+		File "main\program\msvcr90.dll"
+		File "main\program\Microsoft.VC90.ATL.manifest"
+		File "main\program\ATL90.dll"
 	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
 	${If} $0 != 0
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "检测到${PRODUCT_NAME}正在运行，是否强制结束？" IDYES +2
@@ -1190,17 +1207,17 @@ Function un.onInit
 	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
 	Call un.UpdateChanel
-	InitPluginsDir
-	IfFileExists $PLUGINSDIR 0 +2
-	RMDir /r $PLUGINSDIR
-	SetOutPath "$PLUGINSDIR"
-	SetOverwrite on
-	File "zbsetuphelper.dll"
-	File "main\program\Microsoft.VC90.CRT.manifest"
-	File "main\program\msvcp90.dll"
-	File "main\program\msvcr90.dll"
-	File "main\program\Microsoft.VC90.ATL.manifest"
-	File "main\program\ATL90.dll"
+	;InitPluginsDir
+	;IfFileExists $PLUGINSDIR 0 +2
+	;RMDir /r $PLUGINSDIR
+	;SetOutPath "$PLUGINSDIR"
+	;SetOverwrite on
+	;File "zbsetuphelper.dll"
+	;File "main\program\Microsoft.VC90.CRT.manifest"
+	;File "main\program\msvcp90.dll"
+	;File "main\program\msvcr90.dll"
+	;File "main\program\Microsoft.VC90.ATL.manifest"
+	;File "main\program\ATL90.dll"
 	!insertmacro InitBaseCfgDir
 FunctionEnd
 
