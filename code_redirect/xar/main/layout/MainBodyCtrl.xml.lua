@@ -214,6 +214,23 @@ function UpdateUserBalance(self, nBalance)
 	return true
 end
 
+function UpdateRealTimeIncome(self, nBalance, nRealTimeIncome)
+	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
+	if objPanelCenter == nil then
+		TipLog("[UpdateRealTimeIncome] get objPanelCenter failed ")
+		return false
+	end
+	
+	local nChildCnt = objPanelCenter:GetChildCount()
+	for i=0,nChildCnt-1 do
+		local objChild = objPanelCenter:GetChildByIndex(i)
+		if objChild and type(objChild.UpdateRealTimeIncome) == "function" then
+			objChild:UpdateRealTimeIncome(nBalance, nRealTimeIncome)
+		end	
+	end
+	return true
+end
+
 function UpdateMiningSpeed(self, nSpeed)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then

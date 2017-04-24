@@ -14,6 +14,7 @@
 			<UpdateClientUnBindFailState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindFailState"/>
 			<UpdateClientUnBindState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MainBodyCtrl.xml.lua" func="UpdateUserBalance"/>
+			<UpdateRealTimeIncome file="MainBodyCtrl.xml.lua" func="UpdateRealTimeIncome"/>
 			<UpdateMiningSpeed file="MainBodyCtrl.xml.lua" func="UpdateMiningSpeed"/>
 			<UpdateMiningState file="MainBodyCtrl.xml.lua" func="UpdateMiningState"/>
 			<UpdateDagProgress file="MainBodyCtrl.xml.lua" func="UpdateDagProgress"/>

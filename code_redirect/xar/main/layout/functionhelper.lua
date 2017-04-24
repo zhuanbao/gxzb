@@ -309,7 +309,8 @@ function RegisterFunctionObject(self)
 	obj.UpdateMiningState = UpdateMiningState
 	obj.UpdateDagProgress = UpdateDagProgress
 	obj.UpdateUserBalance = UpdateUserBalance
-	
+	obj.UpdateRealTimeIncome = UpdateRealTimeIncome
+
 	obj.NotifyStart = NotifyStart
 	obj.NotifyQuit = NotifyQuit
 	obj.NotifyPause = NotifyPause
@@ -2054,7 +2055,7 @@ function QuerySvrForReportPoolInfo()
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
-	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentWallet())))
+	strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportPoolInfo] strReguestUrl = " .. strReguestUrl)
@@ -2076,7 +2077,7 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	local strSpeed = string.format("%0.2f",nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
-	strInterfaceParam = strInterfaceParam .. "&wallet=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentWallet())))
+	strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
@@ -2647,7 +2648,17 @@ function UpdateClientUnBindState()
 		root:UpdateClientUnBindState()
 	end
 end
-
+--
+function UpdateRealTimeIncome(nRealTimeIncome)
+	local wnd = GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	objMainBodyCtrl:UpdateRealTimeIncome(g_Balance, nRealTimeIncome)
+end
 --所有要更新账户余额的地方在这里处理
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
@@ -2667,6 +2678,7 @@ function UpdateUserBalance()
 	if root and type(root.UpdateUserBalance) == "function" then
 		root:UpdateUserBalance(g_Balance)
 	end
+	g_WorkClient.OnUpdateBalance()
 end
 
 --所有要更新速度的地方在这里处理
@@ -2838,11 +2850,13 @@ end
 
 function WorkingTimerHandle()
 	local interval = 1
-	local tServerInterfaceCfg = g_ServerConfig["tServerInterfaceCfg"]
-	if type(tServerInterfaceCfg) ~= "table" then
-		tServerInterfaceCfg = {}
-	end
-	local nReportCalcInterval = tServerInterfaceCfg["nReportCalcInterval"] or 60
+	local nReportCalcInterval = 60
+	if type(g_ServerConfig) == "table" then
+		local tServerInterfaceCfg = g_ServerConfig["tServerInterfaceCfg"]
+		if type(tServerInterfaceCfg) == "table" then
+			nReportCalcInterval = tServerInterfaceCfg["nReportCalcInterval"] or 60
+		end
+	end	
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
 	g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nAverageHashRate = g_WorkClient.GetAverageHashRate()

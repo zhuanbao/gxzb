@@ -57,6 +57,13 @@ function UpdateUserBalance(self, nBalance)
 	AdjustAmountTextPosition(self)
 end
 
+function UpdateRealTimeIncome(self, nBalance, nRealTimeIncome)
+	local ObjTextNum = self:GetControlObject("MiningPanel.Panel.Amount.Num")
+	local strText = tFunctionHelper.NumberToFormatMoney(nBalance) .. "+" .. tFunctionHelper.NumberToFormatMoney(nRealTimeIncome)
+	ObjTextNum:SetText(strText)
+	AdjustAmountTextPosition(self)
+end
+
 function UpdateMiningSpeed(self, nSpeed)
 	local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
 	if not ObjMiningSpeed:GetVisible() then

@@ -44,7 +44,7 @@ local g_ConnectFailCnt = 0
 local g_MaxConnectFailCnt = 7
 
 local g_strCmdLineFormat = nil
-local g_strWallet = nil
+local g_strAccount = nil
 local g_strPool = nil
 local g_PoolIndex = 0
 
@@ -53,6 +53,10 @@ local g_ClientReTryCnt = 0
 local g_ClientMaxReTryCnt = 3 
 local g_LastClientOutputRightInfoTime = 0
 local g_ControlSpeedCmdLine = nil -- --cl-global-work 1000
+
+local g_LastGetSpeedTime = 0
+local g_LastRealTimeIncome = 0
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -96,7 +100,7 @@ function GetNewMiningCmdInfo()
 	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
 	local tPoolList = tUserConfig["tSvrPoolInfo"]["tPoolList"]
 	g_strCmdLineFormat = nil
-	g_strWallet = nil
+	g_strAccount = nil
 	g_strPool = nil
 	g_PoolIndex = g_PoolIndex + 1
 	if g_PoolIndex <= #tPoolList then
@@ -104,7 +108,7 @@ function GetNewMiningCmdInfo()
 		if type(tabPoolItem) == "table" then
 			if IsRealString(tabPoolItem["cmdlineformat"]) then
 				g_strCmdLineFormat = tabPoolItem["cmdlineformat"]
-				g_strWallet = tabPoolItem["wallet"]
+				g_strAccount = tabPoolItem["account"]
 				g_strPool = tabPoolItem["pool"]
 			end
 		end	
@@ -131,13 +135,31 @@ function GetCurrentMiningCmdLine()
 		return nil
 	end
 	local strCmdLine = g_strCmdLineFormat
-	strCmdLine = string.gsub(strCmdLine,"(<wallet>)",g_strWallet)
+	strCmdLine = string.gsub(strCmdLine,"(<account>)",g_strAccount)
 	strCmdLine = string.gsub(strCmdLine,"(<workid>)",strWorkID)
 	return strCmdLine
 end
 
 function UpdateSpeed(nHashRate)
 	 g_MiningSpeedPerHour = math.floor(nHashRate * tFunctionHelper.GetSvrAverageMiningSpeed())
+end
+
+function GetRealTimeIncome(nSpeed,nSpanTime)
+	if nSpanTime <= 0 or nSpeed <= 0 then
+		TipLog("[GetRealTimeIncome] nSpanTime = " .. GTV(nSpanTime) .. ", nSpeed = " .. GTV(nSpeed))
+		return 0
+	end
+	local nIncome = nSpeed*nSpanTime*tFunctionHelper.GetSvrAverageMiningSpeed()/3600
+	
+	local nLastRealTimeIncome = g_LastRealTimeIncome
+	local nNewRealTimeIncome = g_LastRealTimeIncome + nIncome
+	g_LastRealTimeIncome = nNewRealTimeIncome
+	TipLog("[GetRealTimeIncome] nIncome = " .. GTV(nIncome) .. ", nLastRealTimeIncome = " .. GTV(nLastRealTimeIncome) .. ", nNewRealTimeIncome = " .. GTV(nNewRealTimeIncome))
+	if math.floor(nNewRealTimeIncome) > nLastRealTimeIncome then
+		return math.floor(nNewRealTimeIncome)
+	end
+	TipLog("[GetRealTimeIncome] no new income")
+	return 0
 end
 
 function OnGenOilMsg(tParam)
@@ -149,6 +171,9 @@ function OnGenOilMsg(tParam)
 			ResetGlobalErrorParam()
 			g_PreWorkState = CLIENT_STATE_CALCULATE
 			tFunctionHelper.UpdateMiningState(CLIENT_STATE_CALCULATE)
+			if tFunctionHelper.GetSvrAverageMiningSpeed() == 0 then
+				tFunctionHelper.QueryClientInfo(0)
+			end	
 			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
@@ -158,6 +183,16 @@ function OnGenOilMsg(tParam)
 			g_HashRateSumCounter = g_HashRateSumCounter + 1
 			UpdateSpeed(nParam)
 			tFunctionHelper.UpdateMiningSpeed(g_MiningSpeedPerHour)
+			if g_LastGetSpeedTime == 0 then
+				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
+			else
+				nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetSpeedTime
+				local nRealTimeIncome = GetRealTimeIncome(nParam, nSpanTime)
+				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
+				if nRealTimeIncome > 0 then
+					tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
+				end
+			end
 		end
 	elseif nMsgType == WP_GENOIL_DAG then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
@@ -260,6 +295,8 @@ function ResetGlobalParam()
 		timeMgr:KillTimer(g_GenOilWorkingTimerId)
 		g_GenOilWorkingTimerId = nil
 	end
+	g_LastGetSpeedTime = 0
+	g_LastRealTimeIncome = 0
 end
 
 function ResetGlobalErrorParam()
@@ -313,7 +350,7 @@ end
 function ReStartClientByNewPoolList()
 	Quit()
 	g_strCmdLineFormat = nil
-	g_strWallet = nil
+	g_strAccount = nil
 	g_strPool = nil
 	g_PoolIndex = 0
 	Start()
@@ -364,12 +401,19 @@ function GetCurrentMiningSpeed()
 	return g_MiningSpeedPerHour
 end
 
-function GetCurrentWallet()
-	return g_strWallet
+function GetCurrentAccount()
+	return g_strAccount
 end
 
 function GetCurrentPool()
 	return g_strPool
+end
+
+function OnUpdateBalance()
+	if g_LastGetSpeedTime ~= 0 then
+		g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
+		g_LastRealTimeIncome = 0
+	end
 end
 
 function RegisterFunctionObject(self)
@@ -384,8 +428,9 @@ function RegisterFunctionObject(self)
 	obj.GetAverageHashRate = GetAverageHashRate
 	obj.GetCurrentClientWorkState = GetCurrentClientWorkState
 	obj.GetCurrentMiningSpeed = GetCurrentMiningSpeed
-	obj.GetCurrentWallet = GetCurrentWallet
+	obj.GetCurrentAccount = GetCurrentAccount
 	obj.GetCurrentPool = GetCurrentPool
+	obj.OnUpdateBalance = OnUpdateBalance
 	XLSetGlobal("Global.GenOilClient", obj)
 end
 RegisterFunctionObject()

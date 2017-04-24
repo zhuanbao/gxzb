@@ -8,10 +8,13 @@
 			<UpdateClientUnBindFailState file="MiningPanel.xml.lua" func="UpdateClientUnBindFailState"/>
 			<UpdateClientUnBindState file="MiningPanel.xml.lua" func="UpdateClientUnBindState"/>
 			<UpdateUserBalance file="MiningPanel.xml.lua" func="UpdateUserBalance"/>
+			<UpdateRealTimeIncome file="MiningPanel.xml.lua" func="UpdateRealTimeIncome"/>
+			
 			<UpdateMiningSpeed file="MiningPanel.xml.lua" func="UpdateMiningSpeed"/>
 			<UpdateMiningState file="MiningPanel.xml.lua" func="UpdateMiningState"/>
 			<UpdateDagProgress file="MiningPanel.xml.lua" func="UpdateDagProgress"/>
 			<OnWorkStateChange file="MiningPanel.xml.lua" func="OnWorkStateChange"/>
+			
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 			<SetStateInfoToUser file="MiningPanel.xml.lua" func="SetStateInfoToUser"/>
 		</method_def>
