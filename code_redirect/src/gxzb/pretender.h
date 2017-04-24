@@ -121,6 +121,7 @@ public:
 			if(SUCCEEDED( hr))
 			{
 				//处理过了
+				TSDEBUG(_T("HandleSingleton return true, so exit.lpCmdLine = %s"), lpCmdLine);
 				return bRet;		
 			}
 

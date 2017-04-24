@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 
-#include "stdafx.h"
 //#include "resource.h"
 #include "pretender.h"
 CAppModule _Module;
