@@ -25,28 +25,6 @@ function GetSubTable()
 				},
 			},
 		},
-		["tTaskInfo"] = {
-			[1] = {
-				["tPIDlist"] = {},
-				["tPool"] = {
-					[1] = {
-						["strCmdLineFormat"] = "--farm-recheck 200 -G -S eastredm.com:8108 -SP 1 -O <wallet>.<workid>",
-						["strPool"] = "eastredm.com:8008",
-						["strWallet"] = "0xf8DEd89966dFe80A13ab5306BD1b44d22955DFcf",
-					},
-					[2] = {
-						["strCmdLineFormat"] = "--farm-recheck 200 -G -S guangdong-pool.ethfans.org:3333 -O <wallet>.<workid>",
-						["strPool"] = "guangdong-pool.ethfans.org:3333",
-						["strWallet"] = "0xf8DEd89966dFe80A13ab5306BD1b44d22955DFcf",
-					},
-					[3] = {
-						["strCmdLineFormat"] = "--farm-recheck 200 -G -S huabei-pool.ethfans.org:3333 -O <wallet>.<workid>",
-						["strPool"] = "huabei-pool.ethfans.org:3333",
-						["strWallet"] = "0xf8DEd89966dFe80A13ab5306BD1b44d22955DFcf",
-					},
-				},
-			},
-		},
 		["tServerInterfaceCfg"] = {
 			["nQueryBindInterval"] = 5,
 			["nReportCalcInterval"] = 60,
