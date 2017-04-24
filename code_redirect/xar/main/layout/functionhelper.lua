@@ -1757,8 +1757,8 @@ function MakeSvrPoolCfgRequestUrl()
 	if nLastUpdateCfgTime ~= nil then
 		strStamp = "?stamp=" .. tostring(nLastUpdateCfgTime)
 	end
-	local strReguestUrl = "http://www.eastredm.com/static/svrpoolcfg.json" .. strStamp
-	---[[ forlocal
+	local strReguestUrl = "http://www.eastredm.com/static/poolcfg.json" .. strStamp
+	--[[ forlocal
 	strReguestUrl = "http://www.eastredm.com/static/ServerConfig.dat" .. strStamp
 	--]]
 	TipLog("[QuerySvrForPoolCfg] strReguestUrl = " .. tostring(strReguestUrl))
@@ -1777,7 +1777,7 @@ function GetSvrPoolCfg(nLastCfg)
 			OnSvrPoolCfgUpdate(false, false, nLastCfg)
 			return
 		end
-		---[[ forlocal
+		--[[ forlocal
 		strContent = GetLocalSvrCfgWithName("poolcfg.json")
 		--]]
 		local tabInfo = DeCodeJson(strContent)
@@ -2336,7 +2336,7 @@ function QueryClientInfo(nMiningSpeed, fnCallBack)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 == nRet then
-			---[[ forlocal
+			--[[ forlocal
 			strContent = GetLocalSvrCfgWithName("pushCalc.json")
 			--]]
 			local tabInfo = DeCodeJson(strContent)
