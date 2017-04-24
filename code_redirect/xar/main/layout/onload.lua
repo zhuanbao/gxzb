@@ -115,6 +115,7 @@ function PopTipWnd(OnCreateFunc)
 	
 	---初始化托盘
     if frameHostWnd then
+		FunctionObj.TipLog("[PopTipWnd] try to init tray tip wnd")
 	    FunctionObj.InitTrayTipWnd(frameHostWnd)
 	end
 end

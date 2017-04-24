@@ -1281,6 +1281,7 @@ function InitTrayTipWnd(objHostWnd)
 	g_tipNotifyIcon = tipNotifyIcon
 	SetNotifyIconState()
 	tipNotifyIcon:Show()
+	TipLog("[InitTrayTipWnd] init success")
 	return g_tipNotifyIcon
 end
 
