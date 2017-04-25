@@ -144,6 +144,8 @@ function OnClickUpdateBtn(self)
 			progrText:SetText("下载完成")
 			if Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
 				Helper.tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
+			else
+				progrText:SetText("文件检验失败，请重新下载")
 			end
 		end
 	end)

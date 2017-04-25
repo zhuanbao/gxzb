@@ -152,9 +152,9 @@
 								</obj>
 								<obj id="UpdateWnd.Progress.text" class="TextObject">
 									<attr>
-										<left>(father.width-100)/2</left>
+										<left>(father.width-200)/2</left>
 										<top>father.height+12</top>
-										<width>100</width>
+										<width>200</width>
 										<height>20</height>
 										<valign>center</valign>
 										<halign>center</halign>
