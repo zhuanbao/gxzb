@@ -2149,7 +2149,7 @@ function QuerySvrForGetHistoryInfo(strtype)
 	return strReguestUrl
 end
 
---查询收益接口,strtype = 0 最近24小时，1 最近1个月
+--查询收益接口,strtype = h24 最近24小时，d30 最近1个月
 --不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
 function GetHistoryToServer(strtype, fnCallBack)
@@ -2213,7 +2213,6 @@ function GetHistoryToServer(strtype, fnCallBack)
 		local tEarnings = ReadConfigFromMemByKey("tEarnings") or {}
 		tEarnings[strtype] = tEarnings[strtype] or {}
 		tEarnings[strtype]["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
-		--TODO:现在不确定服务器返回什么格式， 等确定了再改这里
 		tEarnings[strtype == "h24" and "hour24" or "day30"] = UINeedTable(tServer)
 		SaveConfigToFileByKey("tEarnings")
 	end
@@ -2248,12 +2247,12 @@ function GetHistoryToServer(strtype, fnCallBack)
 		--]]
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
-			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" or type(tabInfo["data"]["hour24"]) ~= "table" or type(tabInfo["data"]["day30"]) ~= "table" then
+			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" then
 				TipLog("[GetHistoryToServer] parse info error.")
 				fnCallBack(false, GetLocal(tEarnings))
 				return
 			end
-			fnCallBack(true, UINeedTable(tabInfo["data"][strtype ==0 and "hour24" or "day30"]))
+			fnCallBack(true, UINeedTable(tabInfo["data"]))
 			Save2Local(tabInfo["data"])
 		else
 			TipLog("[GetHistoryToServer] get content failed.")
