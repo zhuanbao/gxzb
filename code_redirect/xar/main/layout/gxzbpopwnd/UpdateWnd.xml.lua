@@ -65,6 +65,12 @@ function OnClickUpdateBtn(self)
 	if not g_tNewVersionInfo then 
 		return 
 	end
+	local strSavePath = GetPacketSavePath(g_tNewVersionInfo.strPacketURL)
+	if Helper:IsRealString(g_tNewVersionInfo.strMD5) 
+		and tFunctionHelper.CheckMD5(strSavePath, g_tNewVersionInfo.strMD5) then
+		Helper.tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
+		return
+	end
 	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
 	local TextVersion = self:GetObject("tree:UpdateWnd.Content.TextVersion")
 	local BtnUpdate = self:GetObject("tree:UpdateWnd.OneKeyUpdate.Btn")
@@ -112,20 +118,21 @@ function OnClickUpdateBtn(self)
 	
 	g_UpdateCancel = false
 	g_CanRetry = false
+	strUrl = strUrl..tFunctionHelper.GetTimeStamp()
 	tFunctionHelper.TipLog("[OnClickUpdateBtn] strUrl = "..tostring(strUrl)..", strSavePath = "..tostring(strSavePath))
 	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
-		if nRet == 0 then
+		if nRet == 0 or nRet == -1 then
 			g_CanRetry = true
 		end
 		if g_UpdateCancel then
-			if nRet == 0 then
+			if nRet == 0 or nRet == -1 then
 				g_UpdateCancel = false
 			end
 			tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress g_UpdateCancel = "..tostring(g_UpdateCancel))
 			return
 		end
 		if g_UpdateState == 2 then
-			if nRet == 0 then
+			if nRet == 0 or nRet == -1 then
 				g_UpdateState = 3
 			end
 			return
@@ -139,6 +146,8 @@ function OnClickUpdateBtn(self)
 			local rateText = tostring(math.floor(rate*100)).."%"
 			progrBar:SetObjPos(l, t, l + w*rate, b)
 			progrText:SetText("正在下载"..rateText)
+		elseif nRet == -1 then
+			progrText:SetText("下载失败，请检查网络连接")
 		elseif nRet == 0 then
 			progrBar:SetObjPos(l, t, l + w, b)
 			progrText:SetText("下载完成")
