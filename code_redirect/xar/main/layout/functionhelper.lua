@@ -2077,7 +2077,7 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	local strSpeed = string.format("%0.2f",nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
-	strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
+	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
