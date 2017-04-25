@@ -210,6 +210,9 @@ function AdjustAmountTextPosition(self)
 	
 	local ObjTextRealTimeIncome = self:GetControlObject("MiningPanel.Panel.Amount.RealTimeIncome")
 	local nLenRealTimeIncome = ObjTextRealTimeIncome:GetTextExtent()
+	if nLenRealTimeIncome > 0 then
+		nLenRealTimeIncome = nLenRealTimeIncome + 1
+	end
 	local ObjTextUnit = self:GetControlObject("MiningPanel.Panel.Amount.Unit")
 	local nLenUnit = ObjTextUnit:GetTextExtent()
 	local nMaxLen = width - (nLenDesc+gap) - (nLenUnit+gap) - nLenRealTimeIncome
