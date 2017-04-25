@@ -348,7 +348,7 @@ function SuspendCtrl_UpdateMiningSpeed(self, nMiningSpeedPerHour)
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
 	speedtext:SetText(tostring(nMiningSpeedPerHour).."¥฿/h")
-	local scaleValue = {0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000}
+	local scaleValue = {0, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000}
 	local nScale = 13
 	for i, v in ipairs(scaleValue) do
 		if i < #scaleValue and nMiningSpeedPerHour >= v and nMiningSpeedPerHour < scaleValue[i+1] then
