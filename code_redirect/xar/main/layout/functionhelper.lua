@@ -2142,9 +2142,6 @@ function QuerySvrForGetHistoryInfo(strtype)
 	local strInterfaceName = "getHistory"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
-	end
 	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(strtype)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
@@ -2161,9 +2158,9 @@ function GetHistoryToServer(strtype, fnCallBack)
 			return true
 		end
 		local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
-		local nLYear, nLMonth, nLDay, nLHour = tipUtil:FormatCrtTime(utc)
-		local nCYear, nCMonth, nCDay, nCHour = tipUtil:FormatCrtTime(utc)
-		if nLYear ~= nCYear or nLMonth ~= nCMonth or nLDay ~= nCDay or nLHour ~= nCHour then
+		local nLYear, nLMonth, nLDay, nLHour, nLMin = tipUtil:FormatCrtTime(utc)
+		local nCYear, nCMonth, nCDay, nCHour, nCMin = tipUtil:FormatCrtTime(nCurrentUtc)
+		if nLYear ~= nCYear or nLMonth ~= nCMonth or nLDay ~= nCDay or nLHour ~= nCHour or nLMin ~= nCMin then
 			return true
 		end
 		return false
@@ -2171,11 +2168,13 @@ function GetHistoryToServer(strtype, fnCallBack)
 	local function UINeedTable(t)
 		local tmp = {}
 		local nCurrent = tipUtil:GetCurrentUTCTime() or 0
+		--[[
 		if strtype == "h24" then
 			nCurrent = nCurrent - 3600
 		else
 			nCurrent = nCurrent - 86400
 		end
+		--]]
 		for i=#t, 1, -1 do
 			local _, LMonth, LDay, LHour = tipUtil:FormatCrtTime(nCurrent)
 			tmp[i] = {}
@@ -2236,7 +2235,7 @@ function GetHistoryToServer(strtype, fnCallBack)
 	, function(nRet, strContent, respHeaders)
 		TipLog("[GetHistoryToServer] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
-		---[[forlocal
+		--[[forlocal
 		strContent = GetLocalSvrCfgWithName("getHistory"..strtype..".json")
 		local tabInfo = DeCodeJson(strContent)
 		if type(tabInfo) == "table" and type(tabInfo["data"]) == "table" then
@@ -2246,7 +2245,7 @@ function GetHistoryToServer(strtype, fnCallBack)
 			fnCallBack(false, GetLocal())
 		end
 		if true then return end
-		---]]
+		--]]
 		if 0 == nRet then
 			local tabInfo = DeCodeJson(strContent)	
 			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" or type(tabInfo["data"]["hour24"]) ~= "table" or type(tabInfo["data"]["day30"]) ~= "table" then
