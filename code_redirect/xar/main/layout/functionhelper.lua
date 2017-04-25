@@ -2772,6 +2772,7 @@ function HandleOnStart()
 end
 
 function HandleOnQuit()
+	UpdateUserBalance()
 	g_UIWorkState = UI_STATE_STOPPED
 	ResetGlobalParam()
 	--更新球的显示状态
