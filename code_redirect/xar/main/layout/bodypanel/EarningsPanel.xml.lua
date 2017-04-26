@@ -21,6 +21,8 @@ function UpdateUserBalance(self, nBalance)
 		textHead:SetObjPos(nNewLeft, 0, nNewLeft+nLenHead, h)
 		bottomText:SetObjPos(nNewLeft + (nLenHead + gap), 0, nNewLeft + (nLenHead + gap) + nLenBalance, h)
 		textTail:SetObjPos(nNewLeft + (nLenHead + gap) + (nLenBalance + gap), 0, nNewLeft + (nLenHead + gap) + (nLenBalance + gap) + nLenTail, h)
+		local totalLen = nNewLeft + (nLenHead + gap) + (nLenBalance + gap) + nLenTail + 4
+		fater:SetObjPos("(father.width-"..totalLen..")/2", "father.height + 20", "father.width/2+"..totalLen.."/2", "father.height + 40")
 	end
 end
 
