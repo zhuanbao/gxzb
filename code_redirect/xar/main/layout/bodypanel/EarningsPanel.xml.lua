@@ -9,6 +9,8 @@ function UpdateUserBalance(self, nBalance)
 		local fater = self:GetObject("BottomLayout")
 		local l, t, r, b = fater:GetObjPos()
 		local w, h = r - l, b - t
+		--处是给一个较大的宽度
+		w = 200
 		local nLenHead = textHead:GetTextExtent()
 		local nLenTail = textTail:GetTextExtent()
 		local nLenBalance = bottomText:GetTextExtent()
