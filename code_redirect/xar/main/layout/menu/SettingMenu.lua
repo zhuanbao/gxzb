@@ -44,7 +44,7 @@ function menuFunTable.OnSelect_exit(self)
 		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
 			{
 				["parentWnd"] = wnd, 
-				["Text"] = "您已赚取了"..tFunctionHelper.NumberToFormatMoney(nCurBalance).."个元宝，请及时绑定\n微信将元宝入账。",
+				["Text"] = "您已赚取了"..tFunctionHelper.NumberToFormatMoney(nCurBalance).."个元宝，\n请及时绑定微信将元宝入账。",
 				["ChangeUI"] = function(objWnd)
 					local objtree = objWnd:GetBindUIObjectTree()
 					local btnyes = objtree:GetUIObject("yes")
