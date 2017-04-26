@@ -296,7 +296,8 @@ function ResetGlobalParam()
 		g_GenOilWorkingTimerId = nil
 	end
 	g_LastGetSpeedTime = 0
-	g_LastRealTimeIncome = 0
+	--进程范围内 只有更新余额的时候 才清0
+	--g_LastRealTimeIncome = 0
 end
 
 function ResetGlobalErrorParam()

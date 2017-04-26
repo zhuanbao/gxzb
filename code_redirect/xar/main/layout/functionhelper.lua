@@ -2362,8 +2362,11 @@ function QueryClientInfo(nMiningSpeed, fnCallBack)
 				end	
 			end
 			if tonumber(tabInfo["data"]["balance"]) ~= nil then
-				g_Balance = tabInfo["data"]["balance"]
-				UpdateUserBalance()
+				--g_Balance = tabInfo["data"]["balance"]
+				if g_Balance ~= tonumber(tabInfo["data"]["balance"]) then
+					SetUserCurrentBalance(tabInfo["data"]["balance"])
+					UpdateUserBalance()
+				end	
 			end
 			if tonumber(tabInfo["data"]["rate"]) ~= nil then
 				--g_PerSpeed = tabInfo["data"]["rate"]
@@ -2772,7 +2775,7 @@ function HandleOnStart()
 end
 
 function HandleOnQuit()
-	UpdateUserBalance()
+	--UpdateUserBalance()
 	g_UIWorkState = UI_STATE_STOPPED
 	ResetGlobalParam()
 	--更新球的显示状态
@@ -2834,8 +2837,10 @@ function NotifyStart()
 end
 
 function NotifyPause()
-	g_WorkClient.Pause()
-	HandleOnQuit()
+	if g_WorkClient then
+		g_WorkClient.Pause()
+		HandleOnQuit()
+	end	
 end
 
 function NotifyResume()
@@ -2844,8 +2849,10 @@ function NotifyResume()
 end
 
 function NotifyQuit()
-	g_WorkClient.Quit()
-	HandleOnQuit()
+	if g_WorkClient then
+		g_WorkClient.Quit()
+		HandleOnQuit()
+	end	
 end
 
 function WorkingTimerHandle()
