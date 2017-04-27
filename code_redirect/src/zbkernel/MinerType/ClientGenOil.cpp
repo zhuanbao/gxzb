@@ -122,7 +122,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 
 	//提交share成功
 	//成功 示例："B-) Submitted and accepted."
-	//失败 示例："B-) Submitted and accepted."
+	//失败 示例：":-( Not accepted."
 	if (boost::icontains(strBuffer,"B-) Submitted and accepted."))
 	{
 		PostWndMsg(WP_GENOIL_SHARE, 0);
