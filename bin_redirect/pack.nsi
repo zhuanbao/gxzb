@@ -245,20 +245,23 @@ FunctionEnd
 	Push $2
 	ReadRegStr $0 HKCU "Software\Share4Money" "statpeerid"
 	ReadRegStr $1 HKLM "Software\Share4Money" "PeerId"
-	${If} $1 != ""
-	${AndIf} $1 != 0
-		${If} $0 == ""
-		${OrIf} $0 == 0
-			StrCpy $0 "0123456789ABCDEF"
-		${EndIf}
-		${StrFilter} $0 "-" "" "" $0
-		${StrFilter} $1 "-" "" "" $1
-		StrCpy $2 $1 1 11
-		${WordReplace} $0 $2 "X" +1 $1
-		${If} $0 != $1
-			System::Call '$PLUGINSDIR\zbsetuphelper::SendAnyHttpStat(t "${strp1}", t "${strp2}", t "${strp3}", i ${np4}) '
-		${EndIf}
+	${If} $1 == ""
+	${OrIf} $1 == 0
+		System::Call "$PLUGINSDIR\zbsetuphelper::GetPeerID(t .r1)"
 	${EndIf}
+	
+	${If} $0 == ""
+	${OrIf} $0 == 0
+		StrCpy $0 "0123456789ABCDEF"
+	${EndIf}
+	${StrFilter} $0 "-" "" "" $0
+	${StrFilter} $1 "-" "" "" $1
+	StrCpy $2 $1 1 11
+	${WordReplace} $0 $2 "X" +1 $1
+	${If} $0 != $1
+		System::Call '$PLUGINSDIR\zbsetuphelper::SendAnyHttpStat(t "${strp1}", t "${strp2}", t "${strp3}", i ${np4}) '
+	${EndIf}
+	
 	Pop $2
 	Pop $1
 	Pop $0
@@ -460,6 +463,7 @@ Function .onInit
 		
 		File "license.txt"
 		Call UpdateChanel
+		Call FirstSendStart
 		!insertmacro InitBaseCfgDir
 		StrCpy $0 3
 		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe') i.r0 ? u"
@@ -479,6 +483,19 @@ FunctionEnd
 
 Var Bool_IsInstallSucc
 Var Bool_IsUpdate
+Function FirstSendStart
+	StrCpy $Bool_IsUpdate 0 
+	ReadRegStr $0 HKLM "software\Share4Money" "Path"
+	IfFileExists $0 0 +2
+	StrCpy $Bool_IsUpdate 1
+	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
+	${If} $Bool_IsUpdate == 0
+		${SendStat} "installstart" "$R1" "$str_ChannelID" 1
+	${Else}
+		${SendStat} "updatestart" "$R1" "$str_ChannelID" 1
+	${EndIf} 
+FunctionEnd
+
 Function DoInstall
 	;初始化安装成功标志位
 	StrCpy $Bool_IsInstallSucc 0
@@ -505,11 +522,6 @@ Function DoInstall
 	File /r "main\*"
 	
 	WriteUninstaller "$INSTDIR\uninst.exe"
-	
-	StrCpy $Bool_IsUpdate 0 
-	ReadRegStr $0 HKLM "software\Share4Money" "Path"
-	IfFileExists $0 0 +2
-	StrCpy $Bool_IsUpdate 1
 	
 	StrCpy $R0 1
 	${If} $IsSilentInst == 1
