@@ -196,7 +196,7 @@ function SendStartupReport(bShowWnd)
 	
 	if not bShowWnd then
 		tStatInfo.strEC = "startup"  --进入上报
-		tStatInfo.strEA = FunctionObj.GetGXZBMinorVer() or ""
+		tStatInfo.strEA = FunctionObj.GetInstallSrc() or ""
 	else
 		tStatInfo.strEC = "showui" 	 --展示上报
 		tStatInfo.strEA = FunctionObj.GetInstallSrc() or ""
@@ -254,7 +254,7 @@ function TryForceUpdate(tServerConfig)
 		FunctionObj.TipLog("[TryForceUpdate] CheckIsUpdating failed,another thread is updating!")
 		return
 	end
-
+	
 	local bPassCheck = FunctionObj.CheckCommonUpdateTime(1)
 	if not bPassCheck then
 		FunctionObj.TipLog("[TryForceUpdate] CheckCommonUpdateTime failed")
@@ -297,6 +297,7 @@ function TryForceUpdate(tServerConfig)
 			strCmd = strCmd.." "..versionInfo["strCmd"]
 		end
 		tipUtil:ShellExecute(0, "open", strRealPath, strCmd, 0, "SW_HIDE")
+		FunctionObj.SendUIReport("updateclinet","auto")
 	end)
 end
 
@@ -366,23 +367,25 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	FunctionObj.PopTipPre4Hour()
 	TryExecuteExtraCode(tServerConfig)
 	
-	--升级提醒
-	FunctionObj.PopRemindUpdateWnd()
 	--[[
 	CheckMachineBindState()
 	FunctionObj.CheckShoudAutoMining()
 	--]]
 	--增加处理/noliveup命令行
-	SetOnceTimer(function()
-					local cmdString = tipUtil:GetCommandLine()
-					local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
-					if not bRet then
-						FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
-						TryForceUpdate(tServerConfig)
-					else
-						FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
-					end
-				end, 1000)
+	--升级提醒
+	local bPopRemind = FunctionObj.PopRemindUpdateWnd()
+	if not bPopRemind then
+		SetOnceTimer(function()
+						local cmdString = tipUtil:GetCommandLine()
+						local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
+						if not bRet then
+							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
+							TryForceUpdate(tServerConfig)
+						else
+							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
+						end
+					end, 1000)
+	end			
 end
 XLSetGlobal("OnDownLoadSvrCfgSuccess", OnDownLoadSvrCfgSuccess)
 

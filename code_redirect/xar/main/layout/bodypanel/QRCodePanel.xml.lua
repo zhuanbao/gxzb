@@ -125,6 +125,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 	local nTimerCounter = 0
 	local function TimerHandle()
 		if not gBinding then
+			--tFunctionHelper.SendUIReport("bindweixin","fail","cancel")
 			return	
 		end
 		if nExpire < 1 then
@@ -132,6 +133,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 			ResetLastQRCodeInfo()
 			ResetGlobalParam()
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Expire")
+			tFunctionHelper.SendUIReport("bindweixin","fail","expire")
 			return
 		end
 		nExpire = nExpire - 1
@@ -152,6 +154,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					ResetLastQRCodeInfo()
 					ResetGlobalParam()
 					ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
+					tFunctionHelper.SendUIReport("bindweixin","fail","svrerror")
 					return 
 				end
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
@@ -159,6 +162,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					UpdateBindSuccessUI(OwnerCtrl)
 					tFunctionHelper.SetUserBindInfo(tabBindInfo)
 					ResetLastQRCodeInfo()
+					tFunctionHelper.SendUIReport("bindweixin","success")
 				end	
 				bQuerying = false
 			end)
@@ -178,6 +182,7 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 	if not ObjBitmap then
 		ResetGlobalParam()
 		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
+		tFunctionHelper.SendUIReport("bindweixin","fail","getbitmap")
 		return
 	end
 	
@@ -194,6 +199,7 @@ function GetQRCodeFromServer(OwnerCtrl)
 		if not bRet then
 			TipLog("Download temp qrcode failed.")
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
+			tFunctionHelper.SendUIReport("bindweixin","fail","downqrcode")
 			return
 		end
 		HandleInfoData(OwnerCtrl, info)

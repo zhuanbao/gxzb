@@ -38,6 +38,7 @@ function OnClickTakeCash(self)
 			tFunctionHelper.SetUserCurrentBalance(nBalance)
 			tFunctionHelper.UpdateUserBalance(nBalance)
 			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
+			tFunctionHelper.SendUIReport("takecash","success")
 		else
 			local nErrorCode = tabInfo["data"]["errCode"]
 			if nErrorCode == ERROR_WORKID or nErrorCode == ERROR_BIND then

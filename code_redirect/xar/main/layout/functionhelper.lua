@@ -201,6 +201,24 @@ function GetCommandStrValue(strKey)
 	return bRet, strValue
 end
 
+function SendUIReport(strEC,strEA,strEL)
+	local tStatInfo = {}
+	tStatInfo.strEC = strEC
+	if strEA == nil then
+		tStatInfo.strEA = GetInstallSrc() or ""
+	else
+		tStatInfo.strEA = strEA
+	end
+	if strEL == nil then
+		tStatInfo.strEL = GetGXZBMinorVer() or ""
+	else
+		tStatInfo.strEL = strEL
+	end
+	
+	tStatInfo.strEV = 1
+	TipConvStatistic(tStatInfo)
+end
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -229,6 +247,7 @@ function RegisterFunctionObject(self)
 	obj.GetCurrentServerTime = GetCurrentServerTime
 	obj.CheckIsAnotherDay = CheckIsAnotherDay
 	obj.CheckPeerIDList = CheckPeerIDList
+	obj.SendUIReport = SendUIReport
 	
 	--业务辅助函数
 	obj.GetModuleDir = GetModuleDir
@@ -1195,19 +1214,23 @@ function UpdateSuspendWndVisible(scene)
 	local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 	if nState == nil or nState == 0 then
 		ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
+		SendUIReport("showsuspendwnd",1)
 	elseif nState == 1 then
 		local SuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
 		if SuspendWnd then
 			SuspendWnd:Show(0)
+			SendUIReport("showsuspendwnd",0)
 		end
 	elseif scene == 1 and nState == 2 then
 		if not CheckIsWorking() then
 			local SuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
 			if SuspendWnd then
 				SuspendWnd:Show(0)
+				SendUIReport("showsuspendwnd",0)
 			end
 		else
 			ShowPopupWndByName("GXZB.SuspendWnd.Instance",  true)
+			SendUIReport("showsuspendwnd",1)
 		end
 	end
 end
@@ -2287,7 +2310,9 @@ function PopRemindUpdateWnd()
 		tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
 		tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
 		SaveConfigToFileByKey("tUserConfig")
+		return true
 	end
+	return false
 end
 
 function PopTipPre4Hour()
@@ -2600,6 +2625,7 @@ function OnUnBindSuccess()
 end	
 
 function OnUnBindFail()
+	SendUIReport("unbindclient","fail")
 	local wnd = GetMainHostWnd()
 	if not wnd then
 		return
@@ -2612,6 +2638,7 @@ function OnUnBindFail()
 end	
 
 function UnBindingClientFromClient()
+	SendUIReport("unbindclient","start")
 	SendUnBindInfoToServer()
 end
 

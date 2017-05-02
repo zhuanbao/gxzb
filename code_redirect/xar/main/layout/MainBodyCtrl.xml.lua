@@ -318,6 +318,7 @@ function OnClickEarningsPanel(self)
 	local objmain = self:GetOwnerControl()
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")
+		tFunctionHelper.SendUIReport("showearnpanel")
 	end
 end
 

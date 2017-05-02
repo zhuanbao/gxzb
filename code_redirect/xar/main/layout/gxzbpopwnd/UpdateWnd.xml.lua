@@ -69,6 +69,7 @@ function OnClickUpdateBtn(self)
 	if Helper:IsRealString(g_tNewVersionInfo.strMD5) 
 		and tFunctionHelper.CheckMD5(strSavePath, g_tNewVersionInfo.strMD5) then
 		Helper.tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
+		tFunctionHelper.SendUIReport("updateclinet","user")
 		return
 	end
 	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
@@ -153,6 +154,7 @@ function OnClickUpdateBtn(self)
 			progrText:SetText("下载完成")
 			if Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
 				Helper.tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
+				tFunctionHelper.SendUIReport("updateclinet","user")
 			else
 				progrText:SetText("文件检验失败，请重新下载")
 			end
