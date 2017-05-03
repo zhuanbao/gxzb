@@ -288,6 +288,7 @@ function TryForceUpdate(tServerConfig)
 		FunctionObj.SetIsUpdating(false)
 	
 		if not IsRealString(strRealPath) then
+			FunctionObj.TipLog("[TryForceUpdate] download fail")
 			return
 		end
 		

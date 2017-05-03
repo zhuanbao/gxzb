@@ -460,6 +460,7 @@ function DownLoadNewVersion(tNewVersionInfo, fnCallBack)
 			fnCallBack(strSavePath, tNewVersionInfo)
 			return
 		end
+		fnCallBack(nil)
 	end)	
 end
 
