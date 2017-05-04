@@ -222,6 +222,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetLastWord", GetLastWord},
 	{"GetLastInputInfo", FGetLastInputInfo},
 	{"SetApplicationId", SetApplicationId},
+	{"StopComputerSleep", StopComputerSleep},
 	{NULL, NULL}
 };
 
@@ -5616,4 +5617,19 @@ int LuaAPIUtil::SetApplicationId(lua_State *pLuaState)
 	}
 	lua_pushboolean(pLuaState,bRet);
 	return 1;
+}
+
+int LuaAPIUtil::StopComputerSleep(lua_State *pLuaState)
+{
+	int nPreventSleep = lua_toboolean(pLuaState, 2);
+	BOOL bPreventSleep = (nPreventSleep == 0) ? FALSE : TRUE;
+	if (bPreventSleep)
+	{
+		::SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED | ES_AWAYMODE_REQUIRED |ES_CONTINUOUS);
+	}
+	else
+	{
+		::SetThreadExecutionState(ES_CONTINUOUS);
+	}
+	return 0;
 }

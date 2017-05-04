@@ -253,6 +253,7 @@ public:
 	static int FGetLastInputInfo(lua_State *pLuaState);
 
 	static int SetApplicationId(lua_State *pLuaState);
+	static int StopComputerSleep(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };
