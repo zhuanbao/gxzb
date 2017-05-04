@@ -2800,6 +2800,7 @@ function HandleOnStart()
 	WorkingTimerHandle()
 	OnWorkStateChange(1)
 	StartMiningCountTimer()
+	tipUtil:StopComputerSleep(true)
 end
 
 function HandleOnQuit()
@@ -2811,6 +2812,7 @@ function HandleOnQuit()
 	OnWorkStateChange(2)
 	SendMiningReport(0, true)
 	StopMiningCountTimer()
+	tipUtil:StopComputerSleep(false)
 end
 
 function StartClient()
