@@ -5626,10 +5626,12 @@ int LuaAPIUtil::StopComputerSleep(lua_State *pLuaState)
 	if (bPreventSleep)
 	{
 		::SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED | ES_AWAYMODE_REQUIRED |ES_CONTINUOUS);
+		TSDEBUG4CXX("StopComputerSleep true ");
 	}
 	else
 	{
 		::SetThreadExecutionState(ES_CONTINUOUS);
+		TSDEBUG4CXX("StopComputerSleep false ");
 	}
 	return 0;
 }
