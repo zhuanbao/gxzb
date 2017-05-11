@@ -36,9 +36,9 @@ RequestExecutionLevel admin
 !define PRODUCT_VERSION "1.0.0.1"
 ;TestCheckFlag==1 ∑«≤‚ ‘ƒ£ Ω
 !if ${TestCheckFlag} == 1
-	!define EM_OUTFILE_NAME "Share4MoneySetup_nointel_${INSTALL_CHANNELID}.exe"
-!else
 	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
+!else
+	!define EM_OUTFILE_NAME "Share4MoneySetup_test_${INSTALL_CHANNELID}.exe"
 !endif
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Share4Money.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
