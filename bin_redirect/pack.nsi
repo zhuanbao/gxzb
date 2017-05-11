@@ -59,7 +59,7 @@ VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=2052 "Comments" ""
 VIAddVersionKey /LANG=2052 "CompanyName" "深圳开心豆豆科技有限公司"
-VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2017-2019 深圳开心豆豆科技有限公司"
+VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2016-2017 深圳开心豆豆科技有限公司"
 VIAddVersionKey /LANG=2052 "FileDescription" "${PRODUCT_NAME}安装程序"
 VIAddVersionKey /LANG=2052 "FileVersion" ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductVersion" ${PRODUCT_VERSION}
@@ -580,8 +580,6 @@ Function DoInstall
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\program\Share4Money.exe"
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "http://www.eastredm.com/"
-	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "深圳开心豆豆科技有限公司"
-
 	;修改环境变量
 	ExecShell open "$SYSDIR\setx.exe" "GPU_FORCE_64BIT_PTR 0" SW_HIDE
 	ExecShell open "$SYSDIR\setx.exe" "GPU_MAX_HEAP_SIZE 100" SW_HIDE
