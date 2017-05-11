@@ -580,6 +580,8 @@ Function DoInstall
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\program\Share4Money.exe"
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "http://www.eastredm.com/"
+	WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "深圳开心豆豆科技有限公司"
+
 	;修改环境变量
 	ExecShell open "$SYSDIR\setx.exe" "GPU_FORCE_64BIT_PTR 0" SW_HIDE
 	ExecShell open "$SYSDIR\setx.exe" "GPU_MAX_HEAP_SIZE 100" SW_HIDE
