@@ -45,7 +45,11 @@ RequestExecutionLevel admin
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 BrandingText "${PRODUCT_NAME}"
-OutFile "bin\${EM_OUTFILE_NAME}"
+!if ${PackUninstall} == 1
+	OutFile "uninstallhelper.exe"
+!else
+	OutFile "bin\${EM_OUTFILE_NAME}"
+!endif
 InstallDir "$PROGRAMFILES\Share4Money"
 InstallDirRegKey HKLM "software\Share4Money" "InstDir"
 ShowInstDetails show
@@ -421,6 +425,10 @@ FunctionEnd
 
 Function .onInit
 	${InitMutex}
+	${If} ${PackUninstall} == 1
+		WriteUninstaller "$EXEDIR\main\uninst.exe"
+		Abort
+	${EndIf}
 	;1：不支持opencl或者显存小于3G， 2：不是64位系统， 0：64位且支持cl
 	StrCpy $CheckFlag ${TestCheckFlag}
 	StrCpy $IsSilentInst 0
@@ -515,13 +523,10 @@ Function DoInstall
 	;先删再装
 	RMDir /r "$INSTDIR\program"
 	RMDir /r "$INSTDIR\xar"
-	RMDir /r "$INSTDIR\res"
 	
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
 	File /r "main\*"
-	
-	WriteUninstaller "$INSTDIR\uninst.exe"
 	
 	StrCpy $R0 1
 	${If} $IsSilentInst == 1
@@ -1242,7 +1247,6 @@ Section Uninstall
 	RMDir /r "$INSTDIR\xar"
 	Delete "$INSTDIR\uninst.exe"
 	RMDir /r "$INSTDIR\program"
-	RMDir /r "$INSTDIR\res"
 	;删配置
 	RMDir /r "$BaseCfgDir\Share4Money"
 	
