@@ -627,7 +627,7 @@ Function CmdSilentInstall
 	CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\卸载${PRODUCT_NAME}.lnk" "$INSTDIR\uninst.exe"
 	;锁定到任务栏
 	System::Call "$PLUGINSDIR\zbsetuphelper::SetInstDir(t '$INSTDIR\program')"
-	;System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
+	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
 	
 	;静默安装根据命令行开机启动
 	System::Call "kernel32::GetCommandLineA() t.R1"
@@ -1012,8 +1012,8 @@ Function NSD_TimerFun
 	
 	;快速启动栏
 	System::Call "$PLUGINSDIR\zbsetuphelper::SetInstDir(t '$INSTDIR\program')"
-	;System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
-	;System::Call "$PLUGINSDIR\zbsetuphelper::Pin2Taskbar(i 1)"
+	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
+	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2Taskbar(i 1)"
 	
 	${If} $BoolSysBoot == 1
 		WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /mining /embedding /sstartfrom sysboot'
