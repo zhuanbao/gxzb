@@ -59,8 +59,9 @@ local g_tPopupWndList = {
 local g_tConfigFileStruct = {
 	["tUserConfig"] = {
 		["strFileName"] = "UserConfig.dat",
+		["bEncypt"] = true,
 		["tContent"] = {}, 
-		["fnMergeOldFile"] = function(infoTable, strFileName) return MergeOldUserCfg(infoTable, strFileName) end,
+		["fnMergeOldFile"] = function(infoTable, strFileName) return MergeOldUserCfg(infoTable, strFileName,bEncypt) end,
 	},
 	["tEarnings"] = {
 		["strFileName"] = "Earnings.dat",
@@ -641,16 +642,17 @@ end
 
 function GetPeerID()
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	if IsRealString(strPeerID) then
-		return string.upper(strPeerID)
+	local strDecryptMachineID = tipUtil:DecryptString(strPeerID,"RpXVQTFlU7NaeMcV")
+	if IsRealString(strDecryptMachineID) then
+		return string.upper(strDecryptMachineID)
 	end
 
 	local strRandPeerID = tipUtil:GetPeerId()
 	if not IsRealString(strRandPeerID) then
 		return ""
 	end
-	
-	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strRandPeerID)
+	local strEncryptPeerID = tipUtil:EncryptString(strRandPeerID,"RpXVQTFlU7NaeMcV")
+	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strEncryptPeerID)
 	return string.upper(strRandPeerID)
 end
 
@@ -672,9 +674,22 @@ function CheckPeerIDList(tPIDlist)
 end
 
 function GetMachineID()
-	local strGUID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\machineid")
-	if IsRealString(strGUID) then
-		return string.upper(strGUID)
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strMachineID = tUserConfig["strMachineID"]
+	if not IsRealString(strMachineID) then
+		strMachineID = RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid")
+		if not IsRealString(strMachineID) then
+			local strGUID = tipUtil:CreateGuid()
+			strMachineID = tipUtil:EncryptString(strGUID,"RpXVQTFlU7NaeMcV")
+			RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid", strMachineID)
+		end
+		tUserConfig["strMachineID"] = strMachineID
+		SaveConfigToFileByKey("tUserConfig")
+	end
+	
+	strDecryptMachineID = tipUtil:DecryptString(strMachineID,"RpXVQTFlU7NaeMcV")
+	if IsRealString(strDecryptMachineID) then
+		return string.upper(strDecryptMachineID)
 	end
 end
 
@@ -951,7 +966,17 @@ function ReadAllConfigInfo()
 	for strKey, tConfig in pairs(g_tConfigFileStruct) do
 		local strFileName = tConfig["strFileName"]
 		local strCfgPath = GetCfgPathWithName(strFileName)
-		local infoTable = LoadTableFromFile(strCfgPath)
+		local infoTable = nil
+		if tConfig["bEncypt"] and not tipUtil:IsFilePlaintext(strCfgPath) then
+			local strDecryptPath = GenDecFilePath(strCfgPath)
+			TipLog("[ReadAllConfigInfo] strDecryptPath = "..tostring(strDecryptPath))
+			if IsRealString(strDecryptPath) then
+				infoTable = LoadTableFromFile(strDecryptPath)
+				tipUtil:DeletePathFile(strDecryptPath)
+			end	
+		else
+			infoTable = LoadTableFromFile(strCfgPath)
+		end
 		if type(infoTable) ~= "table" then
 			TipLog("[ReadAllConfigInfo] GetConfigFile failed! "..tostring(strFileName))
 			--读失败了不用返回
@@ -963,7 +988,7 @@ function ReadAllConfigInfo()
 		local bMerge = false
 		local fnMergeOldFile = tConfig["fnMergeOldFile"]
 		if type(fnMergeOldFile) == "function" then
-			bMerge, tContent = fnMergeOldFile(infoTable, strFileName)
+			bMerge, tContent = fnMergeOldFile(infoTable, strFileName,tConfig["bEncypt"])
 		end
 		
 		tConfig["tContent"] = tContent
@@ -1122,6 +1147,28 @@ function RegSetValue(sPath, value)
 		end
 	end
 	return false
+end
+
+function GenDecFilePath(strEncFilePath)
+	local strKey = "RpXVQTFlU7NaeMcV"
+	XLMessageBox(strEncFilePath)
+	local strDecString = tipUtil:DecryptFileAES(strEncFilePath, strKey)
+	XLMessageBox(strDecString)
+	if type(strDecString) ~= "string" then
+		TipLog("[GenDecFilePath] DecryptFileAES failed : "..tostring(strEncFilePath))
+		return ""
+	end
+	
+	local strTmpDir = tipUtil:GetSystemTempPath()
+	if not tipUtil:QueryFileExists(strTmpDir) then
+		TipLog("[GenDecFilePath] GetSystemTempPath failed strTmpDir: "..tostring(strTmpDir))
+		return ""
+	end
+	
+	local strCfgName = tipUtil:GetTmpFileName() or "s4mcfg.dat"
+	local strCfgPath = tipUtil:PathCombine(strTmpDir, strCfgName)
+	tipUtil:WriteStringToFile(strCfgPath, strDecString)
+	return strCfgPath
 end
 
 
@@ -1502,6 +1549,13 @@ function GetResSavePath(strName)
 	return strPath or ""
 end
 
+function EncryptFilePath(strTmpPath,strSavePath)
+	local strKey = "RpXVQTFlU7NaeMcV"
+	local strData = tipUtil:ReadFileToString(strTmpPath)
+	tipUtil:EncryptAESToFile(strSavePath,strData,strKey)
+	tipUtil:DeletePathFile(strTmpPath)
+end
+
 function SaveConfigToFileByKey(strKey)
 	if not IsRealString(strKey) or type(g_tConfigFileStruct[strKey])~="table" then
 		return
@@ -1511,12 +1565,18 @@ function SaveConfigToFileByKey(strKey)
 	local tContent = g_tConfigFileStruct[strKey]["tContent"]
 	local strConfigPath = GetCfgPathWithName(strFileName)
 	if IsRealString(strConfigPath) and type(tContent) == "table" then
-		tipUtil:SaveLuaTableToLuaFile(tContent, strConfigPath)
-	end
+		if not g_tConfigFileStruct[strKey]["bEncypt"] then
+			tipUtil:SaveLuaTableToLuaFile(tContent, strConfigPath)
+		else
+			local strTmpPath = strConfigPath .. ".tmp"
+			tipUtil:SaveLuaTableToLuaFile(tContent, strTmpPath)
+			EncryptFilePath(strTmpPath,strConfigPath)
+		end
+	end	
 end
 
-function MergeOldUserCfg(tCurrentCfg, strFileName)
-	local tOldCfg, strOldCfgPath = GetOldCfgContent(strFileName)
+function MergeOldUserCfg(tCurrentCfg, strFileName, bEncypt)
+	local tOldCfg, strOldCfgPath = GetOldCfgContent(strFileName,bEncypt)
 	if type(tOldCfg) ~= "table" then
 		return false, tCurrentCfg
 	end
@@ -1533,14 +1593,23 @@ function MergeOldUserCfg(tCurrentCfg, strFileName)
 end
 
 
-function GetOldCfgContent(strCurFileName)
+function GetOldCfgContent(strCurFileName,bEncypt)
 	local strOldFileName = strCurFileName..".bak"
 	local strOldCfgPath = GetCfgPathWithName(strOldFileName)
 	if not IsRealString(strOldCfgPath) or not tipUtil:QueryFileExists(strOldCfgPath) then
 		return nil
 	end
-	
-	local tOldCfg = LoadTableFromFile(strOldCfgPath)
+	local tOldCfg = nil
+	if bEncypt and tipUtil:IsFilePlaintext(strOldCfgPath) then
+		local strDecryptPath = GenDecFilePath(strOldCfgPath)
+		TipLog("[GetOldCfgContent] strDecryptPath = "..tostring(strDecryptPath))
+		if IsRealString(strDecryptPath) then
+			tOldCfg = LoadTableFromFile(strDecryptPath)
+			tipUtil:DeletePathFile(strDecryptPath)
+		end	
+	else
+		tOldCfg = LoadTableFromFile(strOldCfgPath)
+	end
 	return tOldCfg, strOldCfgPath
 end
 
@@ -2040,6 +2109,9 @@ function QuerySvrForReportClientInfo()
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
 	end	
+	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then
+		InitMachName()
+	end
 	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strMachineName"]))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
@@ -2507,9 +2579,6 @@ end
 function InitMachName()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
-		tUserConfig["tUserInfo"] = {}
-	end
-	if not tUserConfig["tUserInfo"] then
 		tUserConfig["tUserInfo"] = {}
 	end
 	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
