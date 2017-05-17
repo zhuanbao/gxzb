@@ -1598,7 +1598,7 @@ function GetOldCfgContent(strCurFileName,bEncypt)
 		return nil
 	end
 	local tOldCfg = nil
-	if bEncypt and tipUtil:IsFilePlaintext(strOldCfgPath) then
+	if bEncypt and not tipUtil:IsFilePlaintext(strOldCfgPath) then
 		local strDecryptPath = GenDecFilePath(strOldCfgPath)
 		TipLog("[GetOldCfgContent] strDecryptPath = "..tostring(strDecryptPath))
 		if IsRealString(strDecryptPath) then
