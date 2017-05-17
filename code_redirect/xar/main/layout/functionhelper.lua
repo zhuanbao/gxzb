@@ -880,7 +880,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
-	local strConfigURL = tUserConfig["strServerConfigURL"]
+	local strConfigURL = tUserConfig["strServerConfigURL"] or "http://www.eastredm.com/static/ServerConfig.dat"
 	if not IsRealString(strConfigURL) then
 		callbackwrap(-2)
 		return
