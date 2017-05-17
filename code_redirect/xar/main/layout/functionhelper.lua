@@ -642,9 +642,9 @@ end
 
 function GetPeerID()
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	local strDecryptMachineID = tipUtil:DecryptString(strPeerID,"RpXVQTFlU7NaeMcV")
-	if IsRealString(strDecryptMachineID) then
-		return string.upper(strDecryptMachineID)
+	local strDecryptPeerID = tipUtil:DecryptString(strPeerID,"RpXVQTFlU7NaeMcV")
+	if IsRealString(strDecryptPeerID) then
+		return string.upper(strDecryptPeerID)
 	end
 
 	local strRandPeerID = tipUtil:GetPeerId()
@@ -677,19 +677,20 @@ function GetMachineID()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local strMachineID = tUserConfig["strMachineID"]
 	if not IsRealString(strMachineID) then
-		strMachineID = RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid")
+		local strRegOldPath = "HKEY_CURRENT_USER\\Software\\Share4Money\\machineid"
+		strMachineID = RegQueryValue(strRegOldPath)
 		if not IsRealString(strMachineID) then
-			local strGUID = tipUtil:CreateGuid()
-			strMachineID = tipUtil:EncryptString(strGUID,"RpXVQTFlU7NaeMcV")
-			RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid", strMachineID)
+			strMachineID = tipUtil:CreateGuid()
+			--strMachineID = tipUtil:EncryptString(strGUID,"RpXVQTFlU7NaeMcV")
+			--RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid", strMachineID)
+		else
+			RegDeleteValue(strRegOldPath)
 		end
 		tUserConfig["strMachineID"] = strMachineID
 		SaveConfigToFileByKey("tUserConfig")
 	end
-	
-	strDecryptMachineID = tipUtil:DecryptString(strMachineID,"RpXVQTFlU7NaeMcV")
-	if IsRealString(strDecryptMachineID) then
-		return string.upper(strDecryptMachineID)
+	if IsRealString(strMachineID) then
+		return string.upper(strMachineID)
 	end
 end
 
