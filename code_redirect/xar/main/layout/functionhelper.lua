@@ -61,7 +61,7 @@ local g_tConfigFileStruct = {
 		["strFileName"] = "UserConfig.dat",
 		["bEncypt"] = true,
 		["tContent"] = {}, 
-		["fnMergeOldFile"] = function(infoTable, strFileName) return MergeOldUserCfg(infoTable, strFileName,bEncypt) end,
+		["fnMergeOldFile"] = function(infoTable, strFileName,bEncypt) return MergeOldUserCfg(infoTable, strFileName,bEncypt) end,
 	},
 	["tEarnings"] = {
 		["strFileName"] = "Earnings.dat",
