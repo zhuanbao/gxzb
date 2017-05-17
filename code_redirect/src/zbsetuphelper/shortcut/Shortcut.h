@@ -4,7 +4,8 @@
 #include "utility.h"
 #include <shlobj.h>
 #include "InvokeShellVerb.h"
-
+using namespace std;
+extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
 // 
 //5386 - Pin to taskbar
 //5387 - Unpin form taskbar

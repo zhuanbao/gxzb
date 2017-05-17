@@ -3,7 +3,6 @@
 #include <string>
 #include <comdef.h>
 #include <atlbase.h>
-using namespace std;
 #include <WTL/atlapp.h>
 #include <Urlmon.h>
 #pragma comment(lib, "Urlmon.lib")
@@ -13,8 +12,21 @@ using namespace std;
 #include <tlhelp32.h>
 #include <atlstr.h>
 #include "..\zbkernel\Utility\PeeIdHelper.h"
-extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
+#include "base64.h"
+#include <openssl/rsa.h>
+#include <openssl/aes.h>
+#include <openssl/evp.h>
+#pragma comment(lib,"libeay32.lib")
+#pragma comment(lib,"ssleay32.lib")
+
 #include "shortcut/Shortcut.h"
+#include "StringOperation.h"
+using namespace std;
+
+extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
+
+void EncryptString(const char* pszData,std::string &strOut);
+void DecryptString(const char* pszBase64Data,std::string &strOut);
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -148,11 +160,11 @@ extern "C" __declspec(dllexport) void SetUpExit()
 
 extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *el,long ev)
 {
+	TSAUTO();
 	if (ec == NULL || ea == NULL)
 	{
 		return ;
 	}
-	TSAUTO();
 	CHAR* szURL = new CHAR[MAX_PATH];
 	memset(szURL, 0, MAX_PATH);
 	char szPid[256] = {0};
@@ -171,7 +183,7 @@ extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *e
 		str += szev;
 	}
 	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
-	
+	TSDEBUG4CXX(L"SendAnyHttpStat szURL = "<<ultra::_A2UTF(szURL));
 	ResetUserHandle();
 	DWORD dwThreadId = 0;
 	HANDLE hThread = CreateThread(NULL, 0, SendHttpStatThread, (LPVOID)szURL,0, &dwThreadId);
@@ -206,9 +218,24 @@ extern "C" __declspec(dllexport) void GetFileVersionString(CHAR* pszFileName, CH
 	}
 }
 
-
+void SetRegPeerID(const char* szPeerID)
+{
+	std::string strEncrypt ="";
+	EncryptString(szPeerID,strEncrypt);
+	HKEY hKey, hTempKey;
+	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software",0,KEY_SET_VALUE, &hKey))
+	{
+		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "Share4Money", &hTempKey))
+		{
+			::RegSetValueExA(hTempKey, "PeerId", 0, REG_SZ, (LPBYTE)strEncrypt.c_str(), strEncrypt.size()+1);
+			RegCloseKey(hTempKey);
+		}
+		RegCloseKey(hKey);
+	}
+}
 extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 {
+	TSAUTO();
 	HKEY hKEY;
 	LPCSTR data_Set= "Software\\Share4Money";
 	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE,data_Set,0,KEY_READ,&hKEY))
@@ -216,10 +243,28 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 		char szValue[260] = {0};
 		DWORD dwSize = sizeof(szValue);
 		DWORD dwType = REG_SZ;
-		if (::RegQueryValueExA(hKEY,"PeerId", 0, &dwType, (LPBYTE)szValue, &dwSize) == ERROR_SUCCESS){
-			strcpy(pszPeerID, szValue);
-			::RegCloseKey(hKEY);
-			return;
+		if (::RegQueryValueExA(hKEY,"PeerId", 0, &dwType, (LPBYTE)szValue, &dwSize) == ERROR_SUCCESS)
+		{
+			DWORD dwLen = strlen(szValue);
+			TSDEBUG4CXX(L"GetPeerID dwLen = "<<dwLen);
+			
+			if (dwLen == 16)
+			{
+				strcpy(pszPeerID, szValue);
+				SetRegPeerID(szValue);
+				return;
+			}
+			else
+			{
+				std::string strDecrypt ="";
+				DecryptString(szValue,strDecrypt);
+				if (!strDecrypt.empty() && strDecrypt.size() == 16)
+				{
+					strcpy(pszPeerID, strDecrypt.c_str());
+					::RegCloseKey(hKEY);
+					return;
+				}
+			}
 		}
 		::RegCloseKey(hKEY);
 	}
@@ -228,16 +273,7 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 	std::string strPeerID;
 	WStringToString(wstrPeerID, strPeerID);
 	strcpy(pszPeerID,strPeerID.c_str());
-
-	HKEY hKey, hTempKey;
-	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software",0,KEY_SET_VALUE, &hKey))
-	{
-		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "Share4Money", &hTempKey))
-		{
-			::RegSetValueExA(hTempKey, "PeerId", 0, REG_SZ, (LPBYTE)pszPeerID, strlen(pszPeerID)+1);
-		}
-		RegCloseKey(hKey);
-	}
+	SetRegPeerID(strPeerID.c_str());
 
 }
 
@@ -663,7 +699,8 @@ extern "C" __declspec(dllexport) void NewGetOSVersionInfo(char* szOutput)
 	sprintf(szOutput, "%u.%u", osvi.dwMajorVersion, osvi.dwMinorVersion);
 }
 
-extern "C" __declspec(dllexport) void CreateGuid(char* szOutPut){
+extern "C" __declspec(dllexport) void CreateGuid(char* szOutPut)
+{
 	if (szOutPut == NULL){
 		return;
 	}
@@ -673,6 +710,71 @@ extern "C" __declspec(dllexport) void CreateGuid(char* szOutPut){
 		guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], 
 		guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
 	}
+}
+
+void SetMachineID(const char* szMachineID)
+{
+	TSAUTO();
+	std::string strEncrypt ="";
+	EncryptString(szMachineID,strEncrypt);
+	HKEY hKey, hTempKey;
+	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER, "Software",0,KEY_SET_VALUE, &hKey))
+	{
+		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "Share4Money", &hTempKey))
+		{
+			::RegSetValueExA(hTempKey, "machineid", 0, REG_SZ, (LPBYTE)strEncrypt.c_str(), strEncrypt.size()+1);
+			RegCloseKey(hTempKey);
+		}
+		RegCloseKey(hKey);
+	}
+}
+
+extern "C" __declspec(dllexport) void WriteMachineID()
+{
+	TSAUTO();
+	HKEY hKEY;
+	char * szPath = "Software\\Share4Money";
+	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER,szPath,0,KEY_READ,&hKEY))
+	{
+		char szValue[260] = {0};
+		DWORD dwSize = sizeof(szValue);
+		DWORD dwType = REG_SZ;
+		if (::RegQueryValueExA(hKEY,"machineid", 0, &dwType, (LPBYTE)szValue, &dwSize) == ERROR_SUCCESS)
+		{
+			DWORD dwLen = strlen(szValue);
+			TSDEBUG4CXX(L"WriteMachineID dwLen = "<<dwLen);
+
+			if (dwLen == 32)
+			{
+				SetMachineID(szValue);
+				return;
+			}
+			else
+			{
+				std::string strDecrypt ="";
+				DecryptString(szValue,strDecrypt);
+				if (!strDecrypt.empty() && strDecrypt.size() == 32)
+				{
+					::RegCloseKey(hKEY);
+					return;
+				}
+			}
+		}
+	}
+	char szGuid[MAX_PATH] = {0};
+	TSDEBUG4CXX(L"Create guid init ");
+	ZeroMemory(szGuid,MAX_PATH);
+	strcpy(szGuid,"00000000000000000000000000000000");
+	GUID guid;
+	TSDEBUG4CXX(L"Create guid start ");
+	if (CoCreateGuid(&guid) == S_OK)
+	{
+		_snprintf(szGuid, MAX_PATH, "%08X%04X%04x%02X%02X%02X%02X%02X%02X%02X%02X",
+			guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], 
+			guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+	}
+	TSDEBUG4CXX(L"Create guid end ");
+	SetMachineID(szGuid);
 }
 
 extern "C" __declspec(dllexport) BOOL FindProcessByName(const char* szProName)
@@ -724,4 +826,98 @@ extern "C" __declspec(dllexport) void TerminateProcessByName(const char* szProNa
 		}
 		::CloseHandle(hSnap);
 	}
+}
+
+void EncryptAESToFileHelper(const unsigned char* pszKey, const char* pszMsg, unsigned char* out_str, int& nlen)
+{
+	EVP_CIPHER_CTX ctx;
+	// init
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CIPHER_CTX_set_padding(&ctx, 1);
+
+	EVP_EncryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, (const unsigned char*)pszKey, NULL);
+
+	//这个EVP_EncryptUpdate的实现实际就是将in按照inl的长度去加密，实现会取得该cipher的块大小（对aes_128来说是16字节）并将block-size的整数倍去加密。
+	//如果输入为50字节，则此处仅加密48字节，outl也为48字节。输入in中的最后两字节拷贝到ctx->buf缓存起来。  
+	//对于inl为block_size整数倍的情形，且ctx->buf并没有以前遗留的数据时则直接加解密操作，省去很多后续工作。  
+	int msglen = strlen(pszMsg);
+	EVP_EncryptUpdate(&ctx, out_str, &nlen, (const unsigned char*)pszMsg, msglen);
+	//余下最后n字节。此处进行处理。
+	//如果不支持pading，且还有数据的话就出错，否则，将block_size-待处理字节数个数个字节设置为此个数的值，如block_size=16,数据长度为4，则将后面的12字节设置为16-4=12，补齐为一个分组后加密 
+	//对于前面为整分组时，如输入数据为16字节，最后再调用此Final时，不过是对16个0进行加密，此密文不用即可，也根本用不着调一下这Final。
+	int outl = 0;
+	EVP_EncryptFinal_ex(&ctx, out_str + nlen, &outl);  
+	nlen += outl;
+	EVP_CIPHER_CTX_cleanup(&ctx);
+}
+
+void EncryptString(const char* pszData,std::string &strOut)
+{
+	char *pszKey = "RpXVQTFlU7NaeMcV";
+	int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
+	char* pszNewKey = new(std::nothrow) char[ubuff+1];
+	memset(pszNewKey,0,ubuff+1);
+
+	strcpy_s(pszNewKey,ubuff+1,pszKey);
+
+	int msglen = strlen(pszData);
+	int flen = ((msglen >> 4) + 1) << 4;
+	unsigned char* out_str = (unsigned char*)malloc(flen + 1);
+	memset(out_str, 0, flen + 1);
+
+	int nlen = 0;
+	EncryptAESToFileHelper((const unsigned char*)pszNewKey, pszData, out_str, nlen);
+	delete[] pszNewKey;
+	if (nlen > 0)
+	{
+		std::string strBase64 = base64_encode(out_str,nlen);
+		strOut = strBase64;
+		free(out_str);
+	}
+	return;
+}
+
+void DecryptFileAESHelper(const unsigned char* pszKey, const unsigned char* pszMsg, int nlen, unsigned char* out_str)
+{
+	EVP_CIPHER_CTX ctx;
+	// init
+	EVP_CIPHER_CTX_init(&ctx);
+
+	EVP_DecryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, pszKey, NULL); 
+
+	int outl = 0;
+	EVP_DecryptUpdate(&ctx, out_str, &outl, pszMsg, nlen);
+	int len = outl;
+
+	outl = 0;
+	EVP_DecryptFinal_ex(&ctx, out_str + len, &outl);  
+	len += outl;
+	out_str[len]=0;
+
+	EVP_CIPHER_CTX_cleanup(&ctx);
+}
+
+
+void DecryptString(const char* pszBase64Data,std::string &strOut)
+{
+	char *pszKey = "RpXVQTFlU7NaeMcV";
+	std::string strData = base64_decode(pszBase64Data);
+	if (strData.size() <= 0)
+	{
+		return;
+	}
+
+	int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
+	char* pszNewKey = new(std::nothrow) char[ubuff+1];
+	memset(pszNewKey,0,ubuff+1);
+	strcpy_s(pszNewKey,ubuff+1,pszKey);
+
+	int flen = ((strData.length() >> 4) + 1) << 4;
+	unsigned char* out_str = (unsigned char*)malloc(flen + 1);
+	memset(out_str, 0, flen + 1);
+	DecryptFileAESHelper((const unsigned char*)pszNewKey, (const unsigned char*)strData.c_str(), strData.length(), out_str);
+	delete[] pszNewKey;
+	strOut = (char*)out_str;
+	free(out_str);
+	return ;
 }
