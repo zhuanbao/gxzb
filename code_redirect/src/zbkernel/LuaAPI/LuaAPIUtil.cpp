@@ -231,7 +231,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"StopComputerSleep", StopComputerSleep},
 	{"CreateGuid", CreateGuid},
 	{"IsFilePlaintext", IsFilePlaintext},
-	
+	{"GetDeviceName", GetDeviceName},
 	{NULL, NULL}
 };
 
@@ -5739,5 +5739,22 @@ int LuaAPIUtil::IsFilePlaintext(lua_State* pLuaState)
 		}
 	}
 	lua_pushboolean(pLuaState, 1);
+	return 1;
+}
+
+int LuaAPIUtil::GetDeviceName(lua_State *pLuaState)
+{
+	DWORD dwLen = MAX_PATH; 
+	char szBuffer[MAX_PATH]; 
+	ZeroMemory(szBuffer,MAX_PATH);
+	if (GetComputerNameA(szBuffer, &dwLen))
+	{
+		std::string utfName = ultra::_A2UTF(szBuffer);
+		lua_pushstring(pLuaState, utfName.c_str());
+	}
+	else
+	{
+		lua_pushnil(pLuaState);
+	}
 	return 1;
 }

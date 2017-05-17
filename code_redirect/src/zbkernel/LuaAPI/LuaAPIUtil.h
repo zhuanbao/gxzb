@@ -256,6 +256,7 @@ public:
 	static int StopComputerSleep(lua_State *pLuaState);
 	static int CreateGuid(lua_State *pLuaState);
 	static int IsFilePlaintext(lua_State *pLuaState);
+	static int GetDeviceName(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };
