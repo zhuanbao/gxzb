@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.1"
+!define PRODUCT_VERSION "1.0.0.2"
 ;TestCheckFlag==1 非测试模式
 !if ${TestCheckFlag} == 1
 	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -177,7 +177,7 @@ Function onCloseCallback
 		Abort
 	${EndIf}
 	HideWindow
-	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	Call cancel
 	Abort
 FunctionEnd
@@ -228,7 +228,7 @@ FunctionEnd
 	StrCpy $R1 1
 	${For} $R3 0 6
 		;FindProcDLL::FindProc "${strProcName}.exe"
-		System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t '${strProcName}.exe') i.r0 ? u"
+		System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t '${strProcName}.exe') i.r0"
 		${If} $0 != 0
 			;KillProcDLL::KillProc "${strProcName}.exe"
 			System::Call "$PLUGINSDIR\zbsetuphelper::TerminateProcessByName(t '${strProcName}.exe')"
@@ -248,11 +248,12 @@ FunctionEnd
 	Push $1
 	Push $2
 	ReadRegStr $0 HKCU "Software\Share4Money" "statpeerid"
-	ReadRegStr $1 HKLM "Software\Share4Money" "PeerId"
-	${If} $1 == ""
-	${OrIf} $1 == 0
-		System::Call "$PLUGINSDIR\zbsetuphelper::GetPeerID(t .r1)"
-	${EndIf}
+	System::Call "$PLUGINSDIR\zbsetuphelper::GetPeerID(t .r1)"
+	;ReadRegStr $1 HKLM "Software\Share4Money" "PeerId"
+	;${If} $1 == ""
+	;${OrIf} $1 == 0
+		;System::Call "$PLUGINSDIR\zbsetuphelper::GetPeerID(t .r1)"
+	;${EndIf}
 	
 	${If} $0 == ""
 	${OrIf} $0 == 0
@@ -373,7 +374,7 @@ FunctionEnd
 Function CheckExeProcExist
 	StrCpy $0 0
 	;FindProcDLL::FindProc "Share4Money.exe"
-	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0"
 	${If} $0 != 0
 		MessageBox MB_YESNO "检测到${PRODUCT_NAME}正在运行，是否强制结束？" /SD IDYES IDYES +2
 		Abort
@@ -474,7 +475,7 @@ Function .onInit
 		Call FirstSendStart
 		!insertmacro InitBaseCfgDir
 		StrCpy $0 3
-		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe') i.r0 ? u"
+		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe') i.r0"
 		;返回值FALSE=0 TRUE=1
 		${If} $0 == 1
 			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于3G， 无法安装"
@@ -532,11 +533,11 @@ Function DoInstall
 	${If} $IsSilentInst == 1
 		StrCpy $R0 0
 	${EndIf}
-	ReadRegStr $0 HKLM "software\Share4Money" "PeerId"
-	${If} $0 == ""
-		System::Call '$PLUGINSDIR\zbsetuphelper::GetPeerID(t) i(.r0).r1'
-		WriteRegStr HKLM "software\Share4Money" "PeerId" "$0"
-	${EndIf}
+	System::Call '$PLUGINSDIR\zbsetuphelper::GetPeerID(t) i(.r0).r1'
+	;${If} $0 == ""
+		;System::Call '$PLUGINSDIR\zbsetuphelper::GetPeerID(t) i(.r0).r1'
+		;WriteRegStr HKLM "software\Share4Money" "PeerId" "$0"
+	;${EndIf}
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	${If} $Bool_IsUpdate == 0
 		${SendStat} "install" "$R1" "$str_ChannelID" 1
@@ -553,16 +554,16 @@ Function DoInstall
 	WriteRegStr HKLM "software\Share4Money" "InstallTimes" "$0"
 	WriteRegStr HKLM "software\Share4Money" "Path" "$INSTDIR\program\Share4Money.exe"
 	;写入机器码
-	StrCpy $0 0
-	ReadRegStr $0 HKCU "software\Share4Money" "machineid"
-	${If} $0 == 0
-	${Orif} $0 == ""
-		StrCpy $0 "00000000000000000000000000000000"
-		System::Call '$PLUGINSDIR\zbsetuphelper::CreateGuid(t .r0)'
-		WriteRegStr HKCU "software\Share4Money" "machineid" "$0"
-	${EndIf}
-	WriteRegStr HKLM "software\Share4Money" "machineid" "$0"
-	
+	;StrCpy $0 0
+	;ReadRegStr $0 HKCU "software\Share4Money" "machineid"
+	;${If} $0 == 0
+	;${Orif} $0 == ""
+		;StrCpy $0 "00000000000000000000000000000000"
+		;System::Call '$PLUGINSDIR\zbsetuphelper::CreateGuid(t .r0)'
+		;WriteRegStr HKCU "software\Share4Money" "machineid" "$0"
+	;${EndIf}
+	;WriteRegStr HKLM "software\Share4Money" "machineid" "$0"
+	System::Call '$PLUGINSDIR\zbsetuphelper::WriteMachineID()'
 	;注册表增加版本信息
 	WriteRegStr HKLM "software\Share4Money" "Ver" ${PRODUCT_VERSION}
 	;写入安装包名字
@@ -662,7 +663,7 @@ Function CmdSilentInstall
 	SetOutPath "$INSTDIR\program"
 	ExecShell open "Share4Money.exe" "/sstartfrom installfinish /installmethod silent $R0" SW_SHOWNORMAL
 	ExitInstal:
-	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	Abort
 FunctionEnd
 
@@ -1077,7 +1078,7 @@ Function lijitiyan
 	SetOutPath "$INSTDIR\program"
 	ExecShell open "Share4Money.exe" "/mining /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
 	HideWindow
-	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	;RMDir /r $PLUGINSDIR
 	Call cancel
 	Abort
@@ -1156,12 +1157,12 @@ Function NSD_TimerAutoRun
 	ShowWindow $Lbl_TimerAutoRun ${SW_HIDE}
 	ShowWindow $Lbl_TimerAutoRun ${SW_SHOW}
 	StrCpy $0 0
-	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0"
 	${If} $0 != 0
 		GetFunctionAddress $0 NSD_TimerAutoRun
 		nsDialogs::KillTimer $0
 		HideWindow
-		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Call cancel
 		Abort
 	${EndIf}
@@ -1171,7 +1172,7 @@ Function NSD_TimerAutoRun
 		SetOutPath "$INSTDIR\program"
 		ExecShell open "Share4Money.exe" " /mining /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
 		HideWindow
-		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Call cancel
 	${EndIf}
 FunctionEnd
@@ -1217,7 +1218,7 @@ Function un.onInit
 		File "main\program\msvcr90.dll"
 		File "main\program\Microsoft.VC90.ATL.manifest"
 		File "main\program\ATL90.dll"
-	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0 ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0"
 	${If} $0 != 0
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "检测到${PRODUCT_NAME}正在运行，是否强制结束？" IDYES +2
 		Abort
@@ -1278,6 +1279,6 @@ Section Uninstall
 		Delete "$STARTMENU\${PRODUCT_NAME}.lnk"
 	RMDir /r "$SMPROGRAMS\${PRODUCT_NAME}"
 	HideWindow
-	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat() ? u"
+	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	SetAutoClose true
 SectionEnd
