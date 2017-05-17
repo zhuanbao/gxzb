@@ -563,7 +563,7 @@ Function DoInstall
 		;WriteRegStr HKCU "software\Share4Money" "machineid" "$0"
 	;${EndIf}
 	;WriteRegStr HKLM "software\Share4Money" "machineid" "$0"
-	System::Call '$PLUGINSDIR\zbsetuphelper::WriteMachineID()'
+	;System::Call '$PLUGINSDIR\zbsetuphelper::WriteMachineID()'
 	;注册表增加版本信息
 	WriteRegStr HKLM "software\Share4Money" "Ver" ${PRODUCT_VERSION}
 	;写入安装包名字
@@ -1270,7 +1270,7 @@ Section Uninstall
 		;删除自用的注册表信息
 		DeleteRegKey HKLM "software\Share4Money"
 		DeleteRegValue HKCU "software\Share4Money" "balance"
-		DeleteRegValue HKCU "software\Share4Money" "machineid"
+		;DeleteRegValue HKCU "software\Share4Money" "machineid"
 		DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money"
 	${EndIf}
 	
