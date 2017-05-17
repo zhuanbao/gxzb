@@ -105,6 +105,7 @@ function BarChartUpdate(self)
 	end
 	--坐标轴变色
 	if attr.Data["reqFailed"] then
+		--[[
 		local xyLineBkg = self:GetObject("xyLineBkg")
 		local xgp = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 		local clor = xgp:CreateColor(51, 51, 51, 255)
@@ -122,6 +123,7 @@ function BarChartUpdate(self)
 			end
 			xyLineBkg:SetBitmap(xylineFailedBitmap30)
 		end
+		--]]
 	end
 	local function GetNewTextObj(strText, valign, halign)
 		local newTextObject = objFactory:CreateUIObject("", "TextObject")
@@ -129,7 +131,8 @@ function BarChartUpdate(self)
 		barchartpanel:AddChild(newTextObject)
 		newTextObject:SetVAlign(valign or "center")
 		newTextObject:SetHAlign(halign or "center")
-		newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
+		--newTextObject:SetTextColorResID(attr.Data["reqFailed"] and attr.FailedColor or attr.LineColor)
+		newTextObject:SetTextColorResID(attr.LineColor)
 		newTextObject:SetTextFont("font.text12")
 		return newTextObject, newTextObject:GetTextExtent()
 	end
