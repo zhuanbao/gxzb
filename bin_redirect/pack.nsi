@@ -1270,6 +1270,7 @@ Section Uninstall
 		;删除自用的注册表信息
 		DeleteRegKey HKLM "software\Share4Money"
 		DeleteRegValue HKCU "software\Share4Money" "balance"
+		DeleteRegValue HKCU "software\Share4Money" "machineid"
 		DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money"
 	${EndIf}
 	
