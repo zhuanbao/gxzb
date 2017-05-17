@@ -2101,6 +2101,10 @@ function QuerySvrForReportClientInfo()
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
+	if not IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
+		TipLog("[QuerySvrForReportClientInfo] no work id")
+		return
+	end
 	local strInterfaceName = "reportClientConf"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
