@@ -14,6 +14,9 @@
 #include "../XLUEApplication.h"
 #include "../EvenListenHelper/LuaMsgWnd.h"
 #include "commonshare\md5.h"
+#include <openssl/rsa.h>
+#include <openssl/aes.h>
+#include <openssl/evp.h>
 #include "LuaAPIUtil.h"
 #include "LuaNotifyIcon.h"
 #include <MsHtmcid.h>
@@ -21,6 +24,9 @@
 #include <mshtml.h> 
 #include <Exdisp.h>
 #include "../EvenListenHelper/LuaMsgWnd.h"
+
+#pragma comment(lib,"libeay32.lib")
+#pragma comment(lib,"ssleay32.lib")
 
 extern HANDLE g_hInst;
 extern CXLUEApplication theApp;
@@ -223,6 +229,9 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetLastInputInfo", FGetLastInputInfo},
 	{"SetApplicationId", SetApplicationId},
 	{"StopComputerSleep", StopComputerSleep},
+	{"CreateGuid", CreateGuid},
+	{"IsFilePlaintext", IsFilePlaintext},
+	
 	{NULL, NULL}
 };
 
@@ -3820,19 +3829,27 @@ void LuaAPIUtil::RegisterObj(XL_LRT_ENV_HANDLE hEnv)
 	XLLRT_RegisterGlobalObj(hEnv, object);
 }
 
-void LuaAPIUtil::EncryptAESHelper(unsigned char* pszKey, const char* pszMsg, int& nBuff,char* out_str)
-{	
-	strcpy(out_str,pszMsg);
-	try
-	{
-		AES aes(pszKey);
-		aes.Cipher((char*)out_str, strlen(pszMsg));
-	}
-	catch (...)
-	{
-		memset(out_str, 0, nBuff + 1);
-		strcpy(out_str, pszMsg);
-	}
+void LuaAPIUtil::EncryptAESToFileHelper(const unsigned char* pszKey, const char* pszMsg, unsigned char* out_str, int& nlen)
+{
+	EVP_CIPHER_CTX ctx;
+	// init
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CIPHER_CTX_set_padding(&ctx, 1);
+
+	EVP_EncryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, (const unsigned char*)pszKey, NULL);
+
+	//这个EVP_EncryptUpdate的实现实际就是将in按照inl的长度去加密，实现会取得该cipher的块大小（对aes_128来说是16字节）并将block-size的整数倍去加密。
+	//如果输入为50字节，则此处仅加密48字节，outl也为48字节。输入in中的最后两字节拷贝到ctx->buf缓存起来。  
+	//对于inl为block_size整数倍的情形，且ctx->buf并没有以前遗留的数据时则直接加解密操作，省去很多后续工作。  
+	int msglen = strlen(pszMsg);
+	EVP_EncryptUpdate(&ctx, out_str, &nlen, (const unsigned char*)pszMsg, msglen);
+	//余下最后n字节。此处进行处理。
+	//如果不支持pading，且还有数据的话就出错，否则，将block_size-待处理字节数个数个字节设置为此个数的值，如block_size=16,数据长度为4，则将后面的12字节设置为16-4=12，补齐为一个分组后加密 
+	//对于前面为整分组时，如输入数据为16字节，最后再调用此Final时，不过是对16个0进行加密，此密文不用即可，也根本用不着调一下这Final。
+	int outl = 0;
+	EVP_EncryptFinal_ex(&ctx, out_str + nlen, &outl);  
+	nlen += outl;
+	EVP_CIPHER_CTX_cleanup(&ctx);
 }
 
 int LuaAPIUtil::EncryptAESToFile(lua_State* pLuaState)
@@ -3847,16 +3864,17 @@ int LuaAPIUtil::EncryptAESToFile(lua_State* pLuaState)
 		{
 			return 0;
 		}
-		
+
 		CComBSTR bstrFilePath;
 		LuaStringToCComBSTR(pszFile,bstrFilePath);
 
 		int msglen = strlen(pszData);
 		int flen = ((msglen >> 4) + 1) << 4;
-		char* out_str = (char*)malloc(flen + 1);
+		unsigned char* out_str = (unsigned char*)malloc(flen + 1);
 		memset(out_str, 0, flen + 1);
 
-		EncryptAESHelper((unsigned char*)pszKey, pszData,flen, out_str);
+		int nlen = 0;
+		EncryptAESToFileHelper((const unsigned char*)pszKey, pszData, out_str, nlen);
 
 		TCHAR tszSaveDir[MAX_PATH] = {0};
 		_tcsncpy(tszSaveDir, bstrFilePath.m_str, MAX_PATH);
@@ -3865,7 +3883,7 @@ int LuaAPIUtil::EncryptAESToFile(lua_State* pLuaState)
 			::SHCreateDirectory(NULL, tszSaveDir);
 
 		std::ofstream of(bstrFilePath.m_str, std::ios_base::out|std::ios_base::binary);
-		of.write((const char*)out_str, flen);
+		of.write((const char*)out_str, nlen);
 
 		free(out_str);
 		return 0;
@@ -3875,19 +3893,24 @@ int LuaAPIUtil::EncryptAESToFile(lua_State* pLuaState)
 }
 
 
-void LuaAPIUtil::DecryptAESHelper(unsigned char* pszKey, const char* pszMsg, int& nMsg,int& nBuff,char* out_str)
+void LuaAPIUtil::DecryptFileAESHelper(const unsigned char* pszKey, const unsigned char* pszMsg, int nlen, unsigned char* out_str)
 {
-	memcpy(out_str,pszMsg,nMsg);
-	try
-	{
-		AES aes(pszKey);
-		aes.InvCipher(out_str, nMsg);
-	}
-	catch(...)
-	{
-		memset(out_str, 0, nBuff + 1);
-		memcpy(out_str,pszMsg,nMsg);
-	}
+	EVP_CIPHER_CTX ctx;
+	// init
+	EVP_CIPHER_CTX_init(&ctx);
+
+	EVP_DecryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, pszKey, NULL); 
+
+	int outl = 0;
+	EVP_DecryptUpdate(&ctx, out_str, &outl, pszMsg, nlen);
+	int len = outl;
+
+	outl = 0;
+	EVP_DecryptFinal_ex(&ctx, out_str + len, &outl);  
+	len += outl;
+	out_str[len]=0;
+
+	EVP_CIPHER_CTX_cleanup(&ctx);
 }
 
 int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
@@ -3937,13 +3960,32 @@ int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
 			return 0;
 		}
 		char* pdata = data;
-		
+		if (iFileSize >= 3 && (byte)pdata[0] == 0xEF && (byte)pdata[1] == 0xBB && (byte)pdata[2] == 0xBF)
+		{
+			// 去掉 BOM 头
+			pdata += 3;
+			iFileSize -= 3;
+		}
+		BOOL bIsPlaintext = TRUE;
+		for (int i = 0; i < iFileSize && i < 4; i++)
+		{
+			if (!isprint((byte)pdata[i]))
+			{
+				bIsPlaintext = FALSE;
+				break;
+			}
+		}
+		if (bIsPlaintext)
+		{
+			lua_pushstring(pLuaState, pdata);
+			delete[] data;
+			return 1;
+		}
 		int flen = ((iFileSize >> 4) + 1) << 4;
-		//int flen = iFileSize;
-		char* out_str = (char*)malloc(flen + 1);
+		unsigned char* out_str = (unsigned char*)malloc(flen + 1);
 		memset(out_str, 0, flen + 1);
 
-		DecryptAESHelper((unsigned char*)pszKey, pdata,iFileSize,flen,out_str);
+		DecryptFileAESHelper((const unsigned char*)pszKey, (const unsigned char*)pdata, iFileSize, out_str);
 
 		lua_pushstring(pLuaState, (const char*)out_str);
 		free(out_str);
@@ -4410,20 +4452,24 @@ int LuaAPIUtil::EncryptString(lua_State* pLuaState)
 		int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
 		char* pszNewKey = new(std::nothrow) char[ubuff+1];
 		memset(pszNewKey,0,ubuff+1);
+
 		strcpy_s(pszNewKey,ubuff+1,pszKey);
 
 		int msglen = strlen(pszData);
 		int flen = ((msglen >> 4) + 1) << 4;
-		char* out_str = (char*)malloc(flen + 1);
+		unsigned char* out_str = (unsigned char*)malloc(flen + 1);
 		memset(out_str, 0, flen + 1);
 
-		EncryptAESHelper((unsigned char*)pszNewKey, pszData,flen, out_str);
+		int nlen = 0;
+		EncryptAESToFileHelper((const unsigned char*)pszNewKey, pszData, out_str, nlen);
 		delete[] pszNewKey;
-
-		std::string strBase64 = base64_encode((unsigned char *)out_str,flen);
-		lua_pushstring(pLuaState, strBase64.c_str());
-		free(out_str);
-		return 1;
+		if (nlen > 0)
+		{
+			std::string strBase64 = base64_encode(out_str,nlen);
+			lua_pushstring(pLuaState, strBase64.c_str());
+			free(out_str);
+			return 1;
+		}
 	}
 	lua_pushnil(pLuaState);
 	return 1;
@@ -4453,10 +4499,9 @@ int LuaAPIUtil::DecryptString(lua_State* pLuaState)
 		strcpy_s(pszNewKey,ubuff+1,pszKey);
 
 		int flen = ((strData.length() >> 4) + 1) << 4;
-		char* out_str = (char*)malloc(flen + 1);
+		unsigned char* out_str = (unsigned char*)malloc(flen + 1);
 		memset(out_str, 0, flen + 1);
-		int isize = (int)strData.length();
-		DecryptAESHelper((unsigned char*)pszNewKey, (const char*)strData.c_str(),isize, flen,out_str);
+		DecryptFileAESHelper((const unsigned char*)pszNewKey, (const unsigned char*)strData.c_str(), strData.length(), out_str);
 		delete[] pszNewKey;
 		lua_pushstring(pLuaState, (const char*)out_str);
 		free(out_str);
@@ -5634,4 +5679,65 @@ int LuaAPIUtil::StopComputerSleep(lua_State *pLuaState)
 		TSDEBUG4CXX("StopComputerSleep false ");
 	}
 	return 0;
+}
+
+int LuaAPIUtil:: CreateGuid(lua_State *pLuaState)
+{
+	char szGuid[MAX_PATH] = {0};
+	ZeroMemory(szGuid,MAX_PATH);
+	strcpy_s(szGuid,32,"00000000000000000000000000000000");
+	GUID guid;
+	if (CoCreateGuid(&guid) == S_OK){
+		_snprintf(szGuid, MAX_PATH, "%08X%04X%04x%02X%02X%02X%02X%02X%02X%02X%02X",
+			guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], 
+			guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+	}
+	std::string utfGuid = ultra::_A2UTF(szGuid);
+	lua_pushstring(pLuaState, utfGuid.c_str());
+	return 1;
+}
+
+
+int LuaAPIUtil::IsFilePlaintext(lua_State* pLuaState)
+{
+	TSAUTO();
+	const char* utf8FilePath = lua_tostring(pLuaState, 2);
+	if (utf8FilePath == NULL)
+	{
+		return 0;
+	}
+	int iFileSize = (int)GetFileSizeHelper(utf8FilePath);
+	if (iFileSize <= 0)
+	{
+		lua_pushboolean(pLuaState, 1);
+		return 1;
+	}
+
+	std::wstring strFilePath = ultra::_UTF2T(utf8FilePath);
+	char data[5] = {0};
+	int nRead = iFileSize > 4 ? 4 : iFileSize;
+	std::ifstream pf(strFilePath.c_str(), std::ios_base::in|std::ios_base::binary);
+	pf.read(data, nRead);
+	int curPosEnd = pf.tellg();
+	if (-1 != curPosEnd && curPosEnd != nRead)
+	{
+		return 0;
+	}
+	char* pdata = data;
+	if (nRead >= 3 && (byte)pdata[0] == 0xEF && (byte)pdata[1] == 0xBB && (byte)pdata[2] == 0xBF)
+	{
+		// 去掉 BOM 头
+		pdata += 3;
+		nRead -= 3;
+	}
+	for (int i = 0; i < nRead; i++)
+	{
+		if (!isprint((byte)pdata[i]))
+		{
+			lua_pushboolean(pLuaState, 0);
+			return 1;
+		}
+	}
+	lua_pushboolean(pLuaState, 1);
+	return 1;
 }

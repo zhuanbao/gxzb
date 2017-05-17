@@ -34,8 +34,8 @@ private:
 	static long ShellExecHelper(HWND hWnd, const char* lpOperation, const char* lpFile, const char* lpParameters, const char* lpDirectory, const char* lpShowCmd, int iShowCmd = -1);
 	static long CopyPathFileHelper(const char* utf8ExistingFileName, const char* utf8NewFileName, BOOL bFailedIfExists);
 	
-	static void EncryptAESHelper(unsigned char* pszKey, const char* pszMsg, int& nBuff,char* out_str);
-	static void DecryptAESHelper(unsigned char* pszKey, const char* pszMsg, int&nMsg,int& nBuff,char* out_str);
+	static void EncryptAESToFileHelper(const unsigned char* pszKey, const char* pszMsg, unsigned char* out_str, int& nlen);
+	static void DecryptFileAESHelper(const unsigned char* pszKey, const unsigned char* pszMsg, int nlen, unsigned char* out_str);
 	
 	static	BOOL GetNtVersionNumbers(OSVERSIONINFOEX& osVersionInfoEx);
 
@@ -254,6 +254,8 @@ public:
 
 	static int SetApplicationId(lua_State *pLuaState);
 	static int StopComputerSleep(lua_State *pLuaState);
+	static int CreateGuid(lua_State *pLuaState);
+	static int IsFilePlaintext(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };
