@@ -5685,7 +5685,7 @@ int LuaAPIUtil:: CreateGuid(lua_State *pLuaState)
 {
 	char szGuid[MAX_PATH] = {0};
 	ZeroMemory(szGuid,MAX_PATH);
-	strcpy_s(szGuid,MAX_PATH,"00000000000000000000000000000000");
+	strcpy(szGuid,"00000000000000000000000000000000");
 	GUID guid;
 	if (CoCreateGuid(&guid) == S_OK){
 		_snprintf(szGuid, MAX_PATH, "%08X%04X%04x%02X%02X%02X%02X%02X%02X%02X%02X",
