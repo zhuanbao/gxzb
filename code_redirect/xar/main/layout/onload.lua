@@ -431,7 +431,7 @@ function TipMain()
 	
 	CreateMainTipWnd()
 	
-	FunctionObj.InitMachName()
+	FunctionObj.InitMachineName()
 	SaveConfigInTimer()
 	if not FunctionObj.CheckIsBinded() then
 		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
@@ -456,7 +456,7 @@ function PreTipMain()
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
 	CheckMachineSuitable(function(bCheck)
-		--bCheck = true
+		bCheck = true
 		if not bCheck then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else

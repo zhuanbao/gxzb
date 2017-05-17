@@ -301,11 +301,13 @@ function OnWorkStateChange(self, nState)
 end
 
 function OnClickMiningPanel(self)
+	tFunctionHelper.OnUserChangePanel()
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"MiningPanel")
 end
 
 function OnClickTakeCashPanel(self)
+	tFunctionHelper.OnUserChangePanel()
 	local OwnerCtrl = self:GetOwnerControl()
 	local strPanel = "TakeCashPanel"
 	if not tFunctionHelper.CheckIsBinded() then
@@ -315,6 +317,7 @@ function OnClickTakeCashPanel(self)
 end
 
 function OnClickEarningsPanel(self)
+	tFunctionHelper.OnUserChangePanel()
 	local objmain = self:GetOwnerControl()
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")

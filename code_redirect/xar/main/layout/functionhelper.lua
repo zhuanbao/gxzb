@@ -293,10 +293,11 @@ function RegisterFunctionObject(self)
 	obj.CheckShouldRemindBind = CheckShouldRemindBind
 	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
 	obj.SetStateInfoToUser = SetStateInfoToUser
-	
+	obj.OnUserChangePanel = OnUserChangePanel
 	
 	--服务器相关函数
-	obj.InitMachName = InitMachName
+	obj.InitMachineName = InitMachineName
+	obj.GetMachineName = GetMachineName
 	obj.GetUserWorkID = GetUserWorkID
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.DownLoadTempQrcode = DownLoadTempQrcode
@@ -359,6 +360,18 @@ function FormatMoneyToNumber(strMoney)
 	end
 	local strNum = string.gsub(strMoney, ",","")
 	return tonumber(strNum)
+end
+
+--这里主要是为了再不工作的时候，切换界面能知道解绑
+function OnUserChangePanel()
+	if not CheckIsBinded() then
+		return
+	end
+	local nAverageHashRate = 0
+	if g_WorkClient then
+		nAverageHashRate = g_WorkClient.GetAverageHashRate()
+	end
+	QueryClientInfo(nAverageHashRate)
 end
 
 function ChangeMainBodyPanel(strPanelName)
@@ -2112,10 +2125,7 @@ function QuerySvrForReportClientInfo()
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
 	end	
-	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then
-		InitMachName()
-	end
-	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strMachineName"]))
+	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(GetMachineName()))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
 	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
@@ -2579,14 +2589,36 @@ function SetMachineNameChangeInfo()
 	ReportClientInfoToServer()
 end
 
-function InitMachName()
+function InitMachineName()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
 	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
-		tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
+		local strDeviceName = tipUtil:GetDeviceName()
+		if IsRealString(strDeviceName) then
+			local iMajor,iMinor = tipUtil:NewGetOSVersion()
+			local strWinVer = "Windows " .. tostring(iMajor) .. "." .. tostring(iMinor)
+			strDeviceName = tostring(strDeviceName) .. "(" .. strWinVer .. ")"
+			TipLog("[InitMachineName] strDeviceName = " .. tostring(strDeviceName))
+			tUserConfig["tUserInfo"]["strMachineName"] = strDeviceName
+		else
+			tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
+		end
 		SaveConfigToFileByKey("tUserConfig")
+	end
+	return tUserConfig["tUserInfo"]["strMachineName"]
+end
+
+function GetMachineName()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	if IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
+		return tUserConfig["tUserInfo"]["strMachineName"]
+	else	
+		return InitMachineName()
 	end
 end
 

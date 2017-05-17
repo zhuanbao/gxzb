@@ -32,7 +32,7 @@ function SaveSettingConfig(objTree)
 	local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
 	local strMachineName = ObjEditMachineID:GetText()
 	if not Helper:IsRealString(strMachineName) then
-		strMachineName = tFunctionHelper.GetPeerID()
+		strMachineName = tFunctionHelper.GetMachineName()
 	end
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
@@ -187,10 +187,10 @@ function OnCreate(self)
 			tUserConfig["tUserInfo"] = {}
 		end
 		local strMachineName = tUserConfig["tUserInfo"]["strMachineName"]
-		if Helper:IsRealString(strMachineName) then 
-			ObjEditMachineID:SetText(strMachineName)
+		if not Helper:IsRealString(strMachineName) then 
+			strMachineName = tFunctionHelper.GetMachineName()
 		end 
-
+		ObjEditMachineID:SetText(strMachineName)
 		if type(tUserConfig["tConfig"]) ~= "table" then
 			tUserConfig["tConfig"] = {}
 		end
