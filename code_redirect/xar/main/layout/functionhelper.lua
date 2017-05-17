@@ -1151,9 +1151,7 @@ end
 
 function GenDecFilePath(strEncFilePath)
 	local strKey = "RpXVQTFlU7NaeMcV"
-	XLMessageBox(strEncFilePath)
 	local strDecString = tipUtil:DecryptFileAES(strEncFilePath, strKey)
-	XLMessageBox(strDecString)
 	if type(strDecString) ~= "string" then
 		TipLog("[GenDecFilePath] DecryptFileAES failed : "..tostring(strEncFilePath))
 		return ""
