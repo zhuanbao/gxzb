@@ -2600,6 +2600,7 @@ function SetUserBindInfo(tabBindInfo)
 	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
+	ReportClientInfoToServer()
 	ChangeClientTitle("共享赚宝")
 	QueryClientInfo(0)
 end
