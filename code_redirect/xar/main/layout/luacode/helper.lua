@@ -667,7 +667,6 @@ end
 
 
 
---https://s3.amazonaws.com/github-cloud/releases/325827/8ddeba82-ce92-11e4-9812-db61045d243b.exe?response-content-disposition=attachment%3B%20filename%3DGit-1.9.5-preview20150319.exe&response-content-type=application/octet-stream&AWSAccessKeyId=AKIAISTNZFOVBIJMK3TQ&Expires=1433307278&Signature=ppcL8mMS3EVKr8e2YXLk3bcENFA%3D
 --发统计的方法
 
 --注册表方法

@@ -281,7 +281,7 @@ function OnShowWindow(self, isShow)
 		--[[local tNewVersionInfo = {
 			strVersion = "1.0.0.2",
 			strContent = "1、修改了XX\n2、优化了xx\n3、see more",
-			strPacketURL = "http://xmp.down.sandai.net/xmp/XMPSetup_5.2.14.5672-dl.exe",
+			strPacketURL = "",
 			strMD5 = "1221212",
 		}
 		g_tNewVersionInfo = tNewVersionInfo
