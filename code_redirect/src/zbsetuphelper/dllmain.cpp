@@ -395,45 +395,6 @@ extern "C" __declspec(dllexport) void DownLoadUrlAndInstall(const char* szUrl, c
 	return;
 }
 
-extern "C" __declspec(dllexport) void Send2KKAnyHttpStat(CHAR *op, CHAR *cid, CHAR *ver)
-{
-	if (op == NULL || cid == NULL)
-	{
-		return ;
-	}
-	TSAUTO();	
-	char szPid[256] = {0};
-	extern void GetPeerID(CHAR * pszPeerID);
-	GetPeerID(szPid);
-	/*szPid[12] = '\0';
-	char szMac[128] = {0};
-	for(int i = 0; i < (int)strlen(szPid); ++i)
-	{
-		if(i != 0 && i%2 == 0)
-		{
-			strcat(szMac, "-");
-		}
-		szMac[strlen(szMac)] = szPid[i];
-	}*/
-	std::string str = "http://stat.ggxpc.com:8082/c?peerid=";
-	str += szPid;
-	str += "&appid=1001&proid=15";
-	str += "&op=";
-	str += op;
-	str += "&cid=";
-	str += cid;
-	str += "&ver=";
-	str += ver;
-	CHAR* szURL = new CHAR[MAX_PATH];
-	memset(szURL, 0, MAX_PATH);
-	sprintf(szURL, "%s", str.c_str());
-	//SendHttpStatThread((LPVOID)szURL);
-	ResetUserHandle();
-	DWORD dwThreadId = 0;
-	HANDLE hThread = CreateThread(NULL, 0, SendHttpStatThread, (LPVOID)szURL,0, &dwThreadId);
-	CloseHandle(hThread);
-}
-
 #include <vector>
 #include <COMUTIL.H>
 typedef std::vector<std::wstring> VectorVerbName;
