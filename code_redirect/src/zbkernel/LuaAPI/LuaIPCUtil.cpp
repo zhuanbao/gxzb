@@ -28,8 +28,6 @@ typedef LONG ( NTAPI *_NtResumeProcess )( IN HANDLE hProcessHandle );
 _NtSuspendProcess fnNtSuspendProcess = NULL;  
 _NtResumeProcess fnNtResumeProcess = NULL; 
 
-TCHAR *szMiningProcessName = _T("gzminer.exe");
-
 LuaIPCUtil::LuaIPCUtil(void)
 {
 }

