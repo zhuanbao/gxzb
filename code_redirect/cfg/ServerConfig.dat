@@ -10,19 +10,10 @@ function GetSubTable()
 				["nSpanSec"] = 86400*1,  
 			},
 			["tForceUpdate"] = {
-				[1] = {
-					["strVersion"] = "1.0.0.17",
-					["tVersion"] = {"1-16"},
-					["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V17.exe",
-					["strMD5"] = "4164b7cf254bdf9e2576c8251b829595",
-					["pcond"] = {"xCD0Vtgaomiq0zUWtTdHzg=="},--进程条件: QQ.exe
-				},
-				[2] = {
-					["strVersion"] = "1.0.0.18",
-					["tVersion"] = {"1-16"},
-					["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V18.exe",
-					["strMD5"] = "87a1af47aa83a6fb54cafe1bb384e845",
-				},
+				["strVersion"] = "1.0.0.17",
+				["tVersion"] = {"1-16"},
+				["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V17.exe",
+				["strMD5"] = "4164b7cf254bdf9e2576c8251b829595",
 			},
 		},
 		["tServerInterfaceCfg"] = {
