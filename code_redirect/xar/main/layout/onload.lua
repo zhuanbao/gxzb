@@ -207,46 +207,11 @@ function SendStartupReport(bShowWnd)
 end
 
 function CheckCondition(tForceUpdate)
-	if not tForceUpdate or #tForceUpdate < 1 then
+	if not tForceUpdate then
 		Helper:LOG("tForceUpdate is nil or wrong style!")
-		-- XLMessageBox("tForceUpdate is nil or wrong style!")
 		return
 	end
-	local strEncryptKey = "Qaamr2Npau6jGy4Q"
-	local function CheckConditionEx(pcond)
-		if not pcond or #pcond < 1 then
-			Helper:LOG("pcond is nil or wrong style!")
-			return false
-		end
-		for index=1, #pcond do
-			--解密进程名
-			local realProcName = tipUtil:DecryptString(pcond[index], strEncryptKey)
-			Helper:LOG("realProcName: "..tostring(realProcName))
-				
-			--检测进程是否存在
-			if realProcName and realProcName ~= "" then
-				if not tipUtil:QueryProcessExists(realProcName) then
-					Helper:LOG("QueryProcessExists false realProcName: "..tostring(realProcName))
-					return false
-				end
-			else
-				return false
-			end
-		end
-		--pcond里配的进程都存在
-		return true
-	end
-	
-	for i=1, #tForceUpdate do
-		local pcond = tForceUpdate[i] and tForceUpdate[i].pcond
-		if not pcond or "" == pcond[1] then
-			return tForceUpdate[i]
-		elseif CheckConditionEx(pcond) then
-			return tForceUpdate[i]
-		end
-	end
-	
-	return nil
+	return tForceUpdate
 end
 
 function TryForceUpdate(tServerConfig)
@@ -314,10 +279,8 @@ function TryExecuteExtraCode(tServerConfig)
 	
 	local bPassCheck = FunctionObj.CheckForceVersion(tExtraHelper["tVersion"])
 	FunctionObj.TipLog("[TryExecuteExtraCode] CheckForceVersion bPassCheck:"..tostring(bPassCheck))
-	if not bPassCheck then --不满足外网版本则是过白状态, 文件名换成v1.0的
-		strURL = string.gsub(strURL, "_v%d%.%d+", "_v1%.0")
-		FunctionObj.TipLog("TryExecuteExtraCode, bPassCheck = "..tostring(bPassCheck)..", strURL = "..tostring(strURL))
-		strMD5 = ""
+	if not bPassCheck then
+		return
 	end
 	
 	
