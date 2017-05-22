@@ -2797,7 +2797,7 @@ end
 --所有要更新账户余额的地方在这里处理
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
-	if tonumber(g_Balance) > 0 then
+	if tonumber(g_Balance) >= 0 then
 		RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", NumberToFormatMoney(g_Balance))
 	end
 	local wnd = GetMainHostWnd()
