@@ -47,6 +47,8 @@ local CLIENT_STATE_PREPARE = 1
 local CLIENT_STATE_EEEOR = 2
 local CLIENT_STATE_AUTO_EXIT = 3
 
+--配置默认值
+local g_cfgDefaultWorkModel = 1
 
 local g_tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
@@ -270,8 +272,9 @@ function RegisterFunctionObject(self)
 	obj.StartRunCountTimer = StartRunCountTimer
 	obj.SaveAllConfig = SaveAllConfig
 	obj.DownLoadNewVersion = DownLoadNewVersion
-	
-	
+	obj.GetDefaultWorkModel = GetDefaultWorkModel
+	obj.GetCurrentWorkModel = GetCurrentWorkModel
+
 	obj.TryToConnectServer = TryToConnectServer
 	obj.InitMiningClient = InitMiningClient
 	--UI函数
@@ -478,6 +481,15 @@ function DownLoadNewVersion(tNewVersionInfo, fnCallBack)
 	end)	
 end
 
+function GetDefaultWorkModel()
+	return g_cfgDefaultWorkModel
+end
+
+function GetCurrentWorkModel()
+	local tUserConfig =ReadConfigFromMemByKey("tUserConfig") or {}
+	local nWorkModel = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"}) or GetDefaultWorkModel()
+	return nWorkModel
+end
 
 function GetTimeStamp()
 	local strPeerId = GetPeerID()
@@ -2922,6 +2934,7 @@ end
 
 function StartClient()
 	SetStateInfoToUser(nil)
+	g_WorkClient.InitCmdLine()
 	local nRet = g_WorkClient.Start()
 	if nRet ~= 0 then
 		if nRet == 1 then

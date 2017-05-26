@@ -3,9 +3,12 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
 local g_AutoRunState = false
-local g_nWorkModel = 0
+--设置挖矿模式的默认值
+--[[
+0 全速，1智能
+--]]
+local g_nWorkModel = 1
 local g_SuspendedWndState = 0
-
 
 function CheckIsAutoRun()
 	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
@@ -210,7 +213,7 @@ function OnCreate(self)
 		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
 			tUserConfig["tConfig"]["WorkModel"] = {}
 		end
-		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or 0
+		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or tFunctionHelper.GetDefaultWorkModel()
 		if g_nWorkModel == 0 then
 			ObjRadioFull:SetCheck(true, false)
 		else

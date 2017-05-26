@@ -232,6 +232,17 @@ end
 --[[
 0 全速，1智能
 --]]
+function InitCmdLine()
+	local nWorkModel = tFunctionHelper.GetCurrentWorkModel()
+	if nWorkModel == 1 then
+		g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Min
+		SetControlSpeedCmdLine(g_GlobalWorkSizeMultiplier_Min)
+	else
+		g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
+		SetControlSpeedCmdLine(nil)
+	end
+end
+
 function SetControlSpeedCmdLine(nGlobalWorkSizeMultiplier)
 	if nGlobalWorkSizeMultiplier ~= nil then
 		g_ControlSpeedCmdLine = "--cl-global-work " .. tostring(nGlobalWorkSizeMultiplier)
@@ -241,8 +252,7 @@ function SetControlSpeedCmdLine(nGlobalWorkSizeMultiplier)
 end
 
 function ChangeMiningSpeed()
-	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local nWorkModel = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
+	local nWorkModel = tFunctionHelper.GetCurrentWorkModel()
 	if nWorkModel ~= 1 then
 		if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
 			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
@@ -420,6 +430,7 @@ end
 function RegisterFunctionObject(self)
 	local obj = {}
 	obj.InitClient = InitClient
+	obj.InitCmdLine = InitCmdLine
 	obj.OnGenOilMsg = OnGenOilMsg
 	obj.Start = Start
 	obj.Quit = Quit
