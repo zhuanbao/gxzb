@@ -183,6 +183,11 @@ function GetModuleDir()
 	return strDir
 end
 
+function GetFileNameFromPath(strPath)
+	local _,_,strFileName = string.find(tostring(strPath), ".+\\([^\\]+)$")
+	return strFileName
+end
+
 function GetCommandStrValue(strKey)
 	local bRet, strValue = false, nil
 	local cmdString = tipUtil:GetCommandLine()
@@ -254,6 +259,7 @@ function RegisterFunctionObject(self)
 	
 	--业务辅助函数
 	obj.GetModuleDir = GetModuleDir
+	obj.GetFileNameFromPath = GetFileNameFromPath
 	obj.GetExePath = GetExePath
 	obj.GetGXZBVersion = GetGXZBVersion
 	obj.GetGXZBMinorVer = GetGXZBMinorVer

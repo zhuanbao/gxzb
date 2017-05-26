@@ -78,6 +78,77 @@ function GTV(obj)
 	return "[" .. type(obj) .. "`" .. tostring(obj) .. "]"
 end
 
+function IsExistOtherUserWnd()
+	local nWndCoverMinPercent = 5
+	local function CheckWindowCond(hWnd)
+		if not tipUtil:IsWindowVisible(hWnd) or tipUtil:IsWindowIconic(hFrontHandle) then
+			return false
+		end
+		local dwPId = tipUtil:GetWndProcessThreadId(hWnd)
+		local strExePath = tipUtil:GetProcessModulePathByPID(dwPId)
+		if not IsRealString(strExePath) then
+			return false
+		end
+		local strFileName = tFunctionHelper.GetFileNameFromPath(strExePath)
+		local strWndClassName = tipUtil:GetWndClassName(hWnd)
+		TipLog("[CheckWindowCond] strWndClassName = " .. GTV(strWndClassName) .. ", strFileName = " .. GTV(strFileName))
+		if not IsRealString(strWndClassName)
+			or not IsRealString(strFileName) then
+			TipLog("[CheckWindowCond] Get name fail")
+			return false
+		end
+		if string.lower(strFileName) == "share4money.exe" 
+			or (string.lower(strFileName) == "explorer.exe" and (string.lower(strWndClassName) ~= "cabinetwclass" and string.lower(strWndClassName) == "explorewclass" ))
+			then
+			TipLog("[CheckWindow] name or class name match")
+			return false
+		end
+		local sl,st,sr,sb = tipUtil:GetScreenArea()
+		local bRet,wndl,wndt,wndr,wndb = tipUtil:GetWndRect(hWnd)
+		if type(wl) ~= "number" or not bRet then
+			TipLog("[CheckWindowCond] Get wnd rect fail")
+			return false
+		end
+		local areal, areat, arear, areab= wndl,wndt,wndr,wndb
+		if wndl < sl then
+			areal = sl
+		end
+		if wndt < st then
+			areat = st
+		end
+		if arear > sr then
+			arear = sr
+		end
+		if wndb > sb then
+			areab = sb
+		end
+		if areal > arear or areat > areab then
+			TipLog("[CheckWindowCond] area error")
+			return false
+		end
+		local nScreenArea = (sb-st)*(sr-sl)
+		local nWindArea = (areab-areat)*(arear-areal)
+		local nCoverPercent = nScreenArea/nWindArea*100
+		TipLog("[CheckWindowCond] nScreenArea = " .. GTV(nScreenArea) .. ", nWindArea = " .. GTV(nWindArea))
+		if nCoverPercent < nWndCoverMinPercent then	
+			return false
+		end
+		TipLog("[CheckWindowCond] find active wnd")
+		return true
+	end
+	
+	local hWnd = tipUtil:FindWindow(nil, nil) 
+	while hWnd do
+		if CheckWindowCond(hWnd) then
+			return true
+		else
+			hWnd = tipUtil:FindWindowEx(nil, hWnd, nil, nil)
+		end
+	end
+	
+	return false
+end
+
 function LimitSpeedCond()
 	if tipUtil:IsNowFullScreen() then
 		TipLog("[LimitSpeedCond] full screen")
@@ -86,7 +157,11 @@ function LimitSpeedCond()
 	local hr, dwTime = tipUtil:GetLastInputInfo()
 	local dwTickCount = tipUtil:GetTickCount()
 	if hr == 0 and type(dwTime) == "number" and type(dwTickCount) == "number" and dwTickCount - dwTime < 3*60*1000 then
-		TipLog("[LimitSpeedCond] Last input in 60 second")
+		TipLog("[LimitSpeedCond] Last input in 3*60 second")
+		return true
+	end
+	if not IsExistOtherUserWnd() then
+		TipLog("[LimitSpeedCond] exist other visiable wnd")
 		return true
 	end
 	return false
