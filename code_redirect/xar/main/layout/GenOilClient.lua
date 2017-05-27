@@ -164,10 +164,13 @@ function LimitSpeedCond()
 		TipLog("[LimitSpeedCond] Last input in 3*60 second")
 		return true
 	end
+	--判断是否有用户窗口(比如用户正在非全屏看电影)
+	--[[
 	if IsExistOtherUserWnd() then
 		TipLog("[LimitSpeedCond] exist other visiable wnd")
 		return true
 	end
+	--]]
 	TipLog("[LimitSpeedCond] not need speed limit")
 	return false
 end
