@@ -82,6 +82,8 @@ public:
 	static int GetSysWorkArea(lua_State* pLuaState);
 	static int GetCurrentScreenRect(lua_State* pLuaState);
 	static int FGetDesktopWndHandle(lua_State *pLuaState);
+	static int GetProcessModulePathByPID(lua_State *pLuaState);
+
 	static int FSetWndPos(lua_State *pLuaState);
 	static int FShowWnd(lua_State *pLuaState);
 	static int FGetWndRect(lua_State *pLuaState);

@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 #pragma warning(disable: 4995)
 #include <TlHelp32.h>
-
+#include <Psapi.h>
+#pragma comment(lib,"Psapi.lib")
 #include <atlsync.h>
 #include <atltime.h>
 #include <WTL/atldlgs.h>
@@ -63,6 +64,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetSysWorkArea", GetSysWorkArea},
 	{"GetCurrentScreenRect", GetCurrentScreenRect},
 	{"GetDesktopWndHandle", FGetDesktopWndHandle}, 
+	{"GetProcessModulePathByPID", GetProcessModulePathByPID},
 	{"SetWndPos", FSetWndPos}, 
 	{"ShowWnd", FShowWnd}, 
 	{"GetWndRect", FGetWndRect}, 
@@ -3273,6 +3275,27 @@ int LuaAPIUtil::FGetCurrentProcessId(lua_State* pLuaState)
 		return 1;
 	}
 	lua_pushnil(pLuaState);
+	return 1;
+}
+
+int LuaAPIUtil::GetProcessModulePathByPID(lua_State* pLuaState)
+{
+	DWORD dwProcessId = static_cast< DWORD >(lua_tointeger(pLuaState, 2));
+	if (dwProcessId <= 0)
+	{
+		return 0;
+	}
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
+	if (NULL == hProcess)
+	{
+		return 0;
+	}
+
+	TCHAR buf[MAX_PATH] = {0};
+	GetProcessImageFileName(hProcess, buf, MAX_PATH);
+	std::string strUtf8 = ultra::_T2UTF(buf);
+	lua_pushstring(pLuaState, strUtf8.c_str());
+	CloseHandle(hProcess);
 	return 1;
 }
 
