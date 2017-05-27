@@ -94,6 +94,11 @@ function UpdateMiningState(self,nMiningState)
 			ShowAnim(self, true)
 		end
 	elseif tFunctionHelper.CheckIsPrepare() then
+		ResetUIVisible(self)
+		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
+		ObjStopBtn:Show(true)
+		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
+		ObjStartBtn:Enable(false)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 		ObjStartBtnText:SetText("准备中......")
 	end

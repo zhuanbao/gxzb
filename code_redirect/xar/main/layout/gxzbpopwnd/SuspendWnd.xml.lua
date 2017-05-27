@@ -309,9 +309,8 @@ function SuspendCtrl_OnWorkStateChange(self, state)
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
-			speedtext:SetText("准备中")
 		end
-		
+		speedtext:SetText("准备中")
 	elseif state == 2 then
 		if attr.currentstate  >= 3 then
 			local newState = attr.currentstate - 3
@@ -331,8 +330,9 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
-			speedtext:SetText("准备中")
 		end
+		speedtext:SetText("准备中")
+		RightDisk:UpdateSpeed(1)
 	end
 end
 

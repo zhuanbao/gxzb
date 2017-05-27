@@ -99,6 +99,7 @@ function IsExistOtherUserWnd()
 			end
 			if string.lower(strFileName) == "share4money.exe" 
 				or (string.lower(strFileName) == "explorer.exe" and (string.lower(strWndClassName) ~= "cabinetwclass" and string.lower(strWndClassName) ~= "explorewclass" ))
+				or (string.lower(strWndClassName) == string.lower("Windows.UI.Core.CoreWindow"))
 				then
 				TipLog("[CheckWindow] name or class name match")
 				return false
@@ -163,10 +164,11 @@ function LimitSpeedCond()
 		TipLog("[LimitSpeedCond] Last input in 3*60 second")
 		return true
 	end
-	if not IsExistOtherUserWnd() then
+	if IsExistOtherUserWnd() then
 		TipLog("[LimitSpeedCond] exist other visiable wnd")
 		return true
 	end
+	TipLog("[LimitSpeedCond] not need speed limit")
 	return false
 end
 
