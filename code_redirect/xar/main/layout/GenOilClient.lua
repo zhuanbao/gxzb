@@ -79,36 +79,38 @@ function GTV(obj)
 end
 
 function IsExistOtherUserWnd()
-	local nWndCoverMinPercent = 5
+	local nWndCoverMinPercent = 2
 	local function CheckWindowCond(hWnd)
 		if not tipUtil:IsWindowVisible(hWnd) or tipUtil:IsWindowIconic(hFrontHandle) then
 			return false
 		end
+		local strFileName = nil 
 		local dwPId = tipUtil:GetWndProcessThreadId(hWnd)
 		local strExePath = tipUtil:GetProcessModulePathByPID(dwPId)
-		if not IsRealString(strExePath) then
-			return false
-		end
-		local strFileName = tFunctionHelper.GetFileNameFromPath(strExePath)
-		local strWndClassName = tipUtil:GetWndClassName(hWnd)
-		TipLog("[CheckWindowCond] strWndClassName = " .. GTV(strWndClassName) .. ", strFileName = " .. GTV(strFileName))
-		if not IsRealString(strWndClassName)
-			or not IsRealString(strFileName) then
-			TipLog("[CheckWindowCond] Get name fail")
-			return false
-		end
-		if string.lower(strFileName) == "share4money.exe" 
-			or (string.lower(strFileName) == "explorer.exe" and (string.lower(strWndClassName) ~= "cabinetwclass" and string.lower(strWndClassName) == "explorewclass" ))
-			then
-			TipLog("[CheckWindow] name or class name match")
-			return false
-		end
+		TipLog("[strExePath]  strExePath = " .. GTV(strExePath))
+		if IsRealString(strExePath) then
+			local strFileName = tFunctionHelper.GetFileNameFromPath(strExePath)
+			local strWndClassName = tipUtil:GetWndClassName(hWnd)
+			TipLog("[CheckWindowCond] strWndClassName = " .. GTV(strWndClassName) .. ", strFileName = " .. GTV(strFileName))
+			if not IsRealString(strWndClassName)
+				or not IsRealString(strFileName) then
+				TipLog("[CheckWindowCond] Get name fail")
+				return false
+			end
+			if string.lower(strFileName) == "share4money.exe" 
+				or (string.lower(strFileName) == "explorer.exe" and (string.lower(strWndClassName) ~= "cabinetwclass" and string.lower(strWndClassName) ~= "explorewclass" ))
+				then
+				TipLog("[CheckWindow] name or class name match")
+				return false
+			end
+		end	
 		local sl,st,sr,sb = tipUtil:GetScreenArea()
 		local bRet,wndl,wndt,wndr,wndb = tipUtil:GetWndRect(hWnd)
-		if type(wl) ~= "number" or not bRet then
+		if not bRet then
 			TipLog("[CheckWindowCond] Get wnd rect fail")
 			return false
 		end
+		TipLog("[CheckWindowCond] wndl = " .. GTV(wndl) .. ", wndt = " .. GTV(wndt) .. ", wndr = " .. GTV(wndr) .. ", wndb = " .. GTV(wndb))
 		local areal, areat, arear, areab= wndl,wndt,wndr,wndb
 		if wndl < sl then
 			areal = sl
@@ -122,13 +124,14 @@ function IsExistOtherUserWnd()
 		if wndb > sb then
 			areab = sb
 		end
+		TipLog("[CheckWindowCond] areal = " .. GTV(areal) .. ", areat = " .. GTV(areat) .. ", arear = " .. GTV(arear) .. ", areab = " .. GTV(areab))
 		if areal > arear or areat > areab then
 			TipLog("[CheckWindowCond] area error")
 			return false
 		end
 		local nScreenArea = (sb-st)*(sr-sl)
 		local nWindArea = (areab-areat)*(arear-areal)
-		local nCoverPercent = nScreenArea/nWindArea*100
+		local nCoverPercent = nWindArea/nScreenArea*100
 		TipLog("[CheckWindowCond] nScreenArea = " .. GTV(nScreenArea) .. ", nWindArea = " .. GTV(nWindArea))
 		if nCoverPercent < nWndCoverMinPercent then	
 			return false
