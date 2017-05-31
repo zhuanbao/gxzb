@@ -1,0 +1,58 @@
+function GetSubTable()
+	local t = {
+		["tWindow"] = {
+			["tSuspend"] = {
+				["nLeft"] = 1595, 
+				["nWidth"] = 154, 
+				["nHeight"] = 82, 
+				["nTop"] = 200, 
+			}, 
+			["tMain"] = {
+				["nHeight"] = 652, 
+				["nWidth"] = 420, 
+				["nLeft"] = 750, 
+				["nTop"] = 194, 
+			}, 
+		}, 
+		["nLastRemindBindUTC"] = 1490413824, 
+		["nLastTakeCashUTC"] = 1490418666, 
+		["tRemindUpdateCfg"] = {
+			["1.0.0.2"] = {
+				["nCnt"] = 1, 
+				["nLastUTC"] = 1489855447, 
+			}, 
+		}, 
+		["tUserInfo"] = {
+			["strWorkID"] = "EA00000003", 
+			["strMachineName"] = "F8B156B963EAB88", 
+			["strOpenID"] = "ojXBrw1IQpt5MDocQbeRoBwdqMg4", 
+			["strNickName"] = "", 
+			["bBind"] = true, 
+			["strHeadImgUrl"] = "", 
+		}, 
+		["strServerConfigURL"] = "http://ip.dnsexit.com/index.php", 
+		["tStandardTime"] = {
+			["nLocalTime"] = 1490425705, 
+			["nServerTime"] = 1490425662, 
+		}, 
+		["strUserCmd"] = "--farm-recheck 300", 
+		["tConfig"] = {
+			["HideMainPage"] = {
+				["bState"] = false, 
+			}, 
+			["RemainBind"] = {
+				["bState"] = true, 
+			}, 
+			["AutoStup"] = {
+				["bState"] = true, 
+			}, 
+			["ShowBall"] = {
+				["nState"] = 0, 
+			}, 
+			["WorkModel"] = {
+				["nState"] = 0, 
+			}, 
+		}, 
+	}
+	return t
+end

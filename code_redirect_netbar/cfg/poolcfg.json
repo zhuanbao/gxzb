@@ -1,0 +1,36 @@
+{
+    "data": {
+        "pool": [
+            {
+                "pidlist": [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                ],
+                "cmdlineformat": "--farm-recheck 2000 -G -S eastredm.com:8108 -SP 1 -O <account>.<workid>",
+                "pool": "eastredm.com_etc",
+                "account": "0x0ca507fc78216a934dfe38e0b81d5aa99fc27e96"
+            },
+            {
+                "pidlist": [
+                    "8",
+                    "9",
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F"
+                ],
+                "cmdlineformat": "--farm-recheck 2000 -G -S eastredm.com:8008 -SP 1 -O <account>.<workid>",
+                "pool": "eastredm.com_eth",
+                "account": "0x9c19b837ead3b4dcc5033a147065c8a1462f2394"
+            }
+        ]
+    }
+}

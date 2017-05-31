@@ -1,0 +1,153 @@
+<xlue>
+	<control class="MainBodyCtrl">
+		<attr_def>
+			<attr name="CurCtrlName" type="string"></attr>
+		</attr_def>
+		<method_def>
+			<ChangePanel file="MainBodyCtrl.xml.lua" func="ChangePanel"/>
+			<InitPanelList file="MainBodyCtrl.xml.lua" func="InitPanelList"/>
+			<GetCurrentCtrlName file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlName"/>
+			<GetCurrentCtrlObj file="MainBodyCtrl.xml.lua" func="GetCurrentCtrlObj"/>
+			<GetChildObjByCtrlName file="MainBodyCtrl.xml.lua" func="GetChildObjByCtrlName"/>
+			
+			<UpdateClientBindState file="MainBodyCtrl.xml.lua" func="UpdateClientBindState"/>
+			<UpdateClientUnBindFailState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindFailState"/>
+			<UpdateClientUnBindState file="MainBodyCtrl.xml.lua" func="UpdateClientUnBindState"/>
+			<UpdateUserBalance file="MainBodyCtrl.xml.lua" func="UpdateUserBalance"/>
+			<UpdateRealTimeIncome file="MainBodyCtrl.xml.lua" func="UpdateRealTimeIncome"/>
+			<UpdateMiningSpeed file="MainBodyCtrl.xml.lua" func="UpdateMiningSpeed"/>
+			<UpdateMiningState file="MainBodyCtrl.xml.lua" func="UpdateMiningState"/>
+			<UpdateDagProgress file="MainBodyCtrl.xml.lua" func="UpdateDagProgress"/>
+			<OnWorkStateChange file="MainBodyCtrl.xml.lua" func="OnWorkStateChange"/>
+		</method_def>
+		<event_def>
+			
+		</event_def>
+		<objtemplate>
+			<children>
+				<obj id="MainBody.Panel" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="MainBody.Panel.Center" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height-111</height>
+							</attr>
+						</obj>
+						<obj id="MainBody.Panel.Buttom" class="ImageObject">
+							<attr>
+								<left>0</left>
+								<top>father.height-111</top>
+								<width>father.width</width>
+								<height>111</height>
+								<image>GXZB.MainWndBottomBkg</image>
+							</attr>
+							<children>
+								<obj id="MainPanel.Buttom.Earnings.Btn" class="TipAddin.Button">
+									<attr>
+										<left>father.width-42*3-56-65*2</left>
+										<top>(father.height-72)</top>
+										<width>42</width>
+										<height>42</height>
+										<NormalBkgID>texture.MainPanel.Earnings.normal</NormalBkgID>
+										<DownBkgID>texture.MainPanel.Earnings.down</DownBkgID>
+										<HoverBkgID>texture.MainPanel.Earnings.hover</HoverBkgID>
+										<DisableBkgID>texture.MainPanel.Earnings.hover</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickEarningsPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Earnings.Text" class="TextObject">
+									<attr>
+										<left>father.width-42*3-56-65*2</left>
+										<top>(father.height-72)+42</top>
+										<width>42</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>FFF0B5</textcolor>
+										<font>font.text13</font>
+										<text>收益</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickEarningsPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Mining.Btn" class="TipAddin.Button">
+									<attr>
+										<left>father.width-42*2-56-65</left>
+										<top>(father.height-72)</top>
+										<width>42</width>
+										<height>42</height>
+										<NormalBkgID>texture.MainPanel.Mining.normal</NormalBkgID>
+										<DownBkgID>texture.MainPanel.Mining.down</DownBkgID>
+										<HoverBkgID>texture.MainPanel.Mining.hover</HoverBkgID>
+										<DisableBkgID>texture.MainPanel.Mining.hover</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickMiningPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.Mining.Text" class="TextObject">
+									<attr>
+										<left>father.width-42*2-56-65</left>
+										<top>(father.height-72)+42</top>
+										<width>42</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>FFF0B5</textcolor>
+										<font>font.text13</font>
+										<text>赚宝</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickMiningPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.TakeCash.Btn" class="TipAddin.Button">
+									<attr>
+										<left>father.width-42-56</left>
+										<top>(father.height-72)</top>
+										<width>42</width>
+										<height>42</height>
+										<NormalBkgID>texture.MainPanel.TakeCash.normal</NormalBkgID>
+										<DownBkgID>texture.MainPanel.TakeCash.down</DownBkgID>
+										<HoverBkgID>texture.MainPanel.TakeCash.hover</HoverBkgID>
+										<DisableBkgID>texture.MainPanel.TakeCash.hover</DisableBkgID>
+									</attr>									
+									<eventlist>
+										<event name="OnClick" file="MainBodyCtrl.xml.lua" func="OnClickTakeCashPanel" />
+									</eventlist>
+								</obj>
+								<obj id="MainPanel.Buttom.TakeCash.Text" class="TextObject">
+									<attr>
+										<left>father.width-42-56</left>
+										<top>(father.height-72)+42</top>
+										<width>42</width>
+										<height>15</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>FFF0B5</textcolor>
+										<font>font.text13</font>
+										<text>提现</text>
+									</attr>									
+									<eventlist>
+										<event name="OnLButtonUp" file="MainBodyCtrl.xml.lua" func="OnClickTakeCashPanel" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>						
+			</children>
+		</objtemplate>
+	</control>
+</xlue>

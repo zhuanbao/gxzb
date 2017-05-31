@@ -1,0 +1,32 @@
+function GetSubTable()
+	local t = {
+		["tNewVersionInfo"] = {
+			["strVersion"] = "1.0.0.2",
+			["strContent"] = "1、修改了XX\n2、优化了xx\n3、see more",
+			["strPacketURL"] = "http://down.sandai.net/thunder9/Thunder9.1.26.614.exe",
+			["strMD5"] = "1221212",
+			["tRemindUpdate"] = {
+				["nCnt"] = 1, 
+				["nSpanSec"] = 86400*1,  
+			},
+			["tForceUpdate"] = {
+				["strVersion"] = "1.0.0.17",
+				["tVersion"] = {"1-16"},
+				["strPacketURL"] = "http://down.lvdun123.com/client/GsSetup_V17.exe",
+				["strMD5"] = "4164b7cf254bdf9e2576c8251b829595",
+			},
+		},
+		["tServerInterfaceCfg"] = {
+			["nQueryBindInterval"] = 5,
+			["nReportCalcInterval"] = 60,
+		},
+		["tRemindCfg"] = {
+			["nPopIntervals"] = 4*60*60,
+			["nHolds"] = 15,
+		},
+		["tExtraHelper"] = {
+			
+		},
+	}
+	return t
+end

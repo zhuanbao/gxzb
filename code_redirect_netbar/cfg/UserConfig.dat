@@ -1,0 +1,6 @@
+function GetSubTable()
+	local t = {
+		["strServerConfigURL"] = "http://www.eastredm.com/static/ServerConfig.dat", 
+	}
+	return t
+end

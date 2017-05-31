@@ -1,0 +1,102 @@
+<xlue>
+    <control class="TextLinkEx">
+        <attr_def>
+            <attr name="Text" type="string" />
+			<attr name="Font" type="string" >
+				<default>default.font</default>
+			</attr>
+			<attr name="TextColor" type="string" >
+				<default>color.textlinkex.normal</default>
+			</attr>
+			<attr name="TextHoverColor" type="string" >
+				<default>system.blue</default>
+			</attr>
+			<attr name="DisableTextColor" type="string" >
+				<default>system.gray</default>
+			</attr>
+			<attr name="Enable" type="bool" >
+				<default>true</default>
+			</attr>
+			<attr name="VAlign" type="string" >
+				<default>center</default>
+			</attr>
+			<attr name="HAlign" type="string" >
+				<default>left</default>
+			</attr>
+            <attr name="TabID" type="int"/>
+            <attr name="Link" type="string" >
+				<default></default>
+			</attr>
+			<attr name="NoSpaceCursor" type="bool" >
+				<default>true</default>
+			</attr>
+			<attr name="Underline" type="bool" >
+				<default>true</default>
+			</attr>
+			<attr name="Show" type="bool">
+			    <default>true</default>
+			</attr>
+			<attr name="ExternData" type="string" />
+        </attr_def>
+        <method_def>
+            <GetText file="TextLinkEx.xml.lua" func="GetText"/>
+            <SetText file="TextLinkEx.xml.lua" func="SetText"/>
+			<GetEnable file="TextLinkEx.xml.lua" func="GetEnable"/>
+            <SetEnable file="TextLinkEx.xml.lua" func="SetEnable"/>
+			<GetTextColorID file="TextLinkEx.xml.lua" func="GetTextColorID"/>
+            <SetTextColorID file="TextLinkEx.xml.lua" func="SetTextColorID"/>
+			<GetTextHoverColorID file="TextLinkEx.xml.lua" func="GetTextHoverColorID"/>
+            <SetTextHoverColorID file="TextLinkEx.xml.lua" func="SetTextHoverColorID"/>
+			<GetDisableTextColorID file="TextLinkEx.xml.lua" func="GetDisableTextColorID"/>
+            <SetDisableTextColorID file="TextLinkEx.xml.lua" func="SetDisableTextColorID"/>
+			<GetVAlign file="TextLinkEx.xml.lua" func="GetVAlign"/>
+            <SetVAlign file="TextLinkEx.xml.lua" func="SetVAlign"/>
+			<GetHAlign file="TextLinkEx.xml.lua" func="GetHAlign"/>
+            <SetHAlign file="TextLinkEx.xml.lua" func="SetHAlign"/>
+            <GetTextExtent file="TextLinkEx.xml.lua" func="GetTextExtent"/>
+			<Show file="TextLinkEx.xml.lua" func="Show"/>
+			<IsShow file="TextLinkEx.xml.lua" func="IsShow" />
+			<SetAlpha file="TextLinkEx.xml.lua" func="SetAlpha"/>
+        </method_def>
+        <event_def>
+            <OnClick />
+			<OnTextLinkMouseHover/>
+			<OnTextLinkMouseLeave/>
+        </event_def>
+        <objtemplate>
+            <children>
+			    <obj id="textlink.layout" class="LayoutObject">
+				    <attr>
+                        <left>0</left>
+                        <top>0</top>
+                        <width>father.width</width>
+                        <height>father.height</height>
+                    </attr>
+					<children>
+					    <obj id="textlink.text" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>system.blue</textcolor>
+								<valign>top</valign>
+								<halign>left</halign>
+								<endellipsis>1</endellipsis>
+							</attr>
+							<eventlist>
+								<event name="OnBind" file="TextLinkEx.xml.lua" func="OnBind" />
+								<event name="OnInitControl" file="TextLinkEx.xml.lua" func="OnInitControl" />
+								<event name="OnMouseHover" file="TextLinkEx.xml.lua" func="OnMouseHover" />
+								<event name="OnMouseMove" file="TextLinkEx.xml.lua" func="OnMouseMove" />
+								<event name="OnMouseLeave" file="TextLinkEx.xml.lua" func="OnMouseLeave" />
+								<event name="OnLButtonUp" file="TextLinkEx.xml.lua" func="OnLButtonUp" />
+							</eventlist>
+						</obj>
+					</children>
+				</obj>
+                
+            </children>
+        </objtemplate>
+    </control>
+</xlue>
