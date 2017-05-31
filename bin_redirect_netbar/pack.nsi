@@ -86,11 +86,6 @@ Var IsSilentInst
 Var str_ChannelID
 Var BoolExitMsg
 
-;注册表是否有netbar
-Var BoolRegHasNetBar
-;命令行是否有netbar
-Var BoolNameHasNetBar
-
 ;主程序至少需要10M空间
 !define NeedSpace 10
 
@@ -348,10 +343,6 @@ Function CloseExe
 FunctionEnd
 
 Function CheckHasInstall
-	${If} $BoolRegHasNetBar == 1
-	${AndIf} $BoolNameHasNetBar == 0
-		Return
-	${Endif}
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
 	IfFileExists $0 0 EndFunction
 	${GetFileVersion} $0 $1
@@ -381,13 +372,6 @@ Function CheckHasInstall
 FunctionEnd
 
 Function CheckExeProcExist
-	${If} $BoolRegHasNetBar == 1
-	${AndIf} $BoolNameHasNetBar == 0
-		${FKillProc} "Share4Money"
-		${FKillProc} "ShareGenoil"
-		${FKillProc} "zbsetuphelper-cl"
-		Return
-	${Endif}
 	StrCpy $0 0
 	;FindProcDLL::FindProc "Share4Money.exe"
 	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0"
@@ -441,21 +425,7 @@ Function UpdateChanel
 FunctionEnd
 
 Function InitNetBarData
-	Push $0
-	Push $1
-	Push $2
-	StrCpy $BoolRegHasNetBar 0
-	StrCpy $BoolNameHasNetBar 1
 	ReadRegStr $0 HKLM "software\Share4Money" "InstEnv"
-	${StrFilter} "$0" "-" "" "" $0
-	${If} $0 == "netbar"
-		StrCpy $BoolRegHasNetBar 1
-	${Else}
-		WriteRegStr HKLM "software\Share4Money" "InstEnv" "netbar"
-	${EndIf}
-	Pop $2
-	Pop $1
-	Pop $0
 FunctionEnd
 
 Function .onInit
@@ -547,14 +517,9 @@ Function DoInstall
 	IfFileExists $BaseCfgDir\Share4Money\localsvrcfg 0 +2
 	RMDir /r "$BaseCfgDir\Share4Money\localsvrcfg"
 	;覆盖安装备份配置
-	${If} $BoolRegHasNetBar == 1
-	${AndIf} $BoolNameHasNetBar == 0
-		RMDir /r "$BaseCfgDir\Share4Money"
-	${Else}
-		IfFileExists "$BaseCfgDir\Share4Money\UserConfig.dat" 0 +3
-		IfFileExists "$BaseCfgDir\Share4Money\UserConfig.dat.bak" +2 0
-		Rename "$BaseCfgDir\Share4Money\UserConfig.dat" "$BaseCfgDir\Share4Money\UserConfig.dat.bak"
-	${EndIf}
+	IfFileExists "$BaseCfgDir\Share4Money\UserConfig.dat" 0 +3
+	IfFileExists "$BaseCfgDir\Share4Money\UserConfig.dat.bak" +2 0
+	Rename "$BaseCfgDir\Share4Money\UserConfig.dat" "$BaseCfgDir\Share4Money\UserConfig.dat.bak"
 	
 	;释放配置
 	SetOutPath "$BaseCfgDir"
@@ -646,10 +611,6 @@ Function CmdSilentInstall
 		Abort
 		Return
 	${EndIf}
-	${If} $BoolRegHasNetBar == 1
-	${AndIf} $BoolNameHasNetBar == 0
-		Goto StartInstall
-	${Endif}
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
 	IfFileExists $0 0 StartInstall
 		${GetFileVersion} $0 $1
