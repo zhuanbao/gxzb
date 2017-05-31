@@ -425,7 +425,7 @@ Function UpdateChanel
 FunctionEnd
 
 Function InitNetBarData
-	ReadRegStr $0 HKLM "software\Share4Money" "InstEnv"
+	WriteRegStr HKLM "software\Share4Money" "InstEnv" "netbar"
 FunctionEnd
 
 Function .onInit
