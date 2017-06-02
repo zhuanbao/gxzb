@@ -1853,7 +1853,7 @@ end
 
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetRealPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	local strGUID = GetMachineID()
 	if IsRealString(strGUID) then
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
