@@ -182,7 +182,7 @@ extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *e
 		sprintf(szev, "&ev=%ld",ev);
 		str += szev;
 	}
-	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
+	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-100364500-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
 	TSDEBUG4CXX(L"SendAnyHttpStat szURL = "<<ultra::_A2UTF(szURL));
 	ResetUserHandle();
 	DWORD dwThreadId = 0;
@@ -764,7 +764,7 @@ void EncryptAESToFileHelper(const unsigned char* pszKey, const char* pszMsg, uns
 
 void EncryptString(const char* pszData,std::string &strOut)
 {
-	char *pszKey = "RpXVQTFlU7NaeMcV";
+	char *pszKey = "z2gQFnLc2RrJ5eBo";
 	int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
 	char* pszNewKey = new(std::nothrow) char[ubuff+1];
 	memset(pszNewKey,0,ubuff+1);
@@ -811,7 +811,7 @@ void DecryptFileAESHelper(const unsigned char* pszKey, const unsigned char* pszM
 
 void DecryptString(const char* pszBase64Data,std::string &strOut)
 {
-	char *pszKey = "RpXVQTFlU7NaeMcV";
+	char *pszKey = "z2gQFnLc2RrJ5eBo";
 	std::string strData = base64_decode(pszBase64Data);
 	if (strData.size() <= 0)
 	{
