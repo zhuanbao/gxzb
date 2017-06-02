@@ -66,6 +66,20 @@ function MessageBox(str)
 	tipUtil:MsgBox(str, "错误", 0x10)
 end
 
+function CheckIsRealPeerID(strPeerID)
+	local len = string.len(strPeerID)
+	strPeerID = string.upper(strPeerID)
+	for index=1,len do
+		local iByte = string.byte(strPeerID, index)
+		if (iByte >= 48 and iByte <= 57)  or (iByte >= 65 and iByte <= 90) then
+			
+		else
+			return false
+		end
+	end
+	return true
+end
+
 function PopTipWnd(OnCreateFunc)
 	local bSuccess = false
 	local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
@@ -414,7 +428,8 @@ function PreTipMain()
 	if FunctionObj.IsHostComputerInNetBar() then
 		FunctionObj.CreatePopupTipWnd()
 	else
-		if not IsRealString(FunctionObj.GetHostPeerID()) then
+		local strHostPeerID = FunctionObj.GetHostPeerID()
+		if not IsRealString(strHostPeerID) or not CheckIsRealPeerID(strHostPeerID) then
 			FunctionObj.TipLog("[PreTipMain] get host peerid fail exit")
 			FunctionObj.FailExitTipWnd(6)
 			return
