@@ -108,7 +108,7 @@ function IsHostComputerInNetBar()
 	end
 	local strHostMac = string.sub(GetHostPeerID(), 1, 12)
 	local strRealMac = string.sub(GetRealPeerID(), 1, 12)
-	return  strHostMac() == strRealMac()
+	return  strHostMac == strRealMac
 end
 --]]
 ---[[ forlocal
