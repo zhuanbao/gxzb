@@ -19,7 +19,7 @@
 // http://www.gnu.org/licenses/lgpl-2.1.txt
 ///////////////////////////////////////////////////////////////////////////////
 #include "ComUtils.h"
-
+#include "stdafx.h"
 static void DispatchPendingMessages_Helper(void)
 {
 	for(int i = 0; i < 16; i++)

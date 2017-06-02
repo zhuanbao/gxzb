@@ -24,7 +24,7 @@
 // Copyright (c) 2011 Robert Strong
 // For details see: http://nsis.sourceforge.net/Invoke_Shell_Verb_plugin
 ///////////////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "InvokeShellVerb.h"
 #include "ShellDispatch.h"
 #include "tchar.h"
