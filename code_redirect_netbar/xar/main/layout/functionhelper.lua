@@ -2056,7 +2056,7 @@ end
 
 function QuerySvrForQrcodeInfo(strWorkID)
 	local strInterfaceName = "getQrcode"
-	local strInterfaceParam = "workerID="..Helper:UrlEncode(tostring(strWorkID)) .. "&peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "workerID="..Helper:UrlEncode(tostring(strWorkID)) .. "&peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	local strGUID = GetMachineID()
 	if IsRealString(strGUID) then
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
@@ -2182,7 +2182,7 @@ function QuerySvrForReportClientInfo()
 		return
 	end
 	local strInterfaceName = "reportClientConf"
-	local strInterfaceParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
@@ -2220,7 +2220,7 @@ function QuerySvrForReportPoolInfo()
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "registeCalc"
-	local strInterfaceParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2240,7 +2240,7 @@ function QuerySvrForPushCalcInfo(nSpeed)
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "pushCalc"
-	local strInterfaceParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2261,7 +2261,7 @@ function QuerySvrForTakeCashInfo(nMoney)
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "drawout"
-	local strInterfaceParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2311,7 +2311,7 @@ function QuerySvrForGetHistoryInfo(strtype)
 		return
 	end
 	local strInterfaceName = "getHistory"
-	local strInterfaceParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(strtype)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -2634,7 +2634,7 @@ function GetUnBindUrl()
 		return
 	end
 	local strAPIName = "unbind"
-	local strOgriParam = "peerid=" .. tostring(Helper:UrlEncode(tostring(GetHostPeerID())))
+	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 				.."&workerID=" .. Helper:UrlEncode(tostring(strWorkID))
 				.. "&openID=" .. Helper:UrlEncode(tostring(strOpenID))
 	local strGUID = GetMachineID()

@@ -414,7 +414,11 @@ function PreTipMain()
 	if FunctionObj.IsHostComputerInNetBar() then
 		FunctionObj.CreatePopupTipWnd()
 	else
-		
+		if not IsRealString(FunctionObj.GetHostPeerID()) then
+			FunctionObj.TipLog("[PreTipMain] get host peerid fail exit")
+			FunctionObj.FailExitTipWnd(6)
+			return
+		end
 	end	
 	CheckMachineSuitable(function(bCheck)
 		--bCheck = true
