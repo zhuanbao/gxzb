@@ -66,21 +66,6 @@ function MessageBox(str)
 	tipUtil:MsgBox(str, "错误", 0x10)
 end
 
-function GetPeerID()
-	local strPeerID = FunctionObj.RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	if IsRealString(strPeerID) then
-		return string.upper(strPeerID)
-	end
-
-	local strRandPeerID = tipUtil:GetPeerId()
-	if not IsRealString(strRandPeerID) then
-		return ""
-	end
-	
-	FunctionObj.RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strRandPeerID)
-	return string.upper(strRandPeerID)
-end
-
 function PopTipWnd(OnCreateFunc)
 	local bSuccess = false
 	local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
@@ -116,7 +101,9 @@ function PopTipWnd(OnCreateFunc)
 	---初始化托盘
     if frameHostWnd then
 		FunctionObj.TipLog("[PopTipWnd] try to init tray tip wnd")
-	    FunctionObj.InitTrayTipWnd(frameHostWnd)
+		if FunctionObj.IsHostComputerInNetBar() then
+			FunctionObj.InitTrayTipWnd(frameHostWnd)
+		end	
 	end
 end
 
@@ -135,13 +122,16 @@ function ShowMainTipWnd(objMainWnd)
 			bHideMainPage = true
 		end
 	end
-	
-	if bHideMainPage then
-		objMainWnd:Show(0)
+	if FunctionObj.IsHostComputerInNetBar() then
+		if bHideMainPage then
+			objMainWnd:Show(0)
+		else
+			objMainWnd:Show(5)
+			FunctionObj.SetWndForeGround(objMainWnd)
+		end
 	else
-		objMainWnd:Show(5)
-		FunctionObj.SetWndForeGround(objMainWnd)
-	end
+		objMainWnd:Show(0)
+	end	
 	
 	objMainWnd:SetTitle("共享赚宝")
 	SendStartupReport(true)
@@ -328,7 +318,9 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	XLSetGlobal("g_ServerConfig", tServerConfig)
 	g_ServerConfig = tServerConfig
 	--4小时1次提醒
-	FunctionObj.PopTipPre4Hour()
+	if FunctionObj.IsHostComputerInNetBar() then
+		FunctionObj.PopTipPre4Hour()
+	end	
 	TryExecuteExtraCode(tServerConfig)
 	
 	--[[
@@ -337,19 +329,21 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	--]]
 	--增加处理/noliveup命令行
 	--升级提醒
-	local bPopRemind = FunctionObj.PopRemindUpdateWnd()
-	if not bPopRemind then
-		SetOnceTimer(function()
-						local cmdString = tipUtil:GetCommandLine()
-						local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
-						if not bRet then
-							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
-							TryForceUpdate(tServerConfig)
-						else
-							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
-						end
-					end, 1000)
-	end			
+	if FunctionObj.IsHostComputerInNetBar() then
+		local bPopRemind = FunctionObj.PopRemindUpdateWnd()
+		if not bPopRemind then
+			SetOnceTimer(function()
+							local cmdString = tipUtil:GetCommandLine()
+							local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
+							if not bRet then
+								FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
+								TryForceUpdate(tServerConfig)
+							else
+								FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
+							end
+						end, 1000)
+		end
+	end		
 end
 XLSetGlobal("OnDownLoadSvrCfgSuccess", OnDownLoadSvrCfgSuccess)
 
@@ -417,11 +411,19 @@ function PreTipMain()
 	SendStartupReport(false)
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
-	FunctionObj.CreatePopupTipWnd()
+	if FunctionObj.IsHostComputerInNetBar() then
+		FunctionObj.CreatePopupTipWnd()
+	else
+		
+	end	
 	CheckMachineSuitable(function(bCheck)
-		bCheck = true
+		--bCheck = true
 		if not bCheck then
-			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+			if FunctionObj.IsHostComputerInNetBar() then
+				FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+			else
+				FunctionObj.FailExitTipWnd(1)
+			end	
 		else
 			TipMain()
 		end
