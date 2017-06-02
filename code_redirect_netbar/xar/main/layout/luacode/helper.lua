@@ -38,6 +38,9 @@ function Helper:LOG(...)
 end
 
 function Helper:Assert(condition, errmsg)
+	if true then
+		return
+	end
 	if condition then
 		return
 	end
