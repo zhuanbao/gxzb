@@ -71,6 +71,41 @@ local g_tConfigFileStruct = {
 	},
 }
 
+---[[
+--网吧版本
+local gHostPeerID = nil
+local gRealPeerID = nil
+function GetHostPeerID()
+	if gHostPeerID ~= nil then
+		return gHostPeerID
+	end
+	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
+	local strDecryptPeerID = tipUtil:DecryptString(strPeerID,"z2gQFnLc2RrJ5eBo")
+	if IsRealString(strDecryptPeerID) then
+		gHostPeerID = string.upper(strDecryptPeerID)
+		return gHostPeerID
+	end
+	gHostPeerID = ""
+	return gHostPeerID
+end
+
+function GetRealPeerID()
+	if gRealPeerID ~= nil then
+		return gRealPeerID
+	end
+	local strHardwarePeerID = tipUtil:GetPeerId()
+	if not IsRealString(strHardwarePeerID) then
+		gRealPeerID = ""
+		return gRealPeerID
+	end
+	gRealPeerID = string.upper(strHardwarePeerID)
+	return gRealPeerID
+end
+
+function IsHostComputerInNetBar()
+	return  GetHostPeerID() == GetRealPeerID()
+end
+--]]
 ---[[ forlocal
 function LoadLocalSvrHelper()
 	local strLocalSvrHelper = __document.."\\..\\localcfghelper.lua"
@@ -130,7 +165,7 @@ function TipConvStatistic(tStat)
 	local tStatInfo = tStat or {}
 	local strDefaultNil = "zb_null"
 	
-	local strCID = GetPeerID()
+	local strCID = GetRealPeerID()
 	local strEC = tStatInfo.strEC 
 	local strEA = tStatInfo.strEA 
 	local strEL = tStatInfo.strEL
@@ -152,7 +187,7 @@ function TipConvStatistic(tStat)
 		strEV = 1
 	end
 
-	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid="..tostring(strCID)
+	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=UA-100364500-1&cid="..tostring(strCID)
 					.."&t=event&ec="..tostring(strEC).."&ea="..tostring(strEA)
 					.."&el="..tostring(strEL).."&ev="..tostring(strEV)
 	TipLog("TipConvStatistic: " .. tostring(strUrl))
@@ -230,6 +265,12 @@ end
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
+	--网吧版本 功能函数
+	---[[
+	obj.IsHostComputerInNetBar = IsHostComputerInNetBar
+	obj.GetHostPeerID = GetHostPeerID
+	obj.GetRealPeerID = GetRealPeerID
+	--]]
 	obj.TipLog = TipLog
 	obj.FetchValueByPath = FetchValueByPath
 	obj.NumberToFormatMoney = NumberToFormatMoney
@@ -498,7 +539,7 @@ function GetCurrentWorkModel()
 end
 
 function GetTimeStamp()
-	local strPeerId = GetPeerID()
+	local strPeerId = GetRealPeerID()
 	local iFlag = tonumber(string.sub(strPeerId, 12, 12), 16) or 0
 	local iTime = tipUtil:GetCurrentUTCTime()
 	local ss = math.floor((iTime + 8 * 3600  - (iFlag + 1) * 3600)/(24*3600))
@@ -1182,7 +1223,7 @@ function RegSetValue(sPath, value)
 end
 
 function GenDecFilePath(strEncFilePath)
-	local strKey = "RpXVQTFlU7NaeMcV"
+	local strKey = "z2gQFnLc2RrJ5eBo"
 	local strDecString = tipUtil:DecryptFileAES(strEncFilePath, strKey)
 	if type(strDecString) ~= "string" then
 		TipLog("[GenDecFilePath] DecryptFileAES failed : "..tostring(strEncFilePath))
@@ -1285,6 +1326,9 @@ end
 
 --scene:0或nil 启动时 1赚宝时
 function UpdateSuspendWndVisible(scene)
+	if not IsHostComputerInNetBar() then
+		return
+	end
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
 	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
@@ -1580,7 +1624,7 @@ function GetResSavePath(strName)
 end
 
 function EncryptFilePath(strTmpPath,strSavePath)
-	local strKey = "RpXVQTFlU7NaeMcV"
+	local strKey = "z2gQFnLc2RrJ5eBo"
 	local strData = tipUtil:ReadFileToString(strTmpPath)
 	tipUtil:EncryptAESToFile(strSavePath,strData,strKey)
 	tipUtil:DeletePathFile(strTmpPath)
@@ -1809,7 +1853,7 @@ end
 
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetRealPeerID()))
 	local strGUID = GetMachineID()
 	if IsRealString(strGUID) then
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
@@ -2012,7 +2056,7 @@ end
 
 function QuerySvrForQrcodeInfo(strWorkID)
 	local strInterfaceName = "getQrcode"
-	local strInterfaceParam = "workerID="..Helper:UrlEncode(tostring(strWorkID)) .. "&peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "workerID="..Helper:UrlEncode(tostring(strWorkID)) .. "&peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	local strGUID = GetMachineID()
 	if IsRealString(strGUID) then
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
@@ -2138,7 +2182,7 @@ function QuerySvrForReportClientInfo()
 		return
 	end
 	local strInterfaceName = "reportClientConf"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
@@ -2176,7 +2220,7 @@ function QuerySvrForReportPoolInfo()
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "registeCalc"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2196,7 +2240,7 @@ function QuerySvrForPushCalcInfo(nSpeed)
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "pushCalc"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2217,7 +2261,7 @@ function QuerySvrForTakeCashInfo(nMoney)
 		tUserConfig["tUserInfo"] = {}
 	end
 	local strInterfaceName = "drawout"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
@@ -2267,7 +2311,7 @@ function QuerySvrForGetHistoryInfo(strtype)
 		return
 	end
 	local strInterfaceName = "getHistory"
-	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
 	strInterfaceParam = strInterfaceParam .. "&type=" .. Helper:UrlEncode((tostring(strtype)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -2590,7 +2634,7 @@ function GetUnBindUrl()
 		return
 	end
 	local strAPIName = "unbind"
-	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strOgriParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 				.."&workerID=" .. Helper:UrlEncode(tostring(strWorkID))
 				.. "&openID=" .. Helper:UrlEncode(tostring(strOpenID))
 	local strGUID = GetMachineID()
@@ -2621,7 +2665,7 @@ function InitMachineName()
 			TipLog("[InitMachineName] strDeviceName = " .. tostring(strDeviceName))
 			tUserConfig["tUserInfo"]["strMachineName"] = strDeviceName
 		else
-			tUserConfig["tUserInfo"]["strMachineName"] = GetPeerID()
+			tUserConfig["tUserInfo"]["strMachineName"] = GetRealPeerID()
 		end
 		SaveConfigToFileByKey("tUserConfig")
 	end
@@ -2679,7 +2723,7 @@ end
 
 function CheckShoudAutoMining()
 	local strCmdline = tipUtil:GetCommandLine()
-	if string.find(string.lower(tostring(strCmdline)), "/mining") then
+	if string.find(string.lower(tostring(strCmdline)), "/mining") or not IsHostComputerInNetBar() then
 		if not CheckIsWorking() then
 			NotifyStart()
 		end
