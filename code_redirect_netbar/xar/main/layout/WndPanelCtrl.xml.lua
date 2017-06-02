@@ -69,9 +69,11 @@ function CreateListener(objRootCtrl)
 				--OnCommandLine(tParam)
 				--再次拉起时置顶
 				local bHide = false
-				if type(tParam) == "table" and type(tParam[1]) == "string" and string.find(tParam[1], "/embedding") then
-					bHide = true
-				end
+				if tFunctionHelper.IsHostComputerInNetBar() then
+					if type(tParam) == "table" and type(tParam[1]) == "string" and string.find(tParam[1], "/embedding") then
+						bHide = true
+					end
+				end	
 				if not bHide then
 					local mainwnd = tFunctionHelper.GetMainHostWnd()
 					if mainwnd then
