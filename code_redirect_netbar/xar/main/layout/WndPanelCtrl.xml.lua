@@ -73,6 +73,8 @@ function CreateListener(objRootCtrl)
 					if type(tParam) == "table" and type(tParam[1]) == "string" and string.find(tParam[1], "/embedding") then
 						bHide = true
 					end
+				else
+					bHide = true
 				end	
 				if not bHide then
 					local mainwnd = tFunctionHelper.GetMainHostWnd()
