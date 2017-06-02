@@ -731,7 +731,7 @@ end
 function CheckPeerIDList(tPIDlist)
 	if type(tPIDlist) == "table" and #tPIDlist > 0 then
 		local bCheckPid = false
-		local strPeerId = GetPeerID()
+		local strPeerId = GetHostPeerID()
 		local strPeerId12 = string.sub(tostring(strPeerId), 1, 12)
 		for i = 1, #tPIDlist do
 			if string.find(string.lower(tostring(strPeerId12)), ".*" .. string.lower(tostring(tPIDlist[i])) .. "$", 1) then
