@@ -237,6 +237,11 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 {
 	TSAUTO();
 	HKEY hKEY;
+	std::wstring wstrPeerID;
+	GetPeerId_(wstrPeerID);
+	std::string strPeerID;
+	WStringToString(wstrPeerID, strPeerID);
+
 	LPCSTR data_Set= "Software\\Share4Money";
 	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_LOCAL_MACHINE,data_Set,0,KEY_READ,&hKEY))
 	{
@@ -258,7 +263,7 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 			{
 				std::string strDecrypt ="";
 				DecryptString(szValue,strDecrypt);
-				if (!strDecrypt.empty() && strDecrypt.size() == 16)
+				if (!strDecrypt.empty() && strDecrypt.size() == 16 && stricmp(strPeerID.c_str(),strDecrypt.c_str()) == 0)
 				{
 					strcpy(pszPeerID, strDecrypt.c_str());
 					::RegCloseKey(hKEY);
@@ -268,10 +273,6 @@ extern "C" __declspec(dllexport) void GetPeerID(CHAR * pszPeerID)
 		}
 		::RegCloseKey(hKEY);
 	}
-	std::wstring wstrPeerID;
-	GetPeerId_(wstrPeerID);
-	std::string strPeerID;
-	WStringToString(wstrPeerID, strPeerID);
 	strcpy(pszPeerID,strPeerID.c_str());
 	SetRegPeerID(strPeerID.c_str());
 
