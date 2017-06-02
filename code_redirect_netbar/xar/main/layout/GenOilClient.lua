@@ -165,8 +165,8 @@ function LimitSpeedCond()
 		return true
 	end
 	--判断是否有用户窗口(比如用户正在非全屏看电影)
-	--[[
-	if IsExistOtherUserWnd() then
+	---[[
+	if not tFunctionHelper.IsHostComputerInNetBar() and IsExistOtherUserWnd() then
 		TipLog("[LimitSpeedCond] exist other visiable wnd")
 		return true
 	end
