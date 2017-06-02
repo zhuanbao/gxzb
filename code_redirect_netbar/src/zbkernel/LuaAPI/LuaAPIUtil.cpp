@@ -3954,7 +3954,8 @@ int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
 		}
 		if (pszFile == NULL || pszKey == NULL)
 		{
-			return 0;
+			lua_pushnil(pLuaState);
+			return 1;
 		}
 
 		CComBSTR bstrFilePath;
@@ -3964,14 +3965,15 @@ int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
 		int iFileSize = (int)GetFileSizeHelper(pszFile);
 		if (iFileSize <= 0)
 		{
-			lua_pushboolean(pLuaState, 1);
+			lua_pushnil(pLuaState);
 			return 1;
 		}
 
 		char* data = new char[iFileSize + 1];
 		if (NULL == data)
 		{
-			return 0;
+			lua_pushnil(pLuaState);
+			return 1;
 		}
 		ZeroMemory(data, iFileSize + 1);
 		std::ifstream pf(bstrFilePath.m_str, std::ios_base::in|std::ios_base::binary);
@@ -3980,7 +3982,8 @@ int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
 		if (-1 != curPosEnd && curPosEnd != iFileSize)
 		{
 			delete[] data;
-			return 0;
+			lua_pushnil(pLuaState);
+			return 1;
 		}
 		char* pdata = data;
 		if (iFileSize >= 3 && (byte)pdata[0] == 0xEF && (byte)pdata[1] == 0xBB && (byte)pdata[2] == 0xBF)
