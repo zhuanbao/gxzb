@@ -418,6 +418,10 @@ function PreTipMain()
 			FunctionObj.TipLog("[PreTipMain] get host peerid fail exit")
 			FunctionObj.FailExitTipWnd(6)
 			return
+		elseif not FunctionObj.CheckIsGettedWorkID() then
+			FunctionObj.TipLog("[PreTipMain] hots not get workid")
+			FunctionObj.FailExitTipWnd(7)
+			return
 		end
 	end	
 	CheckMachineSuitable(function(bCheck)
