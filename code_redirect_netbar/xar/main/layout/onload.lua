@@ -425,6 +425,7 @@ function PreTipMain()
 	SendStartupReport(false)
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
+	FunctionObj.TipLog("[PreTipMain] host peerid = " .. FunctionObj.GetHostPeerID() .. ", real peerid = " .. FunctionObj.GetRealPeerID())
 	if FunctionObj.IsHostComputerInNetBar() then
 		FunctionObj.CreatePopupTipWnd()
 	else
@@ -434,7 +435,7 @@ function PreTipMain()
 			FunctionObj.FailExitTipWnd(6)
 			return
 		elseif not FunctionObj.CheckIsGettedWorkID() then
-			FunctionObj.TipLog("[PreTipMain] hots not get workid")
+			FunctionObj.TipLog("[PreTipMain] host not get workid")
 			FunctionObj.FailExitTipWnd(7)
 			return
 		end
