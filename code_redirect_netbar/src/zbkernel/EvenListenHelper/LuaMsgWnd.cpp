@@ -12,9 +12,11 @@
 #include <atlconv.h>
 #include "Wininet.h"
 #include <fstream>
+#include <Tlhelp32.h>
 #pragma comment(lib, "Wininet.lib")
 #include "..\XLUEApplication.h"
 #include "..\Utility\LuaAPIHelper.h"
+#define CLIENT_NAME _T("Share4Peer.exe")
 LuaMsgWindow::LuaMsgWindow(void)
 {
 	TSAUTO();
@@ -26,6 +28,59 @@ LuaMsgWindow::~LuaMsgWindow(void)
 	TSAUTO();	
 }
 
+bool LuaMsgWindow::IsHideProc(const std::wstring& wstrCmd)
+{
+	int nNumArgs = 0;
+	LPWSTR *szArgList = CommandLineToArgvW(wstrCmd.c_str(), &nNumArgs);
+	if (NULL != szArgList)
+	{
+		for (int i=0; i<nNumArgs; ++i)
+		{
+			if (wcsicmp(szArgList[i],L"/forceshow") == 0)
+			{
+				return false;
+			}
+		}
+		GlobalFree(szArgList);
+	}
+	return true;
+}
+
+void LuaMsgWindow::KillHideProc()
+{
+	HANDLE hMutex = OpenMutex(NULL, true, LUA_MSG_MUTEX_HIDEUI);
+	if (hMutex == NULL && ERROR_FILE_NOT_FOUND == ::GetLastError())
+	{
+		return;
+	}
+	TerminateAllClientInstance(L"Share4Money.exe");
+	TerminateAllClientInstance(CLIENT_NAME);
+	Sleep(1000);//单例互斥量可能还没销毁
+	return ;
+}
+
+void LuaMsgWindow::TerminateAllClientInstance(const wchar_t *szExeName)
+{
+	DWORD dwCurPID = ::GetCurrentProcessId();
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			if(_tcsicmp(pe.szExeFile, szExeName) == 0 && pe.th32ProcessID != 0 && pe.th32ProcessID != dwCurPID)
+			{
+				TSDEBUG4CXX("Kill Hide Proc szExeFile = "<<pe.szExeFile<<", th32ProcessID = "<< pe.th32ProcessID<<", dwCurPID = "<<dwCurPID);
+				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+				::TerminateProcess(hProcess, 4);
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
+	}
+}
 
 bool LuaMsgWindow::HandleSingleton()
 {
@@ -37,6 +92,15 @@ bool LuaMsgWindow::HandleSingleton()
 	cds.cbData =(int) sizeof( WCHAR ) * ((int)wcslen(lpstrCmdLine) + 1) ;  // size of data
 	cds.lpData = lpstrCmdLine;     
 	
+	if (!IsHideProc(lpstrCmdLine))
+	{
+		KillHideProc();
+		
+	}
+	else
+	{
+		HANDLE hHideProcMutex = CreateMutex(NULL, true, LUA_MSG_MUTEX_HIDEUI);
+	}
 	UINT iSingleTon = 1;
 	if(iSingleTon)
 	{

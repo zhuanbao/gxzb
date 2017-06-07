@@ -5,6 +5,7 @@
 
 #define LUA_MSG_WND_CALSS _T("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 #define LUA_MSG_MUTEX _T("{MutexWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
+#define LUA_MSG_MUTEX_HIDEUI _T("{MutexWndHIDEUI_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 
 #include <XLLuaRuntime.h>
 typedef void (*funResultCallBack) (DWORD userdata1,DWORD userdata2, const char* pszKey,  DISPPARAMS* pParams);
@@ -39,6 +40,9 @@ public:
 	int DetachListener(DWORD userData1, const void* pfun);
 	void CloseSingletonMutex();
 	bool HandleSingleton();
+	bool IsHideProc(const std::wstring& wstrCmd);
+	void KillHideProc();
+	void TerminateAllClientInstance(const wchar_t *szExeName);
 	DECLARE_WND_CLASS(LUA_MSG_WND_CALSS)
 	BEGIN_MSG_MAP(LuaMsgWindow)
 		MESSAGE_HANDLER(WM_COPYDATA, OnCopyData)
