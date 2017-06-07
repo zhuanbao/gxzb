@@ -91,7 +91,7 @@ function SetEnvironmentVariables()
 	end
 	local tabCmd = {"GPU_FORCE_64BIT_PTR 0","GPU_MAX_HEAP_SIZE 100","GPU_USE_SYNC_OBJECTS 1","GPU_MAX_ALLOC_PERCENT 100","GPU_SINGLE_ALLOC_PERCENT 100"}
 	for index=1,#tabCmd do
-		tipUtil:ShellExecute(0, "open", strExePath, tabCmd[index], 0, 0)
+		tipUtil:ShellExecute(0, "open", strExePath, tabCmd[index], 0, "SW_HIDE")
 	end
 end
 
@@ -244,13 +244,11 @@ function TryForceUpdate(tServerConfig)
 		FunctionObj.TipLog("[TryForceUpdate] CheckCommonUpdateTime failed")
 		return		
 	end
-
 	local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
 	local tForceUpdate = tNewVersionInfo["tForceUpdate"]
 	if(type(tForceUpdate)) ~= "table" then
 		return 
 	end
-	
 	local strCurVersion = FunctionObj.GetGXZBVersion()
 	local versionInfo = CheckCondition(tForceUpdate)
 	local strNewVersion = versionInfo and versionInfo.strVersion		
@@ -259,7 +257,6 @@ function TryForceUpdate(tServerConfig)
 		FunctionObj.TipLog("[TryForceUpdate] strCurVersion is nil or is not New Version")
 		return
 	end
-	
 	local tVersionLimit = versionInfo["tVersion"]
 	local bPassCheck = FunctionObj.CheckForceVersion(tVersionLimit)
 	FunctionObj.TipLog("[TryForceUpdate] CheckForceVersion bPassCheck:"..tostring(bPassCheck))
@@ -457,7 +454,7 @@ function PreTipMain()
 		end
 	end	
 	CheckMachineSuitable(function(bCheck)
-		--bCheck = true
+		bCheck = true
 		if not bCheck then
 			if FunctionObj.CanShowUIToUser() then
 				FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)

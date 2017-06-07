@@ -230,7 +230,7 @@ function GetInstallDir()
 end
 
 function GetUpdateExeDir()
-	local strInstallDir = GetInstallDir()()
+	local strInstallDir = GetInstallDir()
 	local _,_,strDir = string.find(tostring(strInstallDir), "(.+)\\[^\\]+$")
 	return strDir
 end
@@ -323,7 +323,7 @@ function RegisterFunctionObject(self)
 	obj.SendUIReport = SendUIReport
 	
 	--业务辅助函数
-	obj.GetRegIniPath = obj.GetRegIniPath
+	obj.GetRegIniPath = GetRegIniPath
 	obj.GetModuleDir = GetModuleDir
 	obj.GetInstallDir = GetInstallDir
 	obj.GetUpdateExeDir = GetUpdateExeDir
@@ -959,7 +959,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
-	local strConfigURL = tUserConfig["strServerConfigURL"] or "http://www.eastredm.com/static/ServerConfig.dat"
+	local strConfigURL = tUserConfig["strServerConfigURL"] or "http://www.eastredm.com/static/ServerNetBarConfig.dat"
 	if not IsRealString(strConfigURL) then
 		callbackwrap(-2)
 		return
@@ -1595,11 +1595,7 @@ function GetCfgPathWithName(strCfgName)
 end
 
 function GetResSavePath(strName)
-	local bOk, strBaseDir = QueryAllUsersDir()
-	if not bOk then
-		return ""
-	end
-	
+	local strBaseDir = GetInstallDir()
 	local strPath = tipUtil:PathCombine(strBaseDir, "config\\res\\"..tostring(strName))
 	return strPath or ""
 end
@@ -2841,7 +2837,7 @@ end
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
 	if tonumber(g_Balance) >= 0 then
-		local strRegIniPath = FunctionObj.GetRegIniPath()
+		local strRegIniPath = GetRegIniPath()
 		tipUtil:WriteINI("HKCR", "balance", NumberToFormatMoney(g_Balance), strRegIniPath)
 	end
 	local wnd = GetMainHostWnd()

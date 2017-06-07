@@ -23,8 +23,8 @@ function OnCreate(self)
 		local TextVersion = objtree:GetUIObject("AboutWnd.Content.VersionValue")
 		local TextDate = objtree:GetUIObject("AboutWnd.Content.DateValue")
 		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-		local strRegIniPath = GetRegIniPath()
-		local strLastUTC = tipUtil:ReadINI(strRegIniPath, "HKLM", "InstallTimes")
+		local strRegIniPath = tFunctionHelper.GetRegIniPath()
+		local strLastUTC = Helper.tipUtil:ReadINI(strRegIniPath, "HKLM", "InstallTimes")
 		
 		if not tonumber(strLastUTC) then
 			strLastUTC = tUserConfig["nLastCommonUpdateUTC"]
