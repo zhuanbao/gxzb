@@ -454,7 +454,7 @@ function PreTipMain()
 		end
 	end	
 	CheckMachineSuitable(function(bCheck)
-		bCheck = true
+		--bCheck = true
 		if not bCheck then
 			if FunctionObj.CanShowUIToUser() then
 				FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
