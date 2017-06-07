@@ -6,7 +6,7 @@ local IPCUtil = XLGetObject("IPC.Util")
 
 --常量
 local CLIENT_GENOIL = 1
-local CLIENT_PATH = "ShareGenOil\\ShareGenOil.exe"
+local CLIENT_PATH = "Share4Peer\\Share4Peer.exe"
 --上报速度
 local WP_GENOIL_SPEED = 1
 --上报DAG进度
@@ -166,7 +166,7 @@ function LimitSpeedCond()
 	end
 	--判断是否有用户窗口(比如用户正在非全屏看电影)
 	---[[
-	if not tFunctionHelper.IsHostComputerInNetBar() and IsExistOtherUserWnd() then
+	if not tFunctionHelper.CanShowUIToUser() and IsExistOtherUserWnd() then
 		TipLog("[LimitSpeedCond] exist other visiable wnd")
 		return true
 	end

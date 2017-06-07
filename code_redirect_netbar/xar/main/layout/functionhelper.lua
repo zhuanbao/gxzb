@@ -73,42 +73,42 @@ local g_tConfigFileStruct = {
 
 ---[[
 --网吧版本
-local gHostPeerID = nil
-local gRealPeerID = nil
+
+function InitHostPeerID()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strHostPeerID = tUserConfig["strHostPeerID"]
+	if not IsRealString(strHostPeerID) then
+		tUserConfig["strHostPeerID"] = tipUtil:GetPeerId()
+		SaveConfigToFileByKey("tUserConfig")
+	end
+end
+
 function GetHostPeerID()
-	if gHostPeerID ~= nil then
-		return gHostPeerID
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	local strHostPeerID = tUserConfig["strHostPeerID"]
+	if IsRealString(strHostPeerID) then
+		strHostPeerID = string.upper(strHostPeerID)
+		return strHostPeerID
 	end
-	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	local strDecryptPeerID = tipUtil:DecryptString(strPeerID,"z2gQFnLc2RrJ5eBo")
-	if IsRealString(strDecryptPeerID) then
-		gHostPeerID = string.upper(strDecryptPeerID)
-		return gHostPeerID
-	end
-	gHostPeerID = ""
-	return gHostPeerID
+	strHostPeerID = ""
+	return strHostPeerID
+	
 end
 
 function GetRealPeerID()
-	if gRealPeerID ~= nil then
-		return gRealPeerID
-	end
 	local strHardwarePeerID = tipUtil:GetPeerId()
 	if not IsRealString(strHardwarePeerID) then
-		gRealPeerID = ""
-		return gRealPeerID
+		strHardwarePeerID = ""
+		return strHardwarePeerID
 	end
-	gRealPeerID = string.upper(strHardwarePeerID)
-	return gRealPeerID
+	strHardwarePeerID = string.upper(strHardwarePeerID)
+	return strHardwarePeerID
 end
 
-function IsHostComputerInNetBar()
-	if not IsRealString(GetHostPeerID()) or not IsRealString(GetRealPeerID()) then
-		return false
-	end
-	local strHostMac = string.sub(GetHostPeerID(), 1, 12)
-	local strRealMac = string.sub(GetRealPeerID(), 1, 12)
-	return  strHostMac == strRealMac
+function CanShowUIToUser()
+	local strCmd = tipUtil:GetCommandLine()
+	local bRet = string.find(tostring(strCmd), "/forceshow")
+	return bRet
 end
 --]]
 ---[[ forlocal
@@ -223,6 +223,24 @@ function GetModuleDir()
 	return strDir
 end
 
+function GetInstallDir()
+	local strModuleDir = GetModuleDir()
+	local _,_,strDir = string.find(tostring(strModuleDir), "(.+)\\[^\\]+$")
+	return strDir
+end
+
+function GetUpdateExeDir()
+	local strInstallDir = GetInstallDir()()
+	local _,_,strDir = string.find(tostring(strInstallDir), "(.+)\\[^\\]+$")
+	return strDir
+end
+
+function GetRegIniPath()
+	local strInstallDir = GetInstallDir()
+	local strRegIniPath = tipUtil:PathCombine(strInstallDir, "config\\reg.ini")
+	return strRegIniPath
+end
+
 function GetFileNameFromPath(strPath)
 	local _,_,strFileName = string.find(tostring(strPath), ".+\\([^\\]+)$")
 	return strFileName
@@ -272,7 +290,8 @@ function RegisterFunctionObject(self)
 	--通用功能函数
 	--网吧版本 功能函数
 	---[[
-	obj.IsHostComputerInNetBar = IsHostComputerInNetBar
+	obj.CanShowUIToUser = CanShowUIToUser
+	obj.InitHostPeerID = InitHostPeerID
 	obj.GetHostPeerID = GetHostPeerID
 	obj.GetRealPeerID = GetRealPeerID
 	--]]
@@ -288,7 +307,7 @@ function RegisterFunctionObject(self)
 	obj.RegQueryValue = RegQueryValue
 	obj.RegSetValue = RegSetValue
 	obj.RegDeleteValue = RegDeleteValue
-	obj.GetPeerID = GetPeerID
+
 	obj.GetSystemBits = GetSystemBits
 	obj.FormatByteUnit = FormatByteUnit
 	obj.CheckTimeIsAnotherDay = CheckTimeIsAnotherDay
@@ -304,7 +323,11 @@ function RegisterFunctionObject(self)
 	obj.SendUIReport = SendUIReport
 	
 	--业务辅助函数
+	obj.GetRegIniPath = obj.GetRegIniPath
 	obj.GetModuleDir = GetModuleDir
+	obj.GetInstallDir = GetInstallDir
+	obj.GetUpdateExeDir = GetUpdateExeDir
+
 	obj.GetFileNameFromPath = GetFileNameFromPath
 	obj.GetExePath = GetExePath
 	obj.GetGXZBVersion = GetGXZBVersion
@@ -339,7 +362,6 @@ function RegisterFunctionObject(self)
 	obj.PopupNotifyIconTip = PopupNotifyIconTip
 	obj.InitTrayTipWnd = InitTrayTipWnd 
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
-	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopRemindUpdateWnd = PopRemindUpdateWnd
 	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
 	obj.DestroyPopupWnd = DestroyPopupWnd
@@ -455,6 +477,10 @@ function CheckShouldRemindBind()
 	if CheckIsBinded() then
 		return false
 	end
+	local bRet, strSource = GetCommandStrValue("/sstartfrom")
+	if bRet and string.lower(tostring(strSource)) == "installfinish" then
+		return true
+	end
 	local strCmdline = tipUtil:GetCommandLine()
 	if string.find(string.lower(tostring(strCmdline)), "/mining") then
 		return false
@@ -509,7 +535,7 @@ function DownLoadNewVersion(tNewVersionInfo, fnCallBack)
 	if not string.find(strFileName, "%.exe$") then
 		strFileName = strFileName..".exe"
 	end
-	local strSaveDir = tipUtil:GetSystemTempPath()
+	local strSaveDir = GetUpdateExeDir()
 	local strSavePath = tipUtil:PathCombine(strSaveDir, strFileName)
 	
 	local strStamp = GetTimeStamp()
@@ -717,22 +743,6 @@ function FormatByteUnit(nFileSizeInByte, nPrecision)
 	return strFileSize
 end
 
-function GetPeerID()
-	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	local strDecryptPeerID = tipUtil:DecryptString(strPeerID,"RpXVQTFlU7NaeMcV")
-	if IsRealString(strDecryptPeerID) then
-		return string.upper(strDecryptPeerID)
-	end
-
-	local strRandPeerID = tipUtil:GetPeerId()
-	if not IsRealString(strRandPeerID) then
-		return ""
-	end
-	local strEncryptPeerID = tipUtil:EncryptString(strRandPeerID,"RpXVQTFlU7NaeMcV")
-	RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strEncryptPeerID)
-	return string.upper(strRandPeerID)
-end
-
 function CheckPeerIDList(tPIDlist)
 	if type(tPIDlist) == "table" and #tPIDlist > 0 then
 		local bCheckPid = false
@@ -754,15 +764,7 @@ function GetMachineID()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	local strMachineID = tUserConfig["strMachineID"]
 	if not IsRealString(strMachineID) then
-		local strRegOldPath = "HKEY_CURRENT_USER\\Software\\Share4Money\\machineid"
-		strMachineID = RegQueryValue(strRegOldPath)
-		if not IsRealString(strMachineID) then
-			strMachineID = tipUtil:CreateGuid()
-			--strMachineID = tipUtil:EncryptString(strGUID,"RpXVQTFlU7NaeMcV")
-			--RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\machineid", strMachineID)
-		else
-			RegDeleteValue(strRegOldPath)
-		end
+		strMachineID = tipUtil:CreateGuid()
 		tUserConfig["strMachineID"] = strMachineID
 		SaveConfigToFileByKey("tUserConfig")
 	end
@@ -773,7 +775,11 @@ end
 
 --渠道
 function GetInstallSrc()
-	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\InstallSource")
+	local strRegIniPath = GetRegIniPath()
+	if not IsRealString(strRegIniPath) or not tipUtil:QueryFileExists(tostring(strRegIniPath)) then
+		return ""
+	end
+	local strInstallSrc = tipUtil:ReadINI(strRegIniPath, "HKLM", "InstallSource")
 	if not IsNilString(strInstallSrc) then
 		return tostring(strInstallSrc)
 	end
@@ -782,12 +788,7 @@ function GetInstallSrc()
 end
 
 function GetExePath()
-	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\Path")
-	if IsRealString(strExePath) then
-		return tostring(strExePath)
-	else
-		return tipUtil:GetModuleExeName()
-	end
+	return tipUtil:GetModuleExeName()
 end
 
 function NewAsynGetHttpFile(strUrl, strSavePath, bDelete, funCallback, nTimeoutInMS)
@@ -1161,12 +1162,12 @@ end
 
 
 function GetGXZBVersion()
-	local strgxzbPath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\path")
-	if not IsRealString(strgxzbPath) or not tipUtil:QueryFileExists(strgxzbPath) then
+	local strExePath = tipUtil:GetModuleExeName()
+	if not IsRealString(strExePath) or not tipUtil:QueryFileExists(strExePath) then
 		return ""
 	end
 
-	return tipUtil:GetFileVersionString(strgxzbPath)
+	return tipUtil:GetFileVersionString(strExePath)
 end
 
 
@@ -1331,7 +1332,7 @@ end
 
 --scene:0或nil 启动时 1赚宝时
 function UpdateSuspendWndVisible(scene)
-	if not IsHostComputerInNetBar() then
+	if not CanShowUIToUser() then
 		return
 	end
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -1360,26 +1361,6 @@ function UpdateSuspendWndVisible(scene)
 			SendUIReport("showsuspendwnd",1)
 		end
 	end
-end
-
-function ShowIntroduceOnce()
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local nLastShowIntroduce = FetchValueByPath(tUserConfig, {"nLastShowIntroduce"})
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\ShowIntroduce"
-	
-	if not IsNilString(nLastShowIntroduce) then
-		RegDeleteValue(strRegPath)
-		return
-	end
-	
-	local strValue = RegQueryValue(strRegPath)
-	if IsRealString(strValue) then
-		ShowPopupWndByName("TipIntroduceWnd.Instance", true)
-		tUserConfig["nLastShowIntroduce"] = tipUtil:GetCurrentUTCTime()
-		SaveConfigToFileByKey("tUserConfig")
-	end
-	
-	RegDeleteValue(strRegPath)
 end
 
 function InitTrayTipWnd(objHostWnd)
@@ -1412,7 +1393,6 @@ function InitTrayTipWnd(objHostWnd)
 		--单击左键
 		if event3 == 0x0202 then
 			ShowMainPanleByTray(objHostWnd)
-			ShowIntroduceOnce()
 		end
 		
 		--点击气泡
@@ -1609,12 +1589,8 @@ end
 
 
 function GetCfgPathWithName(strCfgName)
-	local bOk, strBaseDir = QueryAllUsersDir()
-	if not bOk then
-		return ""
-	end
-	
-	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "Share4Money\\"..tostring(strCfgName))
+	local strBaseDir = GetInstallDir()
+	local strCfgFilePath = tipUtil:PathCombine(strBaseDir, "config\\"..tostring(strCfgName))
 	return strCfgFilePath or ""
 end
 
@@ -1624,7 +1600,7 @@ function GetResSavePath(strName)
 		return ""
 	end
 	
-	local strPath = tipUtil:PathCombine(strBaseDir, "Share4Money\\res\\"..tostring(strName))
+	local strPath = tipUtil:PathCombine(strBaseDir, "config\\res\\"..tostring(strName))
 	return strPath or ""
 end
 
@@ -2728,7 +2704,7 @@ end
 
 function CheckShoudAutoMining()
 	local strCmdline = tipUtil:GetCommandLine()
-	if string.find(string.lower(tostring(strCmdline)), "/mining") or not IsHostComputerInNetBar() then
+	if string.find(string.lower(tostring(strCmdline)), "/mining") or not CanShowUIToUser() then
 		if not CheckIsWorking() then
 			NotifyStart()
 		end
@@ -2865,7 +2841,8 @@ end
 function UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
 	if tonumber(g_Balance) >= 0 then
-		RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", NumberToFormatMoney(g_Balance))
+		local strRegIniPath = FunctionObj.GetRegIniPath()
+		tipUtil:WriteINI("HKCR", "balance", NumberToFormatMoney(g_Balance), strRegIniPath)
 	end
 	local wnd = GetMainHostWnd()
 	if not wnd then

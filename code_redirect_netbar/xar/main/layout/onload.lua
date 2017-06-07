@@ -80,6 +80,21 @@ function CheckIsRealPeerID(strPeerID)
 	return true
 end
 
+function SetEnvironmentVariables()
+	local strWindir = os.getenv("windir")
+	if not IsRealString(strWindir) then
+		return
+	end
+	local strExePath = tipUtil:PathCombine(strWindir, "system32\\setx.exe")
+	if not tipUtil:QueryFileExists(strExePath) then
+		return
+	end
+	local tabCmd = {"GPU_FORCE_64BIT_PTR 0","GPU_MAX_HEAP_SIZE 100","GPU_USE_SYNC_OBJECTS 1","GPU_MAX_ALLOC_PERCENT 100","GPU_SINGLE_ALLOC_PERCENT 100"}
+	for index=1,#tabCmd do
+		tipUtil:ShellExecute(0, "open", strExePath, tabCmd[index], 0, 0)
+	end
+end
+
 function PopTipWnd(OnCreateFunc)
 	local bSuccess = false
 	local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
@@ -115,7 +130,7 @@ function PopTipWnd(OnCreateFunc)
 	---初始化托盘
     if frameHostWnd then
 		FunctionObj.TipLog("[PopTipWnd] try to init tray tip wnd")
-		if FunctionObj.IsHostComputerInNetBar() then
+		if FunctionObj.CanShowUIToUser() then
 			FunctionObj.InitTrayTipWnd(frameHostWnd)
 		end	
 	end
@@ -136,7 +151,7 @@ function ShowMainTipWnd(objMainWnd)
 			bHideMainPage = true
 		end
 	end
-	if FunctionObj.IsHostComputerInNetBar() then
+	if FunctionObj.CanShowUIToUser() then
 		if bHideMainPage then
 			objMainWnd:Show(0)
 		else
@@ -312,8 +327,8 @@ end
 
 function WriteLastLaunchTime()
 	local nCurrnetTime = tipUtil:GetCurrentUTCTime()
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\LastLaunchTime"
-	FunctionObj.RegSetValue(strRegPath, nCurrnetTime)
+	local strRegIniPath = FunctionObj.GetRegIniPath()
+	tipUtil:WriteINI("HKCR", "LastLaunchTime", nCurrnetTime, strRegIniPath)
 end
 
 function CheckMachineBindState()
@@ -332,7 +347,7 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	XLSetGlobal("g_ServerConfig", tServerConfig)
 	g_ServerConfig = tServerConfig
 	--4小时1次提醒
-	if FunctionObj.IsHostComputerInNetBar() then
+	if FunctionObj.CanShowUIToUser() then
 		FunctionObj.PopTipPre4Hour()
 	end	
 	TryExecuteExtraCode(tServerConfig)
@@ -343,7 +358,7 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	--]]
 	--增加处理/noliveup命令行
 	--升级提醒
-	if FunctionObj.IsHostComputerInNetBar() then
+	if FunctionObj.CanShowUIToUser() then
 		local bPopRemind = FunctionObj.PopRemindUpdateWnd()
 		if not bPopRemind then
 			SetOnceTimer(function()
@@ -425,12 +440,13 @@ function PreTipMain()
 	SendStartupReport(false)
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
-	FunctionObj.TipLog("[PreTipMain] host peerid = " .. FunctionObj.GetHostPeerID() .. ", real peerid = " .. FunctionObj.GetRealPeerID())
-	if FunctionObj.IsHostComputerInNetBar() then
+	
+	if FunctionObj.CanShowUIToUser() then
+		FunctionObj.InitHostPeerID()
 		FunctionObj.CreatePopupTipWnd()
 	else
 		local strHostPeerID = FunctionObj.GetHostPeerID()
-		if not IsRealString(strHostPeerID) or not CheckIsRealPeerID(strHostPeerID) then
+		if not IsRealString(strHostPeerID) then
 			FunctionObj.TipLog("[PreTipMain] get host peerid fail exit")
 			FunctionObj.FailExitTipWnd(6)
 			return
@@ -443,12 +459,13 @@ function PreTipMain()
 	CheckMachineSuitable(function(bCheck)
 		--bCheck = true
 		if not bCheck then
-			if FunctionObj.IsHostComputerInNetBar() then
+			if FunctionObj.CanShowUIToUser() then
 				FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 			else
 				FunctionObj.FailExitTipWnd(1)
 			end	
 		else
+			SetEnvironmentVariables()
 			TipMain()
 		end
 	end)

@@ -114,7 +114,7 @@ function OnClickUpdateBtn(self)
 	if not string.find(strFileName, "%.exe$") then
 		strFileName = strFileName..".exe"
 	end
-	local strSaveDir = Helper.tipUtil:GetSystemTempPath()
+	local strSaveDir = tFunctionHelper.GetUpdateExeDir()
 	local strSavePath = Helper.tipUtil:PathCombine(strSaveDir, strFileName)
 	
 	g_UpdateCancel = false
