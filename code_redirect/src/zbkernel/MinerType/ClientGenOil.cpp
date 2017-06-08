@@ -7,8 +7,8 @@
 #include <boost/algorithm/string.hpp>
 #include "../EvenListenHelper/LuaMsgWnd.h"
 
-#define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\GenOil.ini")
-#define CLIENT_NAME _T("ShareGenoil.exe")
+#define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
+#define CLIENT_NAME _T("Share4Peer.exe")
 
 CClientGenOil::CClientGenOil(void)
 {
