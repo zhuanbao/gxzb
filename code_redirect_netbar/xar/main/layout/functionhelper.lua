@@ -1603,12 +1603,14 @@ end
 function EncryptFilePath(strTmpPath,strSavePath)
 	local strKey = "z2gQFnLc2RrJ5eBo"
 	local strData = tipUtil:ReadFileToString(strTmpPath)
+	TipLog("[EncryptFilePath] strSavePath = " .. tostring(strSavePath))
 	tipUtil:EncryptAESToFile(strSavePath,strData,strKey)
 	tipUtil:DeletePathFile(strTmpPath)
 end
 
 function SaveConfigToFileByKey(strKey)
 	if not IsRealString(strKey) or type(g_tConfigFileStruct[strKey])~="table" then
+		TipLog("[SaveConfigToFileByKey] save config error ,strKey = "..tostring(strKey))
 		return
 	end
 
@@ -1616,11 +1618,13 @@ function SaveConfigToFileByKey(strKey)
 	local tContent = g_tConfigFileStruct[strKey]["tContent"]
 	local strConfigPath = GetCfgPathWithName(strFileName)
 	if IsRealString(strConfigPath) and type(tContent) == "table" then
+		TipLog("[SaveConfigToFileByKey] try to save config, strKey = " .. tostring(strKey))
 		if not g_tConfigFileStruct[strKey]["bEncypt"] then
 			tipUtil:SaveLuaTableToLuaFile(tContent, strConfigPath)
 		else
 			local strTmpPath = strConfigPath .. ".tmp"
 			tipUtil:SaveLuaTableToLuaFile(tContent, strTmpPath)
+			TipLog("[SaveConfigToFileByKey] strTmpPath path = " .. tostring(strTmpPath))
 			EncryptFilePath(strTmpPath,strConfigPath)
 		end
 	end	
