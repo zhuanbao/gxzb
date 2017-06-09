@@ -961,6 +961,7 @@ int LuaAPIUtil::SaveLuaTableToLuaFile(lua_State* pLuaState)
 				// ConvertAllEscape(strExtra);
 			}
 		}
+		locale loc = locale::global(locale("")); //要打开的文件路径含中文，设置全局locale为本地环境
 		std::ofstream ofs(strSavePath.c_str(), std::ofstream::binary);
 
 		std::string strFirstLine = "function GetSubTable(";
@@ -973,6 +974,7 @@ int LuaAPIUtil::SaveLuaTableToLuaFile(lua_State* pLuaState)
 		strRes += strExtra;
 		ofs.write(strRes.c_str(), (std::streamsize)strRes.length());
 		ofs.close();
+		locale::global(loc);//恢复全局
 		return 0;
 	}
 	return 0;
@@ -3904,10 +3906,10 @@ int LuaAPIUtil::EncryptAESToFile(lua_State* pLuaState)
 		::PathRemoveFileSpec(tszSaveDir);
 		if (!::PathFileExists(tszSaveDir))
 			::SHCreateDirectory(NULL, tszSaveDir);
-
+		locale loc = locale::global(locale("")); //要打开的文件路径含中文，设置全局locale为本地环境
 		std::ofstream of(bstrFilePath.m_str, std::ios_base::out|std::ios_base::binary);
 		of.write((const char*)out_str, nlen);
-
+		locale::global(loc);//恢复全局
 		free(out_str);
 		return 0;
 	}
@@ -3976,8 +3978,10 @@ int LuaAPIUtil::DecryptFileAES(lua_State* pLuaState)
 			return 1;
 		}
 		ZeroMemory(data, iFileSize + 1);
+		locale loc = locale::global(locale("")); //要打开的文件路径含中文，设置全局locale为本地环境
 		std::ifstream pf(bstrFilePath.m_str, std::ios_base::in|std::ios_base::binary);
 		pf.read(data, iFileSize);
+		locale::global(loc);//恢复全局
 		int curPosEnd = pf.tellg();
 		if (-1 != curPosEnd && curPosEnd != iFileSize)
 		{
@@ -5742,8 +5746,10 @@ int LuaAPIUtil::IsFilePlaintext(lua_State* pLuaState)
 	std::wstring strFilePath = ultra::_UTF2T(utf8FilePath);
 	char data[5] = {0};
 	int nRead = iFileSize > 4 ? 4 : iFileSize;
+	locale loc = locale::global(locale("")); //要打开的文件路径含中文，设置全局locale为本地环境
 	std::ifstream pf(strFilePath.c_str(), std::ios_base::in|std::ios_base::binary);
 	pf.read(data, nRead);
+	locale::global(loc);//恢复全局
 	int curPosEnd = pf.tellg();
 	if (-1 != curPosEnd && curPosEnd != nRead)
 	{
