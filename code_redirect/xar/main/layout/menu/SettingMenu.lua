@@ -7,9 +7,11 @@ if not GXZBMenu then
 end
 
 function InitIcon(self, resid)
-	local icon = self:GetControlObject("menu.item.icon")
-	icon:SetObjPos2(24, "(father.height - 16)/2", 16, 16)
-	icon:SetResID(resid)
+	if resid ~= nil then
+		local icon = self:GetControlObject("menu.item.icon")
+		icon:SetObjPos2(24, "(father.height - 16)/2", 16, 16)
+		icon:SetResID(resid)
+	end	
 	--顺便调整文字位置
 	local text = self:GetControlObject("menu.item.text")
 	text:SetObjPos2(47, 0, "father.width - 47", "father.height")
@@ -113,7 +115,7 @@ local menuTable = {
 		{id="allspeed", text = "全速赚宝", OnInitFun = function(self) InitSelectIcon(self, 0) end, OnSelectFun = function(self) SetWorkModelSetting(0)  end},
 		{id="smartwork", text = "智能赚宝", OnInitFun = function(self) InitSelectIcon(self, 1) end, OnSelectFun = function(self) SetWorkModelSetting(1)  end},
 	},
-	OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting.normal") end
+	OnInitFun = function(self) InitIcon(self, nil) end
 },
 {id="checkupdate", text = "检查更新", OnInitFun = function(self) InitIcon(self, "bitmap.menu.update.normal") end},
 {id="about", text = "关于", OnInitFun = function(self) InitIcon(self, "bitmap.menu.about.normal") end},

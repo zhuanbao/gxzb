@@ -7,10 +7,12 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local menuFunTable = {}
 
 function InitIcon(self, resid)
-	local icon = self:GetControlObject("menu.item.icon")
-	icon:SetObjPos2(14, "(father.height - 16)/2", 16, 16)
-	icon:SetResID(resid)
-	--顺便调整文字位置
+	if resid ~= nil then
+		local icon = self:GetControlObject("menu.item.icon")
+		icon:SetObjPos2(14, "(father.height - 16)/2", 16, 16)
+		icon:SetResID(resid)
+		--顺便调整文字位置
+	end
 	local text = self:GetControlObject("menu.item.text")
 	text:SetObjPos2(37, 0, "father.width - 37", "father.height")
 end
@@ -112,7 +114,7 @@ local menuTable = {
 		{id="allspeed", text = "全速赚宝", OnInitFun = function(self) InitWorkModelSelectIcon(self, 0) end, OnSelectFun = function(self) SetWorkModelSetting(0)  end},
 		{id="smartwork", text = "智能赚宝", OnInitFun = function(self) InitWorkModelSelectIcon(self, 1) end, OnSelectFun = function(self) SetWorkModelSetting(1)  end},
 	},
-	OnInitFun = function(self) InitIcon(self, "bitmap.menu.setting.normal") end
+	OnInitFun = function(self) InitIcon(self, nil) end
 },
 --退出
 {id="exit", text = "退出", OnInitFun = function(self) InitIcon(self, "bitmap.menu.exit.normal") end},
