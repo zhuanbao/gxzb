@@ -6,7 +6,7 @@ local IPCUtil = XLGetObject("IPC.Util")
 
 --常量
 local CLIENT_GENOIL = 1
-local CLIENT_PATH = "ShareGenOil\\ShareGenOil.exe"
+local CLIENT_PATH = "Share4Peer\\Share4Peer.exe"
 --上报速度
 local WP_GENOIL_SPEED = 1
 --上报DAG进度
