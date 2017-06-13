@@ -633,9 +633,14 @@ Function CmdSilentInstall
 	CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
 	CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom startmenuprograms"
 	CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\卸载${PRODUCT_NAME}.lnk" "$INSTDIR\uninst.exe"
-	;锁定到任务栏
+	;静默创建桌面快捷方式
+	SetOutPath "$INSTDIR\program"
+	CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
+	${RefreshShellIcons}
+	;锁定到开始菜单和任务栏
 	System::Call "$PLUGINSDIR\zbsetuphelper::SetInstDir(t '$INSTDIR\program')"
 	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
+	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2Taskbar(i 1)"
 	
 	;静默安装根据命令行开机启动
 	System::Call "kernel32::GetCommandLineA() t.R1"
@@ -660,6 +665,17 @@ Function CmdSilentInstall
 		StrCpy $R0 "/embedding"
 	${EndIf}
 	
+	ClearErrors
+	${GetOptions} $R4 "/mining"  $R5
+	IfErrors RunClent 0
+	${If} $R0 == ""
+	${OrIf} $R0 == 0
+		StrCpy $R0 "/mining"
+	${Else}
+		StrCpy $R0 "$R0 /mining"
+	${EndIf}
+	
+	RunClent:
 	SetOutPath "$INSTDIR\program"
 	ExecShell open "Share4Money.exe" "/sstartfrom installfinish /installmethod silent $R0" SW_SHOWNORMAL
 	ExitInstal:
@@ -1018,7 +1034,7 @@ Function NSD_TimerFun
 	CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
 	${RefreshShellIcons}
 	
-	;快速启动栏
+	;锁定快捷方式
 	System::Call "$PLUGINSDIR\zbsetuphelper::SetInstDir(t '$INSTDIR\program')"
 	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2StartMenu(i 1)"
 	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2Taskbar(i 1)"
