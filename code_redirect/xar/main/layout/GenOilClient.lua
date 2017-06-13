@@ -245,6 +245,34 @@ function GetRealTimeIncome(nSpeed,nSpanTime)
 	return 0
 end
 
+function WhenGetShare()
+	local nMaxQueryCnt = 2
+	local nInterval = 3
+	local nQueryCnt = 0
+	local nReportCalcInterval = tFunctionHelper.GetReportCalcInterval()
+	local nLastQueryBalanceTime = tFunctionHelper.GetLastQueryBalanceTime()
+	local nLastBalance = tFunctionHelper.GetUserCurrentBalance()
+	local function DoQueryTimer()
+		nQueryCnt = nQueryCnt + 1
+		if nQueryCnt > nMaxQueryCnt then
+			return
+		end
+		local nCurrentUTCTime = tipUtil:GetCurrentUTCTime()
+		if nCurrentUTCTime > nLastQueryBalanceTime + nReportCalcInterval - 3 then
+			return
+		end
+		local nBalance = tFunctionHelper.GetUserCurrentBalance()
+		if nLastBalance ~= nBalance then
+			return
+		end
+		SetOnceTimer(function()
+			tFunctionHelper.QueryClientInfo(0)
+			DoQueryTimer()
+		end, nInterval*1000)	
+	end
+	DoQueryTimer()
+end
+
 function OnGenOilMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnGenOilMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
@@ -289,6 +317,7 @@ function OnGenOilMsg(tParam)
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
+		WhenGetShare()
 		--处理提交share
 	elseif nMsgType == WP_GENOIL_CONNECT_POOL then
 		if nParam == 0 then

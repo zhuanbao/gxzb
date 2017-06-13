@@ -40,6 +40,8 @@ local g_WorkingTimerId = nil
 local g_SvrAverageMiningSpeed = 0
 
 local g_Balance = 0
+--上次请求收益时间
+local g_LastQueryBalanceTime = 0
 
 --常量
 --客户端状态
@@ -282,6 +284,7 @@ function RegisterFunctionObject(self)
 	obj.DownLoadNewVersion = DownLoadNewVersion
 	obj.GetDefaultWorkModel = GetDefaultWorkModel
 	obj.GetCurrentWorkModel = GetCurrentWorkModel
+	obj.GetReportCalcInterval = GetReportCalcInterval
 
 	obj.TryToConnectServer = TryToConnectServer
 	obj.InitMiningClient = InitMiningClient
@@ -334,6 +337,7 @@ function RegisterFunctionObject(self)
 	obj.CheckIsPrepare = CheckIsPrepare
 	obj.CheckIsCalculate = CheckIsCalculate
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
+	obj.GetLastQueryBalanceTime = GetLastQueryBalanceTime
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
 	obj.GetWorkClient = GetWorkClient
@@ -2530,6 +2534,11 @@ function SetUserCurrentBalance(nBalance)
 	g_Balance = nBalance
 end
 
+--
+function GetLastQueryBalanceTime()
+	return g_LastQueryBalanceTime
+end
+
 --获取客户端状态
 function GetClientCurrentState()
 	if g_WorkClient == nil then
@@ -3020,7 +3029,7 @@ function NotifyQuit()
 	end	
 end
 
-function WorkingTimerHandle()
+function GetReportCalcInterval()
 	local interval = 1
 	local nReportCalcInterval = 60
 	if type(g_ServerConfig) == "table" then
@@ -3030,9 +3039,14 @@ function WorkingTimerHandle()
 		end
 	end	
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
+	return nReportCalcInterval
+end
+function WorkingTimerHandle()
+	local nReportCalcInterval = GetReportCalcInterval()
 	g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nAverageHashRate = g_WorkClient.GetAverageHashRate()
 		QueryClientInfo(nAverageHashRate)
+		g_LastQueryBalanceTime = tipUtil:GetCurrentUTCTime()
 	end, nReportCalcInterval*1000)
 end
 
