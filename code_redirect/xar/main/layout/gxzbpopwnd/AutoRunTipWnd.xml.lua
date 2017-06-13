@@ -19,15 +19,16 @@ end
 
 function DoWorkOnHideWnd()
 	if g_CheckBoxState and not CheckIsAutoRun() then
+		
 		SetAutoRun()
 	end	
 end
 
 function OnClickClose(self)
-	DoWorkOnHideWnd()
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
+	DoWorkOnHideWnd()
 end
 
 function PopupInDeskRight(self)
@@ -66,6 +67,9 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
+		if not tFunctionHelper.CheckIsInitPopupTipWnd() then
+			return
+		end
 		local objtree = self:GetBindUIObjectTree()
 		PopupInDeskRight(self)
 		
@@ -74,12 +78,6 @@ function OnShowWindow(self, bShow)
 		local objTextContentDesc = objtree:GetUIObject("AutoRunTipWnd.Content.Desc")
 		local objTextBind = objtree:GetUIObject("AutoRunTipWnd.Bind")
 		local objCheckAutoRun = objtree:GetUIObject("AutoRunTipWnd.CheckAutoRun")
-		local nMoneyCount = tUserConfig["nMoneyPer4Hour"] or 0
-		if tonumber(nMoneyCount) == nil or nMoneyCount <= 0 then 
-			self:Show(0)
-			return
-		end
-		
 		if tFunctionHelper.CheckIsBinded() then
 			objTextContentBegain:SetObjPos(160, 92+20, 160+310, 92+20+20)
 			objTextContentDesc:SetObjPos(160, 92+20+20, 160+310, 92+20+20+20)
@@ -103,13 +101,13 @@ function OnShowWindow(self, bShow)
 			objCheckAutoRun:SetChildrenVisible(true)
 			objCheckAutoRun:SetVisible(true)
 		end
-		local nTipHolds = 15
+		local nTipHolds = 10
 		if type(g_ServerConfig) == "table" and type(g_ServerConfig["tRemindCfg"]) == "table" and type(g_ServerConfig["tRemindCfg"]["nHolds"]) == "number" then
 			nTipHolds = g_ServerConfig["tRemindCfg"]["nHolds"]
 		end
 		SetOnceTimer(function(item, id)
-			DoWorkOnHideWnd()
 			self:Show(0)
+			DoWorkOnHideWnd()
 		end, nTipHolds*1000)
 	end
 end

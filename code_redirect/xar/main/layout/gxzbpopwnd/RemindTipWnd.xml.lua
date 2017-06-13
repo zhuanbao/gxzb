@@ -66,6 +66,9 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
+		if not tFunctionHelper.CheckIsInitPopupTipWnd() then
+			return
+		end
 		local objtree = self:GetBindUIObjectTree()
 		PopupInDeskRight(self)
 		

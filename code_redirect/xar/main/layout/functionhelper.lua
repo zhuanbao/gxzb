@@ -7,6 +7,7 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local g_WorkClient = nil
 local g_bShowWndByTray = false
 local gStatCount = 0
+local g_bInitPopWnd = false
 
 local gnLastReportRunTmUTC = tipUtil:GetCurrentUTCTime()
 local gnLastReportMiningTmUTC = tipUtil:GetCurrentUTCTime()
@@ -294,6 +295,7 @@ function RegisterFunctionObject(self)
 	obj.PopupNotifyIconTip = PopupNotifyIconTip
 	obj.InitTrayTipWnd = InitTrayTipWnd 
 	obj.CreatePopupTipWnd = CreatePopupTipWnd
+	obj.CheckIsInitPopupTipWnd = CheckIsInitPopupTipWnd
 	obj.ShowIntroduceOnce = ShowIntroduceOnce
 	obj.PopRemindUpdateWnd = PopRemindUpdateWnd
 	obj.UpdateSuspendWndVisible = UpdateSuspendWndVisible
@@ -1054,6 +1056,10 @@ function DestroyMainWnd()
 	end
 end
 
+function CheckIsInitPopupTipWnd()
+	return g_bInitPopWnd
+end
+
 function CreatePopupTipWnd()
 	for key, tItem in pairs(g_tPopupWndList) do
 		local strHostWndName = tItem[1]
@@ -1066,7 +1072,7 @@ function CreatePopupTipWnd()
 			return false
 		end
 	end
-	
+	g_bInitPopWnd = true
 	return true
 end
 
