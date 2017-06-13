@@ -318,6 +318,15 @@ function CheckMachineBindState()
 	end
 end
 
+function TryPopAutoRunTip()
+	local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
+	if Helper:IsRealString(strValue) then
+		return
+	end
+	FunctionObj.ShowPopupWndByName("GXZB.AutoRunTipWnd.Instance", true)
+end
+
 function OnDownLoadSvrCfgSuccess(strServerPath)
 	if FunctionObj.CheckShouldRemindBind() then
 		FunctionObj.ChangeMainBodyPanel("QRCodePanel")
@@ -339,6 +348,7 @@ function OnDownLoadSvrCfgSuccess(strServerPath)
 	--升级提醒
 	local bPopRemind = FunctionObj.PopRemindUpdateWnd()
 	if not bPopRemind then
+		TryPopAutoRunTip()
 		SetOnceTimer(function()
 						local cmdString = tipUtil:GetCommandLine()
 						local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")

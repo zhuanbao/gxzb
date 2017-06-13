@@ -56,6 +56,7 @@ local g_tPopupWndList = {
 	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
 	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
 	[5] = {"GXZB.UpdateFrameWnd", "GXZB.UpdateWndTree"},
+	[6] = {"GXZB.AutoRunTipWnd", "GXZB.AutoRunTipWndTree"},
 }
 
 local g_tConfigFileStruct = {
@@ -2420,11 +2421,13 @@ function PopRemindUpdateWnd()
 end
 
 function PopTipPre4Hour()
-	--[[local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["nMoneyPer4Hour"] = 21321
+	--[[
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["nMoneyPer4Hour"] = 8977
 	SaveConfigToFileByKey("tUserConfig")
 	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-	if true then return end]]
+	if true then return end
+	--]]
 	
 	local nTipPopIntervals  = FetchValueByPath(g_ServerConfig, {"tRemindCfg", "nPopIntervals"}) or 4*3600
 	SetTimer(
@@ -2436,9 +2439,11 @@ function PopTipPre4Hour()
 					for i = 1, 4 do
 						newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]
 					end
-					tUserConfig["nMoneyPer4Hour"] = newgetgold
-					SaveConfigToFileByKey("tUserConfig")
-					ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+					if newgetgold > 0 then
+						tUserConfig["nMoneyPer4Hour"] = newgetgold
+						SaveConfigToFileByKey("tUserConfig")
+						ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+					end	
 				end
 			end)
 		end,	

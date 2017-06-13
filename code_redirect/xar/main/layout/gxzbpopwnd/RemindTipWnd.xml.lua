@@ -1,7 +1,30 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+local g_CheckBoxState = true
+local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+
+function CheckIsAutoRun()
+	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
+	if Helper:IsRealString(strValue) then
+		return true
+	end
+	return false
+end
+
+function SetAutoRun()
+	local strExePath = tFunctionHelper.GetExePath()
+	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
+	Helper:SetRegValue(strAutoRunRegPath, strValue)
+end
+
+function DoWorkOnHideWnd()
+	if g_CheckBoxState and not CheckIsAutoRun() then
+		SetAutoRun()
+	end	
+end
 
 function OnClickClose(self)
+	DoWorkOnHideWnd()
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
@@ -21,7 +44,7 @@ function PopupInDeskRight(self)
 	return true
 end
 
-function OnClickBindBtn(self)
+function OnClickBind(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
@@ -30,6 +53,15 @@ function OnClickBindBtn(self)
 		mainwnd:BringWindowToTop(true)
 	end
 	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
+	DoWorkOnHideWnd()
+end
+
+function OnSelectAutoRun(self, event, bSelect)
+	if bSelect then
+		g_CheckBoxState = true
+	else
+		g_CheckBoxState = false
+	end	
 end
 
 function OnShowWindow(self, bShow)
@@ -37,34 +69,48 @@ function OnShowWindow(self, bShow)
 		local objtree = self:GetBindUIObjectTree()
 		PopupInDeskRight(self)
 		
-		local TextContent = objtree:GetUIObject("RemindTipWnd.Content")
-		local bindbtn = objtree:GetUIObject("RemindTipWnd.Bind.Btn")
-		local icon = objtree:GetUIObject("RemindTipWnd.Icon")
+		local objIcon = objtree:GetUIObject("RemindTipWnd.Icon")
+		local objTextContentIncome = objtree:GetUIObject("RemindTipWnd.Content.Income")
+		local objTextContentDesc = objtree:GetUIObject("RemindTipWnd.Content.Desc")
+		local objTextBind = objtree:GetUIObject("RemindTipWnd.Bind")
+		local objCheckAutoRun = objtree:GetUIObject("RemindTipWnd.CheckAutoRun")
 		local nMoneyCount = tUserConfig["nMoneyPer4Hour"] or 0
+		if tonumber(nMoneyCount) == nil or nMoneyCount <= 0 then 
+			self:Show(0)
+			return
+		end
+		
 		if tFunctionHelper.CheckIsBinded() then
-			if tonumber(nMoneyCount) and nMoneyCount > 0 then
-				icon:SetObjPos(54, 92, 54+80, 92+80)
-				TextContent:SetObjPos(160, 113, 160+310, 113+40)
-				TextContent:SetText("你很努力哟， 又赚取了"..tostring(nMoneyCount).."个元宝，\n继续加油！")
-				bindbtn:Show(false)
-			else
-				self:Show(0)
-			end
+			objTextContentIncome:SetObjPos(160, 92+20, 160+310, 92+20+20)
+			objTextContentIncome:SetText("哎呦，不错哦！又赚取了"..tostring(nMoneyCount).."个元宝。")
+			objTextContentDesc:SetObjPos(160, 92+20+20, 160+310, 92+20+20+20)
+			objTextBind:SetChildrenVisible(false)
+			objTextBind:SetVisible(false)
 		else
-			if tonumber(nMoneyCount) and nMoneyCount > 0 then
-				icon:SetObjPos(54, 84, 54+80, 84+80)
-				TextContent:SetObjPos(160, 102, 160+310, 102+40)
-				TextContent:SetText("你很努力哟， 又赚取了"..tostring(nMoneyCount).."个元宝。\n收益可以通过微信红包提现，请立即绑定。")
-				bindbtn:Show(true)
-			else
-				self:Show(0)
-			end
+			objTextContentIncome:SetObjPos(160, 92+10, 160+310, 92+10+20)
+			objTextContentIncome:SetText("哎呦，不错哦！又赚取了"..tostring(nMoneyCount).."个元宝。")
+			objTextContentDesc:SetObjPos(160, 92+10+20, 160+310, 92+10+20+20)
+			objTextBind:SetObjPos(160, 92+10+20+20, 160+310, 92+10+20+20+20)
+			objTextBind:SetChildrenVisible(true)
+			objTextBind:SetVisible(true)
+		end
+		if CheckIsAutoRun() then
+			g_CheckBoxState = false
+			objCheckAutoRun:SetCheck(false)
+			objCheckAutoRun:SetChildrenVisible(false)
+			objCheckAutoRun:SetVisible(false)
+		else
+			g_CheckBoxState = true
+			objCheckAutoRun:SetCheck(true)
+			objCheckAutoRun:SetChildrenVisible(true)
+			objCheckAutoRun:SetVisible(true)
 		end
 		local nTipHolds = 15
 		if type(g_ServerConfig) == "table" and type(g_ServerConfig["tRemindCfg"]) == "table" and type(g_ServerConfig["tRemindCfg"]["nHolds"]) == "number" then
 			nTipHolds = g_ServerConfig["tRemindCfg"]["nHolds"]
 		end
 		SetOnceTimer(function(item, id)
+			DoWorkOnHideWnd()
 			self:Show(0)
 		end, nTipHolds*1000)
 	end

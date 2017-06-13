@@ -207,7 +207,7 @@
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>悬浮窗显示位置</text>
+												<text>悬浮窗显示设置</text>
 											</attr>
 										</obj>
 										<obj id="SettingWnd.Content.SuspendedWnd.Show" class="CheckBox">

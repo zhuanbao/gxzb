@@ -70,13 +70,13 @@
 							<attr>
 								<left>32</left>
 								<top>8</top>
-								<width>70</width>
+								<width>100</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text13</font>
-								<text>恭喜你</text>
+								<text>元宝收益提醒</text>
 							</attr>
 						</obj>
 						<obj id="RemindTipWnd.Icon" class="ImageObject">
@@ -88,37 +88,105 @@
 								<image>logo-mid</image>
 							</attr>
 						</obj>
-						<obj id="RemindTipWnd.Content" class="TextObject">
+						<obj id="RemindTipWnd.Content.Income" class="TextObject">
 							<attr>
 								<left>160</left>
-								<top>113</top>
-								<width>260</width>
-								<height>40</height>
+								<top>92+10</top>
+								<width>310</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
+								<endellipsis>1</endellipsis>
+								<text>哎呦，不错哦！又赚取了0个元宝。</text>
+							</attr>
+						</obj>
+						<obj id="RemindTipWnd.Content.Desc" class="TextObject">
+							<attr>
+								<left>160</left>
+								<top>92+10+20</top>
+								<width>310</width>
+								<height>20</height>
 								<multiline>1</multiline>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text16</font>
-								<text></text>
+								<text>心情美美哒~</text>
 							</attr>
 						</obj>
-						<obj id="RemindTipWnd.Bind.Btn" class="TipAddin.Button">
+						<obj id="RemindTipWnd.Bind" class="LayoutObject">
 							<attr>
-								<Text>绑定微信</Text>
-								<Visible>false</Visible>
-								<TextFont>font.text20</TextFont>
-								<TextColor>system.white</TextColor>
-								<left>(father.width-186)/2</left>
-								<top>father.height-85</top>
-								<width>186</width>
-								<height>55</height>
-								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
-								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
-								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
-								<DisableBkgID>texture.Update.OneKeyUpdate.disable</DisableBkgID>
+								<left>160</left>
+								<top>92+10+20+20</top>
+								<width>310</width>
+								<height>20</height>
+							</attr>
+							<children>
+								<obj id="RemindTipWnd.Bind.Desc" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>188</width>
+										<height>20</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<text>收益通过微信红包提现哦，</text>
+									</attr>
+								</obj>
+								<obj id="RemindTipWnd.Bind.Link" class="TextLinkEx">
+									<attr>
+										<left>188</left>
+										<top>0</top>
+										<width>100</width>
+										<height>20</height>
+										<HAlign>center</HAlign>
+										<VAlign>center</VAlign>
+										<Text>立即绑定微信</Text>
+										<Font>font.text16</Font>
+										<TextColor>317FFF</TextColor>
+										<TextHoverColor>317FFF</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="RemindTipWnd.xml.lua" func="OnClickBind" />
+									</eventlist>
+								</obj>
+								<obj id="RemindTipWnd.Bind.End" class="TextObject">
+									<attr>
+										<left>188+100</left>
+										<top>0</top>
+										<width>10</width>
+										<height>20</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<text>。</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="RemindTipWnd.CheckAutoRun" class="CheckBox">
+							<attr>
+								<left>54</left>
+								<top>220</top>
+								<width>150</width>
+								<height>25</height>
+								<ImgWidth>13</ImgWidth>
+								<ImgHeight>13</ImgHeight>
+								<CheckNormal>setting_checkbox.check</CheckNormal>
+								<CheckHover>setting_checkbox.check</CheckHover>
+								<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
+								<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+								<Select>true</Select>
+								<Text>开机启动赚宝</Text>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="RemindTipWnd.xml.lua" func="OnClickBindBtn" />
+								<event name="OnSelect" file="RemindTipWnd.xml.lua" func="OnSelectAutoRun" />
 							</eventlist>
 						</obj>
 					</children>
