@@ -338,7 +338,7 @@ SectionEnd
 
 Function CloseExe
 	${FKillProc} "Share4Money"
-	${FKillProc} "ShareGenoil"
+	${FKillProc} "Share4Peer"
 	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
@@ -380,7 +380,7 @@ Function CheckExeProcExist
 		Abort
 		${FKillProc} "Share4Money"
 	${EndIf}
-	${FKillProc} "ShareGenoil"
+	${FKillProc} "Share4Peer"
 	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
@@ -1240,7 +1240,7 @@ Function un.onInit
 		Abort
 		${FKillProc} "Share4Money"
 	${EndIf}
-	${FKillProc} "ShareGenoil"
+	${FKillProc} "Share4Peer"
 	${FKillProc} "zbsetuphelper-cl"
 	Call un.UpdateChanel
 	;InitPluginsDir
