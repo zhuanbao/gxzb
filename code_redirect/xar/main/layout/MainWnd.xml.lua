@@ -18,8 +18,31 @@ function GetTipStartTime()
 end
 --XLSetGlobal("GreenWall.GetTipStartTime", GetTipStartTime)
 
+local gShowOnce = false
+function TryPopAutoRunTip()
+	if gShowOnce then
+		return
+	end
+	local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
+	if Helper:IsRealString(strValue) then
+		return
+	end
+	local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
+	local wndUpdate = hostwndManager:GetHostWnd("GXZB.UpdateFrameWnd.Instance")
+	if wndUpdate == nil then
+		return
+	end
+	if wndUpdate:GetVisible() then
+		return
+	end
+	gShowOnce = true
+	tFunctionHelper.ShowPopupWndByName("GXZB.AutoRunTipWnd.Instance", true)
+end
+
 function OnShowWindow(self, bShow)
 	if bShow then
+		TryPopAutoRunTip()
 		gTipStartTime = tipUtil:GetCurrentUTCTime()
 	end
 end
