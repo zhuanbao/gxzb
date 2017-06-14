@@ -658,16 +658,13 @@ Function CmdSilentInstall
 	${WordReplace} $R1 $R2 "" +1 $R3
 	${StrFilter} "$R3" "-" "" "" $R4
 	ClearErrors
-	${GetOptions} $R4 "/run"  $R0
-	IfErrors ExitInstal 0
-	${If} $R0 == ""
-	${OrIf} $R0 == 0
-		StrCpy $R0 "/embedding"
-	${EndIf}
+	${GetOptions} $R4 "/norun"  $R0
+	IfErrors 0 ExitInstal
+	StrCpy $R0 "/embedding"
 	
 	ClearErrors
-	${GetOptions} $R4 "/mining"  $R5
-	IfErrors RunClent 0
+	${GetOptions} $R4 "/nomining"  $R5
+	IfErrors 0 RunClent 
 	${If} $R0 == ""
 	${OrIf} $R0 == 0
 		StrCpy $R0 "/mining"
