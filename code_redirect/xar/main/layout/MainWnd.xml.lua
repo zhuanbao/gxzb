@@ -29,7 +29,7 @@ function TryPopAutoRunTip()
 		return
 	end
 	local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
-	local wndUpdate = hostwndManager:GetHostWnd("GXZB.UpdateFrameWnd.Instance")
+	local wndUpdate = hostWndManager:GetHostWnd("GXZB.UpdateFrameWnd.Instance")
 	if wndUpdate == nil then
 		return
 	end

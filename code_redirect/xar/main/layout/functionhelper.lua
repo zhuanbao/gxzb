@@ -2419,12 +2419,14 @@ function PopRemindUpdateWnd()
 		.."\n nCurrentUtc="..tostring(nCurrentUtc)
 		.."\n nTipPopInterval="..tostring(nTipPopInterval))
 	if CheckIsNewVersion(strNewVersion, strVersion) and nLocalCnt < nTipPopCnt and nCurrentUtc - nLocaLastUtc > nTipPopInterval then
-		ShowPopupWndByName("GXZB.UpdateFrameWnd.Instance", true)
-		tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
-		tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
-		tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
-		tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
-		SaveConfigToFileByKey("tUserConfig")
+		SetOnceTimer(function()
+				ShowPopupWndByName("GXZB.UpdateFrameWnd.Instance", true)
+				tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
+				tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
+				tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
+				tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
+				SaveConfigToFileByKey("tUserConfig")
+			end, 60*1000)
 		return true
 	end
 	return false
