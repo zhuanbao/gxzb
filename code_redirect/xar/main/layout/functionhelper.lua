@@ -341,6 +341,7 @@ function RegisterFunctionObject(self)
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
 	obj.GetWorkClient = GetWorkClient
+	obj.GetOpenCLPlatformCmd = GetOpenCLPlatformCmd
 	
 	obj.UpdateMiningSpeed = UpdateMiningSpeed
 	obj.UpdateMiningState = UpdateMiningState
@@ -732,6 +733,15 @@ function GetMachineID()
 	end
 end
 
+function GetOpenCLPlatformCmd()
+	local iPlatformID = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "Software\\Share4Money", "openclplatform")
+	iPlatformID = tonumber(iPlatformID) or 0
+	if iPlatformID == 0 then
+		return ""
+	end	
+	local strCmdParam = "--opencl-platform " .. tostring(iPlatformID) 
+	return strCmdParam
+end
 --渠道
 function GetInstallSrc()
 	local strInstallSrc = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\InstallSource")

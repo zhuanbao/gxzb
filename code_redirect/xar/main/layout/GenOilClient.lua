@@ -444,6 +444,11 @@ function Start()
 	
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local strUserCmd =tUserConfig["strUserCmd"]
+	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
+	if IsRealString(strPlatform) then
+		strCmdLine = strCmdLine .. " " .. strPlatform
+	end
+	
 	if IsRealString(strUserCmd) then
 		strCmdLine = strCmdLine .. " " .. strUserCmd
 	end
