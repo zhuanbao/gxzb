@@ -10,6 +10,26 @@
 using namespace std;
 
 
+void SetOpenclPlatform(unsigned int uPlatform)
+{
+	static BOOL bPlatForm = FALSE;
+	if (bPlatForm)
+	{
+		return;
+	}
+	bPlatForm = TRUE;
+	HKEY hKey, hTempKey;
+	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER, "Software",0,KEY_SET_VALUE, &hKey))
+	{
+		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "Share4Money", &hTempKey))
+		{
+			::RegSetValueExA(hTempKey, "openclplatform", 0, REG_DWORD, (LPBYTE)&uPlatform, sizeof(DWORD));
+			RegCloseKey(hTempKey);
+		}
+		RegCloseKey(hKey);
+	}
+}
+
 std::vector<cl::Platform> getPlatforms()
 {
 	vector<cl::Platform> platforms;
@@ -74,6 +94,7 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 					maxRet = result;
 					idxPlatform = i;
 					idxDevice = j;
+					SetOpenclPlatform(idxPlatform);
 					//cout<<"GetBestPlatform begin get one, idxPlatform = "<<idxPlatform<<", idxDevice = "<<idxDevice<<endl;
 				}
 			}
