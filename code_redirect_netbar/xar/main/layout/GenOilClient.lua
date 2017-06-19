@@ -413,6 +413,11 @@ function Start()
 	local strWorkExe = tipUtil:PathCombine(strDir, CLIENT_PATH)
 	local strCmdLine = strWorkExe .. " " .. strPoolCmd
 	
+	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
+	if IsRealString(strPlatform) then
+		strCmdLine = strCmdLine .. " " .. strPlatform
+	end
+	
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local strUserCmd =tUserConfig["strUserCmd"]
 	if IsRealString(strUserCmd) then
