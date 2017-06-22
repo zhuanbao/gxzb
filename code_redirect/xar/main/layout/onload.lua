@@ -258,7 +258,7 @@ function TryForceUpdate(tServerConfig)
 		end
 		
 		FunctionObj.SaveCommonUpdateUTC()
-		local strCmd = " /write /silent /run"
+		local strCmd = " /write /s"
 		if IsRealString(versionInfo["strCmd"]) then
 			strCmd = strCmd.." "..versionInfo["strCmd"]
 		end
