@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.5"
+!define PRODUCT_VERSION "1.0.0.6"
 ;TestCheckFlag==1 非测试模式
 !if ${TestCheckFlag} == 1
 	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -85,6 +85,8 @@ Var BaseCfgDir
 Var IsSilentInst
 Var str_ChannelID
 Var BoolExitMsg
+Var InstallProgressName
+Var BuildNum
 
 ;主程序至少需要10M空间
 !define NeedSpace 10
@@ -339,6 +341,7 @@ SectionEnd
 Function CloseExe
 	${FKillProc} "Share4Money"
 	${FKillProc} "Share4Peer"
+	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
@@ -381,6 +384,7 @@ Function CheckExeProcExist
 		${FKillProc} "Share4Money"
 	${EndIf}
 	${FKillProc} "Share4Peer"
+	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
 FunctionEnd
 
@@ -475,7 +479,7 @@ Function .onInit
 		Call FirstSendStart
 		!insertmacro InitBaseCfgDir
 		StrCpy $0 3
-		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe') i.r0"
+		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe', t '$InstallProgressName', t '$str_ChannelID', t '$BuildNum') i.r0"
 		;返回值FALSE=0 TRUE=1
 		${If} $0 == 1
 			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于3G， 无法安装"
@@ -498,14 +502,18 @@ Function FirstSendStart
 	IfFileExists $0 0 +2
 	StrCpy $Bool_IsUpdate 1
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
+	StrCpy $BuildNum $R1
 	${If} $Bool_IsUpdate == 0
 		${SendStat} "installstart" "$R1" "$str_ChannelID" 1
+		StrCpy $InstallProgressName "installing"
 	${Else}
 		${SendStat} "updatestart" "$R1" "$str_ChannelID" 1
+		StrCpy $InstallProgressName "updating"
 	${EndIf} 
 FunctionEnd
 
 Function DoInstall
+	${SendStat} "$InstallProgressName" "doinstallstart" "$BuildNum_$str_ChannelID" 1
 	;初始化安装成功标志位
 	StrCpy $Bool_IsInstallSucc 0
 	;配置文件
@@ -590,6 +598,7 @@ Function DoInstall
 	ExecShell open "$SYSDIR\setx.exe" "GPU_MAX_ALLOC_PERCENT 100" SW_HIDE
 	ExecShell open "$SYSDIR\setx.exe" "GPU_SINGLE_ALLOC_PERCENT 100" SW_HIDE
 	StrCpy $Bool_IsInstallSucc 1
+	;${SendStat} "$InstallProgressName" "doinstallsuccess" "$BuildNum_$str_ChannelID" 1
 FunctionEnd
 
 Function CmdSilentInstall
@@ -603,6 +612,8 @@ Function CmdSilentInstall
 		Return
 	SetSilent silent
 	${If} $CheckFlag != 0
+		${SendStat} "$InstallProgressName" "checkenvfail" "$BuildNum_$str_ChannelID" 1
+		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
 		Return
 	${EndIf}
@@ -619,7 +630,9 @@ Function CmdSilentInstall
 			${StrFilter} "$R3" "-" "" "" $R4
 			ClearErrors
 			${GetOptions} $R4 "/write"  $R0
-			IfErrors 0 +2
+			IfErrors 0 +4
+			${SendStat} "$InstallProgressName" "coverinstallfail" "$BuildNum_$str_ChannelID" 1
+			System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 			Abort
 			Goto StartInstall
 		${EndIf}
@@ -1238,6 +1251,7 @@ Function un.onInit
 		${FKillProc} "Share4Money"
 	${EndIf}
 	${FKillProc} "Share4Peer"
+	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
 	Call un.UpdateChanel
 	;InitPluginsDir
@@ -1294,5 +1308,8 @@ Section Uninstall
 	RMDir /r "$SMPROGRAMS\${PRODUCT_NAME}"
 	HideWindow
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
+	${If} $0 == "$INSTDIR"
+		DeleteRegKey HKLM "software\Share4Money"
+	${EndIf}
 	SetAutoClose true
 SectionEnd
