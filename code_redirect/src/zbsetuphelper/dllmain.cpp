@@ -28,6 +28,8 @@ extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfi
 void EncryptString(const char* pszData,std::string &strOut);
 void DecryptString(const char* pszBase64Data,std::string &strOut);
 
+void SendStatProxy(const char *ec,const char *ea, const char *el,long ev);
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -44,8 +46,68 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	return TRUE;
 }
 
+int CheckRegDisplayCardInfo()
+{
+	TSAUTO();
+	const char* szRegPath = "Software\\DisplayCardInfo"; 
+	int iRet = 0;
+	do 
+	{
+		HKEY hKey;
+		if (ERROR_SUCCESS != ::RegOpenKeyExA(HKEY_CURRENT_USER,szRegPath,0,KEY_READ,&hKey))
+		{
+			iRet = 1;
+			break;
+		}
+		DWORD dwValue = 0;
+		DWORD dwSize = sizeof(DWORD);
+		DWORD dwType = REG_DWORD;
+		if (::RegQueryValueExA(hKey,"SupportOpenCL", 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS || dwValue != 1)
+		{
+			iRet =  2;
+			break;
+		}
+		if (::RegQueryValueExA(hKey,"DiscreteCard", 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS || dwValue != 1)
+		{
+			iRet = 3;
+			break;
+		}
+		if (::RegQueryValueExA(hKey,"Memory", 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS || dwValue < 3072)
+		{
+			iRet = 4;
+			break;
+		}
+	} while (FALSE);
+	TSDEBUG4CXX("CheckRegDisplayCardInfo  iRet = "<<iRet);
+	return iRet;
+	
+}
 
-extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath){
+
+
+extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const char* szStatKey,const char* szChannelID, const char* szBuild)
+{
+	TSAUTO();
+	
+	TSDEBUG4CXX(L"CheckCLEnvir szExePath = "<<ultra::_A2UTF(szExePath));
+	std::string strEC = szStatKey;
+	std::string strEL = "";
+	if (szChannelID != NULL && szBuild != NULL)
+	{
+		strEL = szBuild;
+		strEL.append("_");
+		strEL.append(szChannelID);
+
+	}
+
+	int dwRegCond = CheckRegDisplayCardInfo();
+	std::string strRegCond;
+	{
+		std::stringstream ss;
+		ss << dwRegCond;
+		ss >> strRegCond;
+	}
+
 	STARTUPINFOA si = { 0 };
 	si.cb = sizeof(STARTUPINFOA);
 	GetStartupInfoA(&si);
@@ -53,19 +115,89 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath){
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	PROCESS_INFORMATION   pi = {0};
 	if (!CreateProcessA(NULL, (LPSTR)szExePath, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)){
+		DWORD dwLastError = ::GetLastError();
+		TSDEBUG4CXX(L"CheckCLEnvir create process error, dwLastError = "<<dwLastError);
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
-		return FALSE;
+		
+	
+		std::string strEA = "1_";
+		strEA.append(strRegCond);
+		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		if (dwRegCond == 0)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
-	DWORD dwResult = WaitForSingleObject(pi.hProcess, 5000);
-	if (dwResult == WAIT_TIMEOUT){
-		return FALSE;
-	}
+	DWORD dwResult = WaitForSingleObject(pi.hProcess, 30*1000);
 	DWORD dwExitCode = 0xFFFFFFFF;
 	if (!GetExitCodeProcess(pi.hProcess, &dwExitCode)){
-		return FALSE;
+		DWORD dwLastError = ::GetLastError();
+		std::string strLastError;
+		{
+			std::stringstream ss;
+			ss << dwLastError;
+			ss >> strLastError;
+		}
+
+		std::string strEA = "2_";
+		strEA.append(strRegCond);
+		strEA.append("_");
+		strEA.append(strLastError.c_str());
+
+		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+
+		if (dwRegCond == 0)
+		{
+
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
-	return dwExitCode == 0;
+	TSDEBUG4CXX(L"CheckCLEnvir dwExitCode = "<<dwExitCode);
+	std::string strExitCode;
+	{
+		std::stringstream ss;
+		ss << dwExitCode;
+		ss >> strExitCode;
+	}
+	
+	if (dwExitCode == 0 || dwExitCode == STILL_ACTIVE)
+	{
+		std::string strEA = "0_";
+		strEA.append(strRegCond);
+		strEA.append("_");
+		strEA.append(strExitCode.c_str());
+
+		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+
+		return TRUE;
+	}
+	else
+	{
+		std::string strEA = "3_";
+		strEA.append(strRegCond);
+		strEA.append("_");
+		strEA.append(strExitCode.c_str());
+
+		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		if (dwRegCond == 0)
+		{
+
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
 }
 
 //程序退出保证所有子线程结束
@@ -831,4 +963,22 @@ void DecryptString(const char* pszBase64Data,std::string &strOut)
 	strOut = (char*)out_str;
 	free(out_str);
 	return ;
+}
+
+
+void SendStatProxy(const char *ec,const char *ea, const char *el,long ev)
+{	
+	TSAUTO();
+	char szEC[MAX_PATH] = {0};
+	ZeroMemory(szEC,0);
+	strcpy_s(szEC,MAX_PATH-1,ec);
+
+	char szEA[MAX_PATH] = {0};
+	ZeroMemory(szEA,0);
+	strcpy_s(szEA,MAX_PATH-1,ea);
+
+	char szEL[MAX_PATH] = {0};
+	ZeroMemory(szEL,0);
+	strcpy_s(szEL,MAX_PATH-1,el);
+	SendAnyHttpStat(szEC,szEA,szEL,ev);
 }
