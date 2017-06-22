@@ -56,6 +56,7 @@ local g_ControlSpeedCmdLine = nil -- --cl-global-work 1000
 
 local g_LastGetSpeedTime = 0
 local g_LastRealTimeIncome = 0
+local g_LastAverageHashRate = 0
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -266,7 +267,7 @@ function WhenGetShare()
 			return
 		end
 		SetOnceTimer(function()
-			tFunctionHelper.QueryClientInfo(0)
+			tFunctionHelper.QueryClientInfo(g_LastAverageHashRate)
 			DoQueryTimer()
 		end, nInterval*1000)	
 	end
@@ -418,6 +419,7 @@ function ResetGlobalParam()
 		g_GenOilWorkingTimerId = nil
 	end
 	g_LastGetSpeedTime = 0
+	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 end
@@ -518,6 +520,7 @@ function GetAverageHashRate()
 		g_HashRateSum = 0
 		g_HashRateSumCounter = 0
 	end	
+	g_LastAverageHashRate = nAverageHashRate
 	return nAverageHashRate
 end
 
