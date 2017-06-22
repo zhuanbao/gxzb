@@ -409,6 +409,10 @@ function TipMain()
 	FunctionObj.CheckShoudAutoMining()
 end
 
+function CheckIsDebug()
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
+	return nValue == 1
+end
 function PreTipMain()
 	--安装的时候快捷方式和这里都不设置APPID就能使得图标重合
 	--tipUtil:SetApplicationId("{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
@@ -420,7 +424,7 @@ function PreTipMain()
 	FunctionObj.CreatePopupTipWnd()
 	CheckMachineSuitable(function(bCheck)
 		--bCheck = true
-		if not bCheck then
+		if not bCheck and not CheckIsDebug() then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
 			TipMain()
