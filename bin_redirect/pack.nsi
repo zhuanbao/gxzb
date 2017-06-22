@@ -665,7 +665,10 @@ Function CmdSilentInstall
 	IfErrors +2 0
 	WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /mining /sstartfrom sysboot /embedding'
 	System::Call '$PLUGINSDIR\zbsetuphelper::GetTime(*l) i(.r0).r1'
-	
+	ReadRegDWORD $R5 HKCU "software\Share4Money" "LastSetBootTime"
+	${If} $R5 == ""
+		WriteRegDWORD HKCU "software\Share4Money" "LastSetBootTime" 0
+	${EndIf}
 	System::Call "kernel32::GetCommandLineA() t.R1"
 	System::Call "kernel32::GetModuleFileName(i 0, t R2R2, i 256)"
 	${WordReplace} $R1 $R2 "" +1 $R3
