@@ -1,6 +1,6 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+--local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
 local g_AutoRunState = false
 --设置挖矿模式的默认值
@@ -10,7 +10,8 @@ local g_AutoRunState = false
 local g_nWorkModel = 1
 local g_SuspendedWndState = 0
 
-function CheckIsAutoRun()
+--[[
+function CheckIsSysAutoRun()
 	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
 	if Helper:IsRealString(strValue) then
 		return true
@@ -18,18 +19,30 @@ function CheckIsAutoRun()
 	return false
 end
 
-function SetAutoRun()
-	local strExePath = tFunctionHelper.GetExePath()
-	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
-	Helper:SetRegValue(strAutoRunRegPath, strValue)
+function CheckIsCfgAutoRun()
+	return tFunctionHelper.CheckLastSetBoot()
 end
+
+function SetAutoRun()
+	if not CheckIsCfgAutoRun() then
+		tFunctionHelper.WriteLastSetBootTime()
+	end
+	if not CheckIsSysAutoRun() then
+		local strExePath = tFunctionHelper.GetExePath()
+		local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
+		Helper:SetRegValue(strAutoRunRegPath, strValue)
+	end
+end
+--]]
 
 function SaveSettingConfig(objTree)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	if g_AutoRunState and not CheckIsAutoRun() then
-		SetAutoRun()
-	elseif not g_AutoRunState and CheckIsAutoRun() then
-		tFunctionHelper.RegDeleteValue(strAutoRunRegPath)
+	if g_AutoRunState then
+		tFunctionHelper.WriteCfgSetBoot()
+		tFunctionHelper.WriteSysSetBoot()
+	else
+		tFunctionHelper.DeleteCfgSetBoot()
+		tFunctionHelper.DeleteSysSetBoot()
 	end
 	
 	local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
@@ -180,8 +193,8 @@ function OnCreate(self)
 		local ObjRadioFull = objTree:GetUIObject("SettingWnd.Content.WorkModel.Full")
 		local ObjRadioIntelligent = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Intelligent")
 
-		g_AutoRunState = CheckIsAutoRun()
-		if CheckIsAutoRun() then
+		g_AutoRunState = tFunctionHelper.CheckCfgSetBoot()
+		if g_AutoRunState then
 			ObjCheckBoxAutoRun:SetCheck(true, false)
 		else
 			ObjCheckBoxAutoRun:SetCheck(false, false)

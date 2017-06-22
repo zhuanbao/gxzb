@@ -231,6 +231,58 @@ function SendUIReport(strEC,strEA,strEL)
 	TipConvStatistic(tStatInfo)
 end
 
+function WriteCfgSetBoot()
+	if CheckCfgSetBoot() then
+		return
+	end
+	local nCurrnetTime = tipUtil:GetCurrentUTCTime()
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\LastSetBootTime"
+	RegSetValue(strRegPath, nCurrnetTime)
+end
+
+function DeleteCfgSetBoot()
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\LastSetBootTime"
+	RegDeleteValue(strRegPath)
+end
+
+function CheckCfgSetBoot()
+	local bRet = false
+	if CheckSysSetBoot() then
+		bRet = true
+	end
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "LastSetBootTime")
+	if nValue ~= nil then
+		bRet = true
+	end
+	if bRet and nValue == nil then
+		local nCurrnetTime = tipUtil:GetCurrentUTCTime()
+		local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\LastSetBootTime"
+		RegSetValue(strRegPath, nCurrnetTime)
+	end
+	return bRet
+end
+
+function WriteSysSetBoot()
+	if CheckSysSetBoot() then
+		return
+	end
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+	local strExePath = GetExePath()
+	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
+	RegSetValue(strRegPath, strValue)
+end
+
+function DeleteSysSetBoot()
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+	RegDeleteValue(strRegPath)
+end
+
+function CheckSysSetBoot()
+	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
+	local strValue = RegQueryValue(strRegPath)
+	return IsRealString(strValue) 
+end
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -288,6 +340,16 @@ function RegisterFunctionObject(self)
 
 	obj.TryToConnectServer = TryToConnectServer
 	obj.InitMiningClient = InitMiningClient
+	
+	obj.WriteCfgSetBoot = WriteCfgSetBoot
+	obj.DeleteCfgSetBoot = DeleteCfgSetBoot
+	obj.CheckCfgSetBoot = CheckCfgSetBoot
+	
+	
+	obj.WriteSysSetBoot = WriteSysSetBoot
+	obj.DeleteSysSetBoot = DeleteSysSetBoot
+	obj.CheckSysSetBoot = CheckSysSetBoot
+	
 	--UI函数
 	obj.GetMainHostWnd = GetMainHostWnd
 	obj.ShowPopupWndByName = ShowPopupWndByName

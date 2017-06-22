@@ -1,6 +1,7 @@
 local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local g_CheckBoxState = true
+--[[
 local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
 function CheckIsAutoRun()
@@ -16,11 +17,12 @@ function SetAutoRun()
 	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
 	Helper:SetRegValue(strAutoRunRegPath, strValue)
 end
+--]]
 
 function DoWorkOnHideWnd()
-	if g_CheckBoxState and not CheckIsAutoRun() then
-		
-		SetAutoRun()
+	if g_CheckBoxState then	
+		tFunctionHelper.WriteCfgSetBoot()
+		tFunctionHelper.WriteSysSetBoot()
 	end	
 end
 
@@ -90,7 +92,7 @@ function OnShowWindow(self, bShow)
 			objTextBind:SetChildrenVisible(true)
 			objTextBind:SetVisible(true)
 		end
-		if CheckIsAutoRun() then
+		if tFunctionHelper.CheckSysSetBoot() then
 			g_CheckBoxState = false
 			objCheckAutoRun:SetCheck(false)
 			objCheckAutoRun:SetChildrenVisible(false)

@@ -23,9 +23,8 @@ function TryPopAutoRunTip()
 	if gShowOnce then
 		return
 	end
-	local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
-	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
-	if Helper:IsRealString(strValue) then
+	
+	if not tFunctionHelper.CheckCfgSetBoot() or tFunctionHelper.CheckSysSetBoot() then
 		return
 	end
 	local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
