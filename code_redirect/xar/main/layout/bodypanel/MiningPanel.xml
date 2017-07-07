@@ -31,10 +31,93 @@
 						<height>father.height</height>
 					</attr>
 					<children>
+						<obj id="MiningPanel.Panel.MainIntroduce" class="TextObject">
+							<attr>
+								<left>(father.width-240)/2</left>
+								<top>10</top>
+								<width>240</width>
+								<height>20</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text19</font>
+								<text>开着电脑就能赚钱</text>
+							</attr>
+						</obj>
+						<obj id="MiningPanel.Panel.FAQ" class="TextLinkEx">
+							<attr>
+								<left>(father.width-200)/2</left>
+								<top>10+20+5</top>
+								<width>200</width>
+								<height>24</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>我好奇是怎么赚钱的</Text>
+								<Font>font.yahei13.underline</Font>
+								<TextColor>AF8656</TextColor>
+								<TextHoverColor>AF8656</TextHoverColor>
+								<Underline>false</Underline>
+								<Show>true</Show>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickFAQ" />
+							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
+							<attr>
+								<left>(father.width-38)/2</left>
+								<top>94+(220-38)/2</top>
+								<width>38</width>
+								<height>38</height>
+								<NormalBkgID>texture.MainPanel.StopMining.normal</NormalBkgID>
+								<DownBkgID>texture.MainPanel.StopMining.down</DownBkgID>
+								<HoverBkgID>texture.MainPanel.StopMining.hover</HoverBkgID>
+								<DisableBkgID>texture.MainPanel.StopMining.normal</DisableBkgID>
+								<Visible>false</Visible>
+								<zorder>999999999</zorder>
+							</attr>									
+							<eventlist>
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
+								<event name="OnMouseEnter" file="MiningPanel.xml.lua" func="OnMouseEnterStopBtn" />
+								<event name="OnMouseLeave" file="MiningPanel.xml.lua" func="OnMouseLeaveStopBtn" />
+							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.StartBtn" class="TipAddin.Button">
+							<attr>
+								<left>(father.width-220)/2</left>
+								<top>94</top>
+								<width>220</width>
+								<height>220</height>
+								<NormalBkgID>texture.MainPanel.StartMining.normal</NormalBkgID>
+								<DownBkgID>texture.MainPanel.StartMining.normal</DownBkgID>
+								<HoverBkgID>texture.MainPanel.StartMining.hover</HoverBkgID>
+								<DisableBkgID>texture.MainPanel.StartMining.normal</DisableBkgID>
+								<Visible>true</Visible>
+							</attr>									
+							<eventlist>
+								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStartMining" />
+								<event name="OnMouseEnter" file="MiningPanel.xml.lua" func="OnMouseEnterStartBtn" />
+								<event name="OnMouseLeave" file="MiningPanel.xml.lua" func="OnMouseLeaveStartBtn" />
+							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.StartBtn.Text" class="TextObject">
+							<attr>
+								<left>(father.width-220)/2+(220-140)/2</left>
+								<top>94+(220-24)/2</top>
+								<width>140</width>
+								<height>24</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>system.white</textcolor>
+								<font>font.text22</font>
+								<text>开始赚宝</text>
+								<zorder>9999999</zorder>
+							</attr>
+						</obj>
 						<obj id="MiningPanel.Panel.MiningSpeed" class="LayoutObject">
 							<attr>
 								<left>98</left>
-								<top>32</top>
+								<top>94+220+30</top>
 								<width>father.width-98*2</width>
 								<height>24</height>
 							</attr>
@@ -67,52 +150,6 @@
 									</attr>
 								</obj>
 							</children>
-						</obj>
-						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
-							<attr>
-								<left>father.width - 18-38</left>
-								<top>15</top>
-								<width>38</width>
-								<height>38</height>
-								<NormalBkgID>texture.MainPanel.StopMining.normal</NormalBkgID>
-								<DownBkgID>texture.MainPanel.StopMining.down</DownBkgID>
-								<HoverBkgID>texture.MainPanel.StopMining.hover</HoverBkgID>
-								<DisableBkgID>texture.MainPanel.StopMining.normal</DisableBkgID>
-								<Visible>false</Visible>
-							</attr>									
-							<eventlist>
-								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStopMining" />
-							</eventlist>
-						</obj>
-						<obj id="MiningPanel.Panel.StartBtn" class="TipAddin.Button">
-							<attr>
-								<left>(father.width-220)/2</left>
-								<top>94</top>
-								<width>220</width>
-								<height>220</height>
-								<NormalBkgID>texture.MainPanel.StartMining.normal</NormalBkgID>
-								<DownBkgID>texture.MainPanel.StartMining.normal</DownBkgID>
-								<HoverBkgID>texture.MainPanel.StartMining.hover</HoverBkgID>
-								<DisableBkgID>texture.MainPanel.StartMining.normal</DisableBkgID>
-								<Visible>true</Visible>
-							</attr>									
-							<eventlist>
-								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickStartMining" />
-							</eventlist>
-						</obj>
-						<obj id="MiningPanel.Panel.StartBtn.Text" class="TextObject">
-							<attr>
-								<left>(father.width-220)/2+(220-140)/2</left>
-								<top>94+(220-24)/2</top>
-								<width>140</width>
-								<height>24</height>
-								<valign>center</valign>
-								<halign>center</halign>
-								<textcolor>system.white</textcolor>
-								<font>font.text22</font>
-								<text>开始赚宝</text>
-								<zorder>99999999</zorder>
-							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
 							<attr>
@@ -194,13 +231,13 @@
 						</obj>
 						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
 							<attr>
-								<left>(father.width-80)/2</left>
+								<left>(father.width-200)/2</left>
 								<top>376+42</top>
-								<width>80</width>
+								<width>200</width>
 								<height>24</height>
 								<HAlign>center</HAlign>
 								<VAlign>center</VAlign>
-								<Text>绑定微信账号</Text>
+								<Text>点这里扫微信提人民币</Text>
 								<Font>font.yahei13.underline</Font>
 								<TextColor>AF8656</TextColor>
 								<TextHoverColor>AF8656</TextHoverColor>

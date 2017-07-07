@@ -94,9 +94,9 @@ function UpdateMiningState(self,nMiningState)
 			ShowAnim(self, true)
 		end
 	elseif tFunctionHelper.CheckIsPrepare() then
-		ResetUIVisible(self)
+		ResetUIVisible(self, true)
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
-		ObjStopBtn:Show(true)
+		--ObjStopBtn:Show(true)
 		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
 		ObjStartBtn:Enable(false)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
@@ -113,7 +113,7 @@ end
 function OnWorkStateChange(self,nState)
 	if nState == 1 then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
-		ObjStopBtn:Show(true)
+		--ObjStopBtn:Show(true)
 		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
 		ObjStartBtn:Enable(false)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
@@ -136,9 +136,13 @@ function ShowAnim(OwnerCtrl, bShow)
 			ObjAnimImg = objFactory:CreateUIObject("MiningPanel.Panel.ShowAnim", "ImageObject")
 			OwnerCtrl:AddChild(ObjAnimImg)
 			local l, t, r, b = ObjStartBtn:GetObjPos()
+			TipLog("[ShowAnim] StartBtn pos, left=" .. tostring(l) .. ", top=" .. tostring(t) .. ", right=" .. tostring(r) .. ", buttom=" .. tostring(b))
 			local w, h = r-l, b-t
 			local offsetW, offsetH = (280-w)/2, (280-h)/2 
+			TipLog("[ShowAnim] Anim pos, left=" .. tostring(l-offsetW) .. ", top=" .. tostring(t-offsetH) .. ", right=" .. tostring(r+offsetW) .. ", buttom=" .. tostring(b+offsetH))
 			ObjAnimImg:SetObjPos(l-offsetW, t-offsetH, r+offsetW, b+offsetH)
+			ObjAnimImg:AttachListener("OnMouseEnter", false, OnMouseEnterMiningAnim)		
+			ObjAnimImg:AttachListener("OnMouseLeave", false, OnMouseLeaveMiningAnim)
 		end
 		ObjAnimImg:SetVisible(true)
 		imageOpenAni = Helper.Ani:RunSeqFrameAni(ObjAnimImg, "GXZB.MainPanel.WorkingAnim", nil, 8000, true)
@@ -163,9 +167,77 @@ function OnClickStopMining(self)
 	end
 end
 
+function OnMouseEnterStopBtn(self)
+	if not self:IsVisible() then
+		self:Show(true)
+	end
+end
+
+function OnMouseLeaveStopBtn(self)
+	if self:IsVisible() then
+		--self:Show(false)
+	end
+end
+
 function OnClickStartMining(self)
 	if not tFunctionHelper.CheckIsWorking() then
 		tFunctionHelper.NotifyStart()
+	end
+end
+
+function OnMouseEnterMiningAnim(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		if not ObjStopBtn:IsVisible() then
+			ObjStopBtn:Show(true)
+		end	
+	end
+end
+
+function OnMouseLeaveMiningAnim(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		if ObjStopBtn:IsVisible() then
+			ObjStopBtn:Show(false)
+		end	
+	end
+end
+
+function OnMouseEnterStartBtn(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		if not ObjStopBtn:IsVisible() then
+			ObjStopBtn:Show(true)
+		end	
+	end
+end
+
+function OnMouseLeaveStartBtn(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		if ObjStopBtn:IsVisible() then
+			ObjStopBtn:Show(false)
+		end	
+	end
+end
+
+function OnMouseEnterStartText(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		ObjStopBtn:Show(true)
+	end
+end
+
+function OnMouseLeaveStartText(self)
+	if tFunctionHelper.CheckIsWorking() then
+		local OwnerCtrl = self:GetOwnerControl()
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		ObjStopBtn:Show(false)
 	end
 end
 
@@ -173,6 +245,9 @@ function OnClickBindWeiXin(self)
 	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
 end
 
+function OnClickFAQ(self)
+	Helper.tipUtil:OpenURL("http://www.eastredm.com/wxweb/faq.html")
+end
 
 function OnInitControl(self)
 	--local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
@@ -235,7 +310,7 @@ function AdjustAmountTextPosition(self)
 	ObjTextUnit:SetObjPos(nNewLeft+(nLenDesc+gap)+nLenNum+nLenRealTimeIncome+gap, 0, nNewLeft+(nLenDesc+gap)+nLenNum+nLenRealTimeIncome+gap+nLenUnit, height)
 end
 
-function ResetUIVisible(OwnerCtrl)
+function ResetUIVisible(OwnerCtrl, bNotResetStopBtn)
 	ShowAnim(OwnerCtrl, false)
 	local ObjStartBtnText = OwnerCtrl:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 	ObjStartBtnText:SetVisible(true)
@@ -250,9 +325,10 @@ function ResetUIVisible(OwnerCtrl)
 	ObjMiningSpeed:SetChildrenVisible(false)
 	ObjMiningSpeed:SetVisible(false)
 
-	
-	local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
-	ObjStopBtn:Show(false)
+	if not bNotResetStopBtn then
+		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
+		ObjStopBtn:Show(false)
+	end	
 	
 	local ObjStartBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StartBtn")
 	ObjStartBtn:Enable(true)

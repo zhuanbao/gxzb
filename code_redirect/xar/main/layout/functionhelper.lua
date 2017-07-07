@@ -20,7 +20,8 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
 
-local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
+local g_strSeverInterfacePrefix = "http://api.eastredm.com/pc"
+local g_strSeverConfigPrefix = "http://conf.eastredm.com"
 
 -- 工作中用到的
 --local g_bWorking = false
@@ -991,7 +992,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
-	local strConfigURL = tUserConfig["strServerConfigURL"] or "http://www.eastredm.com/static/ServerConfig.dat"
+	local strConfigURL = tUserConfig["strServerConfigURL"] or g_strSeverConfigPrefix .. "/static/ServerConfig.dat"
 	if not IsRealString(strConfigURL) then
 		callbackwrap(-2)
 		return
@@ -1965,10 +1966,7 @@ function MakeSvrPoolCfgRequestUrl()
 	if nLastUpdateCfgTime ~= nil then
 		strStamp = "?stamp=" .. tostring(nLastUpdateCfgTime)
 	end
-	local strReguestUrl = "http://www.eastredm.com/static/poolcfg.json" .. strStamp
-	--[[ forlocal
-	strReguestUrl = "http://www.eastredm.com/static/ServerConfig.dat" .. strStamp
-	--]]
+	local strReguestUrl = g_strSeverConfigPrefix .. "/static/poolcfg.json" .. strStamp
 	TipLog("[QuerySvrForPoolCfg] strReguestUrl = " .. tostring(strReguestUrl))
 	return strReguestUrl
 end
