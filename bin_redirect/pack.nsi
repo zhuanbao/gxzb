@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.6"
+!define PRODUCT_VERSION "1.0.0.7"
 ;TestCheckFlag==1 非测试模式
 !if ${TestCheckFlag} == 1
 	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -647,8 +647,11 @@ Function CmdSilentInstall
 	CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom startmenuprograms"
 	CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\卸载${PRODUCT_NAME}.lnk" "$INSTDIR\uninst.exe"
 	;静默创建桌面快捷方式
+	IfFileExists "$DESKTOP\${PRODUCT_NAME}.lnk" 0 +2
+	Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
+	
 	SetOutPath "$INSTDIR\program"
-	CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
+	CreateShortCut "$DESKTOP\共享赚宝：开着电脑就能赚钱.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
 	${RefreshShellIcons}
 	;锁定到开始菜单和任务栏
 	System::Call "$PLUGINSDIR\zbsetuphelper::SetInstDir(t '$INSTDIR\program')"
@@ -1043,8 +1046,11 @@ Function NSD_TimerFun
     GetFunctionAddress $0 InstallationMainFun
     BgWorker::CallAndWait
 	
+	IfFileExists "$DESKTOP\${PRODUCT_NAME}.lnk" 0 +2
+	Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
+	
 	SetOutPath "$INSTDIR\program"
-	CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
+	CreateShortCut "$DESKTOP\共享赚宝：开着电脑就能赚钱.lnk" "$INSTDIR\program\Share4Money.exe" "/sstartfrom desktop"
 	${RefreshShellIcons}
 	
 	;锁定快捷方式
@@ -1303,7 +1309,8 @@ Section Uninstall
 		;DeleteRegValue HKCU "software\Share4Money" "machineid"
 		DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money"
 	${EndIf}
-	
+	IfFileExists "$DESKTOP\共享赚宝：开着电脑就能赚钱.lnk" 0 +2
+		Delete "$DESKTOP\共享赚宝：开着电脑就能赚钱.lnk"
 	IfFileExists "$DESKTOP\${PRODUCT_NAME}.lnk" 0 +2
 		Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
 	IfFileExists "$STARTMENU\${PRODUCT_NAME}.lnk" 0 +2
