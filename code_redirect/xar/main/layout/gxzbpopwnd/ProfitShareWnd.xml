@@ -89,6 +89,7 @@
 								<halign>center</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text20</font>
+								<texttype>freetype</texttype>
 								<text>分享赚分成</text>
 							</attr>
 						</obj>

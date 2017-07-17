@@ -112,6 +112,7 @@
 				<halign>center</halign>
 				<valign>center</valign>
 				<zorder>500</zorder>
+				<texttype>freetype</texttype>
 			</attr>
 		</obj>
 	</children>

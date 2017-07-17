@@ -41,6 +41,7 @@
 								<halign>center</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text19</font>
+								<texttype>freetype</texttype>
 								<text>开着电脑就能赚钱</text>
 							</attr>
 						</obj>
@@ -110,6 +111,7 @@
 								<halign>center</halign>
 								<textcolor>system.white</textcolor>
 								<font>font.text22</font>
+								<texttype>freetype</texttype>
 								<text>开始赚宝</text>
 								<zorder>9999999</zorder>
 							</attr>
@@ -169,6 +171,7 @@
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
 										<font>font.text20</font>
+										<texttype>freetype</texttype>
 										<text>您的金库有</text>
 									</attr>
 								</obj>
@@ -182,6 +185,7 @@
 										<halign>center</halign>
 										<textcolor>CB8C25</textcolor>
 										<font>font.text20</font>
+										<texttype>freetype</texttype>
 										<text>0</text>
 										<endellipsis>1</endellipsis>
 									</attr>
@@ -210,6 +214,7 @@
 										<halign>right</halign>
 										<textcolor>6D5539</textcolor>
 										<font>font.text20</font>
+										<texttype>freetype</texttype>
 										<text>个元宝</text>
 									</attr>
 								</obj>

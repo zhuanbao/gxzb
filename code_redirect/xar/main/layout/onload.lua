@@ -368,7 +368,7 @@ function CheckMachineSuitable(callback)
 		LOG("CheckMachineSuitable strExePath is nil")
 		return callback(false)
 	end
-	local strClCheckPath = strExePath.."\\..\\zbsetuphelper-cl.exe"
+	local strClCheckPath = strExePath.."\\..\\Share4Peer\\zbsetuphelper-cl.exe"
 	if not tipUtil:QueryFileExists(strClCheckPath) then
 		LOG("CheckMachineSuitable not exist path :strClCheckPath="..tostring(strClCheckPath))
 		return callback(false)
