@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.7"
+!define PRODUCT_VERSION "1.0.0.8"
 ;TestCheckFlag==1 非测试模式
 !if ${TestCheckFlag} == 1
 	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -466,14 +466,17 @@ Function .onInit
 	
 	Call InitFont
 	${If} ${RunningX64}
-		File "zbsetuphelper-cl.exe"
+		File "main\program\Share4Peer\msvcp120.dll"
+		File "main\program\Share4Peer\msvcr120.dll"
+		File "main\program\Share4Peer\OpenCL.dll"
+		File "main\program\Share4Peer\zbsetuphelper-cl.exe"
+		;File "zbsetuphelper-cl.exe"
 		;File "zbsetuphelper.dll"
 		;File "main\program\Microsoft.VC90.CRT.manifest"
 		;File "main\program\msvcp90.dll"
 		;File "main\program\msvcr90.dll"
 		;File "main\program\Microsoft.VC90.ATL.manifest"
 		;File "main\program\ATL90.dll"
-		
 		File "license.txt"
 		Call UpdateChanel
 		Call FirstSendStart
