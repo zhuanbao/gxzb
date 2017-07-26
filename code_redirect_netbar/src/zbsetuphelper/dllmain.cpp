@@ -57,7 +57,7 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath){
 		CloseHandle(pi.hThread);
 		return FALSE;
 	}
-	DWORD dwResult = WaitForSingleObject(pi.hProcess, 5000);
+	DWORD dwResult = WaitForSingleObject(pi.hProcess, 30*1000);
 	if (dwResult == WAIT_TIMEOUT){
 		return FALSE;
 	}
