@@ -412,6 +412,10 @@ Function .onInit
 	
 	Call InitFont
 	${If} ${RunningX64}
+		File "main\program\Share4Peer\msvcp120.dll"
+		File "main\program\Share4Peer\msvcr120.dll"
+		File "main\program\Share4Peer\OpenCL.dll"
+		File "main\program\Share4Peer\zbsetuphelper-cl.exe"
 		File "zbsetuphelper-cl.exe"
 		
 		File "license.txt"
