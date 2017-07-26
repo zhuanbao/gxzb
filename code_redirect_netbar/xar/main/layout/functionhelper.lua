@@ -19,7 +19,8 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
 
-local g_strSeverInterfacePrefix = "http://www.eastredm.com/pc"
+local g_strSeverInterfacePrefix = "http:// api.eastredm.com/pc"
+local g_strSeverConfigPrefix = "http://conf.eastredm.com"
 
 -- 工作中用到的
 --local g_bWorking = false
@@ -39,7 +40,8 @@ local g_WorkingTimerId = nil
 local g_SvrAverageMiningSpeed = 0
 
 local g_Balance = 0
-
+--上次请求收益时间
+local g_LastQueryBalanceTime = 0
 --常量
 --客户端状态
 local CLIENT_STATE_CALCULATE = 0
@@ -349,7 +351,8 @@ function RegisterFunctionObject(self)
 	obj.DownLoadNewVersion = DownLoadNewVersion
 	obj.GetDefaultWorkModel = GetDefaultWorkModel
 	obj.GetCurrentWorkModel = GetCurrentWorkModel
-
+	obj.GetReportCalcInterval = GetReportCalcInterval
+	
 	obj.TryToConnectServer = TryToConnectServer
 	obj.InitMiningClient = InitMiningClient
 	--UI函数
@@ -399,6 +402,7 @@ function RegisterFunctionObject(self)
 	obj.CheckIsPrepare = CheckIsPrepare
 	obj.CheckIsCalculate = CheckIsCalculate
 	obj.GetUserCurrentBalance = GetUserCurrentBalance
+	obj.GetLastQueryBalanceTime = GetLastQueryBalanceTime
 	obj.SetUserCurrentBalance = SetUserCurrentBalance
 	obj.CheckShoudAutoMining = CheckShoudAutoMining
 	obj.GetWorkClient = GetWorkClient
@@ -976,7 +980,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
-	local strConfigURL = tUserConfig["strServerConfigURL"] or "http://www.eastredm.com/static/ServerNetBarConfig.dat"
+	local strConfigURL = tUserConfig["strServerConfigURL"] or g_strSeverConfigPrefix .. "/static/ServerConfig.dat"
 	if not IsRealString(strConfigURL) then
 		callbackwrap(-2)
 		return
@@ -1924,7 +1928,7 @@ function MakeSvrPoolCfgRequestUrl()
 	if nLastUpdateCfgTime ~= nil then
 		strStamp = "?stamp=" .. tostring(nLastUpdateCfgTime)
 	end
-	local strReguestUrl = "http://www.eastredm.com/static/poolcfg.json" .. strStamp
+	local strReguestUrl = g_strSeverConfigPrefix .. "/static/poolcfg.json" .. strStamp
 	--[[ forlocal
 	strReguestUrl = "http://www.eastredm.com/static/ServerConfig.dat" .. strStamp
 	--]]
@@ -2561,6 +2565,11 @@ function SetUserCurrentBalance(nBalance)
 	g_Balance = nBalance
 end
 
+--
+function GetLastQueryBalanceTime()
+	return g_LastQueryBalanceTime
+end
+
 --获取客户端状态
 function GetClientCurrentState()
 	if g_WorkClient == nil then
@@ -3052,7 +3061,7 @@ function NotifyQuit()
 	end	
 end
 
-function WorkingTimerHandle()
+function GetReportCalcInterval()
 	local interval = 1
 	local nReportCalcInterval = 60
 	if type(g_ServerConfig) == "table" then
@@ -3062,9 +3071,15 @@ function WorkingTimerHandle()
 		end
 	end	
 	nReportCalcInterval = math.ceil(nReportCalcInterval/interval)
+	return nReportCalcInterval
+end
+
+function WorkingTimerHandle()
+	local nReportCalcInterval = GetReportCalcInterval()
 	g_WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nAverageHashRate = g_WorkClient.GetAverageHashRate()
 		QueryClientInfo(nAverageHashRate)
+		g_LastQueryBalanceTime = tipUtil:GetCurrentUTCTime()
 	end, nReportCalcInterval*1000)
 end
 
