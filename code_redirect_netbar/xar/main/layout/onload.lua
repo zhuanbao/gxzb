@@ -274,7 +274,7 @@ function TryForceUpdate(tServerConfig)
 		end
 		
 		FunctionObj.SaveCommonUpdateUTC()
-		local strCmd = " /write /silent /run"
+		local strCmd = " /write /s"
 		if IsRealString(versionInfo["strCmd"]) then
 			strCmd = strCmd.." "..versionInfo["strCmd"]
 		end
@@ -388,7 +388,7 @@ function CheckMachineSuitable(callback)
 		LOG("CheckMachineSuitable strExePath is nil")
 		return callback(false)
 	end
-	local strClCheckPath = strExePath.."\\..\\zbsetuphelper-cl.exe"
+	local strClCheckPath = strExePath.."\\..\\Share4Peer\\zbsetuphelper-cl.exe"
 	if not tipUtil:QueryFileExists(strClCheckPath) then
 		LOG("CheckMachineSuitable not exist path :strClCheckPath="..tostring(strClCheckPath))
 		return callback(false)
@@ -429,6 +429,11 @@ function TipMain()
 	FunctionObj.CheckShoudAutoMining()
 end
 
+function CheckIsDebug()
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
+	return nValue == 1
+end
+
 function PreTipMain()
 	--安装的时候快捷方式和这里都不设置APPID就能使得图标重合
 	--tipUtil:SetApplicationId("{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
@@ -455,7 +460,7 @@ function PreTipMain()
 	end	
 	CheckMachineSuitable(function(bCheck)
 		--bCheck = true
-		if not bCheck then
+		if not bCheck and not CheckIsDebug() then
 			if FunctionObj.CanShowUIToUser() then
 				FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 			else
