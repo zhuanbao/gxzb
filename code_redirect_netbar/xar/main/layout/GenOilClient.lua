@@ -56,6 +56,7 @@ local g_ControlSpeedCmdLine = nil -- --cl-global-work 1000
 
 local g_LastGetSpeedTime = 0
 local g_LastRealTimeIncome = 0
+local g_LastAverageHashRate = 0
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -245,6 +246,34 @@ function GetRealTimeIncome(nSpeed,nSpanTime)
 	return 0
 end
 
+function WhenGetShare()
+	local nMaxQueryCnt = 2
+	local nInterval = 3
+	local nQueryCnt = 0
+	local nReportCalcInterval = tFunctionHelper.GetReportCalcInterval()
+	local nLastQueryBalanceTime = tFunctionHelper.GetLastQueryBalanceTime()
+	local nLastBalance = tFunctionHelper.GetUserCurrentBalance()
+	local function DoQueryTimer()
+		nQueryCnt = nQueryCnt + 1
+		if nQueryCnt > nMaxQueryCnt then
+			return
+		end
+		local nCurrentUTCTime = tipUtil:GetCurrentUTCTime()
+		if nCurrentUTCTime > nLastQueryBalanceTime + nReportCalcInterval - 3 then
+			return
+		end
+		local nBalance = tFunctionHelper.GetUserCurrentBalance()
+		if nLastBalance ~= nBalance then
+			return
+		end
+		SetOnceTimer(function()
+			tFunctionHelper.QueryClientInfo(g_LastAverageHashRate)
+			DoQueryTimer()
+		end, nInterval*1000)	
+	end
+	DoQueryTimer()
+end
+
 function OnGenOilMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnGenOilMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
@@ -289,6 +318,7 @@ function OnGenOilMsg(tParam)
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
+		WhenGetShare()
 		--处理提交share
 	elseif nMsgType == WP_GENOIL_CONNECT_POOL then
 		if nParam == 0 then
@@ -389,6 +419,7 @@ function ResetGlobalParam()
 		g_GenOilWorkingTimerId = nil
 	end
 	g_LastGetSpeedTime = 0
+	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 end
@@ -489,6 +520,7 @@ function GetAverageHashRate()
 		g_HashRateSum = 0
 		g_HashRateSumCounter = 0
 	end	
+	g_LastAverageHashRate = nAverageHashRate
 	return nAverageHashRate
 end
 
