@@ -29,6 +29,7 @@
 								<halign>center</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text20</font>
+								<texttype>freetype</texttype>
 								<text>绑定微信账号</text>
 							</attr>
 						</obj>
@@ -42,6 +43,7 @@
 								<halign>center</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text20</font>
+								<texttype>freetype</texttype>
 								<text>实时查询收益与元宝提现</text>
 							</attr>
 						</obj>
