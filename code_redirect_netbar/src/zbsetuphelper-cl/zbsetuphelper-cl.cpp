@@ -6,9 +6,48 @@
 #include "cl.hpp"
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include<algorithm>
+#include <shlwapi.h>
+#pragma comment(lib,"shlwapi.lib")
 using namespace std;
 
+bool GetConfigIniFilePath(std::string &strCfgPath)
+{
+	char szPath[MAX_PATH] = {0};
+	GetModuleFileNameA(NULL, szPath, MAX_PATH);
+	PathRemoveFileSpecA(szPath);
+	PathRemoveFileSpecA(szPath);
+	char szCfgPath[MAX_PATH] = {0}; 
+	PathCombineA(szCfgPath,szPath,"config\\reg.ini");
+	if (!PathFileExistsA(szCfgPath))
+	{
+		return false;
+	}
+	strCfgPath = szCfgPath;
+	return true;
+}
+void SetOpenclPlatform(unsigned int uPlatform)
+{
+	static BOOL bPlatForm = FALSE;
+	if (bPlatForm)
+	{
+		return;
+	}
+	bPlatForm = TRUE;
+	std::string strCfgPath;
+	if (!GetConfigIniFilePath(strCfgPath))
+	{
+		return;
+	}
+	std::string strPlatform;
+	{
+		std::stringstream ss;
+		ss << uPlatform;
+		ss >> strPlatform;
+	}
+	::WritePrivateProfileStringA("HKCR", "openclplatform", strPlatform.c_str(), strCfgPath.c_str());
+}
 
 std::vector<cl::Platform> getPlatforms()
 {
@@ -74,6 +113,7 @@ void GetBestPlatform(unsigned int& idxPlatform, unsigned int& idxDevice) {
 					maxRet = result;
 					idxPlatform = i;
 					idxDevice = j;
+					SetOpenclPlatform(idxPlatform);
 					//cout<<"GetBestPlatform begin get one, idxPlatform = "<<idxPlatform<<", idxDevice = "<<idxDevice<<endl;
 				}
 			}
