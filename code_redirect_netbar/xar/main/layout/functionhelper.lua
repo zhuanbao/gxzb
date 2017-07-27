@@ -2839,6 +2839,7 @@ end
 
 function UnBindingClientFromServer()
 	--不用再发统计了
+	TipLog("[UnBindingClientFromServer] try to unbind")
 	OnUnBindSuccess()
 end
 
@@ -3011,6 +3012,7 @@ function HandleOnQuit()
 end
 
 function StartClient()
+	TipLog("[StartClient] try to start client")
 	SetStateInfoToUser(nil)
 	g_WorkClient.InitCmdLine()
 	local nRet = g_WorkClient.Start()
