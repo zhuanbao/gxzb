@@ -20,6 +20,7 @@ local g_bIsUpdating = false
 local JsonFun = nil
 
 local g_strSeverInterfacePrefix = "http://api.eastredm.com/pc"
+local g_strSeverInterfacePrefixAgency = "http://api.eastredm.com/agency"
 local g_strSeverConfigPrefix = "http://conf.eastredm.com"
 
 -- 工作中用到的
@@ -1874,12 +1875,14 @@ end
 function QuerySvrForWorkID()
 	local strInterfaceName = "getWorkerID"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(GetAgencyOpenID()))
+	
 	local strGUID = GetMachineID()
 	if IsRealString(strGUID) then
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
 	end	
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
-	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	local strReguestUrl =  g_strSeverInterfacePrefixAgency .. strParam
 	TipLog("[QuerySvrForWorkID] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
