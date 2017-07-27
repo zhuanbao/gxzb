@@ -335,11 +335,12 @@ function CheckMachineBindState()
 end
 
 function OnDownLoadSvrCfgSuccess(strServerPath)
+	--[[
 	if FunctionObj.CheckShouldRemindBind() then
 		FunctionObj.ChangeMainBodyPanel("QRCodePanel")
 		FunctionObj.SaveLastRemindBindUTC()
 	end
-	
+	--]]
 	local tServerConfig = FunctionObj.LoadTableFromFile(strServerPath) or {}
 	XLSetGlobal("g_ServerConfig", tServerConfig)
 	g_ServerConfig = tServerConfig
@@ -414,7 +415,6 @@ function TipMain()
 	
 	CreateMainTipWnd()
 	
-	FunctionObj.InitMachineName()
 	SaveConfigInTimer()
 	if not FunctionObj.CheckIsBinded() then
 		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
@@ -442,14 +442,16 @@ function PreTipMain()
 	SendStartupReport(false)
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
+	local strHostPeerID = FunctionObj.GetHostPeerID()
 	
-	if FunctionObj.CanShowUIToUser() then
+	if not IsRealString(strHostPeerID) then
 		FunctionObj.InitHostPeerID()
-		FunctionObj.CreatePopupTipWnd()
+		FunctionObj.InitMachineName()
+		--FunctionObj.CreatePopupTipWnd()
 	else
-		local strHostPeerID = FunctionObj.GetHostPeerID()
-		if not IsRealString(strHostPeerID) then
-			FunctionObj.TipLog("[PreTipMain] get host peerid fail exit")
+		local strAgencyOpenID = FunctionObj.GetAgencyOpenID()
+		if not IsRealString(strAgencyOpenID) then
+			FunctionObj.TipLog("[PreTipMain] get agency openid fail")
 			FunctionObj.FailExitTipWnd(6)
 			return
 		elseif not FunctionObj.CheckIsGettedWorkID() then

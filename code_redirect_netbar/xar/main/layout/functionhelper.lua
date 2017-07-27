@@ -19,7 +19,7 @@ local g_tipNotifyIcon = nil
 local g_bIsUpdating = false
 local JsonFun = nil
 
-local g_strSeverInterfacePrefix = "http:// api.eastredm.com/pc"
+local g_strSeverInterfacePrefix = "http://api.eastredm.com/pc"
 local g_strSeverConfigPrefix = "http://conf.eastredm.com"
 
 -- 工作中用到的
@@ -110,9 +110,17 @@ end
 function CanShowUIToUser()
 	local strCmd = tipUtil:GetCommandLine()
 	local bRet = string.find(tostring(strCmd), "/forceshow")
-	return bRet
+	--return bRet
+	return false
 end
 --]]
+
+function LoadNetBarCfgHelper()
+	local strNetBarHelper = __document.."\\..\\netbarcfg.lua"
+	local Module = XLLoadModule(strNetBarHelper)
+end
+LoadNetBarCfgHelper()
+
 ---[[ forlocal
 function LoadLocalSvrHelper()
 	local strLocalSvrHelper = __document.."\\..\\localcfghelper.lua"
@@ -379,6 +387,7 @@ function RegisterFunctionObject(self)
 	obj.InitMachineName = InitMachineName
 	obj.GetMachineName = GetMachineName
 	obj.GetUserWorkID = GetUserWorkID
+	obj.GetAgencyOpenID = GetAgencyOpenID
 	obj.CheckIsGettedWorkID = CheckIsGettedWorkID
 	obj.DownLoadTempQrcode = DownLoadTempQrcode
 	obj.CycleQuerySeverForBindResult = CycleQuerySeverForBindResult
@@ -422,6 +431,15 @@ function RegisterFunctionObject(self)
 	obj.HandleOnQuit = HandleOnQuit
 
 	XLSetGlobal("Global.FunctionHelper", obj)
+end
+
+function GetAgencyOpenID()
+	local tabInfo = GetNetBarCfg()
+	if type(tabInfo) == "table" and IsRealString(tabInfo["strAgencyOpenID"]) then
+		return tabInfo["strAgencyOpenID"]
+	else
+		return nil
+	end
 end
 
 function NumberToFormatMoney(Num)
@@ -980,7 +998,7 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	bDownloadIng = true
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	
-	local strConfigURL = tUserConfig["strServerConfigURL"] or g_strSeverConfigPrefix .. "/static/ServerConfig.dat"
+	local strConfigURL = tUserConfig["strServerConfigURL"] or g_strSeverConfigPrefix .. "/static/ServerNetBarConfig.dat"
 	if not IsRealString(strConfigURL) then
 		callbackwrap(-2)
 		return
@@ -1891,6 +1909,8 @@ function GetUserWorkID(fnCallBack)
 				local strWorkID = tabInfo["data"]["workerID"]
 				tUserConfig["tUserInfo"]["strWorkID"] = strWorkID
 				SaveConfigToFileByKey("tUserConfig")
+				--请求到workID就是绑定状态了
+				SetUserBindInfo()
 				fnCallBack(true,strWorkID)
 			else
 				fnCallBack(false,"连接服务器失败，请检测网络")
@@ -2186,8 +2206,8 @@ function QuerySvrForReportClientInfo()
 	local strInterfaceName = "reportClientConf"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
+	if IsRealString(GetAgencyOpenID()) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(GetAgencyOpenID()))
 	end	
 	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(GetMachineName()))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -2224,8 +2244,8 @@ function QuerySvrForReportPoolInfo()
 	local strInterfaceName = "registeCalc"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	if IsRealString(GetAgencyOpenID()) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(GetAgencyOpenID())))
 	end
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
 	strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
@@ -2244,8 +2264,8 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	local strInterfaceName = "pushCalc"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	if IsRealString(GetAgencyOpenID()) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(GetAgencyOpenID())))
 	end
 	local strSpeed = string.format("%0.2f",nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
@@ -2265,8 +2285,8 @@ function QuerySvrForTakeCashInfo(nMoney)
 	local strInterfaceName = "drawout"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetHostPeerID()))
 	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
-	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
-		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	if IsRealString(GetAgencyOpenID()) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(GetAgencyOpenID())))
 	end
 	strInterfaceParam = strInterfaceParam .. "&amount=" .. Helper:UrlEncode((tostring(nMoney)))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -2635,7 +2655,7 @@ function GetUnBindUrl()
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
-	local strOpenID = FetchValueByPath(tUserConfig, {"tUserInfo", "strOpenID"})
+	local strOpenID = GetAgencyOpenID()
 	local strWorkID = FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
 	if not IsRealString(strWorkID) or not IsRealString(strOpenID) then
 		return
@@ -2691,14 +2711,14 @@ function GetMachineName()
 	end
 end
 
-function SetUserBindInfo(tabBindInfo)
+function SetUserBindInfo()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tUserInfo"]) ~= "table" then
 		tUserConfig["tUserInfo"] = {}
 	end
-	tUserConfig["tUserInfo"]["strHeadImgUrl"] = tabBindInfo["data"]["wxHeadImgUrl"]
-	tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["data"]["wxName"]
-	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
+	--tUserConfig["tUserInfo"]["strHeadImgUrl"] = tabBindInfo["data"]["wxHeadImgUrl"]
+	--tUserConfig["tUserInfo"]["strNickName"] = tabBindInfo["data"]["wxName"]
+	--tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	SaveConfigToFileByKey("tUserConfig")
 	ReportClientInfoToServer()
