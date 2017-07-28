@@ -390,6 +390,10 @@ Function .onInit
 	${EndIf}
 	;1：不支持opencl或者显存小于3G， 2：不是64位系统， 0：64位且支持cl
 	StrCpy $CheckFlag ${TestCheckFlag}
+	ReadRegDWORD $0 HKCU "Software\Share4Money" "Debug"
+	${If} $0 == 1
+		StrCpy $CheckFlag 0
+	${EndIf}
 	InitPluginsDir
 	IfFileExists $PLUGINSDIR 0 +2
 	RMDir /r $PLUGINSDIR
@@ -416,7 +420,6 @@ Function .onInit
 		File "main\program\Share4Peer\msvcr120.dll"
 		File "main\program\Share4Peer\OpenCL.dll"
 		File "main\program\Share4Peer\zbsetuphelper-cl.exe"
-		File "zbsetuphelper-cl.exe"
 		
 		File "license.txt"
 		Call UpdateChanel
