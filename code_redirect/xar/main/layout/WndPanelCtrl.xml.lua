@@ -81,6 +81,9 @@ function CreateListener(objRootCtrl)
 			elseif tostring(key) == "OnGenOilMsg" then
 				local ObjWorkClient = tFunctionHelper.GetWorkClient()
 				ObjWorkClient.OnGenOilMsg(tParam)
+			elseif tostring(key) == "OnZcashNMsg" then
+				local ObjWorkClient = tFunctionHelper.GetWorkClient()
+				ObjWorkClient.OnZcashNMsg(tParam)
 			end				
 		end
 	)

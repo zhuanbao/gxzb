@@ -358,34 +358,47 @@ function LoadDynamicFont()
 	local Module = XLLoadModule(strFontPath)
 end
 
-function CheckMachineSuitable(callback)
+--返回值说明 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
+function CheckMachineSuitable(fnCallBack)
 	if FunctionObj.GetSystemBits() ~= 64 then
 		LOG("CheckMachineSuitable GetSystemBits ~= 64")
-		return callback(false)
+		return fnCallBack(0)
 	end
+	local function fnCheckZcashCond()
+		if tipUtil:CheckZcashNCond() then
+			fnCallBack(2)
+		else
+			fnCallBack(0)
+		end
+	end
+	
 	local strExePath = tipUtil:GetModuleExeName()
 	if not IsRealString(strExePath) then
 		LOG("CheckMachineSuitable strExePath is nil")
-		return callback(false)
+		return fnCheckZcashCond()
 	end
 	local strClCheckPath = strExePath.."\\..\\Share4Peer\\zbsetuphelper-cl.exe"
 	if not tipUtil:QueryFileExists(strClCheckPath) then
 		LOG("CheckMachineSuitable not exist path :strClCheckPath="..tostring(strClCheckPath))
-		return callback(false)
+		return fnCheckZcashCond()
 	end
 	tipAsynUtil:AsynCreateProcess("", strClCheckPath, "", 32, 0, 
 		function (nRet, tProcDetail)
-			LOG("CheckMachineSuitable AsynCreateProcess callback:nRet="..tostring(nRet)..", type(tProcDetail)="..type(tProcDetail))
+			LOG("CheckMachineSuitable AsynCreateProcess: nRet="..tostring(nRet)..", type(tProcDetail)="..type(tProcDetail))
 			if nRet == 0 and tProcDetail and tProcDetail.hProcess then
 				tipAsynUtil:AsynWaitForSingleObject(tProcDetail.hProcess, 60*1000, 
 					function(nRet)
-						local ExitCode = tipUtil:GetProcessExitCode(tProcDetail.hProcess)
-						LOG("CheckMachineSuitable AsynWaitForSingleObject callback:ExitCode="..tostring(ExitCode))
-						callback(ExitCode == 0 or ExitCode == 259)
+						local nExitCode = tipUtil:GetProcessExitCode(tProcDetail.hProcess)
+						LOG("CheckMachineSuitable AsynWaitForSingleObject: nExitCode="..tostring(nExitCode))
+						if nExitCode == 0 or nExitCode == 259 then
+							fnCallBack(1)
+						else
+							fnCheckZcashCond()
+						end
 					end)
 			else
-				LOG("CheckMachineSuitable AsynCreateProcess callback failed")
-				callback(false)
+				LOG("CheckMachineSuitable AsynCreateProcess fnCallBack failed")
+				fnCheckZcashCond()
 			end
 		end)
 end
@@ -411,7 +424,11 @@ end
 
 function CheckIsDebug()
 	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
-	return nValue == 1
+	if nValue ~= nil then
+		FunctionObj.SetMiningType(nValue)
+		return true
+	end
+	return false
 end
 function PreTipMain()
 	--安装的时候快捷方式和这里都不设置APPID就能使得图标重合
@@ -422,9 +439,10 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
-	CheckMachineSuitable(function(bCheck)
+	CheckMachineSuitable(function(nMiningType)
 		--bCheck = true
-		if not bCheck and not CheckIsDebug() then
+		FunctionObj.SetMiningType(nMiningType)
+		if nMiningType == 0 and not CheckIsDebug() then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
 			TipMain()

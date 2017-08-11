@@ -3,7 +3,7 @@ local tipAsynUtil = XLGetObject("API.AsynUtil")
 local IPCUtil = XLGetObject("IPC.Util")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 --local g_ServerConfig = nil
-
+local g_MiningType = 0
 local g_WorkClient = nil
 local g_bShowWndByTray = false
 local gStatCount = 0
@@ -92,6 +92,11 @@ LoadJSONHelper()
 
 function LoadGenOilClient()
 	local strClientPath = __document.."\\..\\GenOilClient.lua"
+	local Module = XLLoadModule(strClientPath)
+end
+
+function LoadZcashNClient()
+	local strClientPath = __document.."\\..\\ZcashNClient.lua"
 	local Module = XLLoadModule(strClientPath)
 end
 
@@ -341,7 +346,8 @@ function RegisterFunctionObject(self)
 
 	obj.TryToConnectServer = TryToConnectServer
 	obj.InitMiningClient = InitMiningClient
-	
+	obj.SetMiningType = SetMiningType
+
 	obj.WriteCfgSetBoot = WriteCfgSetBoot
 	obj.DeleteCfgSetBoot = DeleteCfgSetBoot
 	obj.CheckCfgSetBoot = CheckCfgSetBoot
@@ -1757,7 +1763,22 @@ function ReportAndExit()
 	TipConvStatistic(tStatInfo)
 end
 
+function CheckReportCond(strReportPID)
+	if not IsRealString(strReportPID) then
+		return true
+	end
+	local strPeerId = GetPeerID()
+	local strPId12 = string.sub(strPeerId, 12, 12) or "0"
+	if string.find(strReportPID,strPId12) ~= nil then 
+		return true
+	end
+	return false
+end
+
 function StartRunCountTimer()
+	local strReportPID  = FetchValueByPath(g_ServerConfig, {"tReportPID", "strRunTime"})
+	if not CheckReportCond(strReportPID) then return end
+	
 	local nTimeSpanInSec = 10 * 60 
 	local nTimeSpanInMs = nTimeSpanInSec * 1000
 	local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
@@ -1765,15 +1786,19 @@ function StartRunCountTimer()
 		gnLastReportRunTmUTC = tipUtil:GetCurrentUTCTime()
 		SendRunTimeReport(nTimeSpanInSec, false)
 	end, nTimeSpanInMs)
-	
+	--[[
 	local nTimeSpanInMs = 2*60*1000
 	timerManager:SetTimer(function(item, id)
 		--SendClientReport(10)
 	end, nTimeSpanInMs)
+	--]]
 end
 
 
 function SendRunTimeReport(nTimeSpanInSec, bExit)
+	local strReportPID  = FetchValueByPath(g_ServerConfig, {"tReportPID", "strRunTime"})
+	if not CheckReportCond(strReportPID) then return end
+	
 	local tStatInfo = {}
 	tStatInfo.strEC = "runtime"
 	tStatInfo.strEA = GetInstallSrc() or ""
@@ -1790,6 +1815,10 @@ function SendRunTimeReport(nTimeSpanInSec, bExit)
 end
 
 function StartMiningCountTimer()
+	local strReportPID  = FetchValueByPath(g_ServerConfig, {"tReportPID", "strMining"})
+	if not CheckReportCond(strReportPID) then return end
+	
+	
 	local nTimeSpanInSec = 10 * 60 
 	local nTimeSpanInMs = nTimeSpanInSec * 1000
 	if g_MiningReportTimerId ~= nil then
@@ -1812,6 +1841,9 @@ function StopMiningCountTimer()
 end
 
 function SendMiningReport(nTimeSpanInSec, bExit)
+	local strReportPID  = FetchValueByPath(g_ServerConfig, {"tReportPID", "strMining"})
+	if not CheckReportCond(strReportPID) then return end
+	
 	local tStatInfo = {}
 	tStatInfo.strEC = "mining"
 	tStatInfo.strEA = GetInstallSrc() or ""
@@ -1945,11 +1977,15 @@ function CheckSvrPoolCfg(nLastCfg)
 	if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
 		tUserConfig["tSvrPoolInfo"] = {}
 	end
-	local tPoolList = tUserConfig["tSvrPoolInfo"]["tPoolList"]
+	local strPoolKey = g_WorkClient.GetPoolCfgName()
+	if type(tUserConfig["tSvrPoolInfo"][strPoolKey]) ~= "table" then
+		tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
+	end
+	local tPoolList = tUserConfig["tSvrPoolInfo"][strPoolKey]
 	if type(tPoolList) ~= "table" or #tPoolList < 1 then
 		return false
 	end
-	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"]
+	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"][strPoolKey]["nLastUpdateCfgTime"]
 	if nLastCfg ~= nLastUpdateCfgTime then
 		return false
 	end
@@ -1962,11 +1998,17 @@ function MakeSvrPoolCfgRequestUrl()
 	if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
 		tUserConfig["tSvrPoolInfo"] = {}
 	end
-	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"]
+	local strPoolKey = g_WorkClient.GetPoolCfgName()
+	if type(tUserConfig["tSvrPoolInfo"][strPoolKey]) ~= "table" then
+		tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
+	end
+	
+	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"][strPoolKey]["nLastUpdateCfgTime"]
 	if nLastUpdateCfgTime ~= nil then
 		strStamp = "?stamp=" .. tostring(nLastUpdateCfgTime)
 	end
-	local strReguestUrl = g_strSeverConfigPrefix .. "/static/poolcfg.json" .. strStamp
+	local strPoolCfgName = g_WorkClient.GetPoolCfgName()
+	local strReguestUrl = g_strSeverConfigPrefix .. "/static/" .. tostring(strPoolCfgName) .. strStamp
 	TipLog("[QuerySvrForPoolCfg] strReguestUrl = " .. tostring(strReguestUrl))
 	return strReguestUrl
 end
@@ -1999,6 +2041,10 @@ function GetSvrPoolCfg(nLastCfg)
 		if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
 			tUserConfig["tSvrPoolInfo"] = {}
 		end
+		local strPoolKey = g_WorkClient.GetPoolCfgName()
+		if type(tUserConfig["tSvrPoolInfo"][strPoolKey]) ~= "table" then
+			tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
+		end
 		
 		local tabPool = tabInfo["data"]["pool"]
 		local tabUserPool = {}
@@ -2007,7 +2053,7 @@ function GetSvrPoolCfg(nLastCfg)
 				tabUserPool[#tabUserPool+1] = tabPool[index]
 			end
 		end
-		tUserConfig["tSvrPoolInfo"]["tPoolList"] = tabUserPool
+		tUserConfig["tSvrPoolInfo"][strPoolKey] = tabUserPool
 		
 		if nLastCfg ~= nil then
 			tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"] = nLastCfg
@@ -2282,8 +2328,8 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
-	local strSpeed = string.format("%0.2f",nSpeed)
-	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode((tostring(strSpeed) .. "MH/s"))
+	local strSpeedFormat = g_WorkClient.GetSpeedFormat(nSpeed)
+	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode(strSpeedFormat)
 	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
@@ -3122,10 +3168,18 @@ function WorkingTimerHandle()
 	end, nReportCalcInterval*1000)
 end
 
---初始化客户端,根据需要
+function SetMiningType(nMiningType)
+	g_MiningType = nMiningType
+end
+--初始化客户端,根据需要 1:ETH 2:ZcashN
 function InitMiningClient()
-	LoadGenOilClient()
-	g_WorkClient = XLGetGlobal("Global.GenOilClient")
+	if g_MiningType == 1 then
+		LoadGenOilClient()
+		g_WorkClient = XLGetGlobal("Global.GenOilClient")
+	elseif g_MiningType == 2 then
+		LoadZcashNClient()
+		g_WorkClient = XLGetGlobal("Global.ZcashNClient")
+	end
 	g_WorkClient.InitClient()
 end
 
