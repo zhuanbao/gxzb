@@ -5,7 +5,8 @@ local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
-local g_PoolCfgName = "zcash_poolcfg"
+local g_PoolCfgName = "zcash_poolcfg.json"
+local g_DefaultPoolType = "x_zcash"
 --常量
 local CLIENT_ZCASHN = 2
 local CLIENT_PATH = "Share4Peer\\Share4PeerZN.exe"
@@ -430,7 +431,7 @@ end
 --外部调用函数
 ----------------
 function InitClient()
-	IPCUtil:Init(CLIENT_GENOIL)
+	IPCUtil:Init(CLIENT_ZCASHN)
 end
 function Start()
 	local strPoolCmd = GetCurrentMiningCmdLine()
@@ -442,7 +443,7 @@ function Start()
 	local strCmdLine = "\"" .. strWorkExe .. "\"" .. " " .. strPoolCmd
 	--控制台输出代理
 	local strCoutAgent = tipUtil:PathCombine(strDir, COUTAGENT_PATH)
-	strCmdLine =  "\"" .. strCoutAgent .. "\"" .. strCmdLine
+	strCmdLine =  "\"" .. strCoutAgent .. "\" " .. strCmdLine
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local strUserCmd =tUserConfig["strUserCmd"]
 	--[[
@@ -544,6 +545,10 @@ function GetPoolCfgName()
 	return g_PoolCfgName
 end
 
+function GetDefaultPoolType()
+	return g_DefaultPoolType
+end
+
 function GetSpeedFormat(nSpeed)
 	local strSpeed = tostring(nSpeed)
 	strSpeed = strSpeed .. "SOL/s"
@@ -573,7 +578,8 @@ function RegisterFunctionObject(self)
 	obj.GetCurrentAccount = GetCurrentAccount
 	obj.GetCurrentPool = GetCurrentPool
 	obj.GetPoolCfgName = GetPoolCfgName
-	obj.GetSpeedUnit = GetSpeedUnit
+	obj.GetDefaultPoolType = GetDefaultPoolType
+	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
 	XLSetGlobal("Global.ZcashNClient", obj)
 end

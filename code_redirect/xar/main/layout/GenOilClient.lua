@@ -6,6 +6,7 @@ local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
 local g_PoolCfgName = "poolcfg.json"
+local g_DefaultPoolType = "x_etc"
 --常量
 local CLIENT_GENOIL = 1
 local CLIENT_PATH = "Share4Peer\\Share4Peer.exe"
@@ -547,6 +548,10 @@ function GetPoolCfgName()
 	return g_PoolCfgName
 end
 
+function GetDefaultPoolType()
+	return g_DefaultPoolType
+end
+
 function GetSpeedFormat(nSpeed)
 	local strSpeed = string.format("%0.2f",nSpeed)
 	strSpeed = strSpeed .. "MH/s"
@@ -575,9 +580,10 @@ function RegisterFunctionObject(self)
 	obj.GetCurrentMiningSpeed = GetCurrentMiningSpeed
 	obj.GetCurrentAccount = GetCurrentAccount
 	obj.GetCurrentPool = GetCurrentPool
-	obj.OnUpdateBalance = OnUpdateBalance
 	obj.GetPoolCfgName = GetPoolCfgName
-	obj.GetSpeedUnit = GetSpeedUnit
+	obj.GetDefaultPoolType = GetDefaultPoolType
+	obj.GetSpeedFormat = GetSpeedFormat
+	obj.OnUpdateBalance = OnUpdateBalance
 	XLSetGlobal("Global.GenOilClient", obj)
 end
 RegisterFunctionObject()

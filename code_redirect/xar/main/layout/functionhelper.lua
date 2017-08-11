@@ -1843,7 +1843,7 @@ end
 function SendMiningReport(nTimeSpanInSec, bExit)
 	local strReportPID  = FetchValueByPath(g_ServerConfig, {"tReportPID", "strMining"})
 	if not CheckReportCond(strReportPID) then return end
-	
+	if g_MiningReportTimerId == nil then return end
 	local tStatInfo = {}
 	tStatInfo.strEC = "mining"
 	tStatInfo.strEA = GetInstallSrc() or ""
@@ -1986,7 +1986,8 @@ function CheckSvrPoolCfg(nLastCfg)
 		return false
 	end
 	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"][strPoolKey]["nLastUpdateCfgTime"]
-	if nLastCfg ~= nLastUpdateCfgTime then
+	nLastUpdateCfgTime = tonumber(nLastUpdateCfgTime) or 0
+	if nLastCfg > nLastUpdateCfgTime then
 		return false
 	end
 	return true
@@ -2021,7 +2022,7 @@ function GetSvrPoolCfg(nLastCfg)
 				.." strContent:"..tostring(strContent))
 				
 		if 0 ~= nRet then
-			TipLog("[GetSvrPoolCfg] query sever failed")
+			TipLog("[GetSvrPoolCfg] query sever failed")	
 			OnSvrPoolCfgUpdate(false, false, nLastCfg)
 			return
 		end
@@ -2056,7 +2057,7 @@ function GetSvrPoolCfg(nLastCfg)
 		tUserConfig["tSvrPoolInfo"][strPoolKey] = tabUserPool
 		
 		if nLastCfg ~= nil then
-			tUserConfig["tSvrPoolInfo"]["nLastUpdateCfgTime"] = nLastCfg
+			tUserConfig["tSvrPoolInfo"][strPoolKey]["nLastUpdateCfgTime"] = nLastCfg
 		end	
 		SaveConfigToFileByKey("tUserConfig")
 		OnSvrPoolCfgUpdate(true, true, nLastCfg)
@@ -2064,7 +2065,7 @@ function GetSvrPoolCfg(nLastCfg)
 end
 
 function UpdateSvrPoolCfg(tabInfo)
-	local nLastCfg = tonumber(tabInfo["data"]["lastCfg"])
+	local nLastCfg = tonumber(tabInfo["data"]["lastCfg"]) or 0
 	local bRet = CheckSvrPoolCfg(nLastCfg)
 	if bRet then
 		OnSvrPoolCfgUpdate(true,false,nLastCfg)
@@ -2330,7 +2331,11 @@ function QuerySvrForPushCalcInfo(nSpeed)
 	end
 	local strSpeedFormat = g_WorkClient.GetSpeedFormat(nSpeed)
 	strInterfaceParam = strInterfaceParam .. "&speed=" .. Helper:UrlEncode(strSpeedFormat)
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentPool())))
+	local strPoolInfo = g_WorkClient.GetCurrentPool()
+	if not IsRealString(strPoolInfo) then
+		strPoolInfo = g_WorkClient.GetDefaultPoolType()
+	end
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(strPoolInfo)))
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(g_WorkClient.GetCurrentAccount())))
 	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
