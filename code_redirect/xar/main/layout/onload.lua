@@ -425,7 +425,7 @@ end
 
 function CheckIsDebug()
 	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
-	if nValue ~= nil then
+	if type(nValue) == "number" and nValue > 0 then
 		FunctionObj.SetMiningType(nValue)
 		return true
 	end
