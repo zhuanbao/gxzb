@@ -334,6 +334,9 @@ function OnZcashNMsg(tParam)
 	elseif nMsgType == WP_ZCASH_N_ERROR_INFO then
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
+		if nParam == 3 then
+			tFunctionHelper.SetStateInfoToUser("请安装最新的显卡驱动")
+		end
 	end	
 end
 
