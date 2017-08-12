@@ -27,6 +27,10 @@ function GetSubTable()
 		["tExtraHelper"] = {
 			
 		},
-	}
+		["tReportPID"] = {
+			["strRunTime"] = "1234",
+			["strMining"] = "1234",
+		},
+	}	
 	return t
 end
