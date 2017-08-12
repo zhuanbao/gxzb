@@ -14,7 +14,7 @@ local COUTAGENT_PATH = "Share4Peer\\ShareCout.exe"
 --上报速度
 local WP_ZCASH_N_SPEED = 1
 --上报GPU温度
-local WP_ZCASH_N_SPEED	= 2
+local WP_ZCASH_N_GPUTEMP = 2
 --share提交结果
 local WP_ZCASH_N_SHARE = 3
 --连接矿次结果
