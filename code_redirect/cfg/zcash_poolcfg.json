@@ -1,0 +1,36 @@
+{
+    "data": {
+        "pool": [
+            {
+                "pidlist": [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                ],
+				"cmdlineformat_n": "--server eu1-zcash.flypool2.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
+                "pool": "flypool.org_zcash",
+                "account": "t1frakSjNMJqeyz8gZHSNQ8g6oXyLJFJ6Qz"
+            },
+            {
+                "pidlist": [
+                    "8",
+                    "9",
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F"
+                ],
+				"cmdlineformat_n": "--server eu1-zcash.flypool.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
+                "pool": "flypool.org_zcash",
+                "account": "t1frakSjNMJqeyz8gZHSNQ8g6oXyLJFJ6Qz"
+            }
+        ]
+    }
+}
