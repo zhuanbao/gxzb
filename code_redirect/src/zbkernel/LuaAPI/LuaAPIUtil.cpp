@@ -11,6 +11,7 @@
 #include "../Utility/PeeIdHelper.h"
 #include "../Utility/AES.h"
 #include "../Utility/base64.h"
+#include "../Utility/OpenCL.h"
 #include <comdef.h>
 #include "../XLUEApplication.h"
 #include "../EvenListenHelper/LuaMsgWnd.h"
@@ -234,6 +235,9 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"CreateGuid", CreateGuid},
 	{"IsFilePlaintext", IsFilePlaintext},
 	{"GetDeviceName", GetDeviceName},
+	
+	{"GetLongTypeHighAndLowWord", GetLongTypeHighAndLowWord},
+	{"CheckZcashNCond", CheckZcashNCond},
 	{NULL, NULL}
 };
 
@@ -5788,5 +5792,49 @@ int LuaAPIUtil::GetDeviceName(lua_State *pLuaState)
 	{
 		lua_pushnil(pLuaState);
 	}
+	return 1;
+}
+
+
+int LuaAPIUtil::GetLongTypeHighAndLowWord(lua_State* pLuaState)
+{
+	long lValue = (long)lua_tonumber(pLuaState, 2);
+	DWORD dwHighWord = HIWORD(lValue);
+	DWORD dwLowWord = LOWORD(lValue);
+
+	lua_pushnumber(pLuaState, dwHighWord);
+	lua_pushnumber(pLuaState, dwLowWord);
+	return 2;
+}
+
+BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
+{
+	if (LoadLibraryA("opencl32.dll") == NULL)
+	{
+		TSDEBUG4CXX("[GetUserDisplayCardInfo] load opencl fail, nErrorCode = "<< GetLastError());
+		return FALSE;  
+	}
+
+	GetDisplayCardInfo(vDISPLAY_CARD_INFO);
+	return TRUE;  
+};
+
+int LuaAPIUtil::CheckZcashNCond(lua_State* pLuaState)
+{
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		lua_pushboolean(pLuaState, 0);
+		return 1;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= 2000000000)
+		{
+			lua_pushboolean(pLuaState, 1);
+			return 1;
+		}
+	}
+	lua_pushboolean(pLuaState, 0);
 	return 1;
 }

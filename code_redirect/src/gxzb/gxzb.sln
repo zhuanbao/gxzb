@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zbsetuphelper", "..\zbsetup
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zbsetuphelper-cl", "..\zbsetuphelper-cl\ethsetuphelper.vcproj", "{5C30510A-A599-451C-AE1B-A09E91A0FB55}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShareCout", "..\ShareCout\ShareCout.vcproj", "{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -35,7 +37,6 @@ Global
 		{9D3848F7-7705-4E63-87DA-7A8E3E1E166F}.Release|Win32.ActiveCfg = Release|Win32
 		{9D3848F7-7705-4E63-87DA-7A8E3E1E166F}.Release|Win32.Build.0 = Release|Win32
 		{9D3848F7-7705-4E63-87DA-7A8E3E1E166F}.Release|x64.ActiveCfg = Release|Win32
-		{9D3848F7-7705-4E63-87DA-7A8E3E1E166F}.Release|x64.Build.0 = Release|Win32
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Debug|Win32.ActiveCfg = Debug|x64
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Debug|Win32.Build.0 = Debug|x64
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Debug|x64.ActiveCfg = Debug|x64
@@ -44,6 +45,12 @@ Global
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Release|Win32.Build.0 = Release|x64
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Release|x64.ActiveCfg = Release|x64
 		{5C30510A-A599-451C-AE1B-A09E91A0FB55}.Release|x64.Build.0 = Release|x64
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Debug|Win32.Build.0 = Debug|Win32
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Debug|x64.ActiveCfg = Debug|Win32
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Release|Win32.ActiveCfg = Release|Win32
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Release|Win32.Build.0 = Release|Win32
+		{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

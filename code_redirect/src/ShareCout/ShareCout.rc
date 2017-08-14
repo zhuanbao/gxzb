@@ -70,12 +70,12 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "深圳开心豆豆科技有限公司"
-            VALUE "FileDescription", "zbsetuphelper-cl Application"
+            VALUE "FileDescription", "ShareCout Application"
             VALUE "FileVersion", "1, 0, 0, 9"
-            VALUE "InternalName", "zbsetuphelper-cl"
+            VALUE "InternalName", "ShareCout"
             VALUE "LegalCopyright", "Copyright (c) 2016-2017 深圳开心豆豆科技有限公司"
-            VALUE "OriginalFilename", "zbsetuphelper-cl.exe"
-            VALUE "ProductName", "共享赚宝"
+            VALUE "OriginalFilename", "ShareCout.exe"
+            VALUE "ProductName", "ShareCou Application"
             VALUE "ProductVersion", "1, 0, 0, 9"
         END
     END

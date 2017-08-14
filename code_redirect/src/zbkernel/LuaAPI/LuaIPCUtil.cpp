@@ -4,7 +4,7 @@
 #include "../Utility/IPCInterface.h"
 #include "../Utility/StringOperation.h"
 #include "../MinerType/ClientGenOil.h"
-
+#include "../MinerType/ClientZcashN.h"
 
 CMinerClient *g_pClient = NULL;
 
@@ -109,6 +109,10 @@ int LuaIPCUtil::Init(lua_State* pLuaState)
 	{
 		g_pClient = new CClientGenOil();
 	}
+	else if(uMinerType == MINER_ZCASH)
+	{
+		g_pClient = new CClientZcashN();
+	}
 	return 0;
 }
 
@@ -126,6 +130,49 @@ void LuaIPCUtil::Clear()
 		g_pClient->RetSet();
 		
 	}
+}
+
+void LuaIPCUtil::CycleHandleInfoFromPipeEx()
+{
+	DWORD dwExitCode = 0; 
+	while (GetExitCodeProcess(m_hWorkProcess,&dwExitCode))  
+	{  
+		if (dwExitCode != STILL_ACTIVE)
+		{
+			TSDEBUG4CXX(L"Work process exit,dwExitCode = " << dwExitCode); 
+			g_pClient->OnAutoExit(dwExitCode);
+			break;
+		}
+		//dosomeing
+		char szPipeOutBuffer[PIPE_BUFFER_SIZE+1] = {0};  
+		DWORD dwBytesRead = 0;
+		DWORD dwTotalBytesAvail = 0; 
+		//TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] begain read " ); 
+		PeekNamedPipe(m_hStdOutRead,szPipeOutBuffer,PIPE_BUFFER_SIZE,&dwBytesRead,&dwTotalBytesAvail,NULL);
+
+
+		if (dwBytesRead != 0)
+		{
+			ZeroMemory(szPipeOutBuffer,PIPE_BUFFER_SIZE+1);
+			if (dwTotalBytesAvail > PIPE_BUFFER_SIZE)
+			{
+				while (dwBytesRead >= PIPE_BUFFER_SIZE)
+				{
+					TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] begain read " ); 
+					ReadFile(m_hStdOutRead,szPipeOutBuffer,PIPE_BUFFER_SIZE,&dwBytesRead,NULL);  //read the stdout pipe
+					TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] end read ,dwBytesRead = " <<  dwBytesRead);
+					ZeroMemory(szPipeOutBuffer,PIPE_BUFFER_SIZE+1);
+				}
+			}
+			else {
+				TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] begain read " ); 
+				ReadFile(m_hStdOutRead,szPipeOutBuffer,1023,&dwBytesRead,NULL);
+				TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] end read ,dwBytesRead = " <<  dwBytesRead);
+			}
+			g_pClient->ProcessString(szPipeOutBuffer);
+		}
+	}
+	return;
 }
 
 void LuaIPCUtil::CycleHandleInfoFromPipe()
@@ -158,13 +205,15 @@ void LuaIPCUtil::CycleHandleInfoFromPipe()
 
 UINT WINAPI PipeProc(PVOID pArg)
 {
-	LuaIPCUtil::CycleHandleInfoFromPipe();
+	LuaIPCUtil::CycleHandleInfoFromPipeEx();
 	return 0;
 }
 
 int LuaIPCUtil::Start(lua_State* pLuaState)
 {
+	TSAUTO();
 	TerminateMiningProcess();
+	TSDEBUG4CXX(L"After T"); 
 	long lRet = 0;
 	do
 	{
@@ -194,7 +243,7 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 		si.wShowWindow = SW_HIDE;
 
 		ZeroMemory(&pi, sizeof(pi));
-
+		TSDEBUG4CXX(L"strCmdLine = "<< bstrParams.m_str); 
 		if(!CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
 		{
 			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
@@ -216,9 +265,14 @@ int LuaIPCUtil::Quit(lua_State* pLuaState)
 	{
 		TerminateThread(m_hPipeThread,-2);
 	}
+	if (g_pClient)
+	{
+		g_pClient->TerminateAllClientInstance();
+	}
 	if (m_hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hWorkProcess, 0))
 	{
-		TerminateProcess(m_hWorkProcess,-2);
+		
+		TerminateThread(m_hWorkProcess,-2);
 	}
 	Clear();
 	return 0;

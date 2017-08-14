@@ -21,6 +21,7 @@
 
 #include "shortcut/Shortcut.h"
 #include "StringOperation.h"
+#include "OpenCL.h"
 using namespace std;
 
 extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
@@ -981,4 +982,62 @@ void SendStatProxy(const char *ec,const char *ea, const char *el,long ev)
 	ZeroMemory(szEL,0);
 	strcpy_s(szEL,MAX_PATH-1,el);
 	SendAnyHttpStat(szEC,szEA,szEL,ev);
+}
+
+BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
+{
+	if (LoadLibraryA("opencl32.dll") == NULL)
+	{
+		TSDEBUG4CXX("[GetUserDisplayCardInfo] load opencl fail, nErrorCode = "<< GetLastError());
+		return FALSE;  
+	}
+
+	GetDisplayCardInfo(vDISPLAY_CARD_INFO);
+	return TRUE;  
+};
+extern "C" __declspec(dllexport) BOOL CheckZcashNCond()
+{
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		return FALSE;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		//std::cout << "Information for GPU #" <<index<< ": " << std::endl;
+		//std::cout << "GPU Name = " << iter->name.c_str()<< std::endl;
+		//std::string strType = "UnKnow";
+		//if (iter->vendor == vendor_t::intel)
+		//{
+		//	strType = "Intel";
+		//}
+		//else if(iter->vendor == vendor_t::amd)
+		//{
+		//	strType = "AMD";
+		//}
+		//else if(iter->vendor == vendor_t::nvidia)
+		//{
+		//	strType = "NVIDIA";
+		//}
+		//std::cout << "GPU Type = " <<strType.c_str()<< std::endl;
+
+		//std::cout << "GPU Driver Version = " << iter->version << std::endl;
+		//std::cout << "GPU Adapter RAM = " << iter->memory_size/(1024*1024) << std::endl;
+		//std::cout << "GPU Cache Size = " << iter->cache_size/(1024*1024) << std::endl;
+		//std::cout << "GPU OpenCL PlatformID =  " << iter->platformid<< std::endl;
+		//std::cout << std::endl;
+		
+
+		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= 2000000000)
+		{
+			TSDEBUG4CXX("[CheckZcashNCond] check success");
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+extern "C" __declspec(dllexport) BOOL CheckZcashACond()
+{
+	return FALSE;
 }

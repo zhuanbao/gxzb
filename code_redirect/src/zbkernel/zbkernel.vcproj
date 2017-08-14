@@ -439,6 +439,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Utility\OpenCL.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Utility\PeeIdHelper.h"
 				>
 			</File>
@@ -468,6 +472,14 @@
 			</File>
 			<File
 				RelativePath=".\MinerType\ClientMsgDefine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MinerType\ClientZcashN.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MinerType\ClientZcashN.h"
 				>
 			</File>
 			<File

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="zbsetuphelper"
-	ProjectGUID="{9D3848F7-7705-4E63-87DA-7A8E3E1E166F}"
-	RootNamespace="zbsetuphelper"
+	Name="ShareCout"
+	ProjectGUID="{6AE31AA5-CCAC-4654-AFB5-7F5C835397B7}"
+	RootNamespace="ShareCout"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,8 +20,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
+			ConfigurationType="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,13 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../inc;..\zbkernel\Utility\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;ZBSETUPHELPER_EXPORTS"
+				AdditionalIncludeDirectories="../../inc"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				AssemblerOutput="2"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -62,13 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsupp.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../../lib/$(ConfigurationName)"
 				GenerateDebugInformation="true"
-				GenerateMapFile="true"
-				MapExports="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -97,8 +92,8 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
+			ConfigurationType="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -121,11 +116,10 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../../inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;ZBSETUPHELPER_EXPORTS"
-				RuntimeLibrary="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				AssemblerOutput="2"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -140,13 +134,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsupp.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../lib/$(ConfigurationName)"
 				GenerateDebugInformation="true"
-				GenerateMapFile="true"
-				MapExports="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -183,30 +173,8 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\base64.cpp"
+				RelativePath=".\ShareCout.cpp"
 				>
-			</File>
-			<File
-				RelativePath=".\dllmain.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-						CompileAsManaged="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-						CompileAsManaged="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
@@ -228,10 +196,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\zbsetuphelper.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -239,23 +203,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\base64.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpenCL.h"
-				>
-			</File>
-			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StringOperation.h"
 				>
 			</File>
 			<File
@@ -269,47 +221,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\zbsetuphelper.rc"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="ShortCut"
-			>
-			<File
-				RelativePath=".\shortcut\ComUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\ComUtils.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\InvokeShellVerb.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\InvokeShellVerb.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\ShellDispatch.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\ShellDispatch.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\Shortcut.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\utility.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shortcut\WinUtils.h"
+				RelativePath=".\ShareCout.rc"
 				>
 			</File>
 		</Filter>

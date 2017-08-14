@@ -8,7 +8,7 @@
 #include "../EvenListenHelper/LuaMsgWnd.h"
 
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
-#define CLIENT_NAME _T("Share4Peer.exe")
+#define CLIENT_GENOIL_NAME _T("Share4Peer.exe")
 
 CClientGenOil::CClientGenOil(void)
 {
@@ -45,7 +45,7 @@ void CClientGenOil::TerminateAllClientInstance()
 		BOOL bResult = ::Process32First(hSnap, &pe);
 		while (bResult)
 		{
-			if(_tcsicmp(pe.szExeFile, CLIENT_NAME) == 0 && pe.th32ProcessID != 0)
+			if(_tcsicmp(pe.szExeFile, CLIENT_GENOIL_NAME) == 0 && pe.th32ProcessID != 0)
 			{
 				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
 				::TerminateProcess(hProcess, 4);

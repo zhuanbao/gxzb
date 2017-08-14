@@ -3,6 +3,8 @@
 #define API_UTIL_CLASS	"API.Util.Class"
 #define API_UTIL_OBJ		"API.Util"
 
+
+//struct DISPLAY_CARD_INFO; 
 class LuaAPIUtil
 {
 public:
@@ -259,6 +261,9 @@ public:
 	static int CreateGuid(lua_State *pLuaState);
 	static int IsFilePlaintext(lua_State *pLuaState);
 	static int GetDeviceName(lua_State *pLuaState);
+
+	static int GetLongTypeHighAndLowWord(lua_State *pLuaState);
+	static int CheckZcashNCond(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };

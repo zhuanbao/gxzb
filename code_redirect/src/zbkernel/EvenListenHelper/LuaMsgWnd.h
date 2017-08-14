@@ -43,6 +43,7 @@ public:
 	BEGIN_MSG_MAP(LuaMsgWindow)
 		MESSAGE_HANDLER(WM_COPYDATA, OnCopyData)
 		MESSAGE_HANDLER(WM_GENOIL_MSG, OnGenOilMsg)
+		MESSAGE_HANDLER(WM_ZCASH_N_MSG, OnZcashNMsg)
 	END_MSG_MAP()
 private:
 	LuaMsgWindow(void);
@@ -63,6 +64,7 @@ private:
 public:
 	LRESULT OnCopyData(UINT , WPARAM , LPARAM , BOOL&);
 	LRESULT OnGenOilMsg(UINT , WPARAM , LPARAM , BOOL&);
+	LRESULT OnZcashNMsg(UINT , WPARAM , LPARAM , BOOL&);
 public:
 	void SetKeyboardHook(void);
 	void DelKeyboardHook(void);

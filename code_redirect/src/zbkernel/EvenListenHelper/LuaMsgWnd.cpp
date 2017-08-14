@@ -157,6 +157,18 @@ LRESULT LuaMsgWindow::OnGenOilMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, B
 	return 0;
 }
 
+LRESULT LuaMsgWindow::OnZcashNMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	;
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (int)lParam;
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnZcashNMsg", &params);
+	return 0;
+}
+
 
 void LuaMsgWindow::SetKeyboardHook()
 {

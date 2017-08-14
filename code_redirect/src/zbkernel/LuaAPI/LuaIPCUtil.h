@@ -8,6 +8,7 @@
 typedef enum
 {
 	MINER_GENOIL = 1,
+	MINER_ZCASH = 2,
 }MinerType;
 
 
@@ -44,6 +45,7 @@ private:
 	static HANDLE  m_hStdOutWrite;    ///子进程用的stdout的写入端
 public:
 	static void CycleHandleInfoFromPipe();
+	static void  CycleHandleInfoFromPipeEx();
 	static void Clear();
 	static void TerminateMiningProcess();
 	static BOOL EnableDebugPrivilege();
