@@ -33,13 +33,14 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.8"
-;TestCheckFlag==1 非测试模式
-!if ${TestCheckFlag} == 1
-	!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
-!else
-	!define EM_OUTFILE_NAME "Share4MoneySetup_test_${INSTALL_CHANNELID}.exe"
-!endif
+!define PRODUCT_VERSION "1.0.0.9"
+;TestCheckFlag==0 非测试模式
+;!if ${TestCheckFlag} == 0
+	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
+;!else
+	;!define EM_OUTFILE_NAME "Share4MoneySetup_test_${INSTALL_CHANNELID}.exe"
+;!endif
+!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Share4Money.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -80,13 +81,15 @@ Var Int_FontOffset
 Var Handle_Font
 Var Handle_FontBig
 Var Handle_FontMid
-Var CheckFlag
 Var BaseCfgDir
 Var IsSilentInst
 Var str_ChannelID
 Var BoolExitMsg
 Var InstallProgressName
 Var BuildNum
+
+Var CheckETHCond
+Var CheckZcashNCond
 
 ;主程序至少需要10M空间
 !define NeedSpace 10
@@ -343,6 +346,8 @@ Function CloseExe
 	${FKillProc} "Share4Peer"
 	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
+	${FKillProc} "Share4PeerZN"
+	${FKillProc} "ShareCout"
 FunctionEnd
 
 Function CheckHasInstall
@@ -386,6 +391,8 @@ Function CheckExeProcExist
 	${FKillProc} "Share4Peer"
 	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
+	${FKillProc} "Share4PeerZN"
+	${FKillProc} "ShareCout"
 FunctionEnd
 
 !macro InitBaseCfgDir
@@ -434,8 +441,11 @@ Function .onInit
 		WriteUninstaller "$EXEDIR\main\uninst.exe"
 		Abort
 	${EndIf}
-	;1：不支持opencl或者显存小于3G， 2：不是64位系统， 0：64位且支持cl
-	StrCpy $CheckFlag ${TestCheckFlag}
+	;ETH 0:支持ETH 1：非64位系统 2：显卡不支持(3G)
+	StrCpy $CheckETHCond 9
+	;ZcashN 0:支持ZcashN 1：非64位系统 2：显卡不支持(2G)
+	StrCpy $CheckZcashNCond 9
+	
 	StrCpy $IsSilentInst 0
 	${GetParameters} $R0
 	ClearErrors
@@ -450,6 +460,7 @@ Function .onInit
 	SetOutPath "$PLUGINSDIR"
 	SetOverwrite on
 		File "zbsetuphelper.dll"
+		File "main\program\OpenCL32.dll"
 		File "main\program\Microsoft.VC90.CRT.manifest"
 		File "main\program\msvcp90.dll"
 		File "main\program\msvcr90.dll"
@@ -481,18 +492,26 @@ Function .onInit
 		Call UpdateChanel
 		Call FirstSendStart
 		!insertmacro InitBaseCfgDir
-		StrCpy $0 3
+		StrCpy $0 0
 		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe', t '$InstallProgressName', t '$str_ChannelID', t '$BuildNum') i.r0"
 		;返回值FALSE=0 TRUE=1
 		${If} $0 == 1
 			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于3G， 无法安装"
 			;Abort
-			StrCpy $CheckFlag 0
+			StrCpy $CheckETHCond 0
+		${EndIf}
+		StrCpy $0 0
+		System::Call "$PLUGINSDIR\zbsetuphelper::CheckZcashNCond() i.r0"
+		${If} $0 == 1
+			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于2G， 无法安装"
+			;Abort
+			StrCpy $CheckZcashNCond 0
 		${EndIf}
 		;MessageBox MB_OK "可以安装"
 	${Else}
 		;MessageBox MB_OK "此程序只支持64位操作系统，您使用的操作系统是32位，无法安装"
-		StrCpy $CheckFlag 2
+		StrCpy $CheckETHCond 2
+		StrCpy $CheckZcashNCond 2
 	${EndIf}
 	Call CmdSilentInstall
 FunctionEnd
@@ -614,7 +633,8 @@ Function CmdSilentInstall
 	IfErrors 0 +2
 		Return
 	SetSilent silent
-	${If} $CheckFlag != 0
+	${If} $CheckETHCond != 0 
+	${AndIf} $CheckZcashNCond != 0	
 		${SendStat} "$InstallProgressName" "checkenvfail" "$BuildNum_$str_ChannelID" 1
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
@@ -712,7 +732,8 @@ FunctionEnd
 
 Function check-can-install
 	;支持赚宝
-	${If} $CheckFlag == 0
+	${If} $CheckETHCond == 0 
+	${OrIf} $CheckZcashNCond == 0	
 		StrCpy $BoolExitMsg 1
 		SendMessage $HWNDPARENT "0x408" "1" ""
 	;不支持opencl
@@ -1265,6 +1286,8 @@ Function un.onInit
 	${FKillProc} "Share4Peer"
 	${FKillProc} "ShareGenoil"
 	${FKillProc} "zbsetuphelper-cl"
+	${FKillProc} "Share4PeerZN"
+	${FKillProc} "ShareCout"
 	Call un.UpdateChanel
 	;InitPluginsDir
 	;IfFileExists $PLUGINSDIR 0 +2
