@@ -2084,7 +2084,7 @@ function OnSvrPoolCfgUpdate(bGet, bUpdated,nLastCfg)
 			return
 		end
 		StartClient()
-	elseif GetUIWorkState() == UI_STATE_CALCULATE then
+	elseif GetUIWorkState() == UI_STATE_CALCULATE or GetUIWorkState() == UI_STATE_STARTING then
 		if bUpdated then
 			g_WorkClient.ReStartClientByNewPoolList()
 		end
