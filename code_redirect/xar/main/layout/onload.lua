@@ -442,7 +442,8 @@ function PreTipMain()
 	CheckMachineSuitable(function(nMiningType)
 		--bCheck = true
 		FunctionObj.SetMiningType(nMiningType)
-		if nMiningType == 0 and not CheckIsDebug() then
+		local bDebug = CheckIsDebug()
+		if nMiningType == 0 and not bDebug then
 			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 		else
 			TipMain()

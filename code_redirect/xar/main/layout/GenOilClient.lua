@@ -449,7 +449,12 @@ function Start()
 	local strCmdLine = strWorkExe .. " " .. strPoolCmd
 	
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local strUserCmd =tUserConfig["strUserCmd"]
+	local tabUserCmd =tUserConfig["tabUserCmd"]
+	if type(tabUserCmd) ~= "table" then
+		tabUserCmd = {}
+	end
+	local strUserCmd = tabUserCmd["et"]
+	
 	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
 	if IsRealString(strPlatform) then
 		strCmdLine = strCmdLine .. " " .. strPlatform

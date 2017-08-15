@@ -448,7 +448,11 @@ function Start()
 	local strCoutAgent = tipUtil:PathCombine(strDir, COUTAGENT_PATH)
 	strCmdLine =  "\"" .. strCoutAgent .. "\" " .. strCmdLine
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local strUserCmd =tUserConfig["strUserCmd"]
+	local tabUserCmd =tUserConfig["tabUserCmd"]
+	if type(tabUserCmd) ~= "table" then
+		tabUserCmd = {}
+	end
+	local strUserCmd = tabUserCmd["zn"]
 	--[[
 	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
 	if IsRealString(strPlatform) then
