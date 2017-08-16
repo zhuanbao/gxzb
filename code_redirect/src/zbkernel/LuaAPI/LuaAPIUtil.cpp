@@ -238,6 +238,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	
 	{"GetLongTypeHighAndLowWord", GetLongTypeHighAndLowWord},
 	{"CheckZcashNCond", CheckZcashNCond},
+	{"CheckEthereumCond", CheckEthereumCond},
 	{NULL, NULL}
 };
 
@@ -5831,6 +5832,49 @@ int LuaAPIUtil::CheckZcashNCond(lua_State* pLuaState)
 		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
 		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= 2000000000)
 		{
+			TSDEBUG4CXX(L"can do Zcash N");
+			lua_pushboolean(pLuaState, 1);
+			return 1;
+		}
+	}
+	lua_pushboolean(pLuaState, 0);
+	return 1;
+}
+
+void SetOpenclPlatform(unsigned int uPlatform)
+{
+	static BOOL bPlatForm = FALSE;
+	if (bPlatForm)
+	{
+		return;
+	}
+	bPlatForm = TRUE;
+	HKEY hKey, hTempKey;
+	if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER, "Software",0,KEY_SET_VALUE, &hKey))
+	{
+		if (ERROR_SUCCESS == ::RegCreateKeyA(hKey, "Share4Money", &hTempKey))
+		{
+			::RegSetValueExA(hTempKey, "openclplatform", 0, REG_DWORD, (LPBYTE)&uPlatform, sizeof(DWORD));
+			RegCloseKey(hTempKey);
+		}
+		RegCloseKey(hKey);
+	}
+}
+
+int LuaAPIUtil::CheckEthereumCond(lua_State* pLuaState)
+{
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		lua_pushboolean(pLuaState, 0);
+		return 1;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckEthereumCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if ((iter->vendor == vendor_t::nvidia || iter->vendor == vendor_t::amd) && iter->memory_size >= 3221225472)
+		{
+			TSDEBUG4CXX(L"can do Ethereum");
+			SetOpenclPlatform(iter->platformid);
 			lua_pushboolean(pLuaState, 1);
 			return 1;
 		}
