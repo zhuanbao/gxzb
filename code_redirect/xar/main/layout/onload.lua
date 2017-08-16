@@ -359,48 +359,20 @@ function LoadDynamicFont()
 end
 
 --返回值说明 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
-function CheckMachineSuitable(fnCallBack)
+function CheckMachineSuitable()
 	if FunctionObj.GetSystemBits() ~= 64 then
 		LOG("CheckMachineSuitable GetSystemBits ~= 64")
-		return fnCallBack(0)
-	end
-	local function fnCheckZcashCond()
-		if tipUtil:CheckZcashNCond() then
-			fnCallBack(2)
-		else
-			fnCallBack(0)
-		end
+		return 0
 	end
 	
-	local strExePath = tipUtil:GetModuleExeName()
-	if not IsRealString(strExePath) then
-		LOG("CheckMachineSuitable strExePath is nil")
-		return fnCheckZcashCond()
+	local bEthereum = tipUtil:CheckEthereumCond()
+	if bEthereum then
+		return 1
 	end
-	local strClCheckPath = strExePath.."\\..\\Share4Peer\\zbsetuphelper-cl.exe"
-	if not tipUtil:QueryFileExists(strClCheckPath) then
-		LOG("CheckMachineSuitable not exist path :strClCheckPath="..tostring(strClCheckPath))
-		return fnCheckZcashCond()
+	local bZcashN = tipUtil:CheckZcashNCond()
+	if bZcashN then
+		return 2
 	end
-	tipAsynUtil:AsynCreateProcess("", strClCheckPath, "", 32, 0, 
-		function (nRet, tProcDetail)
-			LOG("CheckMachineSuitable AsynCreateProcess: nRet="..tostring(nRet)..", type(tProcDetail)="..type(tProcDetail))
-			if nRet == 0 and tProcDetail and tProcDetail.hProcess then
-				tipAsynUtil:AsynWaitForSingleObject(tProcDetail.hProcess, 60*1000, 
-					function(nRet)
-						local nExitCode = tipUtil:GetProcessExitCode(tProcDetail.hProcess)
-						LOG("CheckMachineSuitable AsynWaitForSingleObject: nExitCode="..tostring(nExitCode))
-						if nExitCode == 0 or nExitCode == 259 then
-							fnCallBack(1)
-						else
-							fnCheckZcashCond()
-						end
-					end)
-			else
-				LOG("CheckMachineSuitable AsynCreateProcess fnCallBack failed")
-				fnCheckZcashCond()
-			end
-		end)
 end
 
 function TipMain()	
@@ -439,16 +411,14 @@ function PreTipMain()
 	
 	local bSuccess = FunctionObj.ReadAllConfigInfo()
 	FunctionObj.CreatePopupTipWnd()
-	CheckMachineSuitable(function(nMiningType)
-		--bCheck = true
-		FunctionObj.SetMiningType(nMiningType)
-		local bDebug = CheckIsDebug()
-		if nMiningType == 0 and not bDebug then
-			FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-		else
-			TipMain()
-		end
-	end)
+	local nMiningType = CheckMachineSuitable()
+	FunctionObj.SetMiningType(nMiningType)
+	local bDebug = CheckIsDebug()
+	if nMiningType == 0 and not bDebug then
+		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+	else
+		TipMain()
+	end
 end
 
 PreTipMain()
