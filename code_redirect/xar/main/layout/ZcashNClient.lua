@@ -10,7 +10,7 @@ local g_DefaultPoolType = "x_zcash"
 --常量
 local CLIENT_ZCASHN = 2
 local CLIENT_PATH = "Share4Peer\\Share4PeerZN.exe"
-local COUTAGENT_PATH = "Share4Peer\\ShareCout.exe"
+local COUTAGENT_PATH = "ShareCout.exe"
 --上报速度
 local WP_ZCASH_N_SPEED = 1
 --上报GPU温度
