@@ -1936,6 +1936,20 @@ function QuerySvrForWorkID()
 	return strReguestUrl
 end
 
+function QuerySvrForChangeWorkID(strWorkID)
+	local strInterfaceName = "changeWorkerID"
+	local strInterfaceParam="workerID=" .. Helper:UrlEncode(tostring(strWorkID))
+	strInterfaceParam = strInterfaceParam .. "&peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	local strGUID = GetMachineID()
+	if IsRealString(strGUID) then
+		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
+	end	
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForWorkID] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
 function GetUserWorkID(fnCallBack)
 	local strUrl = QuerySvrForWorkID()
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -1962,6 +1976,30 @@ function GetUserWorkID(fnCallBack)
 				tUserConfig["tUserInfo"]["strWorkID"] = strWorkID
 				SaveConfigToFileByKey("tUserConfig")
 				fnCallBack(true,strWorkID)
+			else
+				fnCallBack(false,"连接服务器失败，请检测网络")
+			end		
+		end)
+	elseif strWorkID ~= string.lower(strWorkID)then
+		local strChangeUrl = QuerySvrForChangeWorkID(strWorkID)
+		NewAsynGetHttpContent(strChangeUrl, false
+		, function(nRet, strContent, respHeaders)
+			TipLog("[GetUserWorkID] ChangeWorkID nRet:"..tostring(nRet)
+					.." strContent:"..tostring(strContent))
+					
+			if 0 == nRet then
+				local tabInfo = DeCodeJson(strContent)
+				if type(tabInfo) ~= "table" 
+					or tabInfo["rtn"] ~= 0
+					or type(tabInfo["data"]) ~= "table" then
+					TipLog("[GetUserWorkID] Parse Json failed.")
+					fnCallBack(true,strWorkID)
+					return 
+				end
+				local strNewWorkID = tabInfo["data"]["workerID"]
+				tUserConfig["tUserInfo"]["strWorkID"] = strNewWorkID
+				SaveConfigToFileByKey("tUserConfig")
+				fnCallBack(true,strNewWorkID)
 			else
 				fnCallBack(false,"连接服务器失败，请检测网络")
 			end		
