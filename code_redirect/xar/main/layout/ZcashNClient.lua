@@ -62,6 +62,10 @@ local g_LastGetSpeedTime = 0
 local g_LastRealTimeIncome = 0
 local g_LastAverageHashRate = 0
 
+local g_ZcashNDAGTimerId = nil
+
+
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -279,10 +283,37 @@ function WhenGetShare()
 	DoQueryTimer()
 end
 
+function GenerateVirtualDAG()
+	if g_ZcashNDAGTimerId == nil then
+		local nProgress = 1
+		g_ZcashNDAGTimerId = timeMgr:SetTimer(function(Itm, id)
+			if nProgress >= 100 then
+				timeMgr:KillTimer(g_ZcashNDAGTimerId)
+				g_ZcashNDAGTimerId = nil
+				return 
+			end
+			nProgress = nProgress + 3
+			if nProgress > 100 then
+				nProgress = 100
+				KillVirtualDAG()
+			end
+			tFunctionHelper.UpdateDagProgress(nProgress)
+		end, 1000)
+	end
+end
+
+function KillVirtualDAG()
+	if g_ZcashNDAGTimerId then
+		timeMgr:KillTimer(g_ZcashNDAGTimerId)
+		g_ZcashNDAGTimerId = nil
+	end
+end
+
 function OnZcashNMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnZcashNMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
 	if nMsgType == WP_ZCASH_N_SPEED then
+		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
 			ResetGlobalErrorParam()
@@ -312,6 +343,7 @@ function OnZcashNMsg(tParam)
 			end
 		end
 	elseif nMsgType == WP_ZCASH_N_SHARE then
+		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
 		if nParam == 0 then
@@ -322,6 +354,7 @@ function OnZcashNMsg(tParam)
 		if nParam == 0 then
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
+			GenerateVirtualDAG()
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
 			if g_ConnectFailCnt > g_MaxConnectFailCnt then
@@ -332,6 +365,7 @@ function OnZcashNMsg(tParam)
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
 		ReTryStartClient()
 	elseif nMsgType == WP_ZCASH_N_ERROR_INFO then
+		KillVirtualDAG()
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
 		if nParam == 3 then
@@ -423,6 +457,7 @@ function ResetGlobalParam()
 	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
+	KillVirtualDAG()
 end
 
 function ResetGlobalErrorParam()
