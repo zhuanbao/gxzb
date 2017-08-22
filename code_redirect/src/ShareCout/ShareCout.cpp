@@ -8,7 +8,7 @@
 #define TSLOG_GROUP "GXZB"	//可选,默认为 "TSLOG"
 #include <tslog/tslog.h>
 
-#define SLEEP_TIME 1 // reactivity: sleep time to wait for subprocess to output some more data
+#define SLEEP_TIME 10 // reactivity: sleep time to wait for subprocess to output some more data
 
 CONST COORD origin = { 0, 0 };
 

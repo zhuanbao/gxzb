@@ -12,6 +12,8 @@ CMinerClient *g_pClient = NULL;
 //重定向输出管道的长度
 #define PIPE_BUFFER_SIZE 4096
 
+#define SLEEP_TIME 10 // reactivity: sleep time to wait for subprocess to output some more data
+
 #define VALID_HANDLE(H) (((H) != NULL) && ((H) != INVALID_HANDLE_VALUE))
 /*
  * Close Win32 Handler
@@ -171,6 +173,7 @@ void LuaIPCUtil::CycleHandleInfoFromPipeEx()
 			}
 			g_pClient->ProcessString(szPipeOutBuffer);
 		}
+		Sleep(SLEEP_TIME);
 	}
 	return;
 }
