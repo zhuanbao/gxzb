@@ -373,6 +373,10 @@ function CheckMachineSuitable()
 	if bZcashN then
 		return 2
 	end
+	local bZcashA = tipUtil:CheckZcashACond()
+	if bZcashA then
+		return 3
+	end
 end
 
 function TipMain()	

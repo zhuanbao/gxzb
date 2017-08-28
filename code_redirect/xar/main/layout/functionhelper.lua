@@ -100,6 +100,11 @@ function LoadZcashNClient()
 	local Module = XLLoadModule(strClientPath)
 end
 
+function LoadZcashAClient()
+	local strClientPath = __document.."\\..\\ZcashAClient.lua"
+	local Module = XLLoadModule(strClientPath)
+end
+
 local tryCatch=function(fnFail)  
     local ret,errMessage=pcall(fun); 
 	if not ret then
@@ -3222,6 +3227,10 @@ function InitMiningClient()
 	elseif g_MiningType == 2 then
 		LoadZcashNClient()
 		g_WorkClient = XLGetGlobal("Global.ZcashNClient")
+	elseif g_MiningType == 3 then
+		LoadZcashAClient()
+		g_WorkClient = XLGetGlobal("Global.ZcashAClient")
+	end
 	end
 	g_WorkClient.InitClient()
 end
