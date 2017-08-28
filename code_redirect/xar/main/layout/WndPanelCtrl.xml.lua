@@ -87,7 +87,6 @@ function CreateListener(objRootCtrl)
 			elseif tostring(key) == "OnZcashAMsg" then
 				local ObjWorkClient = tFunctionHelper.GetWorkClient()
 				ObjWorkClient.OnZcashAMsg(tParam)
-			end	
 			end				
 		end
 	)

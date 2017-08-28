@@ -2070,7 +2070,7 @@ function GetSvrPoolCfg(nLastCfg)
 			return
 		end
 		--[[ forlocal
-		strContent = GetLocalSvrCfgWithName("poolcfg.json")
+		strContent = GetLocalSvrCfgWithName("zcash_poolcfg.json")
 		--]]
 		local tabInfo = DeCodeJson(strContent)
 		if type(tabInfo) ~= "table" 
@@ -3230,7 +3230,6 @@ function InitMiningClient()
 	elseif g_MiningType == 3 then
 		LoadZcashAClient()
 		g_WorkClient = XLGetGlobal("Global.ZcashAClient")
-	end
 	end
 	g_WorkClient.InitClient()
 end

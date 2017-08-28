@@ -199,8 +199,8 @@ function GetNewMiningCmdInfo()
 	if g_PoolIndex <= #tPoolList then
 		local tabPoolItem = tPoolList[g_PoolIndex]
 		if type(tabPoolItem) == "table" then
-			if IsRealString(tabPoolItem["cmdlineformat_n"]) then
-				g_strCmdLineFormat = tabPoolItem["cmdlineformat_n"]
+			if IsRealString(tabPoolItem["cmdlineformat_a"]) then
+				g_strCmdLineFormat = tabPoolItem["cmdlineformat_a"]
 				g_strAccount = tabPoolItem["account"]
 				g_strPool = tabPoolItem["pool"]
 			end
@@ -312,7 +312,7 @@ end
 function OnZcashAMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnZcashAMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
-	if nMsgType == WP_ZCASH_N_SPEED then
+	if nMsgType == WP_ZCASH_A_SPEED then
 		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
@@ -342,7 +342,7 @@ function OnZcashAMsg(tParam)
 				end
 			end
 		end
-	elseif nMsgType == WP_ZCASH_N_SHARE then
+	elseif nMsgType == WP_ZCASH_A_SHARE then
 		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
@@ -350,7 +350,7 @@ function OnZcashAMsg(tParam)
 			WhenGetShare()
 			--处理提交share
 		end	
-	elseif nMsgType == WP_ZCASH_N_CONNECT_POOL then
+	elseif nMsgType == WP_ZCASH_A_CONNECT_POOL then
 		if nParam == 0 then
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
@@ -361,10 +361,10 @@ function OnZcashAMsg(tParam)
 				ReStartClientByNextPool()
 			end
 		end
-	elseif nMsgType == WP_ZCASH_N_AUTOEXIT then
+	elseif nMsgType == WP_ZCASH_A_AUTOEXIT then
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
 		ReTryStartClient()
-	elseif nMsgType == WP_ZCASH_N_ERROR_INFO then
+	elseif nMsgType == WP_ZCASH_A_ERROR_INFO then
 		KillVirtualDAG()
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
