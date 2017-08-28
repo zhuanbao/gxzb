@@ -1039,5 +1039,18 @@ extern "C" __declspec(dllexport) BOOL CheckZcashNCond()
 
 extern "C" __declspec(dllexport) BOOL CheckZcashACond()
 {
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		return FALSE;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= 2000000000)
+		{
+			TSDEBUG4CXX("[CheckZcashACond] check success");
+			return TRUE;
+		}
+	}
 	return FALSE;
 }
