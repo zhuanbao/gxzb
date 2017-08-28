@@ -1985,7 +1985,9 @@ function GetUserWorkID(fnCallBack)
 				fnCallBack(false,"连接服务器失败，请检测网络")
 			end		
 		end)
-	elseif strWorkID ~= string.lower(strWorkID)then
+	elseif strWorkID ~= string.lower(strWorkID) 
+		or string.find(strWorkID, "_") ~= nil  
+		or string.find(strWorkID, "-") ~= nil then
 		local strChangeUrl = QuerySvrForChangeWorkID(strWorkID)
 		NewAsynGetHttpContent(strChangeUrl, false
 		, function(nRet, strContent, respHeaders)
