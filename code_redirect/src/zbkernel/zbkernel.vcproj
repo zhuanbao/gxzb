@@ -475,6 +475,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MinerType\ClientZcashA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MinerType\ClientZcashA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MinerType\ClientZcashN.cpp"
 				>
 			</File>

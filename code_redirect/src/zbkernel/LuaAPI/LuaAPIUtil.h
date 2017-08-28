@@ -264,6 +264,7 @@ public:
 
 	static int GetLongTypeHighAndLowWord(lua_State *pLuaState);
 	static int CheckZcashNCond(lua_State *pLuaState);
+	static int CheckZcashACond(lua_State *pLuaState);
 	static int CheckEthereumCond(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];

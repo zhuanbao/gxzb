@@ -8,7 +8,8 @@
 typedef enum
 {
 	MINER_GENOIL = 1,
-	MINER_ZCASH = 2,
+	MINER_ZCASH_N = 2,
+	MINER_ZCASH_A = 3,
 }MinerType;
 
 

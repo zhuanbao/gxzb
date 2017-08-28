@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "ClientZcashN.h"
+#include "ClientZcashA.h"
 #include "ClientMsgDefine.h"
 #include <Tlhelp32.h>
 #include "..\Utility\StringOperation.h"
@@ -8,20 +8,20 @@
 #include "../EvenListenHelper/LuaMsgWnd.h"
 
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
-#define CLIENT_ZCASHN_NAME _T("Share4PeerZN.exe")
+#define CLIENT_ZCASHA_NAME _T("Share4PeerZA.exe")
 
-CClientZcashN::CClientZcashN(void)
+CClientZcashA::CClientZcashA(void)
 {
 	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
 	m_strLastLeft = "";
 }
 
-CClientZcashN::~CClientZcashN(void)
+CClientZcashA::~CClientZcashA(void)
 {
 
 }
 
-bool CClientZcashN::IsDebug()
+bool CClientZcashA::IsDebug()
 {
 #if defined _DEBUG
 	return true;
@@ -34,7 +34,7 @@ bool CClientZcashN::IsDebug()
 #endif
 }
 
-void CClientZcashN::TerminateAllClientInstance()
+void CClientZcashA::TerminateAllClientInstance()
 {
 	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE)
@@ -44,7 +44,7 @@ void CClientZcashN::TerminateAllClientInstance()
 		BOOL bResult = ::Process32First(hSnap, &pe);
 		while (bResult)
 		{
-			if(_tcsicmp(pe.szExeFile, CLIENT_ZCASHN_NAME) == 0 && pe.th32ProcessID != 0)
+			if(_tcsicmp(pe.szExeFile, CLIENT_ZCASHA_NAME) == 0 && pe.th32ProcessID != 0)
 			{
 				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
 				::TerminateProcess(hProcess, 99);
@@ -55,40 +55,40 @@ void CClientZcashN::TerminateAllClientInstance()
 	}
 }
 
-void CClientZcashN::LogString(const char *szBuffer)
+void CClientZcashA::LogString(const char *szBuffer)
 {
 	if (IsDebug())
 	{
 		std::wstring wstrInfo = ultra::_A2T(szBuffer);
-		TSDEBUG4CXX(L"<Client ZN> Output: " <<wstrInfo.c_str());
+		TSDEBUG4CXX(L"<Client ZA> Output: " <<wstrInfo.c_str());
 	}
 }
 
-void CClientZcashN::PostWndMsg(WPARAM wParam, LPARAM lParam)
+void CClientZcashA::PostWndMsg(WPARAM wParam, LPARAM lParam)
 {
-	PostMessageA(m_hMsgWnd, WM_ZCASH_N_MSG, wParam, lParam);
+	PostMessageA(m_hMsgWnd, WM_ZCASH_A_MSG, wParam, lParam);
 }
 
-void CClientZcashN::OnAutoExit(DWORD dwExitCode)
+void CClientZcashA::OnAutoExit(DWORD dwExitCode)
 {
-	PostWndMsg(WP_ZCASH_N_AUTOEXIT, dwExitCode);
+	PostWndMsg(WP_ZCASH_A_AUTOEXIT, dwExitCode);
 }
 
-void CClientZcashN::RetSet()
+void CClientZcashA::RetSet()
 {
-	TSDEBUG4CXX(L"RetSet ZcashN client Param");
+	TSDEBUG4CXX(L"RetSet ZcashA client Param");
 	m_strLastLeft = "";
 }
 
 
-void CClientZcashN::ProcessString(const char *szBuffer)
+void CClientZcashA::ProcessString(const char *szBuffer)
 {
-	
+
 	//LogString(szBuffer);
 	RegexString(szBuffer);
 }
 
-void CClientZcashN::RegexString(const char *szBuffer)
+void CClientZcashA::RegexString(const char *szBuffer)
 {
 	std::string strBuffer = m_strLastLeft;
 	strBuffer.append(szBuffer);
@@ -117,10 +117,10 @@ void CClientZcashN::RegexString(const char *szBuffer)
 
 		}
 	} while (FALSE);
-	
+
 	//GPU温度
-	//Temp: GPU0: 78C GPU1: 111C
-	exp.assign("GPU([0-9])+: ([0-9]+)C", boost::regex::icase);
+	//GPU0 t=0C fan=0%
+	exp.assign("GPU([0-9])+ t=([0-9]+)C", boost::regex::icase);
 	while(boost::regex_search(start,end,what,exp))
 	{
 		if (what.size() == 3)
@@ -142,7 +142,7 @@ void CClientZcashN::RegexString(const char *szBuffer)
 					ssTemp >> iGPUTemp;
 				}
 				LONG lGPUTempInfo = MAKELONG(iGPUTemp,iGPUID);
-				PostWndMsg(WP_ZCASH_N_GPUTEMP, lGPUTempInfo);
+				PostWndMsg(WP_ZCASH_A_GPUTEMP, lGPUTempInfo);
 				TSDEBUG4CXX(L"[RegexString]: GPU"<<iGPUID<<L" "<<iGPUTemp<<L"C");
 			}
 		}
@@ -150,23 +150,16 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	} 
 
 	//提交share成功
-	//成功 示例："INFO 17:53:52: GPU0 Accepted share 72571ms [A:2, R:1]"
-	//失败 示例："INFO 17:53:52: GPU0 Rejected share 1703ms [A:2, R:1]"
-	exp.assign(".*: GPU[0-9]+ Accepted share [0-9]+ms.*", boost::regex::icase);
+	//成功 示例："ZEC: Share accepted (234 ms)!"
+	exp.assign("ZEC: Share accepted ([0-9]+ ms)", boost::regex::icase);
 	if (boost::regex_match(strBuffer,exp))
 	{
-		PostWndMsg(WP_ZCASH_N_SHARE, 0);
+		PostWndMsg(WP_ZCASH_A_SHARE, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Accepted share");
 	}
-	exp.assign(".*: GPU[0-9]+ Rejected share [0-9]+ms.*", boost::regex::icase);
-	if (boost::regex_match(strBuffer,exp))
-	{
-		PostWndMsg(WP_ZCASH_N_SHARE, 1);
-		TSDEBUG4CXX(L"[RegexString]: " << L"Rejected share");
-	}
 	//当前算力
-	//示例："Total speed: 0 Sol/s"
-	exp.assign("Total speed: ([0-9\\.]+) Sol/s", boost::regex::icase);
+	//示例："ZEC - Total Speed: 291.896 H/s, Total Shares: 1, Rejected: 0, Time: 00:00"
+	exp.assign("Total Speed: ([0-9\\.]+) H/s", boost::regex::icase);
 	INT iCurrentSpeed = -1;
 	while(boost::regex_search(start,end,what,exp))
 	{
@@ -175,13 +168,13 @@ void CClientZcashN::RegexString(const char *szBuffer)
 			if (what[1].matched)
 			{
 				std::string strSpeed = what[1];
-				float fNewSpeed = 0.00f;
+				float fNewSpeed = 0.000f;
 				{
 					std::stringstream ssNewSpeed;
 					ssNewSpeed << strSpeed;
 					ssNewSpeed >> fNewSpeed;
 				}
-				int iNewSpeed = ( int )( fNewSpeed * 100 + 0.5 );
+				int iNewSpeed = ( int )( fNewSpeed * 1000 + 0.5 );
 				if (iNewSpeed > iCurrentSpeed)
 				{
 					iCurrentSpeed = iNewSpeed;
@@ -193,57 +186,53 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	} 
 	if (iCurrentSpeed >= 0)
 	{
-		PostWndMsg(WP_ZCASH_N_SPEED, iCurrentSpeed);
+		PostWndMsg(WP_ZCASH_A_SPEED, iCurrentSpeed);
 		TSDEBUG4CXX(L"[RegexString]: " << L"uCurrentSpeed = "<< iCurrentSpeed);
 		return;
 	}
-	
+
 	//重要信息优先处理
 
 	//连接矿次成功
-	//1:"INFO: Detected new work" 
-	if (boost::icontains(strBuffer,"INFO: Detected new work"))
+	//1:"ZEC: Stratum - Connected" 
+	//2:"ZEC: 08/25/17-09:57:15 - New job from"
+	if (boost::icontains(strBuffer,"ZEC: Stratum - Connected") || boost::icontains(strBuffer,"- New job from"))
 	{
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 0);
-		TSDEBUG4CXX(L"[RegexString]: " << L"Detected new work so connect server success");
+		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 0);
+		TSDEBUG4CXX(L"[RegexString]: " << L"Connect server success");
 	}
 	//处理错误：
 
 	//发生错误程序自动退出
 
-	//没找到英伟达的相关dll：ERROR: Cannot load nvml.
-	if (boost::icontains(strBuffer,"ERROR: Cannot load nvml."))
+	//没找到AMD显卡或者opencl支持：AMD OpenCL platform not found
+	//	                           No AMD OPENCLGPUs found, exit
+	if (boost::icontains(strBuffer,"AMD OpenCL platform not found") || boost::icontains(strBuffer,"No AMD OPENCLGPUs found, exit"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 1);
-		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot load nvml");
+		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 1);
+		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot find AMD Gpu");
 	}
-	else if (boost::icontains(strBuffer,"ERROR: No properly configured pool!"))
+	else if (boost::icontains(strBuffer,"ZEC: No pools specified"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 2);
+		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 2);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
-	else if (boost::icontains(strBuffer,"ERROR: Cannot resolve hostname"))
+	else if (boost::icontains(strBuffer,"ZEC: Stratum - Cannot connect to"))
 	{	
-		//PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 1);
-		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve hostname");
+		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 1);
+		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect pool");
 	}
-	else if(boost::icontains(strBuffer,"ERROR: Cannot connect to the pool"))
+	else if(boost::icontains(strBuffer,"Cannot resolve"))
 	{
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 2);
-		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect to the pool");
-	}
-	else if(boost::icontains(strBuffer,"Error: CUDA driver version is insufficient for CUDA runtime version"))
-	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
-		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
+		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 2);
+		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve");
 	}
 	else if(boost::icontains(strBuffer,"Error:"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 99);
-		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
+		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 99);
+		TSDEBUG4CXX(L"[RegexString]: " << L"Some error Info");
 	}
 	//发生错误但是进程继续运行
-	
+
 
 }

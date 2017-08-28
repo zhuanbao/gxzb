@@ -40,3 +40,25 @@
 #define WP_ZCASH_N_AUTOEXIT	    5
 //解析到错误信息
 #define WP_ZCASH_N_ERROR_INFO    9
+
+
+
+//Zcash A卡 客户端的消息定义
+#define WM_ZCASH_A_MSG           WM_USER+400
+
+//WPARAM定义
+//上报速度
+#define WP_ZCASH_A_SPEED		 1
+//GPU温度
+#define WP_ZCASH_A_GPUTEMP       2 
+//share提交结果
+#define WP_ZCASH_A_SHARE         3
+//连接矿次结果
+#define WP_ZCASH_A_CONNECT_POOL	 4
+
+
+//错误
+//进程自动退出
+#define WP_ZCASH_A_AUTOEXIT	    5
+//解析到错误信息
+#define WP_ZCASH_A_ERROR_INFO    9

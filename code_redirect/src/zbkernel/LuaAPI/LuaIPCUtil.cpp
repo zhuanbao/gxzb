@@ -5,6 +5,7 @@
 #include "../Utility/StringOperation.h"
 #include "../MinerType/ClientGenOil.h"
 #include "../MinerType/ClientZcashN.h"
+#include "../MinerType/ClientZcashA.h"
 
 CMinerClient *g_pClient = NULL;
 
@@ -111,9 +112,13 @@ int LuaIPCUtil::Init(lua_State* pLuaState)
 	{
 		g_pClient = new CClientGenOil();
 	}
-	else if(uMinerType == MINER_ZCASH)
+	else if(uMinerType == MINER_ZCASH_N)
 	{
 		g_pClient = new CClientZcashN();
+	}
+	else if(uMinerType == MINER_ZCASH_A)
+	{
+		g_pClient = new CClientZcashA();
 	}
 	return 0;
 }

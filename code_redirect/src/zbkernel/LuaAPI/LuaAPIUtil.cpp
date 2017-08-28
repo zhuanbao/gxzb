@@ -239,6 +239,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetLongTypeHighAndLowWord", GetLongTypeHighAndLowWord},
 	{"CheckZcashNCond", CheckZcashNCond},
 	{"CheckEthereumCond", CheckEthereumCond},
+	{"CheckZcashACond", CheckZcashACond},
 	{NULL, NULL}
 };
 
@@ -5871,10 +5872,32 @@ int LuaAPIUtil::CheckEthereumCond(lua_State* pLuaState)
 	}
 	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
 		TSDEBUG4CXX(L"[CheckEthereumCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
-		if ((iter->vendor == vendor_t::nvidia || iter->vendor == vendor_t::amd) && iter->memory_size >= 3221225472)
+		if ((iter->vendor == vendor_t::nvidia || iter->vendor == vendor_t::amd) && iter->memory_size >= 3000000000)
 		{
 			TSDEBUG4CXX(L"can do Ethereum");
 			SetOpenclPlatform(iter->platformid);
+			lua_pushboolean(pLuaState, 1);
+			return 1;
+		}
+	}
+	lua_pushboolean(pLuaState, 0);
+	return 1;
+}
+
+
+int LuaAPIUtil::CheckZcashACond(lua_State* pLuaState)
+{
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		lua_pushboolean(pLuaState, 0);
+		return 1;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= 2000000000)
+		{
+			TSDEBUG4CXX(L"can do Zcash A");
 			lua_pushboolean(pLuaState, 1);
 			return 1;
 		}
