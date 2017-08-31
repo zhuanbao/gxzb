@@ -2,7 +2,7 @@
     "data": {
         "pool": [
             {
-                "pidlist": [
+				"pidlist": [
                     "0",
                     "1",
                     "2",
@@ -12,12 +12,12 @@
                     "6",
                     "7"
                 ],
-				"cmdlineformat_n": "--server eu1-zcash.flypool2.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
+				"cmdlineformat_n": "--server cn1-zcash.flypool.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
                 "pool": "flypool.org_zcash",
                 "account": "t1frakSjNMJqeyz8gZHSNQ8g6oXyLJFJ6Qz"
             },
             {
-                "pidlist": [
+				"pidlist": [
                     "8",
                     "9",
                     "A",
@@ -27,9 +27,9 @@
                     "E",
                     "F"
                 ],
-				"cmdlineformat_n": "--server eu1-zcash.flypool.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
-                "pool": "flypool.org_zcash",
-                "account": "t1frakSjNMJqeyz8gZHSNQ8g6oXyLJFJ6Qz"
+				"cmdlineformat_n": "--server zec.f2pool.com --user <account>.<workid> --pass x --port 3357 --fee 0 --pec",
+                "pool": "zec.f2pool_zcash",
+                "account": "t1QAuhFih7tcFz7mapKFqMxZkKE97f2MxGQ"
             }
         ]
     }
