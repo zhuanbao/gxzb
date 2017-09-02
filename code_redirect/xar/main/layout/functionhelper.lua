@@ -3132,6 +3132,7 @@ function StartClient()
 	local nRet = g_WorkClient.Start()
 	if nRet ~= 0 then
 		if nRet == 1 then
+			NotifyPause()
 			SetStateInfoToUser("连接赚宝矿场失败,请重试")
 		end	
 		return
