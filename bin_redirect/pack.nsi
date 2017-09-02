@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.10"
+!define PRODUCT_VERSION "1.0.0.11"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -89,7 +89,7 @@ Var InstallProgressName
 Var BuildNum
 
 Var CheckETHCond
-Var CheckZcashNCond
+Var CheckZcashCond
 
 ;主程序至少需要10M空间
 !define NeedSpace 10
@@ -348,6 +348,7 @@ Function CloseExe
 	${FKillProc} "zbsetuphelper-cl"
 	${FKillProc} "Share4PeerZN"
 	${FKillProc} "ShareCout"
+	${FKillProc} "Share4PeerZA"
 FunctionEnd
 
 Function CheckHasInstall
@@ -393,6 +394,7 @@ Function CheckExeProcExist
 	${FKillProc} "zbsetuphelper-cl"
 	${FKillProc} "Share4PeerZN"
 	${FKillProc} "ShareCout"
+	${FKillProc} "Share4PeerZA"
 FunctionEnd
 
 !macro InitBaseCfgDir
@@ -443,8 +445,8 @@ Function .onInit
 	${EndIf}
 	;ETH 0:支持ETH 1：非64位系统 2：显卡不支持(3G)
 	StrCpy $CheckETHCond 9
-	;ZcashN 0:支持ZcashN 1：非64位系统 2：显卡不支持(2G)
-	StrCpy $CheckZcashNCond 9
+	;Zcash 0:支持Zcash 1：非64位系统 2：显卡不支持(2G)
+	StrCpy $CheckZcashCond 9
 	
 	StrCpy $IsSilentInst 0
 	${GetParameters} $R0
@@ -501,17 +503,17 @@ Function .onInit
 			StrCpy $CheckETHCond 0
 		${EndIf}
 		StrCpy $0 0
-		System::Call "$PLUGINSDIR\zbsetuphelper::CheckZcashNCond() i.r0"
+		System::Call "$PLUGINSDIR\zbsetuphelper::CheckZcashCond() i.r0"
 		${If} $0 == 1
 			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于2G， 无法安装"
 			;Abort
-			StrCpy $CheckZcashNCond 0
+			StrCpy $CheckZcashCond 0
 		${EndIf}
 		;MessageBox MB_OK "可以安装"
 	${Else}
 		;MessageBox MB_OK "此程序只支持64位操作系统，您使用的操作系统是32位，无法安装"
-		StrCpy $CheckETHCond 2
-		StrCpy $CheckZcashNCond 2
+		StrCpy $CheckETHCond 1
+		StrCpy $CheckZcashCond 1
 	${EndIf}
 	Call CmdSilentInstall
 FunctionEnd
@@ -634,7 +636,7 @@ Function CmdSilentInstall
 		Return
 	SetSilent silent
 	${If} $CheckETHCond != 0 
-	${AndIf} $CheckZcashNCond != 0	
+	${AndIf} $CheckZcashCond != 0	
 		${SendStat} "$InstallProgressName" "checkenvfail" "$BuildNum_$str_ChannelID" 1
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
@@ -733,7 +735,7 @@ FunctionEnd
 Function check-can-install
 	;支持赚宝
 	${If} $CheckETHCond == 0 
-	${OrIf} $CheckZcashNCond == 0	
+	${OrIf} $CheckZcashCond == 0	
 		StrCpy $BoolExitMsg 1
 		SendMessage $HWNDPARENT "0x408" "1" ""
 	;不支持opencl
@@ -1288,6 +1290,7 @@ Function un.onInit
 	${FKillProc} "zbsetuphelper-cl"
 	${FKillProc} "Share4PeerZN"
 	${FKillProc} "ShareCout"
+	${FKillProc} "Share4PeerZA"
 	Call un.UpdateChanel
 	;InitPluginsDir
 	;IfFileExists $PLUGINSDIR 0 +2
