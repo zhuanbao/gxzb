@@ -9,7 +9,7 @@ local g_PoolCfgName = "zcash_poolcfg.json"
 local g_DefaultPoolType = "x_zcash"
 --常量
 local CLIENT_ZCASHA = 3
-local CLIENT_PATH = "Share4Peer\\Share4PeerZA.exe"
+local CLIENT_PATH = "Share4Peer\\Share4PeerZA\\Share4PeerZA.exe"
 local COUTAGENT_PATH = "ShareCout.exe"
 --上报速度
 local WP_ZCASH_A_SPEED = 1
