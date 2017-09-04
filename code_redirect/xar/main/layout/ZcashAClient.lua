@@ -58,13 +58,16 @@ local g_ClientMaxReTryCnt = 3
 local g_LastClientOutputRightInfoTime = 0
 local g_ControlSpeedCmdLine = nil 
 
-local g_LastGetSpeedTime = 0
+--local g_LastGetSpeedTime = 0
+local g_LastGetRealTimeIncomeTime = 0
 local g_LastRealTimeIncome = 0
 local g_LastAverageHashRate = 0
 
 local g_ZcashADAGTimerId = nil
 
-
+--
+local g_ZcashARealTimeIncomeTimerId = nil
+local g_ClientOutputSpeed = 0 --0H/s
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -309,6 +312,24 @@ function KillVirtualDAG()
 	end
 end
 
+function StartRealTimeIncomeTimer()
+	if g_ZcashARealTimeIncomeTimerId ~= nil then
+		return
+	end
+	g_ZcashARealTimeIncomeTimerId = timeMgr:SetTimer(function(Itm, id)
+		if g_LastGetRealTimeIncomeTime == 0 then
+			g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
+		else
+			nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetRealTimeIncomeTime
+			local nRealTimeIncome = GetRealTimeIncome(g_ClientOutputSpeed, nSpanTime)
+			g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
+			if nRealTimeIncome > 0 then
+				tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
+			end
+		end
+	end, 5000)	
+end
+
 function OnZcashAMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnZcashAMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
@@ -327,20 +348,24 @@ function OnZcashAMsg(tParam)
 		if type(nParam) == "number" and nParam > 0 then
 			--多乘了1000
 			nParam = nParam/1000
+			g_ClientOutputSpeed = nParam
 			g_HashRateSum = g_HashRateSum + nParam
 			g_HashRateSumCounter = g_HashRateSumCounter + 1
 			UpdateSpeed(nParam)
 			tFunctionHelper.UpdateMiningSpeed(g_MiningSpeedPerHour)
+			StartRealTimeIncomeTimer()
+			--[[
 			if g_LastGetSpeedTime == 0 then
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 			else
-				nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetSpeedTime
+				local nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetSpeedTime
 				local nRealTimeIncome = GetRealTimeIncome(nParam, nSpanTime)
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 				if nRealTimeIncome > 0 then
 					tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
 				end
 			end
+			--]]
 		end
 	elseif nMsgType == WP_ZCASH_A_SHARE then
 		KillVirtualDAG()
@@ -450,7 +475,13 @@ function ResetGlobalParam()
 		timeMgr:KillTimer(g_ZcashAWorkingTimerId)
 		g_ZcashAWorkingTimerId = nil
 	end
-	g_LastGetSpeedTime = 0
+	--g_LastGetSpeedTime = 0
+	g_LastGetRealTimeIncomeTime = 0
+	g_ClientOutputSpeed = 0
+	if g_ZcashARealTimeIncomeTimerId then
+		timeMgr:KillTimer(g_ZcashARealTimeIncomeTimerId)
+		g_ZcashARealTimeIncomeTimerId = nil
+	end
 	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
