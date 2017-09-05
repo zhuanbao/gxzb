@@ -317,15 +317,16 @@ function StartRealTimeIncomeTimer()
 		return
 	end
 	g_ZcashARealTimeIncomeTimerId = timeMgr:SetTimer(function(Itm, id)
+		local nSpanTime = 0
 		if g_LastGetRealTimeIncomeTime == 0 then
-			g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
+			nSpanTime = 5
 		else
 			nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetRealTimeIncomeTime
-			local nRealTimeIncome = GetRealTimeIncome(g_ClientOutputSpeed, nSpanTime)
-			g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
-			if nRealTimeIncome > 0 then
-				tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
-			end
+		end	
+		g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
+		local nRealTimeIncome = GetRealTimeIncome(g_ClientOutputSpeed, nSpanTime)
+		if nRealTimeIncome > 0 then
+			tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
 		end
 	end, 5000)	
 end
