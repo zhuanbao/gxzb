@@ -55,27 +55,28 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	run.TerminateAllClientInstance();
 
 
-	SECURITY_ATTRIBUTES sa = {0};  
-	sa.nLength = sizeof(sa);  
-	sa.bInheritHandle = TRUE;  
-	HANDLE hStdInRead,hStdInWrite;
-	//产生一个用于stdin的管道，得到两个HANDLE:  hStdInRead用于子进程读数据，hStdInWrite用于主程序写入数据     
-	if (!CreatePipe(&hStdInRead, &hStdInWrite, &sa, 0))  
-		return 5;  
-	
-	HANDLE hStdOutRead,hStdOutWrite;
-	//产生一个用于stdout的管道，得到两个HANDLE:  m_hStdOutRead用于主程序读出数据，m_hStdOutWrite用于子程序写入数据    
-	if (!CreatePipe(&hStdOutRead, &hStdOutWrite, &sa, 0))  
-		return 5;  
+	//SECURITY_ATTRIBUTES sa = {0};  
+	//sa.nLength = sizeof(sa);  
+	//sa.bInheritHandle = TRUE;  
+	//HANDLE hStdInRead,hStdInWrite;
+	////产生一个用于stdin的管道，得到两个HANDLE:  hStdInRead用于子进程读数据，hStdInWrite用于主程序写入数据     
+	//if (!CreatePipe(&hStdInRead, &hStdInWrite, &sa, 0))  
+	//	return 5;  
+	//
+	//HANDLE hStdOutRead,hStdOutWrite;
+	////产生一个用于stdout的管道，得到两个HANDLE:  m_hStdOutRead用于主程序读出数据，m_hStdOutWrite用于子程序写入数据    
+	//if (!CreatePipe(&hStdOutRead, &hStdOutWrite, &sa, 0))  
+	//	return 5;  
+	//
+
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-
 	ZeroMemory(&si, sizeof(STARTUPINFO));  
 	si.cb = sizeof(STARTUPINFO);  
 	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;  //允许设置showwindow和设置新进程的输入输出句柄参数  
-	si.hStdOutput = hStdOutWrite;     //意思是：子进程的stdout输出到m_hStdOutWrite    
-	si.hStdError = hStdOutWrite;      //意思是：子进程的stderr输出到m_hStdOutWrite    
-	si.hStdInput = hStdInRead;  
+	si.hStdOutput = NULL;     //意思是：子进程的stdout输出到m_hStdOutWrite    
+	si.hStdError = NULL;      //意思是：子进程的stderr输出到m_hStdOutWrite    
+	si.hStdInput = NULL;  
 	si.wShowWindow = SW_HIDE;
 	
 	if(!CreateProcess( NULL,(LPTSTR)strCmdline.c_str(), NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
