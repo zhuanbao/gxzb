@@ -4,6 +4,10 @@
 #include <Tlhelp32.h>
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
+#include "Utility/PeeIdHelper.h"
+//#include "commonshare\md5.h"
+//#include "Utility\StringOperation.h"
+
 bool RunEnvironment::CheckEnvironment()
 {
 	if (CheckZcashNCond())
@@ -60,8 +64,27 @@ std::wstring RunEnvironment::GetRandomAccount()
 	return szAccountList[index];
 }
 
+void RunEnvironment::GetWorkID()
+{
+	std::wstring wstrPeerID;
+	GetPeerId_(wstrPeerID);
+
+	std::string strPeerID = ultra::_T2A(wstrPeerID);
+	wchar_t pszMD5[MAX_PATH] = {0};
+
+	if (GetStringMd5(strPeerID,pszMD5) && wcslen(pszMD5) >= 8)
+	{
+		m_wstrWorkID = ultra::ToLower(std::wstring(pszMD5,8));
+	}
+	else
+	{
+		m_wstrWorkID = L"00000000";
+	}
+}
+
 void RunEnvironment::GetClientInfo()
 {
+	GetWorkID();
 	std::wstring strFormat = L"";
 	std::wstring strAccount = GetRandomAccount();
 	std::wstring strWorkid = L"";

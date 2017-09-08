@@ -10,6 +10,7 @@ public:
 		m_wstrExePath = L"";
 		m_wstrParam = L"";
 		m_pClientInfo = NULL;
+		m_wstrWorkID = L"";
 	}
 	~RunEnvironment()
 	{
@@ -34,10 +35,11 @@ private:
 	bool CheckZcashACond();
 	void GetClientInfo();
 	std::wstring GetRandomAccount();
+	void GetWorkID();
 private:
 	std::wstring m_wstrExePath;
 	std::wstring m_wstrParam;
 	vendor_t m_Type;
 	PCLIENT_INFO m_pClientInfo;
-	
+	std::wstring m_wstrWorkID;
 };

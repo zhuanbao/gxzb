@@ -9,8 +9,8 @@
 
 namespace IDEINFO {
 
-char HardDriveSerialNumber [1024];
-char HardDriveModelNumber [1024];
+static char HardDriveSerialNumber [1024];
+static char HardDriveModelNumber [1024];
 
 //  Valid values for the bCommandReg member of IDEREGS.
 #define  IDE_ATAPI_IDENTIFY  0xA1  //  Returns ID sector for ATAPI.
@@ -149,7 +149,7 @@ inline char * flipAndCodeBytes (const char * str,
 		return buf;
 }
 
-BYTE IdOutCmd [sizeof (SENDCMDOUTPARAMS) + IDENTIFY_BUFFER_SIZE - 1];
+static BYTE IdOutCmd [sizeof (SENDCMDOUTPARAMS) + IDENTIFY_BUFFER_SIZE - 1];
 
    // DoIDENTIFY
    // FUNCTION: Send an IDENTIFY command to the drive
