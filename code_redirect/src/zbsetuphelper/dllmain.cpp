@@ -1057,5 +1057,6 @@ extern "C" __declspec(dllexport) BOOL CheckZcashACond()
 
 extern "C" __declspec(dllexport) BOOL CheckZcashCond()
 {
-	return CheckZcashACond() || CheckZcashNCond();
+	//return CheckZcashACond() || CheckZcashNCond();
+	return CheckZcashNCond();
 }
