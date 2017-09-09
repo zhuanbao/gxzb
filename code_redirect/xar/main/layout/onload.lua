@@ -358,6 +358,15 @@ function LoadDynamicFont()
 	local Module = XLLoadModule(strFontPath)
 end
 
+function IsZcashAClientExist()
+	local strDir = FunctionObj.GetModuleDir()
+	local CLIENT_PATH = "Share4Peer\\Share4PeerZA\\Share4PeerZA.exe"
+	local strWorkExe = tipUtil:PathCombine(strDir, CLIENT_PATH)
+	if not tipUtil:QueryFileExists(strWorkExe) then
+		return false
+	end
+	return true
+end
 --返回值说明 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
 function CheckMachineSuitable()
 	if FunctionObj.GetSystemBits() ~= 64 then
@@ -373,10 +382,11 @@ function CheckMachineSuitable()
 	if bZcashN then
 		return 2
 	end
-	local bZcashA = tipUtil:CheckZcashACond()
+	local bZcashA = IsZcashAClientExist() and tipUtil:CheckZcashACond()
 	if bZcashA then
 		return 3
 	end
+	return 0
 end
 
 function TipMain()	

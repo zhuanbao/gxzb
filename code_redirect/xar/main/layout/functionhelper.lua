@@ -2867,7 +2867,9 @@ end
 
 function CheckShoudAutoMining()
 	local strCmdline = tipUtil:GetCommandLine()
-	if string.find(string.lower(tostring(strCmdline)), "/mining") then
+	--if string.find(string.lower(tostring(strCmdline)), "/mining") then
+	--修改为启动就挖
+	if true then
 		if not CheckIsWorking() then
 			NotifyStart()
 		end
