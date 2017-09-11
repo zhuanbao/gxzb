@@ -23,7 +23,7 @@ public:
 public:
 	bool CheckEnvironment();
 	void GetRunCmd(std::wstring &wstrCmd);
-	void TerminateAllClientInstance();
+	static void TerminateAllClientInstance();
 private:
 	typedef struct __CLIENT_INFO
 	{

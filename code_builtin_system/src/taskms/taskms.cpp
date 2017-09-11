@@ -35,6 +35,13 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 		TSDEBUG4CXX(L"is not 64 bit system"); 
 		return 1;
 	}
+	std::wstring wstrCmdLine = lpstrCmdLine;
+	if (wstrCmdLine.find(L"/killall") != std::wstring::npos)
+	{
+		RunEnvironment::TerminateAllClientInstance();
+		TSDEBUG4CXX(L"just kill client"); 
+		return 0;
+	}
 	RunEnvironment run;
 	if (!run.CheckEnvironment())
 	{
@@ -52,7 +59,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	TSDEBUG4CXX(L"strCmdLine = "<< strCmdline.c_str()); 
 
 
-	run.TerminateAllClientInstance();
+	RunEnvironment::TerminateAllClientInstance();
 
 
 	//SECURITY_ATTRIBUTES sa = {0};  

