@@ -91,7 +91,7 @@ void RunEnvironment::GetClientInfo()
 	m_pClientInfo = new CLIENT_INFO();
 	if (m_Type == vendor_t::nvidia)
 	{
-		strFormat = L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec";
+		strFormat = L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec --intensity 1";
 		//strWorkid = L"n0";
 		m_pClientInfo->strClientSubPath = L"taskmszn\\taskmszn.exe";
 	}
