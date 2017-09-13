@@ -242,6 +242,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Utility"
+			>
+			<File
+				RelativePath=".\Utility\PeeIdHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Utility\PeeIdHelper.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>

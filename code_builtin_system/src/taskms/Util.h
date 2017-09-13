@@ -1,7 +1,9 @@
 #pragma once
+#include <Windows.h>
 #include "Utility/PeeIdHelper.h"
 #include <Urlmon.h>
 #pragma comment(lib, "Urlmon.lib")
+
 DWORD WINAPI SendHttpStatThread(LPVOID pParameter)
 {
 	TSAUTO();

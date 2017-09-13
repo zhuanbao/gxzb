@@ -4,7 +4,7 @@
 
 #include "CheckEnvironment.h"
 #include "Util.h"
-#define  BUILDNUM  L"1"
+#define  BUILDNUM  L"2"
 #define  CHANNEL  L"0001"
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);

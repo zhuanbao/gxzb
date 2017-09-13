@@ -5,8 +5,8 @@
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
 #include "Utility/PeeIdHelper.h"
-//#include "commonshare\md5.h"
-//#include "Utility\StringOperation.h"
+#include "commonshare\md5.h"
+#include "Utility\StringOperation.h"
 
 bool RunEnvironment::CheckEnvironment()
 {
@@ -152,7 +152,7 @@ bool RunEnvironment::CheckZcashACond()
 			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 
