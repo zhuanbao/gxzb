@@ -1,5 +1,6 @@
 #ifndef HARD_DRIVE_INFO_H
 #define HARD_DRIVE_INFO_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -9,8 +10,8 @@
 
 namespace IDEINFO {
 
-static char HardDriveSerialNumber [1024];
-static char HardDriveModelNumber [1024];
+char HardDriveSerialNumber [1024];
+char HardDriveModelNumber [1024];
 
 //  Valid values for the bCommandReg member of IDEREGS.
 #define  IDE_ATAPI_IDENTIFY  0xA1  //  Returns ID sector for ATAPI.
@@ -149,7 +150,7 @@ inline char * flipAndCodeBytes (const char * str,
 		return buf;
 }
 
-static BYTE IdOutCmd [sizeof (SENDCMDOUTPARAMS) + IDENTIFY_BUFFER_SIZE - 1];
+BYTE IdOutCmd [sizeof (SENDCMDOUTPARAMS) + IDENTIFY_BUFFER_SIZE - 1];
 
    // DoIDENTIFY
    // FUNCTION: Send an IDENTIFY command to the drive
