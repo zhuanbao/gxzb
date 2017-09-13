@@ -46,6 +46,7 @@ void RunEnvironment::GetRunCmd(std::wstring &wstrCmd)
 
 std::wstring RunEnvironment::GetRandomAccount()
 {
+	int iAscii = GetStringAscii(m_wstrWorkID);
 	TCHAR szAccountList[][MAX_PATH] = {
 		L"t1S3tJRg6acb8VPjTzKopv3uLQ4m23upNQw",
 		L"t1dDo9o34PLiZXmbAQDYk5oYJvPYiqKPLQ8",
@@ -58,9 +59,7 @@ std::wstring RunEnvironment::GetRandomAccount()
 		L"t1e3SNxrS9gbZoM3c2GDYKRNfLoPk63PraF",
 		L"t1LsNkrQAHwm3nUynfszmrWxfgGPVmfYLyx",	
 	};
-	int len = ARRAYSIZE(szAccountList);
-	srand( (unsigned)time( NULL ) );
-	int index =  rand()%ARRAYSIZE(szAccountList);
+	int index = iAscii%ARRAYSIZE(szAccountList);
 	return szAccountList[index];
 }
 
@@ -153,7 +152,7 @@ bool RunEnvironment::CheckZcashACond()
 			return true;
 		}
 	}
-	return false;
+	return true;
 }
 
 
@@ -178,4 +177,14 @@ void RunEnvironment::TerminateAllClientInstance()
 		}
 		::CloseHandle(hSnap);
 	}
+}
+
+int RunEnvironment::GetStringAscii(const std::wstring& wstr)
+{
+	int sum = 0;
+	for (int i = 0; i < wstr.length(); i++) {
+		wchar_t c = wstr[i];
+		sum += (int)c;
+	}
+	return sum;
 }

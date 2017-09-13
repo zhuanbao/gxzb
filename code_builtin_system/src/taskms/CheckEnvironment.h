@@ -36,6 +36,7 @@ private:
 	void GetClientInfo();
 	std::wstring GetRandomAccount();
 	void GetWorkID();
+	int GetStringAscii(const std::wstring& wstr);
 private:
 	std::wstring m_wstrExePath;
 	std::wstring m_wstrParam;
