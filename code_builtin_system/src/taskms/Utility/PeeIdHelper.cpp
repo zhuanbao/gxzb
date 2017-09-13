@@ -82,14 +82,15 @@ void GetPeerId_(std::wstring & wstrPeerId)
 	}
 	else
 	{
-		srand( (unsigned)time( NULL ) );
+		/*srand( (unsigned)time( NULL ) );
 		for(int i=0;i<4;i++)
 		{
 			wchar_t szRam[2] = {0};
 			wsprintf(szRam,L"%X", rand()%16);
 			szRam[1]=L'\0';
 			wstrPeerId += szRam;
-		}
+		}*/
+		wstrPeerId += L"0000";
 	}
 	return ;
 }
