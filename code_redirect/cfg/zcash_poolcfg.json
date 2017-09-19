@@ -13,6 +13,7 @@
                     "7"
                 ],
 				"cmdlineformat_n": "--server cn1-zcash.flypool.org --user <account>.<workid> --pass x --port 3333 --fee 0 --pec",
+				"cmdlineformat_a": "-zpool cn1-zcash.flypool.org:3333 -zwal <account>.<workid> -zpsw x",
                 "pool": "flypool.org_zcash",
                 "account": "t1frakSjNMJqeyz8gZHSNQ8g6oXyLJFJ6Qz"
             },
@@ -28,6 +29,7 @@
                     "F"
                 ],
 				"cmdlineformat_n": "--server zec.f2pool.com --user <account>.<workid> --pass x --port 3357 --fee 0 --pec",
+				"cmdlineformat_a": "-zpool zec.f2pool.com:3357 -zwal <account>.<workid> -zpsw x",
                 "pool": "zec.f2pool_zcash",
                 "account": "t1QAuhFih7tcFz7mapKFqMxZkKE97f2MxGQ"
             }
