@@ -39,7 +39,7 @@ local g_HashRateSumCounter = 0 --速度累加的计数器
 local g_PerSpeed = 10 --服务端返回的平均速度((元宝/Hour)/SOL)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 
-local g_MiningMode_Min = 10
+local g_MiningMode_Min = 0
 local g_MiningMode_Max = nil
 local g_MiningMode_Cur = g_MiningMode_Max
 
@@ -416,7 +416,7 @@ end
 
 function SetControlSpeedCmdLine(nIntensity)
 	if nIntensity ~= nil then
-		g_ControlSpeedCmdLine = "-li " .. tostring(nIntensity)
+		g_ControlSpeedCmdLine = "-i " .. tostring(nIntensity)
 	else
 		g_ControlSpeedCmdLine = nil
 	end

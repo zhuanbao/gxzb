@@ -314,7 +314,7 @@ end
 
 function CheckMachineBindState()
 	if FunctionObj.CheckIsGettedWorkID() then
-		FunctionObj.QueryClientInfo(0)
+		FunctionObj.QueryWorkerInfo()
 	end
 end
 
@@ -368,7 +368,7 @@ function IsZcashAClientExist()
 	return true
 end
 --]]
---返回值说明 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
+--返回值说明 -1: 需要安装额外的版本 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
 function CheckMachineSuitable()
 	if FunctionObj.GetSystemBits() ~= 64 then
 		LOG("CheckMachineSuitable GetSystemBits ~= 64")
@@ -383,10 +383,11 @@ function CheckMachineSuitable()
 	if bZcashN then
 		return 2
 	end
-	--[[
+	---[[
 	local bZcashA = tipUtil:CheckZcashACond()
 	if bZcashA then
-		return 3
+		FunctionObj.ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
+		return -1
 	end
 	--]]
 	return 0
@@ -433,7 +434,7 @@ function PreTipMain()
 	local bDebug = CheckIsDebug()
 	if nMiningType == 0 and not bDebug then
 		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-	else
+	elseif nMiningType ~= -1 then
 		TipMain()
 	end
 end

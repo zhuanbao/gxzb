@@ -51,7 +51,6 @@ end
 ---------事件---------
 
 
-
 --------辅助函数----
 function CreateListener(objRootCtrl)
 	local objFactory = XLGetObject("APIListen.Factory")
@@ -87,6 +86,8 @@ function CreateListener(objRootCtrl)
 			elseif tostring(key) == "OnZcashAMsg" then
 				local ObjWorkClient = tFunctionHelper.GetWorkClient()
 				ObjWorkClient.OnZcashAMsg(tParam)
+			elseif tostring(key) == "OnErrorMsg" then
+				tFunctionHelper.SendErrorReport(tParam[1],tParam[2])
 			end				
 		end
 	)

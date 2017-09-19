@@ -61,6 +61,7 @@ local g_tPopupWndList = {
 	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
 	[5] = {"GXZB.UpdateFrameWnd", "GXZB.UpdateWndTree"},
 	[6] = {"GXZB.AutoRunTipWnd", "GXZB.AutoRunTipWndTree"},
+	[7] = {"GXZB.ZcashAPromptWnd", "GXZB.ZcashAPromptWndTree"},
 }
 
 local g_tConfigFileStruct = {
@@ -150,7 +151,7 @@ function TipConvStatistic(tStat)
 	local strEA = tStatInfo.strEA 
 	local strEL = tStatInfo.strEL
 	local strEV = tStatInfo.strEV
-	
+	local strTID = tStatInfo.strTID or "UA-96195625-1"
 	if IsNilString(strEC) then
 		strEC = strDefaultNil
 	end
@@ -167,7 +168,7 @@ function TipConvStatistic(tStat)
 		strEV = 1
 	end
 
-	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid="..tostring(strCID)
+	local strUrl = "http://www.google-analytics.com/collect?v=1&tid=" .. tostring(strTID).. "="..tostring(strCID)
 					.."&t=event&ec="..tostring(strEC).."&ea="..tostring(strEA)
 					.."&el="..tostring(strEL).."&ev="..tostring(strEV)
 	TipLog("TipConvStatistic: " .. tostring(strUrl))
@@ -237,6 +238,17 @@ function SendUIReport(strEC,strEA,strEL)
 	else
 		tStatInfo.strEL = strEL
 	end
+	
+	tStatInfo.strEV = 1
+	TipConvStatistic(tStatInfo)
+end
+
+function SendErrorReport(strEA,strEL)
+	local tStatInfo = {}
+	tStatInfo.strTID = "UA-106737106-1"
+	tStatInfo.strEC = GetGXZBMinorVer() or ""
+	tStatInfo.strEA = strEA or 0
+	tStatInfo.strEL = strEL or ""
 	
 	tStatInfo.strEV = 1
 	TipConvStatistic(tStatInfo)
@@ -383,7 +395,8 @@ function RegisterFunctionObject(self)
 	obj.SaveLastRemindBindUTC = SaveLastRemindBindUTC
 	obj.SetStateInfoToUser = SetStateInfoToUser
 	obj.OnUserChangePanel = OnUserChangePanel
-	
+	obj.SendErrorReport = SendErrorReport
+
 	--服务器相关函数
 	obj.InitMachineName = InitMachineName
 	obj.GetMachineName = GetMachineName
@@ -395,6 +408,7 @@ function RegisterFunctionObject(self)
 	obj.ReportClientInfoToServer = ReportClientInfoToServer
 	obj.ReportMiningPoolInfoToServer = ReportMiningPoolInfoToServer
 	obj.QueryClientInfo = QueryClientInfo
+	obj.QueryWorkerInfo = QueryWorkerInfo
 	obj.TakeCashToServer = TakeCashToServer
 	obj.GetHistoryToServer = GetHistoryToServer
 	obj.PopTipPre4Hour = PopTipPre4Hour
@@ -492,7 +506,7 @@ function CheckShouldRemindBind()
 		return false
 	end
 	local strCmdline = tipUtil:GetCommandLine()
-	if string.find(string.lower(tostring(strCmdline)), "/mining") then
+	if true then
 		return false
 	end
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -2406,6 +2420,78 @@ function QuerySvrForTakeCashInfo(nMoney)
 	return strReguestUrl
 end
 
+function QuerySvrForWorkerInfo()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tUserInfo"]) ~= "table" then
+		tUserConfig["tUserInfo"] = {}
+	end
+	local strInterfaceName = "getWorkerInfo"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
+	end
+	local strPoolInfo = g_WorkClient.GetCurrentPool()
+	if not IsRealString(strPoolInfo) then
+		strPoolInfo = g_WorkClient.GetDefaultPoolType()
+	end
+	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(strPoolInfo)))
+	local strParam = MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  g_strSeverInterfacePrefix .. strParam
+	TipLog("[QuerySvrForWorkInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+--查询客户端信息
+function QueryWorkerInfo(fnCallBack)
+	local strReguestUrl = QuerySvrForWorkerInfo()
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	TipLog("[QueryWorkerInfo] strReguestUrl = " .. strReguestUrl)
+	NewAsynGetHttpContent(strReguestUrl, false
+	, function(nRet, strContent, respHeaders)
+		TipLog("[QueryWorkerInfo] nRet:"..tostring(nRet)
+				.." strContent:"..tostring(strContent))
+				
+		if 0 == nRet then
+			--[[ forlocal
+			strContent = GetLocalSvrCfgWithName("getWorkerInfo.json")
+			--]]
+			local tabInfo = DeCodeJson(strContent)
+			if type(tabInfo) ~= "table" 
+				or tabInfo["rtn"] ~= 0 
+				or type(tabInfo["data"]) ~= "table" then
+				TipLog("[QueryWorkerInfo] parse info error.")
+				if fnCallBack ~= nil then
+					fnCallBack(false)
+				end
+				return 
+			end
+			UpdateSvrPoolCfg(tabInfo)
+			if fnCallBack ~= nil then
+				fnCallBack(true)
+			end
+			-- 绑定 未绑定 解绑 是否 status 不一样
+			if tabInfo["data"]["status"] ~= 1 then
+				if CheckIsBinded() then
+					UnBindingClientFromServer()
+					--return
+				end	
+			end
+			if tonumber(tabInfo["data"]["balance"]) ~= nil then
+				--g_Balance = tabInfo["data"]["balance"]
+				if g_Balance ~= tonumber(tabInfo["data"]["balance"]) then
+					SetUserCurrentBalance(tabInfo["data"]["balance"])
+					UpdateUserBalance()
+				end	
+			end
+		else
+			if fnCallBack ~= nil then
+				fnCallBack(false)
+			end
+			TipLog("[QueryWorkerInfo] query sever failed.")
+		end
+	end)
+end
 --提现接口
 function TakeCashToServer(nMoney, fnCallBack)
 	local strReguestUrl = QuerySvrForTakeCashInfo(nMoney)
@@ -2840,7 +2926,7 @@ function SetUserBindInfo(tabBindInfo)
 	SaveConfigToFileByKey("tUserConfig")
 	ReportClientInfoToServer()
 	ChangeClientTitle("共享赚宝")
-	QueryClientInfo(0)
+	QueryWorkerInfo()
 end
 
 function CheckIsBinded()
@@ -3147,14 +3233,14 @@ function NotifyStart()
 	g_UIWorkState = UI_STATE_STARTING
 	UpdateSuspendWndVisible(1)
 	OnWorkStateChange(1)
-	local function OnQueryClientInfo(bRet)
+	local function OnQueryWorkerInfo(bRet)
 		if GetUIWorkState() ~= UI_STATE_PREPARE_POOL then
 			return 
 		end
 		if not bRet then
 			SetStateInfoToUser("连接服务器失败，重试中...")
 			SetOnceTimer(function()
-				QueryClientInfo(0, OnQueryClientInfo)
+				QueryWorkerInfo(OnQueryWorkerInfo)
 			end, 5*1000)
 			return
 		end	
@@ -3174,7 +3260,7 @@ function NotifyStart()
 		end
 		--获取矿池信息
 		g_UIWorkState = UI_STATE_PREPARE_POOL
-		QueryClientInfo(0, OnQueryClientInfo)
+		QueryWorkerInfo(OnQueryWorkerInfo)
 		SetStateInfoToUser(nil)
 	end
 	g_UIWorkState = UI_STATE_PREPARE_WORKID
