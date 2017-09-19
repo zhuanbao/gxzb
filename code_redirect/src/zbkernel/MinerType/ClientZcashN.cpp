@@ -215,35 +215,70 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	if (boost::icontains(strBuffer,"ERROR: Cannot load nvml."))
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 1);
+		PostErrorMsg(strBuffer.c_str(),"error: cannot load nvml");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot load nvml");
 	}
 	else if (boost::icontains(strBuffer,"ERROR: No properly configured pool!"))
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 2);
+		PostErrorMsg(strBuffer.c_str(),"error: no properly configured pool!");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
 	else if (boost::icontains(strBuffer,"ERROR: Cannot resolve hostname"))
 	{	
 		//PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
 		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 1);
+		PostErrorMsg(strBuffer.c_str(),"error: cannot resolve hostname");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve hostname");
 	}
 	else if(boost::icontains(strBuffer,"ERROR: Cannot connect to the pool"))
 	{
 		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 2);
+		PostErrorMsg(strBuffer.c_str(),"error: cannot connect to the pool");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect to the pool");
 	}
 	else if(boost::icontains(strBuffer,"Error: CUDA driver version is insufficient for CUDA runtime version"))
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
+		PostErrorMsg(strBuffer.c_str(),"error: cuda driver version is insufficient");
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
 	}
 	else if(boost::icontains(strBuffer,"Error:"))
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 99);
+		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
 	}
 	//发生错误但是进程继续运行
 	
 
+}
+
+
+void CClientZcashN::PostErrorMsg(const char *szBuffer, const char *szBeg)
+{
+	std::string strInfo = ultra::ToLower(ultra::Trim(std::string(szBuffer)));
+	std::string strSep = "\r\n";
+	size_t nBegPos = strInfo.find(szBeg);
+	if (nBegPos == std::string::npos)
+	{
+		nBegPos = 0;
+	} 
+	size_t nEndPos = strInfo.find("\r\n");
+	if (nEndPos == std::string::npos)
+	{
+		nEndPos = strInfo.find("\r");
+		if (nEndPos == std::string::npos)
+		{
+			nEndPos = strInfo.find("\n");
+		}
+	} 
+	strInfo = strInfo.substr(nBegPos,nEndPos);
+	if (strInfo.length()>MAX_ERROR_LEN-1)
+	{
+		strInfo = strInfo.substr(0,MAX_ERROR_LEN-1);
+	}
+	char * pInfo = new char[MAX_ERROR_LEN];
+	strcpy_s(pInfo,MAX_ERROR_LEN,strInfo.c_str());
+	PostMessage(m_hMsgWnd, WM_ERROR_INFO, 1, (LPARAM)pInfo);
 }

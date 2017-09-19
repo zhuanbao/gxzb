@@ -210,29 +210,65 @@ void CClientZcashA::RegexString(const char *szBuffer)
 	if (boost::icontains(strBuffer,"AMD OpenCL platform not found") || boost::icontains(strBuffer,"No AMD OPENCLGPUs found, exit"))
 	{
 		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 1);
+
+		PostErrorMsg(strBuffer.c_str(),"amd opencl platform not found");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot find AMD Gpu");
 	}
 	else if (boost::icontains(strBuffer,"ZEC: No pools specified"))
 	{
 		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 2);
+		PostErrorMsg(strBuffer.c_str(),"zec: no pools specified");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
 	else if (boost::icontains(strBuffer,"ZEC: Stratum - Cannot connect to"))
 	{	
 		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 1);
+		PostErrorMsg(strBuffer.c_str(),"zec: stratum - cannot connect to");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect pool");
 	}
 	else if(boost::icontains(strBuffer,"Cannot resolve"))
 	{
 		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 2);
+		PostErrorMsg(strBuffer.c_str(),"cannot resolve");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve");
 	}
 	else if(boost::icontains(strBuffer,"Error:"))
 	{
 		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 99);
+		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Some error Info");
 	}
 	//发生错误但是进程继续运行
 
 
+}
+
+
+
+void CClientZcashA::PostErrorMsg(const char *szBuffer, const char *szBeg)
+{
+	std::string strInfo = ultra::ToLower(ultra::Trim(std::string(szBuffer)));
+	std::string strSep = "\r\n";
+	size_t nBegPos = strInfo.find(szBeg);
+	if (nBegPos == std::string::npos)
+	{
+		nBegPos = 0;
+	} 
+	size_t nEndPos = strInfo.find("\r\n");
+	if (nEndPos == std::string::npos)
+	{
+		nEndPos = strInfo.find("\r");
+		if (nEndPos == std::string::npos)
+		{
+			nEndPos = strInfo.find("\n");
+		}
+	} 
+	strInfo = strInfo.substr(nBegPos,nEndPos);
+	if (strInfo.length()>MAX_ERROR_LEN-1)
+	{
+		strInfo = strInfo.substr(0,MAX_ERROR_LEN-1);
+	}
+	char * pInfo = new char[MAX_ERROR_LEN];
+	strcpy_s(pInfo,MAX_ERROR_LEN,strInfo.c_str());
+	PostMessage(m_hMsgWnd, WM_ERROR_INFO, 1, (LPARAM)pInfo);
 }

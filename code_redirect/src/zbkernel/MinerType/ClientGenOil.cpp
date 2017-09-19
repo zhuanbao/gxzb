@@ -220,11 +220,15 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	if (boost::icontains(strBuffer,"Invalid argument:"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 1);
+
+		PostErrorMsg(strBuffer.c_str(),"invalid argument:");
+
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
 	else if(boost::icontains(strBuffer,"No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 2);
+		PostErrorMsg(strBuffer.c_str(),"no gpu device");
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
 	}
 	//发生错误但是进程继续运行
@@ -241,16 +245,19 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	else if (boost::icontains(strBuffer,"error: front end compiler failed build"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 3);
+		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: front end compiler failed build");
 	}
 	else if (boost::icontains(strBuffer,"error: invalid storage-class specifiers in OpenCL"))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 4);
+		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: invalid storage-class specifiers in OpenCL");
 	}
 	else if (boost::icontains(strBuffer,"error: "))
 	{
 		PostWndMsg(WP_GENOIL_ERROR_INFO, 5);
+		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: new resone");
 	}
 	//opencl 错误码 clEnqueueWriteBuffer(-38)
@@ -275,9 +282,39 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	} 
 	if (iErrorCode < 0)
 	{	
+		TSDEBUG4CXX(L"[RegexString]: " << L"OpenCL Error function start");
 		PostWndMsg(WP_GENOIL_ERROR_OPENCL, iErrorCode);
+		PostErrorMsg(strBuffer.c_str(),"cl");
 		std::wstring wstrErrorFun = ultra::_A2T(strErrorFun);
 		TSDEBUG4CXX(L"[RegexString]: " << L"OpenCL Error function(" <<wstrErrorFun.c_str()<<"), ErrorCode = "<<iErrorCode);
 	}
 
+}
+
+void CClientGenOil::PostErrorMsg(const char *szBuffer, const char *szBeg)
+{
+	std::string strInfo = ultra::ToLower(ultra::Trim(std::string(szBuffer)));
+	std::string strSep = "\r\n";
+	size_t nBegPos = strInfo.find(szBeg);
+	if (nBegPos == std::string::npos)
+	{
+		nBegPos = 0;
+	} 
+	size_t nEndPos = strInfo.find("\r\n");
+	if (nEndPos == std::string::npos)
+	{
+		nEndPos = strInfo.find("\r");
+		if (nEndPos == std::string::npos)
+		{
+			nEndPos = strInfo.find("\n");
+		}
+	} 
+	strInfo = strInfo.substr(nBegPos,nEndPos);
+	if (strInfo.length()>MAX_ERROR_LEN-1)
+	{
+		strInfo = strInfo.substr(0,MAX_ERROR_LEN-1);
+	}
+	char * pInfo = new char[MAX_ERROR_LEN];
+	strcpy_s(pInfo,MAX_ERROR_LEN,strInfo.c_str());
+	PostMessage(m_hMsgWnd, WM_ERROR_INFO, 1, (LPARAM)pInfo);
 }

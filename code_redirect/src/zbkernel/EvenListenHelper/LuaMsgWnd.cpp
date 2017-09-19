@@ -181,6 +181,23 @@ LRESULT LuaMsgWindow::OnZcashAMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, B
 	return 0;
 }
 
+
+LRESULT LuaMsgWindow::OnErrorMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	LPSTR pInfo = (LPSTR)lParam;
+	std::wstring wstrInfo;
+	AnsiStringToWideString(pInfo,wstrInfo);
+	delete pInfo;
+
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (LPWSTR)wstrInfo.c_str();
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnErrorMsg", &params);
+	return 0;
+}
+
 void LuaMsgWindow::SetKeyboardHook()
 {
 	if (NULL==m_hKeyboardHook)

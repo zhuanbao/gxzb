@@ -16,6 +16,7 @@ private:
 	void RegexString(const char *szBuffer);
 	void PostWndMsg(WPARAM wParam, LPARAM lParam);
 	void RetSet();
+	void PostErrorMsg(const char *szBuffer, const char *szBeg);
 private:
 	HWND m_hMsgWnd;
 	int  m_DagProgress;
