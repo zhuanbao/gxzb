@@ -17,8 +17,8 @@ function SetMsgToUser(strText)
 	end
 end
 
-function OnTakeCashToServerCallBack(event, bSuccess, tabInfo)
-	if not bSuccess then
+function OnTakeCashToServerCallBack(obj, event, bSuccess, tabInfo)
+	if not bSuccess and type(tabInfo) ~= "table" then
 		SetMsgToUser("连接服务器失败，请重试")
 		--self:Enable(true)
 	elseif tabInfo["rtn"] == 0 then	
@@ -75,7 +75,7 @@ function OnClickTakeCash(self)
 	end
 	self:Enable(false)
 	--local bSuccess = tFunctionHelper.ReadAllConfigInfo()
-	ClientWorkModule:AddListener("OnTakeCashToServer", OnTakeCashToServerCallBack)
+	ClientWorkModule:AddListener("OnTakeCashToServer", OnTakeCashToServerCallBack, ClientWorkModule)
 	ClientWorkModule:TakeCashToServer(nTakeMoney)
 	
 	local tStatInfo = {}
