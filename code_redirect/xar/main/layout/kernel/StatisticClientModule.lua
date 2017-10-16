@@ -16,6 +16,11 @@ StatisticClient._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
 StatisticClient._strLastReportRunTimeState = "nomining"
 StatisticClient._tabCpuTime = nil
 
+StatisticClient._ResoureCnt = 0
+StatisticClient._nCpuUsagePrecent = 0
+StatisticClient._nMemoryLoadPrecent = 0
+StatisticClient._nGpuUsagePrecent = 0
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -62,16 +67,45 @@ function ParamEncode(strParam)
     return strParam
 end
 
-function StatisticClient:CalculateCpuUsage()
+function StatisticClient:CalculateResourceUsage()
+	--cpu
 	local nUsagePrecent,tabTime =  tipUtil:GetCPUUsage(self._tabCpuTime) 
 	self._tabCpuTime = tabTime
-	self._nCpuUsagePrecent = nUsagePrecent
+	self._nCpuUsagePrecent = self._nCpuUsagePrecent+nUsagePrecent
+	
+	--memory
+	local tabMemoryInfo = tipUtil:GetMemoryStatus()
+	if type(tabMemoryInfo) ~= "table" then
+		tabMemoryInfo = {}
+	end
+	local nMemoryLoadPrecent = tabMemoryInfo["MemoryLoad"] or 0
+	self._nMemoryLoadPrecent = self._nMemoryLoadPrecent + nMemoryLoadPrecent
+	
+	--gpu
+	local nGpuUsagePrecent = tipUtil:GetGPUUsage(2) or 0
+	self._nGpuUsagePrecent = self._nGpuUsagePrecent + nGpuUsagePrecent
+
+	self._ResoureCnt = self._ResoureCnt + 1
+end
+
+function StatisticClient:GetAverageResourceUsage()
+	local nAverageCpu, nAverageMemory, nAverageGpu = 0,0,0
+	if self._ResoureCnt >= 1 then
+		nAverageCpu = math.floor(self._nCpuUsagePrecent/self._ResoureCnt)
+		nAverageMemory = math.floor(self._nMemoryLoadPrecent/self._ResoureCnt)
+		nAverageGpu = math.floor(self._nGpuUsagePrecent/self._ResoureCnt)
+	end
+	self._nCpuUsagePrecent = 0
+	self._nMemoryLoadPrecent = 0
+	self._nGpuUsagePrecent = 0
+	self._ResoureCnt = 0
+	return nAverageCpu, nAverageMemory, nAverageGpu
 end
 
 function StatisticClient:Init()
 	--ClientWorkModule = XLGetGlobal("ClientWorkModule")
 	timeMgr:SetTimer(function(Itm, id)
-			self:CalculateCpuUsage()
+			self:CalculateResourceUsage()
 		end, 1*1000)
 end
 
@@ -185,15 +219,18 @@ function StatisticClient:SendRunTimeReport(strState)
 	if tStatInfo.fu5 == "mining" then
 		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
 		tStatInfo.fu7 = ClientWorkModule:GetMiningType()
-		local tabMemoryInfo = tipUtil:GetMemoryStatus()
-		if type(tabMemoryInfo) ~= "table" then
-			tabMemoryInfo = {}
-		end
-		local nCpuUsagePrecent = self._nCpuUsagePrecent or 0
-		local nMemoryLoadPrecent = tabMemoryInfo["MemoryLoad"] or 0
-		local nGpuUsagePrecent = tipUtil:GetGPUUsage(2) or 0
-		tStatInfo.fu8 = nCpuUsagePrecent .. "_" .. nMemoryLoadPrecent .. "_" .. nGpuUsagePrecent
 	end
+	--[[
+	local tabMemoryInfo = tipUtil:GetMemoryStatus()
+	if type(tabMemoryInfo) ~= "table" then
+		tabMemoryInfo = {}
+	end
+	local nCpuUsagePrecent = self._nCpuUsagePrecent or 0
+	local nMemoryLoadPrecent = tabMemoryInfo["MemoryLoad"] or 0
+	local nGpuUsagePrecent = tipUtil:GetGPUUsage(2) or 0
+	--]]
+	local nCpuUsagePrecent, nMemoryLoadPrecent, nGpuUsagePrecent = self:GetAverageResourceUsage()
+	tStatInfo.fu8 = nCpuUsagePrecent .. "_" .. nMemoryLoadPrecent .. "_" .. nGpuUsagePrecent
 	tStatInfo.fu9 = nSpanTime
 	self:SendOnlineReport(tStatInfo)
 	self._strLastReportRunTimeState = strState
