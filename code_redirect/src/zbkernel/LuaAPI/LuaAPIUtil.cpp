@@ -6058,7 +6058,7 @@ int LuaAPIUtil::FGetGPUUsage(lua_State *pLuaState)
 	int nType = (int)lua_tointeger( pLuaState, 2);
 	if (nType == vendor_t::nvidia)
 	{
-		iGpuUsage = Nvidia::GetNvidiaGpuUsgae();
+		iGpuUsage = Nvidia::NvidiaInfo::Instance()->GetGpuUsgae();
 		lua_pushinteger(pLuaState, iGpuUsage);
 	}
 	else
