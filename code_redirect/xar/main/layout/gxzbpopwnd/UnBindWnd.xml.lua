@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 
 function DestoryDialog(self)
@@ -12,7 +12,11 @@ function OnClickCloseDialog(self)
 end
 
 function OnClickUnBind(self)
-	tFunctionHelper.UnBindingClientFromClient()
+	--tFunctionHelper.UnBindingClientFromClient()
+	local tStatInfo = {}
+	tStatInfo.fu1 = "unbindwx"
+	--tStatInfo.fu5 = "client"
+	StatisticClient:SendClickReport(tStatInfo)
 	DestoryDialog(self)
 end
 

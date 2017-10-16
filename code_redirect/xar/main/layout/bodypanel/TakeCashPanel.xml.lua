@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local gCanTakeMoney = 0
 local gBalance = 0
 --提现错误码
@@ -7,13 +7,62 @@ local ERROR_EXCEEDING_TAKE_TIME = -2
 local ERROR_WORKID = -3
 local ERROR_NO_ENOUGH_MONEY = -4
 local ERROR_BIND = -5
+local gOwnerCtrl = nil
 
-function SetMsgToUser(OwnerCtrl, strText)
-	local ObjMsgToUser = OwnerCtrl:GetControlObject("TakeCashPanel.Panel.MsgToUser")
+function SetMsgToUser(strText)
+	local ObjMsgToUser = gOwnerCtrl:GetControlObject("TakeCashPanel.Panel.MsgToUser")
 	ObjMsgToUser:SetText(strText)
 	if not ObjMsgToUser:GetVisible() then
 		ObjMsgToUser:SetVisible(true)
 	end
+end
+
+function OnTakeCashToServerCallBack(event, bSuccess, tabInfo)
+	if not bSuccess then
+		SetMsgToUser("连接服务器失败，请重试")
+		--self:Enable(true)
+	elseif tabInfo["rtn"] == 0 then	
+		local nBalance = tabInfo["data"]["balance"] 
+		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+		tUserConfig["nLastTakeCashUTC"] = tFunctionHelper.GetCurrentServerTime()
+		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+		ClientWorkModule:SetUserCurrentBalance(nBalance)
+		ClientWorkModule:UpdateUserBalance(nBalance)
+		SetMsgToUser("恭喜您，提现成功，请查看微信")
+		--Statistic:SendUIReport("takecash","success")
+		local tStatInfo = {}
+		tStatInfo.fu1 = "takecash"
+		tStatInfo.fu5 = "success"
+		StatisticClient:SendEventReport(tStatInfo)
+	else
+		local nErrorCode = tabInfo["data"]["errCode"]
+		if nErrorCode == ERROR_WORKID or nErrorCode == ERROR_BIND then
+			SetMsgToUser("绑定信息错误，无法提现")
+		elseif nErrorCode == ERROR_NO_ENOUGH_MONEY then
+			local nBalance = tabInfo["data"]["balance"] or 0
+			--self:Enable(true)
+			ClientWorkModule:SetUserCurrentBalance(nBalance)
+			ClientWorkModule:UpdateUserBalance(nBalance)
+			SetMsgToUser("余额不足，无法提现")
+		elseif nErrorCode == ERROR_EXCEEDING_TAKE_TIME then
+			local nBalance = tabInfo["data"]["balance"] 
+			ClientWorkModule:SetUserCurrentBalance(nBalance)
+			ClientWorkModule:UpdateUserBalance(nBalance)
+			SetMsgToUser("今天已提现，请明天再来~")
+		else
+			if nErrorCode == ERROR_INPUT then
+				SetMsgToUser("输入金额错误，请重新输入")
+			else
+				SetMsgToUser("服务器未知错误，请重试")
+			end	
+			--self:Enable(true)
+		end
+		local tStatInfo = {}
+		tStatInfo.fu1 = "takecash"
+		tStatInfo.fu5 = "fail"
+		tStatInfo.fu6 = nErrorCode
+		StatisticClient:SendEventReport(tStatInfo)
+	end	
 end
 
 function OnClickTakeCash(self)
@@ -26,44 +75,12 @@ function OnClickTakeCash(self)
 	end
 	self:Enable(false)
 	--local bSuccess = tFunctionHelper.ReadAllConfigInfo()
-	tFunctionHelper.TakeCashToServer(nTakeMoney,function(bRet, tabInfo)
-		if not bRet then
-			SetMsgToUser(OwnerCtrl, "连接服务器失败，请重试")
-			--self:Enable(true)
-		elseif tabInfo["rtn"] == 0 then	
-			local nBalance = tabInfo["data"]["balance"] 
-			local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-			tUserConfig["nLastTakeCashUTC"] = tFunctionHelper.GetCurrentServerTime()
-			tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-			tFunctionHelper.SetUserCurrentBalance(nBalance)
-			tFunctionHelper.UpdateUserBalance(nBalance)
-			SetMsgToUser(OwnerCtrl, "恭喜您，提现成功，请查看微信")
-			tFunctionHelper.SendUIReport("takecash","success")
-		else
-			local nErrorCode = tabInfo["data"]["errCode"]
-			if nErrorCode == ERROR_WORKID or nErrorCode == ERROR_BIND then
-				SetMsgToUser(OwnerCtrl, "绑定信息错误，无法提现")
-			elseif nErrorCode == ERROR_NO_ENOUGH_MONEY then
-				local nBalance = tabInfo["data"]["balance"] or 0
-				--self:Enable(true)
-				tFunctionHelper.SetUserCurrentBalance(nBalance)
-				tFunctionHelper.UpdateUserBalance(nBalance)
-				SetMsgToUser(OwnerCtrl, "余额不足，无法提现")
-			elseif nErrorCode == ERROR_EXCEEDING_TAKE_TIME then
-				local nBalance = tabInfo["data"]["balance"] 
-				tFunctionHelper.SetUserCurrentBalance(nBalance)
-				tFunctionHelper.UpdateUserBalance(nBalance)
-				SetMsgToUser(OwnerCtrl, "今天已提现，请明天再来~")
-			else
-				if nErrorCode == ERROR_INPUT then
-					SetMsgToUser(OwnerCtrl, "输入金额错误，请重新输入")
-				else
-					SetMsgToUser(OwnerCtrl, "服务器未知错误，请重试")
-				end	
-				--self:Enable(true)
-			end
-		end	
-	end)
+	ClientWorkModule:AddListener("OnTakeCashToServer", OnTakeCashToServerCallBack)
+	ClientWorkModule:TakeCashToServer(nTakeMoney)
+	
+	local tStatInfo = {}
+	tStatInfo.fu1 = "takecash"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnEditFocusChange(self, isFocus)
@@ -151,7 +168,7 @@ function OnClickUnBindWeiXin(self)
 end
 
 function OnInitControl(self)
-	
+	gOwnerCtrl = self
 end
 
 function CheckCanTakeCash()

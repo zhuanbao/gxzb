@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local Helper = XLGetGlobal("Helper")
 local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
@@ -21,7 +21,7 @@ local tabCtrl = {
 }
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@QRCodePanel: " .. tostring(strLog))
+		tipUtil:Log("QRCodePanel: " .. tostring(strLog))
 	end
 end
 
@@ -59,7 +59,7 @@ function AutoJumpToPanel(OwnerCtrl)
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	local strPanle = "MiningPanel"
 	local strInfo = "秒后跳转到赚宝界面"
-	if tFunctionHelper.GetUserCurrentBalance() >= gMinTakeCashBalance then
+	if ClientWorkModule:GetUserCurrentBalance() >= gMinTakeCashBalance then
 		strPanle = "TakeCashPanel"
 		strInfo = "秒后开始提现"
 	end
@@ -70,7 +70,7 @@ function AutoJumpToPanel(OwnerCtrl)
 	gChangePanelTimeoutId = timerManager:SetTimer(function(Itm, id)
 		if nTotalTime <= 0 and gBinding then
 			ResetGlobalParam()
-			tFunctionHelper.ChangeMainBodyPanel(strPanle)
+			UIInterface:ChangeMainBodyPanel(strPanle)
 			return
 		end
 		nTotalTime = nTotalTime - 1
@@ -111,21 +111,12 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 	local nExpire = math.floor(tabInfo["data"]["expire"]/1000)
 	local ImgTmpCode= OwnerCtrl:GetControlObject("QRCodePanel.Panel.QRCode.TmpCode")
 	ImgTmpCode:SetBitmap(ObjBitmap)
-	local tServerConfig = g_ServerConfig
-	if type(tServerConfig) ~= "table" then
-		tServerConfig = {}
-	end
-	local tServerInterfaceCfg = tServerConfig["tServerInterfaceCfg"]
-	if type(tServerInterfaceCfg) ~= "table" then
-		tServerInterfaceCfg = {}
-	end
-	local nQueryInterval = tabInfo["data"]["interval"] or tServerInterfaceCfg["nQueryBindInterval"] or 10
+	local nQueryInterval = tonumber(tabInfo["data"]["interval"]) or 10
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	local bQuerying = false
 	local nTimerCounter = 0
 	local function TimerHandle()
 		if not gBinding then
-			--tFunctionHelper.SendUIReport("bindweixin","fail","cancel")
 			return	
 		end
 		if nExpire < 1 then
@@ -133,7 +124,12 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 			ResetLastQRCodeInfo()
 			ResetGlobalParam()
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.Expire")
-			tFunctionHelper.SendUIReport("bindweixin","fail","expire")
+			
+			local tStatInfo = {}
+			tStatInfo.fu1 = "bindwx"
+			tStatInfo.fu5 = "fail"
+			tStatInfo.fu6 = "expire"
+			StatisticClient:SendEventReport(tStatInfo)
 			return
 		end
 		nExpire = nExpire - 1
@@ -144,7 +140,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 			bQuerying = true
 			TipLog("Cycle query sever for bind result in.")
 			nTimerCounter = 0
-			tFunctionHelper.CycleQuerySeverForBindResult(function(bRet,tabBindInfo)
+			ClientWorkModule:CycleQuerySeverForBindResult(function(bRet,tabBindInfo)
 				if not gBinding or not bQuerying then
 					return
 				end
@@ -154,15 +150,23 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					ResetLastQRCodeInfo()
 					ResetGlobalParam()
 					ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
-					tFunctionHelper.SendUIReport("bindweixin","fail","svrerror")
+					local tStatInfo = {}
+					tStatInfo.fu1 = "bindwx"
+					tStatInfo.fu5 = "fail"
+					tStatInfo.fu6 = "svrerror"
+					StatisticClient:SendEventReport(tStatInfo)
 					return 
 				end
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
 					ResetGlobalParam()
 					UpdateBindSuccessUI(OwnerCtrl)
-					tFunctionHelper.SetUserBindInfo(tabBindInfo)
+					ClientWorkModule:SetUserBindInfo(tabBindInfo)
 					ResetLastQRCodeInfo()
-					tFunctionHelper.SendUIReport("bindweixin","success")
+					--Statistic:SendUIReport("bindweixin","success")
+					local tStatInfo = {}
+					tStatInfo.fu1 = "bindwx"
+					tStatInfo.fu5 = "success"
+					StatisticClient:SendEventReport(tStatInfo)
 				end	
 				bQuerying = false
 			end)
@@ -182,7 +186,12 @@ function HandleInfoData(OwnerCtrl,tabInfo)
 	if not ObjBitmap then
 		ResetGlobalParam()
 		ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
-		tFunctionHelper.SendUIReport("bindweixin","fail","getbitmap")
+		--Statistic:SendUIReport("bindweixin","fail","getbitmap")
+		local tStatInfo = {}
+		tStatInfo.fu1 = "bindwx"
+		tStatInfo.fu5 = "fail"
+		tStatInfo.fu6 = "getbitmap"
+		StatisticClient:SendEventReport(tStatInfo)
 		return
 	end
 	
@@ -195,11 +204,16 @@ end
 
 function GetQRCodeFromServer(OwnerCtrl)
 	ResetGlobalParam()
-	tFunctionHelper.DownLoadTempQrcode(function(bRet,info)
+	ClientWorkModule:DownLoadTempQrcode(function(bRet,info)
 		if not bRet then
 			TipLog("Download temp qrcode failed.")
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
-			tFunctionHelper.SendUIReport("bindweixin","fail","downqrcode")
+			--Statistic:SendUIReport("bindweixin","fail","downqrcode")
+			local tStatInfo = {}
+			tStatInfo.fu1 = "bindwx"
+			tStatInfo.fu5 = "fail"
+			tStatInfo.fu6 = "downqrcode"
+			StatisticClient:SendEventReport(tStatInfo)
 			return
 		end
 		HandleInfoData(OwnerCtrl, info)
@@ -213,15 +227,15 @@ function OnClickRefreshQRCode(self)
 end
 
 function OnClickBegainMining(self)
-	tFunctionHelper.ChangeMainBodyPanel("MiningPanel")
-	if not tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyStart()
+	UIInterface:ChangeMainBodyPanel("MiningPanel")
+	if not ClientWorkModule:CheckIsWorking() then
+		ClientWorkModule:NotifyStart()
 	end
 end
 
 function OnClickUnBindWeiXin(self)
 	local OwnerCtrl = self:GetOwnerControl()
-	tFunctionHelper.ChangeMainBodyPanel("MiningPanel")
+	UIInterface:ChangeMainBodyPanel("MiningPanel")
 end
 
 

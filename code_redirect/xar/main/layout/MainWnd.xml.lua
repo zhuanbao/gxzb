@@ -1,6 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local gRootCtrl = nil
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 function OnClose( self )
 	self:Show(0)
@@ -11,12 +11,6 @@ end
 function OnMouseLeave(self, x, y)
 
 end
-
-local gTipStartTime = nil
-function GetTipStartTime()
-	return gTipStartTime
-end
---XLSetGlobal("GreenWall.GetTipStartTime", GetTipStartTime)
 
 local gShowOnce = false
 function TryPopAutoRunTip()
@@ -36,7 +30,7 @@ function TryPopAutoRunTip()
 		return
 	end
 	gShowOnce = true
-	tFunctionHelper.ShowPopupWndByName("GXZB.AutoRunTipWnd.Instance", true)
+	UIInterface:ShowPopupWndByName("GXZB.AutoRunTipWnd.Instance", true)
 end
 
 function OnShowWindow(self, bShow)
@@ -68,20 +62,9 @@ function PopupInDeskMiddle(self)
 	return true
 end
 
-function FetchValueByPath(obj, path)
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
-end
-
 function OnCreate( self )
 	 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local tMain = FetchValueByPath(tUserConfig, {"tWindow", "tMain"})
+	local tMain = tFunctionHelper.FetchValueByPath(tUserConfig, {"tWindow", "tMain"})
 	if type(tMain) == "table" and type(tMain.nLeft) == "number" and type(tMain.nTop) == "number" and type(tMain.nWidth) == "number" and type(tMain.nHeight) == "number" then
 		self:Move(tMain.nLeft, tMain.nTop, tMain.nWidth, tMain.nHeight)
 	else	

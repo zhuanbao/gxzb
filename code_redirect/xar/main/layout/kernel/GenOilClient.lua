@@ -1,7 +1,7 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
@@ -74,12 +74,22 @@ end
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@File=GenOilClient: " .. tostring(strLog))
+		tipUtil:Log("GenOilClient: " .. tostring(strLog))
 	end
 end
 
 function GTV(obj)
 	return "[" .. type(obj) .. "`" .. tostring(obj) .. "]"
+end
+
+function GetOpenCLPlatformCmd()
+	local iPlatformID = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "Software\\Share4Money", "openclplatform")
+	iPlatformID = tonumber(iPlatformID) or 0
+	if iPlatformID == 0 then
+		return ""
+	end	
+	local strCmdParam = "--opencl-platform " .. tostring(iPlatformID) 
+	return strCmdParam
 end
 
 function IsExistOtherUserWnd()
@@ -229,7 +239,7 @@ function GetCurrentMiningCmdLine()
 end
 
 function UpdateSpeed(nHashRate)
-	 g_MiningSpeedPerHour = math.floor(nHashRate * tFunctionHelper.GetSvrAverageMiningSpeed())
+	 g_MiningSpeedPerHour = math.floor(nHashRate * ClientWorkModule:GetSvrAverageMiningSpeed())
 end
 
 function GetRealTimeIncome(nSpeed,nSpanTime)
@@ -237,7 +247,7 @@ function GetRealTimeIncome(nSpeed,nSpanTime)
 		TipLog("[GetRealTimeIncome] nSpanTime = " .. GTV(nSpanTime) .. ", nSpeed = " .. GTV(nSpeed))
 		return 0
 	end
-	local nIncome = nSpeed*nSpanTime*tFunctionHelper.GetSvrAverageMiningSpeed()/3600
+	local nIncome = nSpeed*nSpanTime*ClientWorkModule:GetSvrAverageMiningSpeed()/3600
 	
 	local nLastRealTimeIncome = g_LastRealTimeIncome
 	local nNewRealTimeIncome = g_LastRealTimeIncome + nIncome
@@ -254,9 +264,9 @@ function WhenGetShare()
 	local nMaxQueryCnt = 2
 	local nInterval = 3
 	local nQueryCnt = 0
-	local nReportCalcInterval = tFunctionHelper.GetReportCalcInterval()
-	local nLastQueryBalanceTime = tFunctionHelper.GetLastQueryBalanceTime()
-	local nLastBalance = tFunctionHelper.GetUserCurrentBalance()
+	local nReportCalcInterval = ClientWorkModule:GetHeartbeatInterval()
+	local nLastQueryBalanceTime = ClientWorkModule:GetLastQueryBalanceTime()
+	local nLastBalance = ClientWorkModule:GetUserCurrentBalance()
 	local function DoQueryTimer()
 		nQueryCnt = nQueryCnt + 1
 		if nQueryCnt > nMaxQueryCnt then
@@ -266,12 +276,12 @@ function WhenGetShare()
 		if nCurrentUTCTime > nLastQueryBalanceTime + nReportCalcInterval - 3 then
 			return
 		end
-		local nBalance = tFunctionHelper.GetUserCurrentBalance()
+		local nBalance = ClientWorkModule:GetUserCurrentBalance()
 		if nLastBalance ~= nBalance then
 			return
 		end
 		SetOnceTimer(function()
-			tFunctionHelper.QueryClientInfo(g_LastAverageHashRate)
+			ClientWorkModule:QueryWorkerInfo()
 			DoQueryTimer()
 		end, nInterval*1000)	
 	end
@@ -286,9 +296,9 @@ function OnGenOilMsg(tParam)
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
 			ResetGlobalErrorParam()
 			g_PreWorkState = CLIENT_STATE_CALCULATE
-			tFunctionHelper.UpdateMiningState(CLIENT_STATE_CALCULATE)
-			if tFunctionHelper.GetSvrAverageMiningSpeed() == 0 then
-				tFunctionHelper.QueryClientInfo(0)
+			UIInterface:UpdateUIMiningState(CLIENT_STATE_CALCULATE)
+			if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+				ClientWorkModule:QueryClientInfo(0)
 			end	
 			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
@@ -298,7 +308,7 @@ function OnGenOilMsg(tParam)
 			g_HashRateSum = g_HashRateSum + nParam
 			g_HashRateSumCounter = g_HashRateSumCounter + 1
 			UpdateSpeed(nParam)
-			tFunctionHelper.UpdateMiningSpeed(g_MiningSpeedPerHour)
+			UIInterface:UpdateMiningSpeed(g_MiningSpeedPerHour)
 			if g_LastGetSpeedTime == 0 then
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 			else
@@ -306,7 +316,7 @@ function OnGenOilMsg(tParam)
 				local nRealTimeIncome = GetRealTimeIncome(nParam, nSpanTime)
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 				if nRealTimeIncome > 0 then
-					tFunctionHelper.UpdateRealTimeIncome(nRealTimeIncome)
+					UIInterface:UpdateRealTimeIncome(nRealTimeIncome)
 				end
 			end
 		end
@@ -314,10 +324,10 @@ function OnGenOilMsg(tParam)
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_PREPARE then
 			g_PreWorkState = CLIENT_STATE_PREPARE
-			tFunctionHelper.UpdateMiningState(CLIENT_STATE_PREPARE)
+			UIInterface:UpdateUIMiningState(CLIENT_STATE_PREPARE)
 		end
 		if tonumber(nParam) ~= nil then
-			tFunctionHelper.UpdateDagProgress(nParam)
+			UIInterface:UpdateDagProgress(nParam)
 		end
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
@@ -350,7 +360,7 @@ end
 0 全速，1智能
 --]]
 function InitCmdLine()
-	local nWorkModel = tFunctionHelper.GetCurrentWorkModel()
+	local nWorkModel = UIInterface:GetCurrentWorkModel()
 	if nWorkModel == 1 then
 		g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Min
 		SetControlSpeedCmdLine(g_GlobalWorkSizeMultiplier_Min)
@@ -369,7 +379,7 @@ function SetControlSpeedCmdLine(nGlobalWorkSizeMultiplier)
 end
 
 function ChangeMiningSpeed()
-	local nWorkModel = tFunctionHelper.GetCurrentWorkModel()
+	local nWorkModel = UIInterface:GetCurrentWorkModel()
 	if nWorkModel ~= 1 then
 		if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
 			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
@@ -455,7 +465,7 @@ function Start()
 	end
 	local strUserCmd = tabUserCmd["et"]
 	
-	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
+	local strPlatform = GetOpenCLPlatformCmd()
 	if IsRealString(strPlatform) then
 		strCmdLine = strCmdLine .. " " .. strPlatform
 	end
@@ -500,8 +510,8 @@ function ReStartClientByNextPool()
 	--连接下一个矿池
 	GetNewMiningCmdInfo()
 	if Start() ~= 0 then
-		tFunctionHelper.SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
-		tFunctionHelper.HandleOnQuit()
+		UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
+		ClientWorkModule:QuitMinerSuccess()
 		return
 	end
 end
@@ -511,13 +521,13 @@ function ReTryStartClient()
 	g_ClientReTryCnt = g_ClientReTryCnt + 1
 	TipLog("[ReTryStartClient] g_ClientReTryCnt = " .. GTV(g_ClientReTryCnt))
 	if g_ClientReTryCnt >= g_ClientMaxReTryCnt then
-		tFunctionHelper.SetStateInfoToUser("赚宝进程运行失败")
-		tFunctionHelper.HandleOnQuit()
+		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		ClientWorkModule:QuitMinerSuccess()
 		return
 	end
 	if Start() ~= 0 then
-		tFunctionHelper.SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
-		tFunctionHelper.HandleOnQuit()
+		UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
+		ClientWorkModule:QuitMinerSuccess()
 		return
 	end
 end
@@ -589,6 +599,6 @@ function RegisterFunctionObject(self)
 	obj.GetDefaultPoolType = GetDefaultPoolType
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
-	XLSetGlobal("Global.GenOilClient", obj)
+	XLSetGlobal("GenOilClient", obj)
 end
 RegisterFunctionObject()

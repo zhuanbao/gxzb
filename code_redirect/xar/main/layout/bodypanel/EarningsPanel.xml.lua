@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 function UpdateUserBalance(self, nBalance)
 	local bottomText = self:GetObject("BottomTextBalance")
@@ -35,10 +35,10 @@ function UpdateClientUnBindState(self)
 	if attr.currentpanel == 2 then
 		reqID = "d30"
 	end
-	tFunctionHelper.GetHistoryToServer(reqID, function(bRet, tabInfo)
+	ClientWorkModule:GetHistoryToServer(reqID, function(bRet, tabInfo)
 			attr.Data = tabInfo
 			attr.Data["reqFailed"] = not bRet
-			attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
+			attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 			self:Update()
 		end)
 end
@@ -340,10 +340,10 @@ function OnClickHourBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
-	tFunctionHelper.GetHistoryToServer("h24", function(bRet, tabInfo)
+	ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet
-		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
+		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end
@@ -358,10 +358,10 @@ function OnClickDayBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
-	tFunctionHelper.GetHistoryToServer("d30", function(bRet, tabInfo)
+	ClientWorkModule:GetHistoryToServer("d30", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet
-		attr.Data["balance"] = tFunctionHelper.GetUserCurrentBalance()
+		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end

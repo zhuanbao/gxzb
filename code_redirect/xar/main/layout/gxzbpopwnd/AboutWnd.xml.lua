@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 function OnClickClose(self)
 	local objTree = self:GetOwner()
@@ -40,4 +40,7 @@ end
 
 function OnClickLink(self)
 	Helper.tipUtil:OpenURL(self:GetText())
+	local tStatInfo = {}
+	tStatInfo.fu1 = "openhomepage"
+	StatisticClient:SendClickReport(tStatInfo)
 end

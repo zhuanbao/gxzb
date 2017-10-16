@@ -1,6 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
-local g_ServerConfig = nil
+
 
 function LoadLuaModule(tFile, curDocPath)
 --tFile可以传lua文件绝对路径、相对路径
@@ -30,22 +30,39 @@ function LoadLuaModule(tFile, curDocPath)
 	end
 end
 
-local File = {
+local tabLuaFile = {
 "luacode\\objectbase.lua",
 "luacode\\helper.lua",
 "luacode\\helper_token.lua",
-"functionhelper.lua",
-"menu\\SettingMenu.lua",
+"kernel\\utility.lua",
+
 "menu\\SuspendMenu.lua",
+"menu\\SettingMenu.lua",
+"kernel\\ServerCfgModule.lua",
+"kernel\\StatisticClientModule.lua",
+"kernel\\UIInterfaceModule.lua",
+"kernel\\ClientWorkModule.lua",
+"kernel\\GenOilClient.lua",
+"kernel\\ZcashNClient.lua",
+"kernel\\ZcashAClient.lua",
 }
-LoadLuaModule(File, __document)
+LoadLuaModule(tabLuaFile, __document)
 
-local FunctionObj = XLGetGlobal("Global.FunctionHelper")
 local Helper = XLGetGlobal("Helper")
-
-
---------------
-
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local ServerCfg = XLGetGlobal("ServerCfg")
+local StatisticClient = XLGetGlobal("StatisticClient")
+local UIInterface = XLGetGlobal("UIInterface")
+local ClientWorkModule = XLGetGlobal("ClientWorkModule")
+local GenOilClient = XLGetGlobal("GenOilClient")
+local ZcashNClient = XLGetGlobal("ZcashNClient")
+local ZcashAClient = XLGetGlobal("ZcashAClient")
+function InitGlobalObj()
+	StatisticClient:Init()
+	--UIInterface:Init()
+	ClientWorkModule:Init()
+end
+InitGlobalObj()
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -58,27 +75,118 @@ function IsRealString(str)
 	return type(str) == "string" and str ~= ""
 end
 
-function MessageBox(str)
-	if not IsRealString(str) then
-		return
-	end
-	
-	tipUtil:MsgBox(str, "错误", 0x10)
+function TipLog(strLog)
+	tipUtil:Log("onload: " .. tostring(strLog))
 end
 
-function GetPeerID()
-	local strPeerID = FunctionObj.RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
-	if IsRealString(strPeerID) then
-		return string.upper(strPeerID)
+function CheckIsDebug()
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
+	if type(nValue) == "number" and nValue > 0 then
+		ClientWorkModule:SetMiningType(nValue)
+		return true
 	end
+	return false
+end
 
-	local strRandPeerID = tipUtil:GetPeerId()
-	if not IsRealString(strRandPeerID) then
-		return ""
+function SendStartUpReport()
+	local tStatInfo = {}
+	tStatInfo.fu1 = "startup"
+	local tabMemoryInfo = tipUtil:GetMemoryStatus()
+	if type(tabMemoryInfo) ~= "table" then
+		tabMemoryInfo = {}
+	end
+	tStatInfo.fu5 = math.floor((tabMemoryInfo["TotalPhys"] or 0)/1024)
+	local tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
+	if type(tabDisplayCard) == "table" then
+		for index=1,#tabDisplayCard do
+			local tabItem = tabDisplayCard[index]
+			if type(tabItem) == "table" then
+				nMemSize = 0
+				if type(tabItem["memory_size"]) == "number" then
+					nMemSize = math.floor(tabItem["memory_size"]/(1024*1024))
+				end
+				if IsRealString(tStatInfo.fu6) then
+					tStatInfo.fu6 = tStatInfo.fu6 .. "_"
+				else
+					tStatInfo.fu6 = ""
+				end
+				tStatInfo.fu6 = tStatInfo.fu6 .. (tabItem["vendor"] or "") .. "|"
+								.. (tabItem["name"] or "") .. "|"
+								.. (nMemSize)
+			end					
+		end
+	end
+	local strCpuName =  tFunctionHelper.RegQueryValue("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\ProcessorNameString") or ""
+	local strCpuMz = tFunctionHelper.RegQueryValue("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\~MHz") or 0
+	tStatInfo.fu7 = strCpuName.."_"..tostring(strCpuMz)
+	local bRet, strSource = tFunctionHelper.GetCommandStrValue("/sstartfrom")
+	tStatInfo.fu8 = strSource or ""
+	StatisticClient:SendEventReport(tStatInfo)
+end
+
+function SendInitSuccessReport()
+	local tStatInfo = {}
+	tStatInfo.fu1 = "initsuccess"
+	StatisticClient:SendEventReport(tStatInfo)
+end
+
+--返回值说明 -1: 需要安装额外的版本 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
+function CheckMachineSuitable()
+	if tFunctionHelper.GetSystemBits() ~= 64 then
+		LOG("CheckMachineSuitable GetSystemBits ~= 64")
+		return 0
 	end
 	
-	FunctionObj.RegSetValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId", strRandPeerID)
-	return string.upper(strRandPeerID)
+	local bEthereum = tipUtil:CheckEthereumCond()
+	if bEthereum then
+		return 1
+	end
+	local bZcashN = tipUtil:CheckZcashNCond()
+	if bZcashN then
+		return 2
+	end
+	---[[
+	local bZcashA = tipUtil:CheckZcashACond()
+	if bZcashA then
+		--return 3
+		UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
+		return -1
+	end
+	--]]
+	return 0
+end
+
+function LoadDynamicFont()
+	local strFontPath = __document.."\\..\\dynamicfont.lua"
+	local Module = XLLoadModule(strFontPath)
+end
+
+function ShowMainTipWnd(objMainWnd)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local bHideMainPage = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "HideMainPage", "bState"})
+	
+	local cmdString = tipUtil:GetCommandLine()
+	
+	local bRet = string.find(tostring(cmdString), "/forceshow")
+	if bRet then
+		bHideMainPage = false
+	else
+		local bRet = string.find(tostring(cmdString), "/embedding")
+		if bRet then
+			bHideMainPage = true
+		end
+	end
+	
+	if bHideMainPage then
+		objMainWnd:Show(0)
+	else
+		objMainWnd:Show(5)
+		UIInterface:SetWndForeGround(objMainWnd)
+	end
+	
+	objMainWnd:SetTitle("共享赚宝")
+	SendInitSuccessReport()
+	tFunctionHelper.WriteLastLaunchTime()
 end
 
 function PopTipWnd(OnCreateFunc)
@@ -109,66 +217,19 @@ function PopTipWnd(OnCreateFunc)
 		end
 	end
 	if not bSuccess then
-		local FunctionObj = XLGetGlobal("Global.FunctionHelper")
-		FunctionObj.FailExitTipWnd(4)
+		StatisticClient:FailExitProcess(4)
 	end
-	
 	---初始化托盘
     if frameHostWnd then
-		FunctionObj.TipLog("[PopTipWnd] try to init tray tip wnd")
-	    FunctionObj.InitTrayTipWnd(frameHostWnd)
+		TipLog("[PopTipWnd] try to init tray tip wnd")
+	    UIInterface:InitTrayTipWnd(frameHostWnd)
 	end
-end
-
-function ShowMainTipWnd(objMainWnd)
-	local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
-	local bHideMainPage = FetchValueByPath(tUserConfig, {"tConfig", "HideMainPage", "bState"})
-	
-	local cmdString = tipUtil:GetCommandLine()
-	
-	local bRet = string.find(tostring(cmdString), "/forceshow")
-	if bRet then
-		bHideMainPage = false
-	else
-		local bRet = string.find(tostring(cmdString), "/embedding")
-		if bRet then
-			bHideMainPage = true
-		end
-	end
-	
-	if bHideMainPage then
-		objMainWnd:Show(0)
-	else
-		objMainWnd:Show(5)
-		FunctionObj.SetWndForeGround(objMainWnd)
-	end
-	
-	objMainWnd:SetTitle("共享赚宝")
-	SendStartupReport(true)
-	WriteLastLaunchTime()
-end
-
-
-function ShowExitRemindWnd()
-	FunctionObj.ShowPopupWndByName("TipExitRemindWnd.Instance", true)
-end
--------------------------------
-
-function FetchValueByPath(obj, path)
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
 end
 
 function CreateMainTipWnd()
 	local function OnCreateFuncF(treectrl)
 		local rootctrl = treectrl:GetUIObject("root.layout:root.ctrl")
-		local tUserConfig = FunctionObj.ReadConfigFromMemByKey("tUserConfig") or {}
+		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 		local bRet = rootctrl:SetTipData(tUserConfig)			
 		if not bRet then
 			return false
@@ -176,187 +237,9 @@ function CreateMainTipWnd()
 	
 		return true
 	end
-	
 	PopTipWnd(OnCreateFuncF)	
 end
 
-function SaveConfigInTimer()
-	local nTimeSpanInMs = 10 * 60 * 1000
-	local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
-	timerManager:SetTimer(function(item, id)
-		FunctionObj.SaveAllConfig()
-	end, nTimeSpanInMs)
-end
-
-function SendStartupReport(bShowWnd)
-	local tStatInfo = {}
-	
-	local bRet, strSource = FunctionObj.GetCommandStrValue("/sstartfrom")
-	tStatInfo.strEL = strSource or ""
-	
-	if not bShowWnd then
-		tStatInfo.strEC = "startup"  --进入上报
-		tStatInfo.strEA = FunctionObj.GetInstallSrc() or ""
-	else
-		tStatInfo.strEC = "showui" 	 --展示上报
-		tStatInfo.strEA = FunctionObj.GetInstallSrc() or ""
-	end
-	
-	tStatInfo.strEV = 1
-	FunctionObj.TipConvStatistic(tStatInfo)
-end
-
-function CheckCondition(tForceUpdate)
-	if not tForceUpdate then
-		Helper:LOG("tForceUpdate is nil or wrong style!")
-		return
-	end
-	return tForceUpdate
-end
-
-function TryForceUpdate(tServerConfig)
-	if FunctionObj.CheckIsUpdating() then
-		FunctionObj.TipLog("[TryForceUpdate] CheckIsUpdating failed,another thread is updating!")
-		return
-	end
-	
-	local bPassCheck = FunctionObj.CheckCommonUpdateTime(1)
-	if not bPassCheck then
-		FunctionObj.TipLog("[TryForceUpdate] CheckCommonUpdateTime failed")
-		return		
-	end
-
-	local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
-	local tForceUpdate = tNewVersionInfo["tForceUpdate"]
-	if(type(tForceUpdate)) ~= "table" then
-		return 
-	end
-	
-	local strCurVersion = FunctionObj.GetGXZBVersion()
-	local versionInfo = CheckCondition(tForceUpdate)
-	local strNewVersion = versionInfo and versionInfo.strVersion		
-	if not IsRealString(strCurVersion) or not IsRealString(strNewVersion)
-		or not FunctionObj.CheckIsNewVersion(strNewVersion, strCurVersion) then
-		FunctionObj.TipLog("[TryForceUpdate] strCurVersion is nil or is not New Version")
-		return
-	end
-	
-	local tVersionLimit = versionInfo["tVersion"]
-	local bPassCheck = FunctionObj.CheckForceVersion(tVersionLimit)
-	FunctionObj.TipLog("[TryForceUpdate] CheckForceVersion bPassCheck:"..tostring(bPassCheck))
-	if not bPassCheck then
-		return 
-	end
-	
-	FunctionObj.SetIsUpdating(true)
-	FunctionObj.DownLoadNewVersion(versionInfo, function(strRealPath) 
-		FunctionObj.SetIsUpdating(false)
-	
-		if not IsRealString(strRealPath) then
-			FunctionObj.TipLog("[TryForceUpdate] download fail")
-			return
-		end
-		
-		FunctionObj.SaveCommonUpdateUTC()
-		local strCmd = " /write /s"
-		if IsRealString(versionInfo["strCmd"]) then
-			strCmd = strCmd.." "..versionInfo["strCmd"]
-		end
-		tipUtil:ShellExecute(0, "open", strRealPath, strCmd, 0, "SW_HIDE")
-		FunctionObj.SendUIReport("updateclinet","auto")
-	end)
-end
-
-
-function TryExecuteExtraCode(tServerConfig)
-	local tExtraHelper = tServerConfig["tExtraHelper"] or {}
-	local strURL = tExtraHelper["strURL"]
-	local strMD5 = tExtraHelper["strMD5"]
-	
-	if not IsRealString(strURL) then
-		return
-	end
-	
-	local bPassCheck = FunctionObj.CheckForceVersion(tExtraHelper["tVersion"])
-	FunctionObj.TipLog("[TryExecuteExtraCode] CheckForceVersion bPassCheck:"..tostring(bPassCheck))
-	if not bPassCheck then
-		return
-	end
-	
-	
-	local strHelperName = FunctionObj.GetFileSaveNameFromUrl(strURL)
-	local strSaveDir = tipUtil:GetSystemTempPath()
-	local strSavePath = tipUtil:PathCombine(strSaveDir, strHelperName)
-	
-	local strStamp = FunctionObj.GetTimeStamp()
-	local strURLFix = strURL..strStamp
-	
-	FunctionObj.DownLoadFileWithCheck(strURLFix, strSavePath, strMD5
-	, function(bRet, strRealPath)
-		FunctionObj.TipLog("[TryExecuteExtraCode] strURL:"..tostring(strURL)
-		        .."  bRet:"..tostring(bRet).."  strRealPath:"..tostring(strRealPath))
-				
-		if bRet < 0 then
-			return
-		end
-		
-		FunctionObj.TipLog("[TryExecuteExtraCode] begin execute extra helper: "..tostring(strRealPath))
-		XLLoadModule(strRealPath)
-	end)	
-end
-
-
-function WriteLastLaunchTime()
-	local nCurrnetTime = tipUtil:GetCurrentUTCTime()
-	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Share4Money\\LastLaunchTime"
-	FunctionObj.RegSetValue(strRegPath, nCurrnetTime)
-end
-
-function CheckMachineBindState()
-	if FunctionObj.CheckIsGettedWorkID() then
-		FunctionObj.QueryWorkerInfo()
-	end
-end
-
-function OnDownLoadSvrCfgSuccess(strServerPath)
-	if FunctionObj.CheckShouldRemindBind() then
-		FunctionObj.ChangeMainBodyPanel("QRCodePanel")
-		FunctionObj.SaveLastRemindBindUTC()
-	end
-	
-	local tServerConfig = FunctionObj.LoadTableFromFile(strServerPath) or {}
-	XLSetGlobal("g_ServerConfig", tServerConfig)
-	g_ServerConfig = tServerConfig
-	--4小时1次提醒
-	FunctionObj.PopTipPre4Hour()
-	TryExecuteExtraCode(tServerConfig)
-	
-	--[[
-	CheckMachineBindState()
-	FunctionObj.CheckShoudAutoMining()
-	--]]
-	--增加处理/noliveup命令行
-	--升级提醒
-	local bPopRemind = FunctionObj.PopRemindUpdateWnd()
-	if not bPopRemind then
-		SetOnceTimer(function()
-						local cmdString = tipUtil:GetCommandLine()
-						local bRet = string.find(string.lower(tostring(cmdString)), "/noliveup")
-						if not bRet then
-							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] TryForceUpdate")
-							TryForceUpdate(tServerConfig)
-						else
-							FunctionObj.TipLog("[OnDownLoadSvrCfgSuccess] bRet")
-						end
-					end, 1000)
-	end			
-end
-XLSetGlobal("OnDownLoadSvrCfgSuccess", OnDownLoadSvrCfgSuccess)
-
-function LoadDynamicFont()
-	local strFontPath = __document.."\\..\\dynamicfont.lua"
-	local Module = XLLoadModule(strFontPath)
-end
 --[[
 function IsZcashAClientExist()
 	local strDir = FunctionObj.GetModuleDir()
@@ -368,72 +251,38 @@ function IsZcashAClientExist()
 	return true
 end
 --]]
---返回值说明 -1: 需要安装额外的版本 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
-function CheckMachineSuitable()
-	if FunctionObj.GetSystemBits() ~= 64 then
-		LOG("CheckMachineSuitable GetSystemBits ~= 64")
-		return 0
-	end
-	
-	local bEthereum = tipUtil:CheckEthereumCond()
-	if bEthereum then
-		return 1
-	end
-	local bZcashN = tipUtil:CheckZcashNCond()
-	if bZcashN then
-		return 2
-	end
-	---[[
-	local bZcashA = tipUtil:CheckZcashACond()
-	if bZcashA then
-		FunctionObj.ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
-		return -1
-	end
-	--]]
-	return 0
-end
 
 function TipMain()	
-	
 	CreateMainTipWnd()
-	
-	FunctionObj.InitMachineName()
-	SaveConfigInTimer()
-	if not FunctionObj.CheckIsBinded() then
-		FunctionObj.ChangeClientTitle("共享赚宝(未绑定)")
+	tFunctionHelper.InitMachineName()
+	tFunctionHelper.SaveConfigInTimer()
+	if not ClientWorkModule:CheckIsBinded() then
+		UIInterface:ChangeClientTitle("共享赚宝(未绑定)")
 	end
 	--显示悬浮框
-	FunctionObj.UpdateSuspendWndVisible()
-	FunctionObj.InitMiningClient()
-	FunctionObj.TryToConnectServer(function(bConnect,strPath)
-		FunctionObj.TipLog("[TipMain] Try to connect server, bConnect = " .. tostring(bConnect))
-		FunctionObj.StartRunCountTimer()
-	end)
-	CheckMachineBindState()
-	FunctionObj.CheckShoudAutoMining()
+	UIInterface:UpdateSuspendWndVisible()
+	ClientWorkModule:InitMiningClient()
+	ServerCfg:TryToConnectServer()
+	ClientWorkModule:CheckMachineBindState()
+	if ClientWorkModule:CheckShoudAutoMining() then
+		TipLog("[TipMain] try to auto mining")
+		ClientWorkModule:DoAutoMining()
+	end
 end
 
-function CheckIsDebug()
-	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
-	if type(nValue) == "number" and nValue > 0 then
-		FunctionObj.SetMiningType(nValue)
-		return true
-	end
-	return false
-end
 function PreTipMain()
 	--安装的时候快捷方式和这里都不设置APPID就能使得图标重合
 	--tipUtil:SetApplicationId("{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 	LoadDynamicFont()
-	SendStartupReport(false)
-	
-	local bSuccess = FunctionObj.ReadAllConfigInfo()
-	FunctionObj.CreatePopupTipWnd()
+	SendStartUpReport()
+	StatisticClient:StartRunTimeReport("nomining")
+	local bSuccess = tFunctionHelper.ReadAllConfigInfo()
+	UIInterface:CreatePopupTipWnd()
 	local nMiningType = CheckMachineSuitable()
-	FunctionObj.SetMiningType(nMiningType)
+	ClientWorkModule:SetMiningType(nMiningType)
 	local bDebug = CheckIsDebug()
 	if nMiningType == 0 and not bDebug then
-		FunctionObj.ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
+		UIInterface:ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
 	elseif nMiningType ~= -1 then
 		TipMain()
 	end

@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 local g_tPanelCtrlList = {
 	"EarningsPanel",
@@ -78,16 +78,20 @@ function CreateListener(objRootCtrl)
 					end
 				end
 			elseif tostring(key) == "OnGenOilMsg" then
-				local ObjWorkClient = tFunctionHelper.GetWorkClient()
+				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnGenOilMsg(tParam)
 			elseif tostring(key) == "OnZcashNMsg" then
-				local ObjWorkClient = tFunctionHelper.GetWorkClient()
+				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnZcashNMsg(tParam)
 			elseif tostring(key) == "OnZcashAMsg" then
-				local ObjWorkClient = tFunctionHelper.GetWorkClient()
+				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnZcashAMsg(tParam)
 			elseif tostring(key) == "OnErrorMsg" then
-				tFunctionHelper.SendErrorReport(tParam[1],tParam[2])
+				local tStatInfo = {}
+				tStatInfo.fu1 = "clienterrormsg"
+				tStatInfo.fu5 = tParam[1]
+				tStatInfo.fu6 = tParam[2]
+				StatisticClient:SendClientErrorReport(tStatInfo)
 			end				
 		end
 	)

@@ -1,3 +1,4 @@
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 -------事件---
 function OnSelect_Setting(self)
 	GXZBMenu.SettingMenu.menuFunTable.OnSelect_setting()
@@ -13,9 +14,8 @@ function OnInit_MainUI(self)
 end
 
 function OnInit_Pause(self)
-	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
 	local attr = self:GetAttribute()
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		attr.Text = "暂停"
 		attr.Icon = "bitmap.menu.pause.normal"
 	else
@@ -25,11 +25,18 @@ function OnInit_Pause(self)
 end
 
 function OnSelect_Pause(self)
-	local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
-	if tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyQuit()
+	if ClientWorkModule:CheckIsWorking() then
+		ClientWorkModule:NotifyQuit()
+		local tStatInfo = {}
+		tStatInfo.fu1 = "stopmining"
+		tStatInfo.fu5 = "tray"
+		StatisticClient:SendClickReport(tStatInfo)
 	else
-		tFunctionHelper.NotifyStart()
+		ClientWorkModule:NotifyStart()
+		local tStatInfo = {}
+		tStatInfo.fu1 = "startmining"
+		tStatInfo.fu5 = "tray"
+		StatisticClient:SendClickReport(tStatInfo)
 	end
 end
 

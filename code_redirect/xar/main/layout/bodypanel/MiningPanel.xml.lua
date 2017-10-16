@@ -1,13 +1,12 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
-local Helper = XLGetGlobal("Helper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local g_UnBindFailTimerId = nil
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@ChildCtrl_MiningPanel: " .. tostring(strLog))
+		tipUtil:Log("MiningPanel: " .. tostring(strLog))
 	end
 end
 
@@ -17,7 +16,7 @@ function ChangeBindEntryVisible(OwnerCtrl)
 		return
 	end
 	local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")
-	if not tFunctionHelper.CheckIsBinded() then
+	if not ClientWorkModule:CheckIsBinded() then
 		ObjBindWeiXinEntry:Show(true)
 	else
 		ObjBindWeiXinEntry:Show(false)
@@ -86,14 +85,14 @@ function UpdateMiningSpeed(self, nSpeed)
 end
 
 function UpdateMiningState(self,nMiningState)
-	if tFunctionHelper.CheckIsCalculate() then
+	if ClientWorkModule:CheckIsCalculate() then
 		local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
 		if not ObjMiningSpeed:GetVisible() then
 			ObjMiningSpeed:SetChildrenVisible(true)
 			ObjMiningSpeed:SetVisible(true)
 			ShowAnim(self, true)
 		end
-	elseif tFunctionHelper.CheckIsPrepare() then
+	elseif ClientWorkModule:CheckIsPrepare() then
 		ResetUIVisible(self, true)
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		--ObjStopBtn:Show(true)
@@ -110,15 +109,15 @@ function UpdateDagProgress(self,nProgress)
 	ObjStartBtnText:SetText(strText)
 end
 --1:正在运行,2:不在运行
-function OnWorkStateChange(self,nState)
-	if nState == 1 then
+function OnWorkStateChange(self)
+	if ClientWorkModule:CheckIsWorking() then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		--ObjStopBtn:Show(true)
 		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
 		ObjStartBtn:Enable(false)
 		local ObjStartBtnText = self:GetControlObject("MiningPanel.Panel.StartBtn.Text")
 		ObjStartBtnText:SetText("准备中......")
-	elseif nState == 2 then
+	else
 		ResetUIVisible(self)
 	end
 end
@@ -162,9 +161,13 @@ end
 function OnClickStopMining(self)
 	local OwnerCtrl = self:GetOwnerControl()
 	SetStateInfoToUser(OwnerCtrl,nil)
-	if tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyQuit()
+	if ClientWorkModule:CheckIsWorking() then
+		ClientWorkModule:NotifyQuit()
 	end
+	local tStatInfo = {}
+	tStatInfo.fu1 = "stopmining"
+	tStatInfo.fu5 = "miningbtn"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnMouseEnterStopBtn(self)
@@ -180,13 +183,17 @@ function OnMouseLeaveStopBtn(self)
 end
 
 function OnClickStartMining(self)
-	if not tFunctionHelper.CheckIsWorking() then
-		tFunctionHelper.NotifyStart()
+	if not ClientWorkModule:CheckIsWorking() then
+		ClientWorkModule:NotifyStart()
 	end
+	local tStatInfo = {}
+	tStatInfo.fu1 = "startmining"
+	tStatInfo.fu5 = "miningbtn"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnMouseEnterMiningAnim(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if not ObjStopBtn:IsVisible() then
@@ -196,7 +203,7 @@ function OnMouseEnterMiningAnim(self)
 end
 
 function OnMouseLeaveMiningAnim(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if ObjStopBtn:IsVisible() then
@@ -206,7 +213,7 @@ function OnMouseLeaveMiningAnim(self)
 end
 
 function OnMouseEnterStartBtn(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if not ObjStopBtn:IsVisible() then
@@ -216,7 +223,7 @@ function OnMouseEnterStartBtn(self)
 end
 
 function OnMouseLeaveStartBtn(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if ObjStopBtn:IsVisible() then
@@ -226,7 +233,7 @@ function OnMouseLeaveStartBtn(self)
 end
 
 function OnMouseEnterStartText(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(true)
@@ -234,7 +241,7 @@ function OnMouseEnterStartText(self)
 end
 
 function OnMouseLeaveStartText(self)
-	if tFunctionHelper.CheckIsWorking() then
+	if ClientWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(false)
@@ -242,11 +249,19 @@ function OnMouseLeaveStartText(self)
 end
 
 function OnClickBindWeiXin(self)
-	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
+	UIInterface:ChangeMainBodyPanel("QRCodePanel")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "qrcode"
+	tStatInfo.fu6 = "link"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnClickFAQ(self)
 	Helper.tipUtil:OpenURL("http://www.eastredm.com/wxweb/faq.html")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "openfaq"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnInitControl(self)

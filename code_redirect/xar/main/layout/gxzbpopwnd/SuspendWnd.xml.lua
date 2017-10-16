@@ -1,16 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
-
-function FetchValueByPath(obj, path)
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
-end
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 function PopupInDeskRightTop(self)
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
@@ -21,7 +10,7 @@ end
 
 function OnCreate(self)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local tSuspend = FetchValueByPath(tUserConfig, {"tWindow", "tSuspend"})
+	local tSuspend = tFunctionHelper.FetchValueByPath(tUserConfig, {"tWindow", "tSuspend"})
 	if type(tSuspend) == "table" and type(tSuspend.nLeft) == "number" and type(tSuspend.nTop) == "number" and type(tSuspend.nWidth) == "number" and type(tSuspend.nHeight) == "number" then
 		self:Move(tSuspend.nLeft, tSuspend.nTop, tSuspend.nWidth, tSuspend.nHeight)
 	else	
@@ -179,16 +168,22 @@ end
 function SuspendRightDisk_Click(self)
 	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
 	local attr = self:GetAttribute()
-	LOG("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(tFunctionHelper.CheckIsWorking()))
+	LOG("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
 	if attr.currentstate == 1 then
-		--self:GetOwnerControl():OnWorkStateChange(1)
-		if not tFunctionHelper.CheckIsWorking() then
-			tFunctionHelper.NotifyStart()
+		if not ClientWorkModule:CheckIsWorking() then
+			ClientWorkModule:NotifyStart()
+			local tStatInfo = {}
+			tStatInfo.fu1 = "startmining"
+			tStatInfo.fu5 = "ball"
+			StatisticClient:SendClickReport(tStatInfo)
 		end
 	elseif attr.currentstate == 4 then
-		--self:GetOwnerControl():OnWorkStateChange(2)
-		if tFunctionHelper.CheckIsWorking() then
-			tFunctionHelper.NotifyQuit()
+		if ClientWorkModule:CheckIsWorking() then
+			ClientWorkModule:NotifyQuit()
+			local tStatInfo = {}
+			tStatInfo.fu1 = "stopmining"
+			tStatInfo.fu5 = "ball"
+			StatisticClient:SendClickReport(tStatInfo)
 		end
 	end
 end
@@ -300,18 +295,18 @@ function SuspendCtrl_UpdateLine(self, nLineValue)
 end
 
 --1:正在运行,2:不在运行t
-function SuspendCtrl_OnWorkStateChange(self, state)
+function SuspendCtrl_OnWorkStateChange(self)
 	local attr = self:GetAttribute()
 	attr.currentstate = attr.currentstate or 0
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
-	if state == 1 then
+	if ClientWorkModule:CheckIsWorking() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
 		end
 		speedtext:SetText("准备中")
-	elseif state == 2 then
+	else
 		if attr.currentstate  >= 3 then
 			local newState = attr.currentstate - 3
 			self:SetState(newState)
@@ -324,9 +319,9 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 	attr.currentstate = attr.currentstate or 0
 	local RightDisk = self:GetObject("RightDisk")
 	local speedtext = RightDisk:GetObject("speedtext")
-	if tFunctionHelper.CheckIsCalculate() then
+	if ClientWorkModule:CheckIsCalculate() then
 		speedtext:SetText("0¥฿/h")
-	elseif tFunctionHelper.CheckIsPrepare() then
+	elseif ClientWorkModule:CheckIsPrepare() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)

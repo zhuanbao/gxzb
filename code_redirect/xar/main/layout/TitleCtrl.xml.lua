@@ -1,5 +1,5 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local Helper =  XLGetGlobal("Helper")
 -----事件----
 function OnClickCloseBtn(self)
@@ -57,32 +57,6 @@ function SetBkgVisible(objRootCtrl, bVisible)
 	objShadow:SetVisible(bVisible)
 end
 
-function SetBtnStyle(objRootCtrl, bMainPanel)
-	local objCloseBtn = objRootCtrl:GetControlObject("TipCtrl.Caption.CloseBtn")
-	local objMinBtn = objRootCtrl:GetControlObject("TipCtrl.Caption.BtnMin")
-	local objConfig = objRootCtrl:GetControlObject("TipCtrl.Caption.Config")
-	
-	local attrClose = objCloseBtn:GetAttribute()
-	local attrMin = objMinBtn:GetAttribute()
-	local attrConfig = objConfig:GetAttribute()
-	
-	if bMainPanel then
-		attrClose.NormalBkgID = "GreenWall.MainWnd.BtnClose.Normal"
-		attrMin.NormalBkgID = "GreenWall.MainWnd.BtnMin.Normal"
-		attrConfig.NormalBkgID = "GreenWall.MainWnd.Config.Normal"
-	else
-		attrClose.NormalBkgID = "GreenWall.BtnClose.Normal"
-		attrMin.NormalBkgID = "GreenWall.BtnMin.Normal"
-		attrConfig.NormalBkgID = "GreenWall.Config.Normal"
-	end
-	
-	objCloseBtn:SetState(0, true)  --force
-	objMinBtn:SetState(0, true)
-	objConfig:SetState(0, true)
-	
-	tFunctionHelper.UpdateWindow()
-end
-
 function ChangeTitle(self, strTitle)
 	local ObjTitleText = self:GetControlObject("TitleCtrl.Caption.Title")
 	ObjTitleText:SetText(strTitle)
@@ -100,7 +74,7 @@ end
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@TitleCtrl: " .. tostring(strLog))
+		tipUtil:Log("TitleCtrl: " .. tostring(strLog))
 	end
 end
 

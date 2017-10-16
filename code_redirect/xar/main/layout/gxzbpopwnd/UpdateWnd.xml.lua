@@ -1,5 +1,6 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
+local tipUtil = XLGetObject("API.Util")
 local g_tNewVersionInfo = nil
 --0未更新， 1正在更新， 2弹出对话框， 3弹出对话框时已下载完成
 local g_UpdateState = 0
@@ -7,6 +8,10 @@ local g_UpdateState = 0
 local g_UpdateCancel = false
 --是否可以重新开1个下载线程
 local g_CanRetry = false
+
+function TipLog(strLog)
+	tipUtil:Log("UpdateWnd: " .. tostring(strLog))
+end
 
 function OnClickClose(self)
 	local objTree = self:GetOwner()
@@ -69,7 +74,7 @@ function OnClickUpdateBtn(self)
 	if Helper:IsRealString(g_tNewVersionInfo.strMD5) 
 		and tFunctionHelper.CheckMD5(strSavePath, g_tNewVersionInfo.strMD5) then
 		Helper.tipUtil:ShellExecute(0, "open", strSavePath, 0, 0, "SW_SHOWNORMAL")
-		tFunctionHelper.SendUIReport("updateclinet","user")
+		--Statistic:SendUIReport("updateclinet","user")
 		return
 	end
 	local TextBig = self:GetObject("tree:UpdateWnd.Content.TextBig")
@@ -106,7 +111,7 @@ function OnClickUpdateBtn(self)
 	local strNewVersion = g_tNewVersionInfo.strVersion		
 	if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)
 		or not tFunctionHelper.CheckIsNewVersion(strNewVersion, strCurVersion) then
-		tFunctionHelper.TipLog("[OnClickUpdateBtn] strCurVersion is nil or is not New Version")
+		TipLog("[OnClickUpdateBtn] strCurVersion is nil or is not New Version")
 		return
 	end
 	local strUrl = g_tNewVersionInfo["strPacketURL"]
@@ -120,7 +125,7 @@ function OnClickUpdateBtn(self)
 	g_UpdateCancel = false
 	g_CanRetry = false
 	strUrl = strUrl..tFunctionHelper.GetTimeStamp()
-	tFunctionHelper.TipLog("[OnClickUpdateBtn] strUrl = "..tostring(strUrl)..", strSavePath = "..tostring(strSavePath))
+	TipLog("[OnClickUpdateBtn] strUrl = "..tostring(strUrl)..", strSavePath = "..tostring(strSavePath))
 	tipAsynUtil:AsynGetHttpFileWithProgress(strUrl, strSavePath, false, function(nRet, savepath, ulProgress, ulProgressMax)
 		if nRet == 0 or nRet == -1 then
 			g_CanRetry = true
@@ -129,7 +134,7 @@ function OnClickUpdateBtn(self)
 			if nRet == 0 or nRet == -1 then
 				g_UpdateCancel = false
 			end
-			tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress g_UpdateCancel = "..tostring(g_UpdateCancel))
+			TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress g_UpdateCancel = "..tostring(g_UpdateCancel))
 			return
 		end
 		if g_UpdateState == 2 then
@@ -141,7 +146,7 @@ function OnClickUpdateBtn(self)
 		local l, t, r, b = progrBar:GetObjPos()
 		local fl, ft, fr, fb = progress:GetObjPos()
 		local w = fr - fl
-		tFunctionHelper.TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress nRet = "..tostring(nRet)..", ulProgress = "..tostring(ulProgress)..", ulProgressMax = "..tostring(ulProgressMax))
+		TipLog("[OnClickUpdateBtn] AsynGetHttpFileWithProgress nRet = "..tostring(nRet)..", ulProgress = "..tostring(ulProgress)..", ulProgressMax = "..tostring(ulProgressMax))
 		if nRet == -2 and type(ulProgress) == "number" and type(ulProgressMax) == "number" and ulProgress < ulProgressMax and ulProgress > 0 then
 			local rate = ulProgress/ulProgressMax
 			local rateText = tostring(math.floor(rate*100)).."%"
@@ -154,7 +159,7 @@ function OnClickUpdateBtn(self)
 			progrText:SetText("下载完成")
 			if Helper.tipUtil:QueryFileExists(savepath) and CheckPacketMD5(savepath) then
 				Helper.tipUtil:ShellExecute(0, "open", savepath, 0, 0, "SW_SHOWNORMAL")
-				tFunctionHelper.SendUIReport("updateclinet","user")
+				--Statistic:SendUIReport("updateclinet","user")
 			else
 				progrText:SetText("文件检验失败，请重新下载")
 			end
@@ -188,18 +193,6 @@ function PopupInDeskRight(self)
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
 	self:Move( workright - nLayoutWidth+9, workbottom - nLayoutHeight+9, nLayoutWidth, nLayoutHeight)
 	return true
-end
-
-function FetchValueByPath(obj, path)
-	if obj == nil then return end
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
 end
 
 local isAutoPopFirstEntry = true
@@ -268,7 +261,7 @@ function OnShowWindow(self, isShow)
 			self:SetMaxTrackSize(wndR - wndL, wndB - wndT + Hoffset+10)
 		end
 		if isAutoPop then
-			local nHolds  = FetchValueByPath(g_ServerConfig, {"tNewVersionInfo", "tRemindUpdate", "nHolds"}) or 30
+			local nHolds  = tonumber(ServerCfg:GetServerCfgData({"tNewVersionInfo", "tRemindUpdate", "nHolds"})) or 30
 			SetOnceTimer(
 				function(item, id)
 					self:Show(0)
@@ -291,7 +284,6 @@ function OnShowWindow(self, isShow)
 			ShowNoUpdate()
 			return
 		end	
-
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strCfgPath) or {}
 		local tNewVersionInfo = tServerConfig["tNewVersionInfo"] or {}
 		local strPacketURL = tNewVersionInfo["strPacketURL"]
@@ -301,7 +293,6 @@ function OnShowWindow(self, isShow)
 			ShowNoUpdate()
 			return 
 		end
-		
 		local strCurVersion = tFunctionHelper.GetGXZBVersion()
 		local strNewVersion = tNewVersionInfo.strVersion
 		if not Helper:IsRealString(strCurVersion) or not Helper:IsRealString(strNewVersion)

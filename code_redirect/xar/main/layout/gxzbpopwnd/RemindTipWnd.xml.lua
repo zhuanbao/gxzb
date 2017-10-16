@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local g_CheckBoxState = true
 --[[
@@ -51,12 +51,18 @@ function OnClickBind(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
-	local mainwnd = tFunctionHelper.GetMainHostWnd()
+	local mainwnd = UIInterface:GetMainHostWnd()
 	if mainwnd then
 		mainwnd:BringWindowToTop(true)
 	end
-	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
+	UIInterface:ChangeMainBodyPanel("QRCodePanel")
 	DoWorkOnHideWnd()
+	
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "qrcode"
+	tStatInfo.fu6 = "remindwnd"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnSelectAutoRun(self, event, bSelect)
@@ -69,7 +75,7 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		if not tFunctionHelper.CheckIsInitPopupTipWnd() then
+		if not UIInterface:CheckIsInitPopupTipWnd() then
 			return
 		end
 		local objtree = self:GetBindUIObjectTree()
@@ -86,7 +92,7 @@ function OnShowWindow(self, bShow)
 			return
 		end
 		
-		if tFunctionHelper.CheckIsBinded() then
+		if ClientWorkModule:CheckIsBinded() then
 			objTextContentIncome:SetObjPos(160, 92+20, 160+310, 92+20+20)
 			objTextContentIncome:SetText("哎呦，不错哦！又赚取了"..tostring(nMoneyCount).."个元宝。")
 			objTextContentDesc:SetObjPos(160, 92+20+20, 160+310, 92+20+20+20)
@@ -111,10 +117,7 @@ function OnShowWindow(self, bShow)
 			objCheckAutoRun:SetChildrenVisible(true)
 			objCheckAutoRun:SetVisible(true)
 		end
-		local nTipHolds = 15
-		if type(g_ServerConfig) == "table" and type(g_ServerConfig["tRemindCfg"]) == "table" and type(g_ServerConfig["tRemindCfg"]["nHolds"]) == "number" then
-			nTipHolds = g_ServerConfig["tRemindCfg"]["nHolds"]
-		end
+		local nTipHolds = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg","nHolds"})) or 15
 		SetOnceTimer(function(item, id)
 			DoWorkOnHideWnd()
 			self:Show(0)

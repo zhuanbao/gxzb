@@ -1,6 +1,17 @@
 local tipUtil = XLGetObject("API.Util")
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local Helper =  XLGetGlobal("Helper")
+
+
+function IsRealString(AString)
+    return type(AString) == "string" and AString ~= ""
+end
+
+function TipLog(strLog)
+	if type(tipUtil.Log) == "function" then
+		tipUtil:Log("MainBodyCtrl: " .. tostring(strLog))
+	end
+end
 -----事件----
 
 
@@ -283,7 +294,7 @@ function UpdateDagProgress(self, nProgress)
 	return true
 end
 
-function OnWorkStateChange(self, nState)
+function OnWorkStateChange(self)
 	local objPanelCenter= self:GetControlObject("MainBody.Panel.Center")
 	if objPanelCenter == nil then
 		TipLog("[OnWorkStateChange] get objPanelCenter failed ")
@@ -294,35 +305,50 @@ function OnWorkStateChange(self, nState)
 	for i=0,nChildCnt-1 do
 		local objChild = objPanelCenter:GetChildByIndex(i)
 		if objChild and type(objChild.OnWorkStateChange) == "function" then
-			objChild:OnWorkStateChange(nState)
+			objChild:OnWorkStateChange()
 		end	
 	end
 	return true
 end
 
 function OnClickMiningPanel(self)
-	tFunctionHelper.OnUserChangePanel()
+	UIInterface:OnUserChangePanel()
 	local OwnerCtrl = self:GetOwnerControl()
 	ChangePanel(OwnerCtrl,"MiningPanel")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "mining"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnClickTakeCashPanel(self)
-	tFunctionHelper.OnUserChangePanel()
+	UIInterface:OnUserChangePanel()
 	local OwnerCtrl = self:GetOwnerControl()
 	local strPanel = "TakeCashPanel"
-	if not tFunctionHelper.CheckIsBinded() then
+	
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "takecash"
+	if not ClientWorkModule:CheckIsBinded() then
 		strPanel = "QRCodePanel"
+		tStatInfo.fu5 = "qrcode"
+		tStatInfo.fu6 = "takecashbtn"
 	end
 	ChangePanel(OwnerCtrl,strPanel)
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnClickEarningsPanel(self)
-	tFunctionHelper.OnUserChangePanel()
+	UIInterface:OnUserChangePanel()
 	local objmain = self:GetOwnerControl()
 	if objmain then
 		objmain:ChangePanel("EarningsPanel")
-		tFunctionHelper.SendUIReport("showearnpanel")
+		--Statistic:SendUIReport("showearnpanel")
 	end
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "earning"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 -----辅助函数----
@@ -345,14 +371,4 @@ function GetCtrlKeyByCtrlName(strName)
 	local CTRLKEYPREFIX = "MainBody_"
 	local strCtrlKey = CTRLKEYPREFIX..tostring(strName)
 	return strCtrlKey
-end
-
-function IsRealString(AString)
-    return type(AString) == "string" and AString ~= ""
-end
-
-function TipLog(strLog)
-	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("@@MainBodyCtrl: " .. tostring(strLog))
-	end
 end

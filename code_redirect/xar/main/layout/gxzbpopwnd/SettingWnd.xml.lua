@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 --local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
@@ -55,7 +55,7 @@ function SaveSettingConfig(objTree)
 	end
 	if not Helper:IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) or tUserConfig["tUserInfo"]["strMachineName"] ~= strMachineName then
 		tUserConfig["tUserInfo"]["strMachineName"] = strMachineName
-		tFunctionHelper.SetMachineNameChangeInfo()
+		ClientWorkModule:SetMachineNameChangeInfo()
 	end
 	
 	if type(tUserConfig["tConfig"]) ~= "table" then
@@ -73,8 +73,8 @@ function SaveSettingConfig(objTree)
 	
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 	--更新球的状态
-	local isWorking = tFunctionHelper.CheckIsWorking()
-	tFunctionHelper.UpdateSuspendWndVisible(isWorking and 1 or 0)
+	local isWorking = ClientWorkModule:CheckIsWorking()
+	UIInterface:UpdateSuspendWndVisible()
 end
 
 function DestoryDialog(self)
@@ -88,11 +88,17 @@ function OnClickCloseDialog(self)
 end
 
 function OnSelectAutoRun(self, event, bSelect)
+	local tStatInfo = {}
 	if bSelect then
 		g_AutoRunState = true
+		tStatInfo.fu5 = 1
 	else
 		g_AutoRunState = false
+		tStatInfo.fu5 = 0
 	end	
+	tStatInfo.fu1 = "autorun"
+	tStatInfo.fu6 = "settingwnd"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function SetEditTextState(self, bFocus)
@@ -195,9 +201,9 @@ function OnCreate(self)
 
 		g_AutoRunState = tFunctionHelper.CheckCfgSetBoot()
 		if g_AutoRunState then
-			ObjCheckBoxAutoRun:SetCheck(true, false)
+			ObjCheckBoxAutoRun:SetCheck(true, true)
 		else
-			ObjCheckBoxAutoRun:SetCheck(false, false)
+			ObjCheckBoxAutoRun:SetCheck(false, true)
 		end
 		if type(tUserConfig["tUserInfo"]) ~= "table" then
 			tUserConfig["tUserInfo"] = {}
@@ -215,22 +221,22 @@ function OnCreate(self)
 		end
 		g_SuspendedWndState = tUserConfig["tConfig"]["ShowBall"]["nState"] or 0
 		if g_SuspendedWndState == 0 then
-			ObjRadioShow:SetCheck(true, false)
+			ObjRadioShow:SetCheck(true, true)
 		elseif g_SuspendedWndState == 1 then
-			ObjRadioHide:SetCheck(true, false)
+			ObjRadioHide:SetCheck(true, true)
 		else
-			ObjRadioShowAtMining:SetCheck(true, false)
+			ObjRadioShowAtMining:SetCheck(true, true)
 		end
 		
 		
 		if type(tUserConfig["tConfig"]["WorkModel"]) ~= "table" then
 			tUserConfig["tConfig"]["WorkModel"] = {}
 		end
-		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or tFunctionHelper.GetDefaultWorkModel()
+		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or UIInterface:GetDefaultWorkModel()
 		if g_nWorkModel == 0 then
-			ObjRadioFull:SetCheck(true, false)
+			ObjRadioFull:SetCheck(true, true)
 		else
-			ObjRadioIntelligent:SetCheck(true, false)
+			ObjRadioIntelligent:SetCheck(true, true)
 		end
 	end
 end

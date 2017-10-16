@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 function GenerateFont()
 	local XARManager = XLGetObject("Xunlei.UIEngine.XARManager")

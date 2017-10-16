@@ -3,7 +3,7 @@ if not GXZBMenu then
 	GXZBMenu = {}
 	XLSetGlobal("GXZBMenu", GXZBMenu)
 end
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local menuFunTable = {}
 
 function InitIcon(self, resid)
@@ -43,23 +43,12 @@ function SetBallSetting(value)
 	tUserConfig["tConfig"]["ShowBall"] = tUserConfig["tConfig"]["ShowBall"] or {}
 	tUserConfig["tConfig"]["ShowBall"]["nState"] = value
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-	tFunctionHelper.UpdateSuspendWndVisible(value == 2 and 1 or 0)
-end
-
-function FetchValueByPath(obj, path)
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
+	UIInterface:UpdateSuspendWndVisible()
 end
 
 function InitSelectIcon(self, id)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local nSelect = FetchValueByPath(tUserConfig, {"tConfig", "ShowBall", "nState"})
+	local nSelect = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "ShowBall", "nState"})
 	if ((not nSelect or nSelect == 0) and id == 0) or
 		(nSelect == 1 and id == 1) or
 		(nSelect == 2 and id == 2) then
@@ -72,7 +61,7 @@ end
 
 function InitWorkModelSelectIcon(self, id)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local nSelect = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
+	local nSelect = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
 	if ((not nSelect or nSelect == 1) and id == 1) or
 		(nSelect == 0 and id == 0) then
 		InitIcon(self, "bitmap.menu.select.normal")

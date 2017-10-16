@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local g_CheckBoxState = true
 --[[
@@ -51,25 +51,36 @@ function OnClickBind(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
-	local mainwnd = tFunctionHelper.GetMainHostWnd()
+	local mainwnd = UIInterface:GetMainHostWnd()
 	if mainwnd then
 		mainwnd:BringWindowToTop(true)
 	end
-	tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
+	UIInterface:ChangeMainBodyPanel("QRCodePanel")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "qrcode"
+	tStatInfo.fu6 = "autorun"
+	StatisticClient:SendClickReport(tStatInfo)
 	DoWorkOnHideWnd()
 end
 
 function OnSelectAutoRun(self, event, bSelect)
+	local tStatInfo = {}
 	if bSelect then
 		g_CheckBoxState = true
+		tStatInfo.fu5 = 1
 	else
 		g_CheckBoxState = false
+		tStatInfo.fu5 = 0
 	end	
+	tStatInfo.fu1 = "autorun"
+	tStatInfo.fu6 = "autorunwnd"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		if not tFunctionHelper.CheckIsInitPopupTipWnd() then
+		if not UIInterface:CheckIsInitPopupTipWnd() then
 			return
 		end
 		local objtree = self:GetBindUIObjectTree()
@@ -80,7 +91,7 @@ function OnShowWindow(self, bShow)
 		local objTextContentDesc = objtree:GetUIObject("AutoRunTipWnd.Content.Desc")
 		local objTextBind = objtree:GetUIObject("AutoRunTipWnd.Bind")
 		local objCheckAutoRun = objtree:GetUIObject("AutoRunTipWnd.CheckAutoRun")
-		if tFunctionHelper.CheckIsBinded() then
+		if ClientWorkModule:CheckIsBinded() then
 			objTextContentBegain:SetObjPos(160, 92+20, 160+310, 92+20+20)
 			objTextContentDesc:SetObjPos(160, 92+20+20, 160+310, 92+20+20+20)
 			objTextBind:SetChildrenVisible(false)
@@ -94,19 +105,16 @@ function OnShowWindow(self, bShow)
 		end
 		if tFunctionHelper.CheckSysSetBoot() then
 			g_CheckBoxState = false
-			objCheckAutoRun:SetCheck(false)
+			objCheckAutoRun:SetCheck(false, true)
 			objCheckAutoRun:SetChildrenVisible(false)
 			objCheckAutoRun:SetVisible(false)
 		else
 			g_CheckBoxState = true
-			objCheckAutoRun:SetCheck(true)
+			objCheckAutoRun:SetCheck(false, true)
 			objCheckAutoRun:SetChildrenVisible(true)
 			objCheckAutoRun:SetVisible(true)
 		end
-		local nTipHolds = 10
-		if type(g_ServerConfig) == "table" and type(g_ServerConfig["tRemindCfg"]) == "table" and type(g_ServerConfig["tRemindCfg"]["nHolds"]) == "number" then
-			nTipHolds = g_ServerConfig["tRemindCfg"]["nHolds"]
-		end
+		local nTipHolds = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg","nHolds"})) or 10
 		SetOnceTimer(function(item, id)
 			self:Show(0)
 			DoWorkOnHideWnd()

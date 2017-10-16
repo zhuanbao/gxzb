@@ -1,4 +1,4 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 
 local GXZBMenu = XLGetGlobal("GXZBMenu")
 if not GXZBMenu then
@@ -39,8 +39,8 @@ end
 
 function menuFunTable.OnSelect_exit(self)
 	local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-	local nRet, nCurBalance = 0, tFunctionHelper.GetUserCurrentBalance()
-	local bBind = tFunctionHelper.CheckIsBinded()
+	local nRet, nCurBalance = 0, ClientWorkModule:GetUserCurrentBalance()
+	local bBind = ClientWorkModule:CheckIsBinded()
 	--未绑定微信且元宝余额不为0
 	if nCurBalance > 0 and not bBind then
 		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
@@ -59,34 +59,23 @@ function menuFunTable.OnSelect_exit(self)
 			}
 		)
 		if nRet == 0 then
-			local mainwnd = tFunctionHelper.GetMainHostWnd()
+			local mainwnd = UIInterface:GetMainHostWnd()
 			if mainwnd then
 				mainwnd:BringWindowToTop(true)
 			end
-			tFunctionHelper.ChangeMainBodyPanel("QRCodePanel")
+			UIInterface:ChangeMainBodyPanel("QRCodePanel")
 			return
 		end
 	end
 	if wnd then
 		wnd:Show(0)
 	end
-	tFunctionHelper.ReportAndExit()
-end
-
-function FetchValueByPath(obj, path)
-	local cursor = obj
-	for i = 1, #path do
-		cursor = cursor[path[i]]
-		if cursor == nil then
-			return nil
-		end
-	end
-	return cursor
+	UIInterface:ReportAndExit()
 end
 
 function InitSelectIcon(self, id)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local nSelect = FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
+	local nSelect = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "WorkModel", "nState"})
 	if ((not nSelect or nSelect == 1) and id == 1) or
 		(nSelect == 0 and id == 0) then
 		InitIcon(self, "bitmap.menu.select.normal")

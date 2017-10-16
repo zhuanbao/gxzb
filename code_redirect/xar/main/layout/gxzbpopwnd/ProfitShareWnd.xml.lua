@@ -1,12 +1,12 @@
-local tFunctionHelper = XLGetGlobal("Global.FunctionHelper")
+local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 
 function ExitAndReport(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
-	tFunctionHelper.DestroyPopupWnd()
-	tFunctionHelper.FailExitTipWnd(2)
+	UIInterface:DestroyPopupWnd()
+	StatisticClient:FailExitProcess(2)
 end
 
 function OnClickClose(self)
