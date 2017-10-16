@@ -227,6 +227,7 @@ function StatisticClient:FailExitProcess(iExitCode)
 	local tStatInfo = {}
 	tStatInfo.fu1 = "failexit"
 	tStatInfo.fu5 = iExitCode
+	tStatInfo.Exit = true
 	self:SendEventReport(tStatInfo)
 end
 
