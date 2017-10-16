@@ -11,7 +11,7 @@ function GetSubTable()
 			},
 			["tForceUpdate"] = {
 				["strVersion"] = "1.0.0.17",
-				["tVersion"] = {"1-2"},
+				["tVersion"] = {"1-18"},
 				["strPacketURL"] = "http://xmp.down.sandai.net/xmp/xmppushersetup_2.0.0.87.sbear",
 				["strMD5"] = "5D36F5356AF87DC5EE6D93C156143BE5",
 			},
@@ -27,9 +27,9 @@ function GetSubTable()
 		["tExtraHelper"] = {
 			
 		},
-		["tReportPID"] = {
-			["strRunTime"] = "1234",
-			["strMining"] = "1234",
+		["tReportInfo"] = {
+			["strOnlinePID"] = "1234",
+			["nOnlineInterval"] = "60*10",
 		},
 	}	
 	return t
