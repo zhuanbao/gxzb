@@ -606,7 +606,7 @@ function UIInterface:UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
 	local nBalance = ClientWorkModule:GetUserCurrentBalance()
 	if tonumber(nBalance) >= 0 then
-		RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", tFunctionHelper.NumberToFormatMoney(nBalance))
+		tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", tFunctionHelper.NumberToFormatMoney(nBalance))
 	end
 	local wnd = self:GetMainHostWnd()
 	if not wnd then
