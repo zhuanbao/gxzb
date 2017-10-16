@@ -210,6 +210,7 @@ end
 function StatisticClient:SendRunTimeReport(strState)
 	local nSpanTime = math.abs(tipUtil:GetCurrentUTCTime() - self._nLastReportRunTimeUTC)
 	if nSpanTime == 0 then
+		self._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
 		self._strLastReportRunTimeState = strState
 		return
 	end
@@ -234,6 +235,7 @@ function StatisticClient:SendRunTimeReport(strState)
 	tStatInfo.fu9 = nSpanTime
 	self:SendOnlineReport(tStatInfo)
 	self._strLastReportRunTimeState = strState
+	self._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
 end
 
 function StatisticClient:StartRunTimeReport(strState)
