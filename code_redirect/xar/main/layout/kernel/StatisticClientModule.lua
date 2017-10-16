@@ -176,6 +176,7 @@ end
 function StatisticClient:SendRunTimeReport(strState)
 	local nSpanTime = math.abs(tipUtil:GetCurrentUTCTime() - self._nLastReportRunTimeUTC)
 	if nSpanTime == 0 then
+		self._strLastReportRunTimeState = strState
 		return
 	end
 	local tStatInfo = {}
