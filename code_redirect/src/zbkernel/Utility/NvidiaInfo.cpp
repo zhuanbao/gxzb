@@ -60,6 +60,7 @@ namespace Nvidia {
 		static BOOL bInit = FALSE;
 		if (!bInit)
 		{
+			bInit = TRUE;
 			Init();
 		}
 		if (m_bCanGet)
