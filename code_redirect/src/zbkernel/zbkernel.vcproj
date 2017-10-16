@@ -439,6 +439,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Utility\NvidiaInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Utility\NvidiaInfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Utility\OpenCL.h"
 				>
 			</File>

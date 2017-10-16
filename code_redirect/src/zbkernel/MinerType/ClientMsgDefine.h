@@ -66,4 +66,4 @@
 
 //´íÎóÐÅÏ¢
 #define WM_ERROR_INFO      WM_USER+100
-#define MAX_ERROR_LEN      100
+#define MAX_ERROR_LEN      200

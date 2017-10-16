@@ -1,0 +1,4 @@
+namespace Nvidia
+{
+	int GetNvidiaGpuUsgae();
+}

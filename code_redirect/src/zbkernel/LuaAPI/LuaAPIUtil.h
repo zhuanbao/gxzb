@@ -266,6 +266,10 @@ public:
 	static int CheckZcashNCond(lua_State *pLuaState);
 	static int CheckZcashACond(lua_State *pLuaState);
 	static int CheckEthereumCond(lua_State *pLuaState);
+	static int GetAllDisplayCardInfo(lua_State *pLuaState);
+	static int FGetCPUUsage(lua_State *pLuaState);
+	static int FGetMemoryStatus(lua_State *pLuaState);
+	static int FGetGPUUsage(lua_State *pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 };

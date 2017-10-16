@@ -270,5 +270,5 @@ void CClientZcashA::PostErrorMsg(const char *szBuffer, const char *szBeg)
 	}
 	char * pInfo = new char[MAX_ERROR_LEN];
 	strcpy_s(pInfo,MAX_ERROR_LEN,strInfo.c_str());
-	PostMessage(m_hMsgWnd, WM_ERROR_INFO, 1, (LPARAM)pInfo);
+	PostMessage(m_hMsgWnd, WM_ERROR_INFO, 3, (LPARAM)pInfo);
 }

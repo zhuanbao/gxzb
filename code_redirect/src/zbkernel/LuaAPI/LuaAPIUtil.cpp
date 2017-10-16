@@ -22,7 +22,7 @@
 #include "LuaAPIUtil.h"
 #include "LuaNotifyIcon.h"
 #include <MsHtmcid.h>
-
+#include "../Utility/NvidiaInfo.h"
 #include <mshtml.h> 
 #include <Exdisp.h>
 #include "../EvenListenHelper/LuaMsgWnd.h"
@@ -240,6 +240,11 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"CheckZcashNCond", CheckZcashNCond},
 	{"CheckEthereumCond", CheckEthereumCond},
 	{"CheckZcashACond", CheckZcashACond},
+	{"GetAllDisplayCardInfo", GetAllDisplayCardInfo},
+	{"GetCPUUsage", FGetCPUUsage},
+	{"GetMemoryStatus", FGetMemoryStatus},
+	{"GetGPUUsage", FGetGPUUsage},
+
 	{NULL, NULL}
 };
 
@@ -5903,5 +5908,162 @@ int LuaAPIUtil::CheckZcashACond(lua_State* pLuaState)
 		}
 	}
 	lua_pushboolean(pLuaState, 0);
+	return 1;
+}
+
+int LuaAPIUtil::GetAllDisplayCardInfo(lua_State* pLuaState)
+{
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		lua_pushnil(pLuaState);
+		return 1;
+	}
+	int i = 0;
+	lua_newtable(pLuaState);
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		
+		lua_newtable(pLuaState);
+		lua_pushstring(pLuaState, "vendor");
+		lua_pushnumber(pLuaState, iter->vendor);
+		lua_settable(pLuaState, -3);
+
+		lua_pushstring(pLuaState, "name");
+		lua_pushstring(pLuaState, ultra::_A2UTF(iter->name).c_str());
+		lua_settable(pLuaState, -3);
+
+		lua_pushstring(pLuaState, "version");
+		lua_pushstring(pLuaState, ultra::_A2UTF(iter->version).c_str());
+		lua_settable(pLuaState, -3);
+
+
+		lua_pushstring(pLuaState, "memory_size");
+		lua_pushnumber(pLuaState, iter->memory_size);
+		lua_settable(pLuaState, -3);
+
+		lua_rawseti(pLuaState, -2, i + 1);
+		i++;
+	}
+	return 1;
+}
+
+int LuaAPIUtil::FGetCPUUsage(lua_State *pLuaState)
+{
+	LONGLONG lastIdle = 0;
+	LONGLONG lastKernel = 0;
+	LONGLONG lastUser = 0;
+	int nParamCount = lua_gettop(pLuaState) - 1; //参数个数
+	if (nParamCount >= 1)
+	{
+		bool bTable = lua_istable(pLuaState, 2);
+		if (bTable)
+		{
+			bool bOK = false;
+			int top = lua_gettop(pLuaState);
+			lua_pushnil(pLuaState);
+			if (lua_next(pLuaState, top) && (LUA_TNUMBER == lua_type(pLuaState, -1)))/* 用一下 'key' （在索引 -2 处） 和 'value' （在索引 -1 处） */
+			{
+				lastIdle = (LONGLONG)lua_tonumber(pLuaState, -1);
+				lua_pop(pLuaState, 1);
+				if (lua_next(pLuaState, top) && (LUA_TNUMBER == lua_type(pLuaState, -1)))
+				{
+					lastKernel = (LONGLONG)lua_tonumber(pLuaState, -1);
+					lua_pop(pLuaState, 1);
+					if (lua_next(pLuaState, top) && (LUA_TNUMBER == lua_type(pLuaState, -1)))
+					{
+						lastUser = (LONGLONG)lua_tonumber(pLuaState, -1);
+						lua_pop(pLuaState, 1);
+						bOK = true;
+					}
+				}
+			}
+			lua_pop(pLuaState, 1);
+			if (!bOK)
+			{
+				lastIdle = lastKernel = lastUser = 0;
+			}
+		}
+	}
+
+	LONGLONG idle = 0;
+	LONGLONG kernel = 0;
+	LONGLONG user = 0;
+	int nCpuUsage = 0;
+	if (GetSystemTimes((FILETIME *)&idle, (FILETIME *)&kernel, (FILETIME *)&user))
+	{
+		LONGLONG userDelta = user - lastUser;
+		LONGLONG kernelDelta = kernel - lastKernel;
+		LONGLONG idleDelta = idle - lastIdle;
+
+		nCpuUsage = static_cast<int> ((kernelDelta + userDelta - idleDelta) * 100 / (kernelDelta + userDelta));
+		//TSDEBUG(L"nCpuUsage = %d", nCpuUsage);
+
+		lastUser = user;
+		lastKernel = kernel;
+		lastIdle = idle;
+	}
+
+	lua_pushnumber(pLuaState, nCpuUsage);
+	lua_checkstack(pLuaState, 3);
+	lua_newtable(pLuaState);
+	lua_pushnumber(pLuaState, (lua_Number) lastIdle);
+	lua_rawseti(pLuaState, -2, 1);
+	lua_pushnumber(pLuaState, (lua_Number) lastKernel);
+	lua_rawseti(pLuaState, -2, 2);
+	lua_pushnumber(pLuaState, (lua_Number) lastUser);
+	lua_rawseti(pLuaState, -2, 3);
+
+	return 2;
+}
+
+int LuaAPIUtil::FGetMemoryStatus(lua_State *pLuaState)
+{
+	int iDIV = 1024;
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof (statex);
+	GlobalMemoryStatusEx(&statex);
+
+	lua_newtable(pLuaState);
+	lua_pushstring(pLuaState, "MemoryLoad");
+	lua_pushnumber(pLuaState, statex.dwMemoryLoad);
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "TotalPhys");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullTotalPhys / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "AvailPhys");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullAvailPhys / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "TotalPageFile");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullTotalPageFile / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "AvailPageFile");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullAvailPageFile / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "TotalVirtual");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullTotalVirtual / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "AvailVirtual");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullAvailVirtual / iDIV));
+	lua_settable(pLuaState, -3);
+	lua_pushstring(pLuaState, "AvailExtendedVirtual");
+	lua_pushnumber(pLuaState, (lua_Number) (statex.ullAvailExtendedVirtual / iDIV));
+	lua_settable(pLuaState, -3);
+
+	return 1;
+}
+
+int LuaAPIUtil::FGetGPUUsage(lua_State *pLuaState)
+{
+	int iGpuUsage = 0;
+	int nType = (int)lua_tointeger( pLuaState, 2);
+	if (nType == vendor_t::nvidia)
+	{
+		iGpuUsage = Nvidia::GetNvidiaGpuUsgae();
+		lua_pushinteger(pLuaState, iGpuUsage);
+	}
+	else
+	{
+		lua_pushnil(pLuaState);
+	}
 	return 1;
 }
