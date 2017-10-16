@@ -126,6 +126,10 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 	if not self._bForceExit and tStat.Exit then
 		self._bForceExit = true
 	end
+	--保证统计不卡进程，这样后面的新示例可以立马起来
+	if self._bForceExit then
+		tipUtil:CloseSingletonMutex()
+	end
 	tipAsynUtil:AsynSendHttpStat(strStatisticUrl, function()
 		self._nStatCount = self._nStatCount - 1
 		if self._nStatCount == 0 and self._bForceExit then
@@ -235,6 +239,6 @@ function StatisticClient:ExitClient(statInfo)
 	tFunctionHelper.SaveAllConfig()		
 	ClientWorkModule:NotifyQuit()
 	TipLog("************ Exit ************")
-	tipUtil:CloseSingletonMutex()
+	--tipUtil:CloseSingletonMutex()
 	tipUtil:Exit("Exit")
 end
