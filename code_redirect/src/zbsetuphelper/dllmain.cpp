@@ -19,6 +19,7 @@
 #pragma comment(lib,"libeay32.lib")
 #pragma comment(lib,"ssleay32.lib")
 
+#include "commonshare/md5.h"
 #include "shortcut/Shortcut.h"
 #include "StringOperation.h"
 #include "OpenCL.h"
@@ -29,7 +30,7 @@ extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfi
 void EncryptString(const char* pszData,std::string &strOut);
 void DecryptString(const char* pszBase64Data,std::string &strOut);
 
-void SendStatProxy(const char *ec,const char *ea, const char *el,long ev);
+void SendStatProxy(const char* fu1,const char* fu4, const char* fu5,  const char* fu6);
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -86,20 +87,14 @@ int CheckRegDisplayCardInfo()
 
 
 
-extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const char* szStatKey,const char* szChannelID, const char* szBuild)
+extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const char* szfu1,const char* szfu4)
 {
 	TSAUTO();
 	
 	TSDEBUG4CXX(L"CheckCLEnvir szExePath = "<<ultra::_A2UTF(szExePath));
-	std::string strEC = szStatKey;
-	std::string strEL = "";
-	if (szChannelID != NULL && szBuild != NULL)
-	{
-		strEL = szBuild;
-		strEL.append("_");
-		strEL.append(szChannelID);
-
-	}
+	std::string strfu1 = szfu1;
+	std::string strfu4 = szfu4;
+	std::string strfu5 = "genoilenvinfo";
 
 	int dwRegCond = CheckRegDisplayCardInfo();
 	std::string strRegCond;
@@ -122,9 +117,9 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 		CloseHandle(pi.hThread);
 		
 	
-		std::string strEA = "1_";
-		strEA.append(strRegCond);
-		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		std::string strfu6 = "1_";
+		strfu6.append(strRegCond);
+		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
 		if (dwRegCond == 0)
 		{
 			return TRUE;
@@ -145,12 +140,12 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 			ss >> strLastError;
 		}
 
-		std::string strEA = "2_";
-		strEA.append(strRegCond);
-		strEA.append("_");
-		strEA.append(strLastError.c_str());
+		std::string strfu6 = "2_";
+		strfu6.append(strRegCond);
+		strfu6.append("_");
+		strfu6.append(strLastError.c_str());
 
-		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
 
 		if (dwRegCond == 0)
 		{
@@ -172,23 +167,23 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 	
 	if (dwExitCode == 0 || dwExitCode == STILL_ACTIVE)
 	{
-		std::string strEA = "0_";
-		strEA.append(strRegCond);
-		strEA.append("_");
-		strEA.append(strExitCode.c_str());
+		std::string strfu6 = "0_";
+		strfu6.append(strRegCond);
+		strfu6.append("_");
+		strfu6.append(strExitCode.c_str());
 
-		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
 
 		return TRUE;
 	}
 	else
 	{
-		std::string strEA = "3_";
-		strEA.append(strRegCond);
-		strEA.append("_");
-		strEA.append(strExitCode.c_str());
+		std::string strfu6 = "3_";
+		strfu6.append(strRegCond);
+		strfu6.append("_");
+		strfu6.append(strExitCode.c_str());
 
-		SendStatProxy(strEC.c_str(),strEA.c_str(),strEL.c_str(),1);
+		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
 		if (dwRegCond == 0)
 		{
 
@@ -291,31 +286,54 @@ extern "C" __declspec(dllexport) void SetUpExit()
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 
-extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *ec,CHAR *ea, CHAR *el,long ev)
+extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *fu1,CHAR *fu4, CHAR *fu5,CHAR *fu6)
 {
 	TSAUTO();
-	if (ec == NULL || ea == NULL)
-	{
-		return ;
-	}
-	CHAR* szURL = new CHAR[MAX_PATH];
-	memset(szURL, 0, MAX_PATH);
 	char szPid[256] = {0};
 	extern void GetPeerID(CHAR * pszPeerID);
 	GetPeerID(szPid);
-	std::string str = "";
-	if (el != NULL )
+	std::string strfu2= szPid;
+	std::string strfu1= "";
+	if (NULL != fu1)
 	{
-		str += "&el=";
-		str += el;
+		strfu1 = fu1;
 	}
-	if (ev != 0)
+	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
+	std::string strfu4= "";
+	if (NULL != fu4)
 	{
-		CHAR szev[MAX_PATH] = {0};
-		sprintf(szev, "&ev=%ld",ev);
-		str += szev;
+		strfu4 = fu4;
 	}
-	sprintf(szURL, "http://www.google-analytics.com/collect?v=1&tid=UA-96195625-1&cid=%s&t=event&ec=%s&ea=%s%s",szPid,ec,ea,str.c_str());
+	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
+	std::string strfu5= "";
+	if (NULL != fu5)
+	{
+		strfu5 = fu5;
+	}
+	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
+
+	std::string strfu6= "";
+	if (NULL != fu6)
+	{
+		strfu6 = fu6;
+	}
+	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
+	CHAR szParam[MAX_PATH] = {0};
+	sprintf(szParam, "/install?fu1=%s&fu2=%s&fu3=&fu4=%s&fu5=%s&fu6=%s&fu7=&fu8=&fu9=",
+		strfu1.c_str(),strfu2.c_str(), strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+	
+	TSDEBUG4CXX(L"SendAnyHttpStat szParam = "<<ultra::_A2UTF(szParam));
+	
+	wchar_t pszMD5[MAX_PATH] = {0};
+	GetStringMd5(szParam,pszMD5);
+	std::string strmd5 = ultra::_T2A(pszMD5);
+
+	TSDEBUG4CXX(L"SendAnyHttpStat pszMD5 = "<<pszMD5);
+
+	CHAR* szURL = new CHAR[MAX_PATH];
+	memset(szURL, 0, MAX_PATH);
+	sprintf(szURL, "http://pgv.eastredm.com/pc%s&md5=%s",szParam,strmd5.c_str());
+
 	TSDEBUG4CXX(L"SendAnyHttpStat szURL = "<<ultra::_A2UTF(szURL));
 	ResetUserHandle();
 	DWORD dwThreadId = 0;
@@ -575,6 +593,7 @@ wchar_t* AnsiToUnicode( const char* szStr )
 	MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, szStr, -1, pResult, nLen );
 	return pResult;
 }
+
 
 #define IF_FAILED_OR_NULL_BREAK(rv,ptr) \
 {if (FAILED(rv) || ptr == NULL) break;}
@@ -967,21 +986,26 @@ void DecryptString(const char* pszBase64Data,std::string &strOut)
 }
 
 
-void SendStatProxy(const char *ec,const char *ea, const char *el,long ev)
+void SendStatProxy(const char* fu1,const char* fu4, const char* fu5,  const char* fu6)
 {	
 	TSAUTO();
-	char szEC[MAX_PATH] = {0};
-	ZeroMemory(szEC,0);
-	strcpy_s(szEC,MAX_PATH-1,ec);
+	char szfu1[MAX_PATH] = {0};
+	ZeroMemory(szfu1,0);
+	strcpy_s(szfu1,MAX_PATH-1,fu1);
 
-	char szEA[MAX_PATH] = {0};
-	ZeroMemory(szEA,0);
-	strcpy_s(szEA,MAX_PATH-1,ea);
+	char szfu4[MAX_PATH] = {0};
+	ZeroMemory(szfu4,0);
+	strcpy_s(szfu4,MAX_PATH-1,fu4);
 
-	char szEL[MAX_PATH] = {0};
-	ZeroMemory(szEL,0);
-	strcpy_s(szEL,MAX_PATH-1,el);
-	SendAnyHttpStat(szEC,szEA,szEL,ev);
+	char szfu5[MAX_PATH] = {0};
+	ZeroMemory(szfu5,0);
+	strcpy_s(szfu5,MAX_PATH-1,fu5);
+
+	char szfu6[MAX_PATH] = {0};
+	ZeroMemory(szfu6,0);
+	strcpy_s(szfu6,MAX_PATH-1,fu6);
+
+	SendAnyHttpStat(szfu1,szfu4,szfu5,szfu6);
 }
 
 BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
