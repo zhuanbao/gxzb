@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.14"
+!define PRODUCT_VERSION "1.0.0.16"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -91,6 +91,7 @@ Var BuildNum
 Var CheckETHCond
 Var CheckZcashCond
 
+Var Verision_Channel
 ;主程序至少需要10M空间
 !define NeedSpace 10
 
@@ -248,7 +249,7 @@ FunctionEnd
 !macroend
 !define FKillProc "!insertmacro _FKillProc"
 
-!macro _SendStat strp1 strp2 strp3 np4
+!macro _SendStat fu1 fu4 fu5 fu6
 	Push $0
 	Push $1
 	Push $2
@@ -269,7 +270,7 @@ FunctionEnd
 	StrCpy $2 $1 1 11
 	${WordReplace} $0 $2 "X" +1 $1
 	${If} $0 != $1
-		System::Call '$PLUGINSDIR\zbsetuphelper::SendAnyHttpStat(t "${strp1}", t "${strp2}", t "${strp3}", i ${np4}) '
+		System::Call '$PLUGINSDIR\zbsetuphelper::SendAnyHttpStat(t "${fu1}", t "${fu4}", t "${fu5}", i ${fu6}) '
 	${EndIf}
 	
 	Pop $2
@@ -437,6 +438,25 @@ Function UpdateChanel
 	${EndIf}
 FunctionEnd
 
+Var strInstallExeChanel
+Function GetInstallExeChanel
+	System::Call 'kernel32::GetModuleFileName(i 0, t R2R2, i 256)'
+	Push $R2
+	Push "\"
+	Call GetLastPart
+	Pop $R1
+	
+	${WordFind2X} "$R1" "_" "." +1 $R3
+	${If} $R3 == 0
+	${OrIf} $R3 == ""
+		StrCpy $strInstallExeChanel ${INSTALL_CHANNELID}
+	${ElseIf} $R1 == $R3
+		StrCpy $strInstallExeChanel "unknown"
+	${Else}
+		StrCpy $strInstallExeChanel $R3
+	${EndIf}
+FunctionEnd
+
 Function .onInit
 	${InitMutex}
 	${If} ${PackUninstall} == 1
@@ -477,6 +497,9 @@ Function .onInit
 	File "res\warning.bmp"
 	File "res\2weima.bmp"
 	
+	Call GetInstallExeChanel
+	StrCpy $Verision_Channel "${PRODUCT_VERSION}_$strInstallExeChanel"
+
 	Call InitFont
 	${If} ${RunningX64}
 		File "main\program\Share4Peer\msvcp120.dll"
@@ -495,7 +518,7 @@ Function .onInit
 		Call FirstSendStart
 		!insertmacro InitBaseCfgDir
 		StrCpy $0 0
-		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe', t '$InstallProgressName', t '$str_ChannelID', t '$BuildNum') i.r0"
+		System::Call "$PLUGINSDIR\zbsetuphelper::CheckCLEnvir(t '$PLUGINSDIR\zbsetuphelper-cl.exe', t '$InstallProgressName', t '$Verision_Channel') i.r0"
 		;返回值FALSE=0 TRUE=1
 		${If} $0 == 1
 			;MessageBox MB_OK "您的显卡驱动不支持opencl或者显存小于3G， 无法安装"
@@ -512,6 +535,7 @@ Function .onInit
 		;MessageBox MB_OK "可以安装"
 	${Else}
 		;MessageBox MB_OK "此程序只支持64位操作系统，您使用的操作系统是32位，无法安装"
+		Call EnterErrorStat
 		StrCpy $CheckETHCond 1
 		StrCpy $CheckZcashCond 1
 	${EndIf}
@@ -528,16 +552,30 @@ Function FirstSendStart
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	StrCpy $BuildNum $R1
 	${If} $Bool_IsUpdate == 0
-		${SendStat} "installstart" "$R1" "$str_ChannelID" 1
-		StrCpy $InstallProgressName "installing"
+		${SendStat} "installenter" "$Verision_Channel" "" ""
+		StrCpy $InstallProgressName "installprogress"
 	${Else}
-		${SendStat} "updatestart" "$R1" "$str_ChannelID" 1
-		StrCpy $InstallProgressName "updating"
+		${SendStat} "updateenter" "$Verision_Channel" "" ""
+		StrCpy $InstallProgressName "updateprogress"
+	${EndIf} 
+FunctionEnd
+
+Function EnterErrorStat
+	StrCpy $Bool_IsUpdate 0 
+	ReadRegStr $0 HKLM "software\Share4Money" "Path"
+	IfFileExists $0 0 +2
+	StrCpy $Bool_IsUpdate 1
+	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
+	StrCpy $BuildNum $R1
+	${If} $Bool_IsUpdate == 0
+		${SendStat} "installenterfail" "$Verision_Channel" "" ""
+	${Else}
+		${SendStat} "updateenterfail" "$Verision_Channel" "" ""
 	${EndIf} 
 FunctionEnd
 
 Function DoInstall
-	${SendStat} "$InstallProgressName" "doinstallstart" "$BuildNum_$str_ChannelID" 1
+	${SendStat} "$InstallProgressName" "$Verision_Channel" "outputfile" ""
 	;初始化安装成功标志位
 	StrCpy $Bool_IsInstallSucc 0
 	;配置文件
@@ -561,9 +599,9 @@ Function DoInstall
 	SetOverwrite on
 	File /r "main\*"
 	
-	StrCpy $R0 1
+	StrCpy $R0 "noslient"
 	${If} $IsSilentInst == 1
-		StrCpy $R0 0
+		StrCpy $R0 "slient"
 	${EndIf}
 	System::Call '$PLUGINSDIR\zbsetuphelper::GetPeerID(t) i(.r0).r1'
 	;${If} $0 == ""
@@ -572,11 +610,11 @@ Function DoInstall
 	;${EndIf}
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	${If} $Bool_IsUpdate == 0
-		${SendStat} "install" "$R1" "$str_ChannelID" 1
-		${SendStat} "installmethod" "$R1" "$R0" 1
+		${SendStat} "install" "$Verision_Channel" "$R0" ""
+		;${SendStat} "installmethod" "$R1" "$R0" 1
 	${Else}
-		${SendStat} "update" "$R1" "$str_ChannelID" 1
-		${SendStat} "updatemethod" "$R1" "$R3" 1
+		${SendStat} "update" "$Verision_Channel" "$R0" ""
+		;${SendStat} "updatemethod" "$R1" "$R3" 1
 	${EndIf}  
 	
 	;写入自用的注册表信息
@@ -637,7 +675,7 @@ Function CmdSilentInstall
 	SetSilent silent
 	${If} $CheckETHCond != 0 
 	${AndIf} $CheckZcashCond != 0	
-		${SendStat} "$InstallProgressName" "checkenvfail" "$BuildNum_$str_ChannelID" 1
+		${SendStat} "$InstallProgressName" "$Verision_Channel" "checkenvfail" ""
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
 		Return
@@ -656,7 +694,7 @@ Function CmdSilentInstall
 			ClearErrors
 			${GetOptions} $R4 "/write"  $R0
 			IfErrors 0 +4
-			${SendStat} "$InstallProgressName" "coverinstallfail" "$BuildNum_$str_ChannelID" 1
+			${SendStat} "$InstallProgressName" "$Verision_Channel" "coverfail" ""
 			System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 			Abort
 			Goto StartInstall
@@ -1326,7 +1364,7 @@ Section Uninstall
 	${EndIf}
 	
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R2
-	${SendStat} "uninstall" "$R2" $str_ChannelID 1
+	${SendStat} "uninstall" "${PRODUCT_VERSION}_$str_ChannelID" "" ""
 	
 	ReadRegStr $0 HKLM "software\Share4Money" "InstDir"
 	${If} $0 == "$INSTDIR"
