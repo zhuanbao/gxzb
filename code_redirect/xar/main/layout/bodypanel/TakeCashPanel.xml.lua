@@ -27,7 +27,7 @@ function OnTakeCashToServerCallBack(event, bSuccess, tabInfo)
 		tUserConfig["nLastTakeCashUTC"] = tFunctionHelper.GetCurrentServerTime()
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 		ClientWorkModule:SetUserCurrentBalance(nBalance)
-		ClientWorkModule:UpdateUserBalance(nBalance)
+		UIInterface:UpdateUserBalance()
 		SetMsgToUser("恭喜您，提现成功，请查看微信")
 		--Statistic:SendUIReport("takecash","success")
 		local tStatInfo = {}
@@ -42,12 +42,12 @@ function OnTakeCashToServerCallBack(event, bSuccess, tabInfo)
 			local nBalance = tabInfo["data"]["balance"] or 0
 			--self:Enable(true)
 			ClientWorkModule:SetUserCurrentBalance(nBalance)
-			ClientWorkModule:UpdateUserBalance(nBalance)
+			UIInterface:UpdateUserBalance()
 			SetMsgToUser("余额不足，无法提现")
 		elseif nErrorCode == ERROR_EXCEEDING_TAKE_TIME then
 			local nBalance = tabInfo["data"]["balance"] 
 			ClientWorkModule:SetUserCurrentBalance(nBalance)
-			ClientWorkModule:UpdateUserBalance(nBalance)
+			UIInterface:UpdateUserBalance()
 			SetMsgToUser("今天已提现，请明天再来~")
 		else
 			if nErrorCode == ERROR_INPUT then

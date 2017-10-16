@@ -935,7 +935,7 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo)
 			--g_Balance = tabInfo["data"]["balance"]
 			if self._Balance ~= tonumber(tabInfo["data"]["balance"]) then
 				self:SetUserCurrentBalance(tabInfo["data"]["balance"])
-				self:UpdateUserBalance()
+				UIInterface:UpdateUserBalance()
 			end	
 		end
 	end
