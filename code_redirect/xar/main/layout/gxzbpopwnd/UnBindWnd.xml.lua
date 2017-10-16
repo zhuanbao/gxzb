@@ -12,7 +12,7 @@ function OnClickCloseDialog(self)
 end
 
 function OnClickUnBind(self)
-	--tFunctionHelper.UnBindingClientFromClient()
+	ClientWorkModule:UnBindingClientFromClient()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "unbindwx"
 	--tStatInfo.fu5 = "client"
