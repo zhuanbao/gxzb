@@ -130,9 +130,10 @@ http://pgv.eastredm.com/pc/interface?fu1=1&fu2=1&fu3=1&fu4=1&fu5=1&fu6=1&fu7=1&f
 interface:接口名称
 fu1：类别
 fu2: peerid
-fu3: workid
-fu4: version_channel
+fu3: version
+fu4: channel
 fu5~fu9:额外信息
+fu10:workid
 --]]
 
 function StatisticClient:SendServerStatistic(strApiInterface, tStat)
