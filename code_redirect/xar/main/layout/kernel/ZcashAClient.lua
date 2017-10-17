@@ -389,6 +389,12 @@ function OnZcashAMsg(tParam)
 		end
 	elseif nMsgType == WP_ZCASH_A_AUTOEXIT then
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
+		local tStatInfo = {}
+		tStatInfo.fu1 = "runerror"
+		tStatInfo.fu5 = "autoexit"
+		tStatInfo.fu6 = tostring(3)
+		tStatInfo.fu7 = tostring(nParam)
+		StatisticClient:SendClientErrorReport(tStatInfo)
 		ReTryStartClient()
 	elseif nMsgType == WP_ZCASH_A_ERROR_INFO then
 		KillVirtualDAG()

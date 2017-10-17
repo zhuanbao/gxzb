@@ -346,6 +346,12 @@ function OnGenOilMsg(tParam)
 		end
 	elseif nMsgType == WP_GENOIL_AUTOEXIT then
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
+		local tStatInfo = {}
+		tStatInfo.fu1 = "runerror"
+		tStatInfo.fu5 = "autoexit"
+		tStatInfo.fu6 = tostring(1)
+		tStatInfo.fu7 = tostring(nParam)
+		StatisticClient:SendClientErrorReport(tStatInfo)
 		ReTryStartClient()
 	elseif nMsgType == WP_GENOIL_ERROR_INFO then
 		g_PreWorkState = CLIENT_STATE_EEEOR
