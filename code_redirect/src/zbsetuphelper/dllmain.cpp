@@ -30,7 +30,7 @@ extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfi
 void EncryptString(const char* pszData,std::string &strOut);
 void DecryptString(const char* pszBase64Data,std::string &strOut);
 
-void SendStatProxy(const char* fu1,const char* fu4, const char* fu5,  const char* fu6);
+void SendStatProxy(const char* fu1,const char* version_channel, const char* fu5,  const char* fu6);
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -87,13 +87,13 @@ int CheckRegDisplayCardInfo()
 
 
 
-extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const char* szfu1,const char* szfu4)
+extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const char* szfu1,const char* version_channel)
 {
 	TSAUTO();
 	
 	TSDEBUG4CXX(L"CheckCLEnvir szExePath = "<<ultra::_A2UTF(szExePath));
 	std::string strfu1 = szfu1;
-	std::string strfu4 = szfu4;
+	std::string strversion_channel = version_channel;
 	std::string strfu5 = "genoilenvinfo";
 
 	int dwRegCond = CheckRegDisplayCardInfo();
@@ -119,7 +119,7 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 	
 		std::string strfu6 = "1_";
 		strfu6.append(strRegCond);
-		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+		SendStatProxy(strfu1.c_str(),strversion_channel.c_str(),strfu5.c_str(),strfu6.c_str());
 		if (dwRegCond == 0)
 		{
 			return TRUE;
@@ -145,7 +145,7 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 		strfu6.append("_");
 		strfu6.append(strLastError.c_str());
 
-		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+		SendStatProxy(strfu1.c_str(),strversion_channel.c_str(),strfu5.c_str(),strfu6.c_str());
 
 		if (dwRegCond == 0)
 		{
@@ -172,7 +172,7 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 		strfu6.append("_");
 		strfu6.append(strExitCode.c_str());
 
-		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+		SendStatProxy(strfu1.c_str(),strversion_channel.c_str(),strfu5.c_str(),strfu6.c_str());
 
 		return TRUE;
 	}
@@ -183,7 +183,7 @@ extern "C" __declspec(dllexport) BOOL CheckCLEnvir(const char* szExePath, const 
 		strfu6.append("_");
 		strfu6.append(strExitCode.c_str());
 
-		SendStatProxy(strfu1.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+		SendStatProxy(strfu1.c_str(),strversion_channel.c_str(),strfu5.c_str(),strfu6.c_str());
 		if (dwRegCond == 0)
 		{
 
@@ -286,7 +286,7 @@ extern "C" __declspec(dllexport) void SetUpExit()
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 
-extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *fu1,CHAR *fu4, CHAR *fu5,CHAR *fu6)
+extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *fu1,CHAR *version_channel, CHAR *fu5,CHAR *fu6)
 {
 	TSAUTO();
 	char szPid[256] = {0};
@@ -298,29 +298,36 @@ extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *fu1,CHAR *fu4, CHAR 
 	{
 		strfu1 = fu1;
 	}
-	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
+	std::string strfu3= "";
 	std::string strfu4= "";
-	if (NULL != fu4)
+	if (NULL != version_channel)
 	{
-		strfu4 = fu4;
+		std::string strTmp = version_channel;
+		size_t iPos = strTmp.find("_", 0);
+		if (iPos != std::string::npos)
+		{
+			strfu3 = strTmp.substr(0,iPos);
+			strfu4 = strTmp.substr(iPos+1);
+		}
+		else
+		{
+			strfu3 = strTmp;
+		}
 	}
-	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
 	std::string strfu5= "";
 	if (NULL != fu5)
 	{
 		strfu5 = fu5;
 	}
-	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
 
 	std::string strfu6= "";
 	if (NULL != fu6)
 	{
 		strfu6 = fu6;
 	}
-	TSDEBUG4CXX(L"SendAnyHttpStat strfu1 = ");
 	CHAR szParam[MAX_PATH] = {0};
-	sprintf(szParam, "/install?fu1=%s&fu2=%s&fu3=&fu4=%s&fu5=%s&fu6=%s&fu7=&fu8=&fu9=",
-		strfu1.c_str(),strfu2.c_str(), strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
+	sprintf(szParam, "/install?fu1=%s&fu2=%s&fu3=%s&fu4=%s&fu5=%s&fu6=%s&fu7=&fu8=&fu9=&fu10=",
+		strfu1.c_str(),strfu2.c_str(), strfu3.c_str(),strfu4.c_str(),strfu5.c_str(),strfu6.c_str());
 	
 	TSDEBUG4CXX(L"SendAnyHttpStat szParam = "<<ultra::_A2UTF(szParam));
 	
@@ -986,16 +993,16 @@ void DecryptString(const char* pszBase64Data,std::string &strOut)
 }
 
 
-void SendStatProxy(const char* fu1,const char* fu4, const char* fu5,  const char* fu6)
+void SendStatProxy(const char* fu1,const char* version_channel, const char* fu5,  const char* fu6)
 {	
 	TSAUTO();
 	char szfu1[MAX_PATH] = {0};
 	ZeroMemory(szfu1,0);
 	strcpy_s(szfu1,MAX_PATH-1,fu1);
 
-	char szfu4[MAX_PATH] = {0};
-	ZeroMemory(szfu4,0);
-	strcpy_s(szfu4,MAX_PATH-1,fu4);
+	char szversion_channel[MAX_PATH] = {0};
+	ZeroMemory(szversion_channel,0);
+	strcpy_s(szversion_channel,MAX_PATH-1,version_channel);
 
 	char szfu5[MAX_PATH] = {0};
 	ZeroMemory(szfu5,0);
@@ -1005,7 +1012,7 @@ void SendStatProxy(const char* fu1,const char* fu4, const char* fu5,  const char
 	ZeroMemory(szfu6,0);
 	strcpy_s(szfu6,MAX_PATH-1,fu6);
 
-	SendAnyHttpStat(szfu1,szfu4,szfu5,szfu6);
+	SendAnyHttpStat(szfu1,szversion_channel,szfu5,szfu6);
 }
 
 BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
