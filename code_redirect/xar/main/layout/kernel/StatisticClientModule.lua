@@ -139,18 +139,19 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 	local rdRandom = tipUtil:GetCurrentUTCTime()
 	local tUserConfig = ClientWorkModule:GetUserConfig()
 	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
-	local strVersionAndChannel = (tFunctionHelper.GetGXZBVersion() or "") .. "_" .. (tFunctionHelper.GetInstallSrc() or "")
+	local strVersion = tFunctionHelper.GetGXZBVersion() or ""
+	local strChannel = tFunctionHelper.GetInstallSrc() or ""
 	--local strApiInterface = tStat.ApiInterface or "clientError"
 	local strInterfaceParam = "fu1=" .. ParamEncode(tostring(tStat.fu1))
 					 .. "&fu2=" .. ParamEncode(tostring(tFunctionHelper.GetPeerID()))
-				     .. "&fu3=" .. ParamEncode(strWorkID or "")
-				     .. "&fu4=" .. ParamEncode(strVersionAndChannel)
+				     .. "&fu3=" .. ParamEncode(strVersion)
+				     .. "&fu4=" .. ParamEncode(strChannel)
 				     .. "&fu5=" .. (MakeMaxParamLen(tStat.fu5) or "")
 				     .. "&fu6=" .. (MakeMaxParamLen(tStat.fu6) or "")
 				     .. "&fu7=" .. (MakeMaxParamLen(tStat.fu7) or "")
 				     .. "&fu8=" .. (MakeMaxParamLen(tStat.fu8) or "")
 				     .. "&fu9=" .. (MakeMaxParamLen(tStat.fu9) or "")
-	
+					 .. "&fu10=" .. ParamEncode(strWorkID or "")
 	local strParam = ClientWorkModule:MakeInterfaceMd5(strApiInterface, strInterfaceParam)
 	local strStatisticUrl = self:FormatRequestUrl(strParam)
 	strStatisticUrl = strStatisticUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
