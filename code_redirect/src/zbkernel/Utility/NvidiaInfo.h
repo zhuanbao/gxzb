@@ -1,3 +1,5 @@
+//https://github.com/MestreLion/amdgpuinfo/blob/master/amdinfo.c
+//AMD的可以参考这里，需要试验
 namespace Nvidia
 {
 #define NVAPI_MAX_PHYSICAL_GPUS   64
