@@ -72,7 +72,7 @@ function CreateListener(objRootCtrl)
 					bHide = true
 				end
 				if not bHide then
-					local mainwnd = tFunctionHelper.GetMainHostWnd()
+					local mainwnd = UIInterface:GetMainHostWnd()
 					if mainwnd then
 						mainwnd:BringWindowToTop(true)
 					end
