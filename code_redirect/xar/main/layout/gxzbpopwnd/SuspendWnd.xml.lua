@@ -173,7 +173,7 @@ function SuspendRightDisk_Click(self)
 		if not ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyStart()
 			local tStatInfo = {}
-			tStatInfo.fu1 = "startmining"
+			tStatInfo.fu1 = "startworking"
 			tStatInfo.fu5 = "ball"
 			StatisticClient:SendClickReport(tStatInfo)
 		end
@@ -181,7 +181,7 @@ function SuspendRightDisk_Click(self)
 		if ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyQuit()
 			local tStatInfo = {}
-			tStatInfo.fu1 = "stopmining"
+			tStatInfo.fu1 = "stopworking"
 			tStatInfo.fu5 = "ball"
 			StatisticClient:SendClickReport(tStatInfo)
 		end

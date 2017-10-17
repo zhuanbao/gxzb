@@ -21,7 +21,7 @@ function OnOpenUrl(self)
 	local strZcashAWebUrl = "http://www.eastredm.com/download_a.html"
 	Helper.tipUtil:OpenURL(strZcashAWebUrl)
 	local tStatInfo = {}
-	tStatInfo.fu1 = "openzcashawnd"
+	tStatInfo.fu1 = "openzapage"
 	StatisticClient:SendClickReport(tStatInfo)
 	ExitAndReport(self)
 end

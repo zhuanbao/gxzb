@@ -317,7 +317,7 @@ function OnClickMiningPanel(self)
 	ChangePanel(OwnerCtrl,"MiningPanel")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "showpanel"
-	tStatInfo.fu5 = "mining"
+	tStatInfo.fu5 = "working"
 	StatisticClient:SendClickReport(tStatInfo)
 end
 

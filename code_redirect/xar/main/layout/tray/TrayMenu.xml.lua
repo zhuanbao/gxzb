@@ -28,13 +28,13 @@ function OnSelect_Pause(self)
 	if ClientWorkModule:CheckIsWorking() then
 		ClientWorkModule:NotifyQuit()
 		local tStatInfo = {}
-		tStatInfo.fu1 = "stopmining"
+		tStatInfo.fu1 = "stopworking"
 		tStatInfo.fu5 = "tray"
 		StatisticClient:SendClickReport(tStatInfo)
 	else
 		ClientWorkModule:NotifyStart()
 		local tStatInfo = {}
-		tStatInfo.fu1 = "startmining"
+		tStatInfo.fu1 = "startworking"
 		tStatInfo.fu5 = "tray"
 		StatisticClient:SendClickReport(tStatInfo)
 	end

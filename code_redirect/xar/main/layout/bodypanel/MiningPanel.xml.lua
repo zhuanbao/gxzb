@@ -165,8 +165,8 @@ function OnClickStopMining(self)
 		ClientWorkModule:NotifyQuit()
 	end
 	local tStatInfo = {}
-	tStatInfo.fu1 = "stopmining"
-	tStatInfo.fu5 = "miningbtn"
+	tStatInfo.fu1 = "stopworking"
+	tStatInfo.fu5 = "workingbtn"
 	StatisticClient:SendClickReport(tStatInfo)
 end
 
@@ -187,8 +187,8 @@ function OnClickStartMining(self)
 		ClientWorkModule:NotifyStart()
 	end
 	local tStatInfo = {}
-	tStatInfo.fu1 = "startmining"
-	tStatInfo.fu5 = "miningbtn"
+	tStatInfo.fu1 = "startworking"
+	tStatInfo.fu5 = "workingbtn"
 	StatisticClient:SendClickReport(tStatInfo)
 end
 

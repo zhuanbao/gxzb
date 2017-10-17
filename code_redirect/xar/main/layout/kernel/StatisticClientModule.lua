@@ -13,7 +13,7 @@ StatisticClient._bForceExit = false
 StatisticClient._StatTimeoutTimerId = nil
 StatisticClient._RunTimeReportTimerId = nil
 StatisticClient._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
-StatisticClient._strLastReportRunTimeState = "nomining"
+StatisticClient._strLastReportRunTimeState = "noworking"
 StatisticClient._tabCpuTime = nil
 
 StatisticClient._ResoureCnt = 0
@@ -218,7 +218,7 @@ function StatisticClient:SendRunTimeReport(strState)
 	local tStatInfo = {}
 	tStatInfo.fu1 = "runtime"
 	tStatInfo.fu5 = self._strLastReportRunTimeState
-	if tStatInfo.fu5 == "mining" then
+	if tStatInfo.fu5 == "working" then
 		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
 		tStatInfo.fu7 = ClientWorkModule:GetMiningType()
 	end

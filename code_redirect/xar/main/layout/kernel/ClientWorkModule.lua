@@ -448,13 +448,16 @@ function ClientWorkModule:SetUserBindInfo(tabBindInfo)
 end
 
 --
-function ClientWorkModule:ReportInterfaceErrorInfo(strUrl, strErrorInfo)
+function ClientWorkModule:ReportInterfaceErrorInfo(strUrl, strFu6, strFu8)
 	local _,_,strInterfaceName = string.find(tostring(strUrl), ".+/([%w]+)?")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "interfaceerror"
 	tStatInfo.fu5 = strInterfaceName
-	tStatInfo.fu6 = strErrorInfo
+	tStatInfo.fu6 = strFu6
 	tStatInfo.fu7 = strUrl
+	if IsRealString(strFu8) then
+		tStatInfo.fu8 = strFu8
+	end	
 	StatisticClient:SendClientErrorReport(tStatInfo)
 end
 --与服务端通信逻辑--
@@ -472,7 +475,6 @@ function ClientWorkModule:GetServerJsonData(strUrl,fnCallBack)
 		end
 		
 		local tabInfo = tFunctionHelper.DeCodeJson(strContent)		
-		
 		if type(tabInfo) ~= "table" 
 			or tabInfo["rtn"] ~= 0 then
 			TipLog("[GetServerJsonData] parse json failed, strUrl = " .. tostring(strUrl))
@@ -480,7 +482,7 @@ function ClientWorkModule:GetServerJsonData(strUrl,fnCallBack)
 				self:ReportInterfaceErrorInfo(strUrl, "decodefail")
 			else
 				local nRtn = tabInfo["rtn"] or -1
-				self:ReportInterfaceErrorInfo(strUrl, "rtnfail_" .. tostring(nRtn))
+				self:ReportInterfaceErrorInfo(strUrl, "rtnfail", tostring(nRtn))
 			end
 			fnCallBack(false,tabInfo)
 			return
@@ -938,6 +940,11 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo)
 				UIInterface:UpdateUserBalance()
 			end	
 		end
+	else
+		if self:CheckIsWorking() then
+			self:NotifyPause()
+			UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+		end	
 	end
 end
 

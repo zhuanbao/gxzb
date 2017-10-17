@@ -749,7 +749,7 @@ end
 function UIInterface:OnStart()
 	self:UpdateSuspendWndVisible()
 	self:OnWorkStateChange()
-	StatisticClient:StartRunTimeReport("mining")
+	StatisticClient:StartRunTimeReport("working")
 	tipUtil:StopComputerSleep(true)
 end	
 
@@ -757,7 +757,7 @@ function UIInterface:OnQuit()
 	self:UpdateSuspendWndVisible()
 	self:OnWorkStateChange()
 	--Statistic:SendMiningReport(0, true)
-	StatisticClient:StartRunTimeReport("nomining")
+	StatisticClient:StartRunTimeReport("noworking")
 	--Statistic:StopMiningCountTimer()
 	tipUtil:StopComputerSleep(false)
 end	
@@ -782,7 +782,7 @@ function UIInterface:ReportAndExit()
 	self:HideTray()
 	
 	
-	StatisticClient:StartRunTimeReport("nomining")
+	StatisticClient:StartRunTimeReport("noworking")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "exit"
 	tStatInfo.Exit = true

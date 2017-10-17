@@ -148,9 +148,9 @@ function CheckMachineSuitable()
 	---[[
 	local bZcashA = tipUtil:CheckZcashACond()
 	if bZcashA then
-		--return 3
-		UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
-		return -1
+		return 3
+		--UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
+		--return -1
 	end
 	--]]
 	return 0
@@ -275,7 +275,7 @@ function PreTipMain()
 	--tipUtil:SetApplicationId("{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 	LoadDynamicFont()
 	SendStartUpReport()
-	StatisticClient:StartRunTimeReport("nomining")
+	StatisticClient:StartRunTimeReport("noworking")
 	local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	UIInterface:CreatePopupTipWnd()
 	local nMiningType = CheckMachineSuitable()
