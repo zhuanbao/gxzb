@@ -619,7 +619,7 @@ function UIInterface:UpdateUserBalance()
 	--更新球
 	local root = self:GetSuspendRootCtrol()
 	if root and type(root.UpdateUserBalance) == "function" then
-		root:UpdateUserBalance(g_Balance)
+		root:UpdateUserBalance(nBalance)
 	end
 	ClientWorkModule._WorkClient.OnUpdateBalance()
 end
