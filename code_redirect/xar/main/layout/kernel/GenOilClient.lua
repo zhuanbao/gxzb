@@ -5,8 +5,8 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
-local g_PoolCfgName = "poolcfg.json"
-local g_DefaultPoolType = "x_etc"
+local g_PoolCfgName = "apcfg.json"
+local g_DefaultPoolType = "x_ca"
 --常量
 local CLIENT_GENOIL = 1
 local CLIENT_PATH = "Share4Peer\\Share4Peer.exe"
@@ -207,7 +207,7 @@ function GetNewMiningCmdInfo()
 			if IsRealString(tabPoolItem["cmdlineformat"]) then
 				g_strCmdLineFormat = tabPoolItem["cmdlineformat"]
 				g_strAccount = tabPoolItem["account"]
-				g_strPool = tabPoolItem["pool"]
+				g_strPool = tabPoolItem["p"]
 			end
 		end	
 	end
@@ -575,7 +575,7 @@ end
 
 function GetSpeedFormat(nSpeed)
 	local strSpeed = string.format("%0.2f",nSpeed)
-	strSpeed = strSpeed .. "MH/s"
+	--strSpeed = strSpeed .. "MH/s"
 	return strSpeed
 end
 

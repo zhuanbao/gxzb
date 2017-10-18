@@ -238,7 +238,7 @@ function ClientWorkModule:QuerySvrForPushCalcInfo(nSpeed)
 	if not IsRealString(strPoolInfo) then
 		strPoolInfo = self._WorkClient.GetDefaultPoolType()
 	end
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(strPoolInfo)))
+	strInterfaceParam = strInterfaceParam .. "&p=" .. Helper:UrlEncode((tostring(strPoolInfo)))
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(self._WorkClient.GetCurrentAccount())))
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
@@ -273,7 +273,7 @@ function ClientWorkModule:QuerySvrForWorkerInfo()
 	if not IsRealString(strPoolInfo) then
 		strPoolInfo = self._WorkClient.GetDefaultPoolType()
 	end
-	strInterfaceParam = strInterfaceParam .. "&pool=" .. Helper:UrlEncode((tostring(strPoolInfo)))
+	strInterfaceParam = strInterfaceParam .. "&p=" .. Helper:UrlEncode((tostring(strPoolInfo)))
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
 	TipLog("[QuerySvrForWorkInfo] strReguestUrl = " .. strReguestUrl)
@@ -662,7 +662,7 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 			tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
 		end
 		
-		local tabPool = tabInfo["data"]["pool"]
+		local tabPool = tabInfo["data"]["p"]
 		local tabUserPool = {}
 		for index = 1, #tabPool do
 			if type(tabPool[index]) == "table" and tFunctionHelper.CheckPeerIDList(tabPool[index]["pidlist"]) then
@@ -734,8 +734,8 @@ function ClientWorkModule:GetSvrPoolCfg()
 			local tabInfo = tFunctionHelper.DeCodeJson(strContent)
 			if type(tabInfo) == "table" 
 				and type(tabInfo["data"]) == "table" 
-				and type(tabInfo["data"]["pool"]) == "table" 
-				and #tabInfo["data"]["pool"] > 0 then
+				and type(tabInfo["data"]["p"]) == "table" 
+				and #tabInfo["data"]["p"] > 0 then
 				fnGetNewPoolCallback(tabInfo)
 				return
 			end	
