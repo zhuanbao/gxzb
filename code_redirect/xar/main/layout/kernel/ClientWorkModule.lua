@@ -677,9 +677,9 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 		self:DispatchEvent("OnUpdateCfgFinish", bUpdate)
 	elseif bUpdate and not tabInfo then
-		SetStateInfoToUser("连接服务器失败，重试中...")
+		UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
 		SetOnceTimer(function()
-			GetSvrPoolCfg()
+			self:GetSvrPoolCfg()
 		end, 5*1000)
 	elseif not bUpdate then
 		self:DispatchEvent("OnUpdateCfgFinish", bUpdate)
