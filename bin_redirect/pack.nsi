@@ -729,7 +729,7 @@ Function CmdSilentInstall
 	ClearErrors
 	${GetOptions} $R4 "/setboot"  $R0
 	IfErrors +2 0
-	WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /mining /sstartfrom sysboot /embedding'
+	WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /working /sstartfrom sysboot /embedding'
 	System::Call '$PLUGINSDIR\zbsetuphelper::GetTime(*l) i(.r0).r1'
 	ReadRegDWORD $R5 HKCU "software\Share4Money" "LastSetBootTime"
 	${If} $R5 == ""
@@ -745,13 +745,13 @@ Function CmdSilentInstall
 	StrCpy $R0 "/embedding"
 	
 	ClearErrors
-	${GetOptions} $R4 "/nomining"  $R5
+	${GetOptions} $R4 "/noworking"  $R5
 	IfErrors 0 RunClent 
 	${If} $R0 == ""
 	${OrIf} $R0 == 0
-		StrCpy $R0 "/mining"
+		StrCpy $R0 "/working"
 	${Else}
-		StrCpy $R0 "$R0 /mining"
+		StrCpy $R0 "$R0 /working"
 	${EndIf}
 	
 	RunClent:
@@ -1123,7 +1123,7 @@ Function NSD_TimerFun
 	System::Call "$PLUGINSDIR\zbsetuphelper::Pin2Taskbar(i 1)"
 	
 	${If} $BoolSysBoot == 1
-		WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /mining /embedding /sstartfrom sysboot'
+		WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money" '"$INSTDIR\program\Share4Money.exe" /working /embedding /sstartfrom sysboot'
 	${Else}
 		DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "Share4Money"
 	${EndIf}
@@ -1175,7 +1175,7 @@ FunctionEnd
 
 Function lijitiyan
 	SetOutPath "$INSTDIR\program"
-	ExecShell open "Share4Money.exe" "/mining /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
+	ExecShell open "Share4Money.exe" "/working /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
 	HideWindow
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	;RMDir /r $PLUGINSDIR
@@ -1269,7 +1269,7 @@ Function NSD_TimerAutoRun
 		GetFunctionAddress $0 NSD_TimerAutoRun
 		nsDialogs::KillTimer $0
 		SetOutPath "$INSTDIR\program"
-		ExecShell open "Share4Money.exe" " /mining /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
+		ExecShell open "Share4Money.exe" " /working /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
 		HideWindow
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Call cancel
