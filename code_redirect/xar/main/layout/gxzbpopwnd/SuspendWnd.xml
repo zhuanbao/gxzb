@@ -1,8 +1,8 @@
 <xlue>
-	<control class="SuspendLeftGoldBalance">
+	<control class="SuspendGoldBank">
 		<method_def>
-			<SetState file="SuspendWnd.xml.lua" func="LeftGoldBalance_SetState"/>
-			<Click file="SuspendWnd.xml.lua" func="LeftGoldBalance_Click"/>
+			<SetState file="SuspendWnd.xml.lua" func="GoldBank_SetState"/>
+			<Click file="SuspendWnd.xml.lua" func="GoldBank_Click"/>
 		</method_def>
 		<objtemplate>
 			<children>
@@ -77,61 +77,61 @@
 		</objtemplate>
 	</control>
 	
-	<control class="SuspendRightDisk">
+	<control class="SuspendSpeedoMeter">
 		<method_def>
-			<SetState file="SuspendWnd.xml.lua" func="SuspendRightDisk_SetState"/>
-			<UpdateSpeed file="SuspendWnd.xml.lua" func="SuspendRightDisk_UpdateSpeed"/>
-			<Click file="SuspendWnd.xml.lua" func="SuspendRightDisk_Click"/>
+			<SetState file="SuspendWnd.xml.lua" func="SpeedoMeter_SetState"/>
+			<UpdateSpeed file="SuspendWnd.xml.lua" func="SpeedoMeter_UpdateSpeed"/>
+			<Click file="SuspendWnd.xml.lua" func="SpeedoMeter_Click"/>
 		</method_def>
 		<objtemplate>
 			<children>
-				<obj id="graydisk" class="ImageObject">
+				<obj id="SpeedoMeterGray" class="ImageObject">
 					<attr>
 						<left>0</left>
 						<top>5</top>
 						<width>father.width</width>
 						<height>father.height-5</height>
-						<image>suspend-nowork-rightdisk-hoverleft</image>
+						<image>suspend-nowork-hoveroff</image>
 						<valign>top</valign>
 						<halign>center</halign>
 					</attr>
 					<children>
-						<obj id="graydisk.needle" class="ImageObject">
+						<obj id="SpeedoMeterGray.Needle" class="ImageObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
 								<width>father.width</width>
 								<height>father.height</height>
-								<image>suspend-nowork-rightdisk-needlegray</image>
+								<image>suspend-nowork-needlegray</image>
 								<valign>top</valign>
 								<halign>center</halign>
 							</attr>
 						</obj>
-						<obj id="starticon" class="ImageObject">
+						<obj id="SpeedoMeterGray.Start" class="ImageObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
 								<width>father.width</width>
 								<height>father.height</height>
-								<image>suspend-nowork-rightdisk-hoverright</image>
+								<image>suspend-nowork-hoveron</image>
 								<valign>top</valign>
 								<halign>center</halign>
 							</attr>
 						</obj>
 					</children>
 				</obj>
-				<obj id="lightdisk" class="ImageObject">
+				<obj id="SpeedoMeterLight" class="ImageObject">
 					<attr>
 						<left>0</left>
 						<top>5</top>
 						<width>82</width>
 						<height>father.height-5</height>
-						<image>suspend-work-rightdisk-hoverleft</image>
+						<image>suspend-work-hoveroff</image>
 						<valign>top</valign>
 						<halign>center</halign>
 					</attr>
 					<children>
-						<obj id="lightdisk.needle" class="ImageObject">
+						<obj id="SpeedoMeterLight.Needle" class="ImageObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
@@ -142,7 +142,7 @@
 								<halign>center</halign>
 							</attr>
 						</obj>
-						<obj id="speedtext" class="TextObject">
+						<obj id="SpeedoMeterLight.SpeedText" class="TextObject">
 							<attr>
 								<left>0</left>
 								<top>40</top>
@@ -158,13 +158,13 @@
 								<text></text>
 							</attr>
 						</obj>
-						<obj id="stopicon" class="ImageObject">
+						<obj id="SpeedoMeterLight.Stopicon" class="ImageObject">
 							<attr>
 								<left>0</left>
 								<top>0</top>
 								<width>father.width</width>
 								<height>father.height</height>
-								<image>suspend-work-rightdisk-hoverright</image>
+								<image>suspend-work-hoveron</image>
 								<valign>top</valign>
 								<halign>center</halign>
 							</attr>
@@ -206,7 +206,7 @@
 								<texture>suspend-nowork-bkg0</texture>
 							</attr>
 							<children>
-								<obj id="RightDisk" class="SuspendRightDisk">
+								<obj id="GoldBank" class="SuspendGoldBank">
 									<attr>
 										<left>father.width-82</left>
 										<top>0</top>
@@ -214,7 +214,7 @@
 										<height>father.height</height>
 									</attr>
 								</obj>	
-								<obj id="LeftGoldBalance" class="SuspendLeftGoldBalance">
+								<obj id="SpeedoMeter" class="SuspendSpeedoMeter">
 									<attr>
 										<left>0</left>
 										<top>0</top>

@@ -91,15 +91,15 @@ local UIDecor = function(obj)
 	}
 end
 
-function LeftGoldBalance_Click(self)
+function GoldBank_Click(self)
 	local attr = self:GetAttribute()
-	if attr.currentstate == 2 or attr.currentstate == 5 then
+	if attr.currentstate == 1 or attr.currentstate == 4 then
 		local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 		objHostWnd:BringWindowToTop(true)
 	end
 end
 
-function LeftGoldBalance_SetState(self, state)
+function GoldBank_SetState(self, state)
 	local attr = self:GetAttribute()
 	if state == attr.currentstate then
 		return
@@ -115,7 +115,7 @@ function LeftGoldBalance_SetState(self, state)
 	if state == 3 then
 		self:SetVisible(false)
 		self:SetChildrenVisible(false)
-	elseif state == 0 or state == 1 or state == 4 then
+	elseif state == 0 or state == 2 or state == 5 then
 		local function hoverright()
 			self:SetVisible(true)
 			self:SetChildrenVisible(true)
@@ -141,7 +141,7 @@ function LeftGoldBalance_SetState(self, state)
 		else
 			hoverright()
 		end
-	elseif state == 2 then
+	elseif state == 1 then
 		self:SetVisible(true)
 		self:SetChildrenVisible(true)
 		goldtextnumber:SetVisible(true)
@@ -165,11 +165,11 @@ function LeftGoldBalance_SetState(self, state)
 	end
 end
 
-function SuspendRightDisk_Click(self)
+function SpeedoMeter_Click(self)
 	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
 	local attr = self:GetAttribute()
 	LOG("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
-	if attr.currentstate == 1 then
+	if attr.currentstate == 2 then
 		if not ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyStart()
 			local tStatInfo = {}
@@ -177,7 +177,7 @@ function SuspendRightDisk_Click(self)
 			tStatInfo.fu5 = "ball"
 			StatisticClient:SendClickReport(tStatInfo)
 		end
-	elseif attr.currentstate == 4 then
+	elseif attr.currentstate == 5 then
 		if ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyQuit()
 			local tStatInfo = {}
@@ -188,45 +188,51 @@ function SuspendRightDisk_Click(self)
 	end
 end
 
-function SuspendRightDisk_SetState(self, state)
+function SpeedoMeter_SetState(self, state)
 	local attr = self:GetAttribute()
 	if state == attr.currentstate then
 		return
 	end
 	attr.currentstate = state
-	local graydisk = self:GetObject("graydisk")
-	local starticon = graydisk:GetObject("starticon")
-	local lightdisk = self:GetObject("lightdisk")
-	local stopicon = lightdisk:GetObject("stopicon")
+	local objSpeedoMeterGray = self:GetObject("SpeedoMeterGray")
+	local objStart = objSpeedoMeterGray:GetObject("SpeedoMeterGray.Start")
+	local objSpeedoMeterLight = self:GetObject("SpeedoMeterLight")
+	local objStop = objSpeedoMeterLight:GetObject("SpeedoMeterLight.Stopicon")
 	if state == 0 then
-		graydisk:SetVisible(false)
-		graydisk:SetChildrenVisible(false)
-		lightdisk:SetVisible(false)
-		lightdisk:SetChildrenVisible(false)
+		objSpeedoMeterGray:SetVisible(false)
+		objSpeedoMeterGray:SetChildrenVisible(false)
+		objSpeedoMeterLight:SetVisible(false)
+		objSpeedoMeterLight:SetChildrenVisible(false)
 	elseif state == 1 then
-		lightdisk:SetVisible(false)
-		lightdisk:SetChildrenVisible(false)
-		graydisk:SetVisible(true)
-		graydisk:SetChildrenVisible(true)
-		starticon:SetVisible(true)
+		objSpeedoMeterLight:SetVisible(false)
+		objSpeedoMeterLight:SetChildrenVisible(false)
+		objSpeedoMeterGray:SetVisible(true)
+		objSpeedoMeterGray:SetChildrenVisible(true)
+		objStart:SetVisible(false)
 	elseif state == 2 then
-		lightdisk:SetVisible(false)
-		lightdisk:SetChildrenVisible(false)
-		graydisk:SetVisible(true)
-		graydisk:SetChildrenVisible(true)
-		starticon:SetVisible(false)
+		objSpeedoMeterLight:SetVisible(false)
+		objSpeedoMeterLight:SetChildrenVisible(false)
+		objSpeedoMeterGray:SetVisible(true)
+		objSpeedoMeterGray:SetChildrenVisible(true)
+		objStart:SetVisible(true)
+	elseif state == 3 then
+		objSpeedoMeterGray:SetVisible(false)
+		objSpeedoMeterGray:SetChildrenVisible(false)
+		objSpeedoMeterLight:SetVisible(true)
+		objSpeedoMeterLight:SetChildrenVisible(true)
+		objStop:SetVisible(false)
 	elseif state == 4 then
-		graydisk:SetVisible(false)
-		graydisk:SetChildrenVisible(false)
-		lightdisk:SetVisible(true)
-		lightdisk:SetChildrenVisible(true)
-		stopicon:SetVisible(true)
+		objSpeedoMeterGray:SetVisible(false)
+		objSpeedoMeterGray:SetChildrenVisible(false)
+		objSpeedoMeterLight:SetVisible(true)
+		objSpeedoMeterLight:SetChildrenVisible(true)
+		objStop:SetVisible(false)
 	else
-		graydisk:SetVisible(false)
-		graydisk:SetChildrenVisible(false)
-		lightdisk:SetVisible(true)
-		lightdisk:SetChildrenVisible(true)
-		stopicon:SetVisible(false)
+		objSpeedoMeterGray:SetVisible(false)
+		objSpeedoMeterGray:SetChildrenVisible(false)
+		objSpeedoMeterLight:SetVisible(true)
+		objSpeedoMeterLight:SetChildrenVisible(true)
+		objStop:SetVisible(true)
 	end
 	--重置指针
 	if state < 3 then
@@ -234,7 +240,7 @@ function SuspendRightDisk_SetState(self, state)
 	end
 end
 
-function SuspendRightDisk_UpdateSpeed(self, nspeed)
+function SpeedoMeter_UpdateSpeed(self, nspeed)
 	if type(nspeed) ~= "number" or nspeed < 1 or nspeed > 13 then
 		return
 	end
@@ -245,7 +251,7 @@ function SuspendRightDisk_UpdateSpeed(self, nspeed)
 	if attr.currentspeed == nspeed then
 		return
 	end
-	local needleobj = self:GetObject("lightdisk:lightdisk.needle")
+	local needleobj = self:GetObject("SpeedoMeterLight:SpeedoMeterLight.Needle")
 	function killanimtimer()
 		if attr.animtimer then
 			KillTimer(attr.animtimer)
@@ -272,14 +278,15 @@ function SuspendCtrl_SetState(self, state)
 	end
 	attr.currentstate = state
 	local strip = self:GetObject("strip")
-	local RightDisk = strip:GetObject("RightDisk")
-	local LeftGoldBalance = strip:GetObject("LeftGoldBalance")
-	RightDisk:SetState(state)
-	LeftGoldBalance:SetState(state)
+	local SpeedoMeter = self:GetObject("SpeedoMeter")
+	local GoldBank = strip:GetObject("GoldBank")
+	SpeedoMeter:SetState(state)
+	GoldBank:SetState(state)
 	if state == 0 then
-		LeftGoldBalance:SetObjPos(0, 0, 82, "father.height")
+		GoldBank:SetObjPos(0, 0, 82, "father.height")
 	else
-		LeftGoldBalance:SetObjPos(10, 0, 82, "father.height")
+		--GoldBank:SetObjPos(10, 0, 82, "father.height")
+		GoldBank:SetObjPos(67, 0, 139, "father.height")
 	end
 	self:UpdateLine(attr.linevalue or 0)
 end
@@ -298,8 +305,8 @@ end
 function SuspendCtrl_OnWorkStateChange(self)
 	local attr = self:GetAttribute()
 	attr.currentstate = attr.currentstate or 0
-	local RightDisk = self:GetObject("RightDisk")
-	local speedtext = RightDisk:GetObject("speedtext")
+	local SpeedoMeter = self:GetObject("SpeedoMeter")
+	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
 	if ClientWorkModule:CheckIsWorking() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
@@ -317,8 +324,8 @@ end
 function SuspendCtrl_UpdateMiningState(self, nMiningState)
 	local attr = self:GetAttribute()
 	attr.currentstate = attr.currentstate or 0
-	local RightDisk = self:GetObject("RightDisk")
-	local speedtext = RightDisk:GetObject("speedtext")
+	local SpeedoMeter = self:GetObject("SpeedoMeter")
+	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
 	if ClientWorkModule:CheckIsCalculate() then
 		speedtext:SetText("0¥฿/h")
 	elseif ClientWorkModule:CheckIsPrepare() then
@@ -327,7 +334,7 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 			self:SetState(newState)
 		end
 		speedtext:SetText("准备中")
-		RightDisk:UpdateSpeed(1)
+		SpeedoMeter:UpdateSpeed(1)
 	end
 end
 
@@ -341,8 +348,8 @@ function SuspendCtrl_UpdateMiningSpeed(self, nMiningSpeedPerHour)
 		local newState = attr.currentstate + 3
 		self:SetState(newState)
 	end
-	local RightDisk = self:GetObject("RightDisk")
-	local speedtext = RightDisk:GetObject("speedtext")
+	local SpeedoMeter = self:GetObject("SpeedoMeter")
+	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
 	speedtext:SetText(tostring(nMiningSpeedPerHour).."¥฿/h")
 	local scaleValue = {0, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000}
 	local nScale = 13
@@ -352,7 +359,7 @@ function SuspendCtrl_UpdateMiningSpeed(self, nMiningSpeedPerHour)
 			break
 		end
 	end
-	RightDisk:UpdateSpeed(nScale)
+	SpeedoMeter:UpdateSpeed(nScale)
 end
 
 function SuspendCtrl_UpdateUserBalance(self, nBalance)
@@ -371,8 +378,8 @@ function SuspendCtrl_UpdateUserBalance(self, nBalance)
 	attr.linevalue = nScale
 	self:UpdateLine(nScale)
 	--更新灰色余额
-	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
-	local goldtextnumber = UIDecor(LeftGoldBalance:GetObject("goldtextnumberconta"))
+	local GoldBank = self:GetObject("GoldBank")
+	local goldtextnumber = UIDecor(GoldBank:GetObject("goldtextnumberconta"))
 	local strShow
 	if nBalance < 10000 then
 		strShow = tostring(nBalance)
@@ -413,12 +420,12 @@ function SuspendCtrl_UpdateClientUnBindState(self)
 	attr.linevalue = 0
 	self:UpdateLine(0)
 	--清除速度显示
-	local RightDisk = self:GetObject("RightDisk")
-	local speedtext = RightDisk:GetObject("speedtext")
+	local SpeedoMeter = self:GetObject("SpeedoMeter")
+	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
 	speedtext:SetText("")
 	--清除灰色余额
-	local LeftGoldBalance = self:GetObject("LeftGoldBalance")
-	local goldtextnumber = UIDecor(LeftGoldBalance:GetObject("goldtextnumberconta"))
+	local GoldBank = self:GetObject("GoldBank")
+	local goldtextnumber = UIDecor(GoldBank:GetObject("goldtextnumberconta"))
 	goldtextnumber:SetText("0")
 end
 
@@ -445,14 +452,14 @@ function OnLButtonUp(self, x, y)
 		local l, t, r, b = self:GetObjPos()
 		local width, height = r - l, b - t
 		--在右边弹起
-		if x >= width - minWidth then
-			local RightDisk = self:GetObject("RightDisk")
-			RightDisk:Click()
+		if x < width - minWidth then
+			local SpeedoMeter = self:GetObject("SpeedoMeter")
+			SpeedoMeter:Click()
 		else
 			--在左边的元宝上弹起
-			if x >= 28 and x <= 76 and y >= 20 and y <= 63 then
-				local LeftGoldBalance = self:GetObject("LeftGoldBalance")
-				LeftGoldBalance:Click()
+			if x >= 90 and x <= 118 and y >= 22 and y <= 54 then
+				local GoldBank = self:GetObject("GoldBank")
+				GoldBank:Click()
 			end
 		end
 	end
