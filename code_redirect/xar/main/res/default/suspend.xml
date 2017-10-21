@@ -50,7 +50,7 @@
 		<font id="font.suspend.balancehead.lower" height="12" facename="defaultfont" /> 
 		<font id="font.suspend.speed" height="10" facename="defaultfont" /> 
 		
-		<color id="color.suspend.balance" value="#FFDE01"/>
+		<color id="color.suspend.balance" value="#FF0000"/>
 		<color id="color.suspend.balanceshadow" value="#511B00"/>
 		<color id="color.suspend.balance.lower" value="#E1E1E1"/>
 		<color id="color.suspend.speed" value="#FFFFFF"/>
