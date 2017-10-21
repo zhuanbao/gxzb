@@ -206,7 +206,7 @@
 								<texture>suspend-nowork-bkg0</texture>
 							</attr>
 							<children>
-								<obj id="GoldBank" class="SuspendGoldBank">
+								<obj id="SpeedoMeter" class="SuspendSpeedoMeter">
 									<attr>
 										<left>father.width-82</left>
 										<top>0</top>
@@ -214,7 +214,7 @@
 										<height>father.height</height>
 									</attr>
 								</obj>	
-								<obj id="SpeedoMeter" class="SuspendSpeedoMeter">
+								<obj id="GoldBank" class="SuspendGoldBank">
 									<attr>
 										<left>0</left>
 										<top>0</top>

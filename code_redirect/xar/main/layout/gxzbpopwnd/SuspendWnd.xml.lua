@@ -1,5 +1,10 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+
+function TipLog(strLog)
+	tipUtil:Log("SuspendWnd: " .. tostring(strLog))
+end
 
 function PopupInDeskRightTop(self)
 	local workleft, worktop, workright, workbottom = Helper.tipUtil:GetWorkArea()
@@ -40,6 +45,10 @@ end
 -------------------------------
 --------以下是控件逻辑---------
 -------------------------------
+
+local g_bSpeedMeterLeft = true
+
+
 local UIDecor = function(obj)
 	return {
 		_obj = obj,
@@ -93,10 +102,8 @@ end
 
 function GoldBank_Click(self)
 	local attr = self:GetAttribute()
-	if attr.currentstate == 1 or attr.currentstate == 4 then
-		local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
-		objHostWnd:BringWindowToTop(true)
-	end
+	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+	objHostWnd:BringWindowToTop(true)
 end
 
 function GoldBank_SetState(self, state)
@@ -115,61 +122,18 @@ function GoldBank_SetState(self, state)
 	if state == 3 then
 		self:SetVisible(false)
 		self:SetChildrenVisible(false)
-	elseif state == 0 or state == 2 or state == 5 then
-		local function hoverright()
-			self:SetVisible(true)
-			self:SetChildrenVisible(true)
-			goldtextnumber:SetVisible(true)
-			goldtexthead:SetVisible(true)
-			goldicon:SetResID("suspend-gold-gray")
-			goldtextnumber:SetTextColorResID("color.suspend.balance")
-			goldtextnumber:SetAlpha(255)
-			goldtexthead:SetTextColorResID("color.suspend.balance")
-			goldtexthead:SetAlpha(255)
-			goldtexthead:SetTextFontResID("font.suspend.balancehead")
-			local goldzorder = goldicon:GetZorder()
-			if type(goldzorder) == "number" then
-				goldtexthead:SetZorder(goldzorder+1)
-				goldtextnumber:SetZorder(goldzorder+1)
-			end
-		end
-		--停右边
-		if needDelay then
-			self:SetVisible(false)
-			self:SetChildrenVisible(false)
-			SetOnceTimer(hoverright, 200)
-		else
-			hoverright()
-		end
-	elseif state == 1 then
-		self:SetVisible(true)
-		self:SetChildrenVisible(true)
-		goldtextnumber:SetVisible(true)
-		goldtexthead:SetVisible(true)
-		goldtextnumber:SetTextColorResID("color.suspend.balance.lower")
-		goldtextnumber:SetAlpha(117)
-		goldtexthead:SetTextColorResID("color.suspend.balance.lower")
-		goldtexthead:SetAlpha(117)
-		goldtexthead:SetTextFontResID("font.suspend.balancehead.lower")
-		goldicon:SetResID("suspend-gold-light")
-		local textzorder = goldtexthead:GetZorder()
-		if type(textzorder) == "number" then
-			goldicon:SetZorder(textzorder+101)
-		end
+		SetShowWndTimer(false)
 	else
 		self:SetVisible(true)
 		self:SetChildrenVisible(true)
-		goldtextnumber:SetVisible(false)
-		goldtexthead:SetVisible(false)
-		goldicon:SetResID("suspend-gold-light")
 	end
 end
 
 function SpeedoMeter_Click(self)
 	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
 	local attr = self:GetAttribute()
-	LOG("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
-	if attr.currentstate == 2 then
+	TipLog("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
+	if attr.currentstate == 2 or attr.currentstate == 1 then
 		if not ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyStart()
 			local tStatInfo = {}
@@ -177,7 +141,7 @@ function SpeedoMeter_Click(self)
 			tStatInfo.fu5 = "ball"
 			StatisticClient:SendClickReport(tStatInfo)
 		end
-	elseif attr.currentstate == 5 then
+	elseif attr.currentstate == 5 or attr.currentstate == 4 then
 		if ClientWorkModule:CheckIsWorking() then
 			ClientWorkModule:NotifyQuit()
 			local tStatInfo = {}
@@ -198,18 +162,21 @@ function SpeedoMeter_SetState(self, state)
 	local objStart = objSpeedoMeterGray:GetObject("SpeedoMeterGray.Start")
 	local objSpeedoMeterLight = self:GetObject("SpeedoMeterLight")
 	local objStop = objSpeedoMeterLight:GetObject("SpeedoMeterLight.Stopicon")
+	local objOwner = self:GetOwnerControl()
 	if state == 0 then
 		objSpeedoMeterGray:SetVisible(false)
 		objSpeedoMeterGray:SetChildrenVisible(false)
 		objSpeedoMeterLight:SetVisible(false)
 		objSpeedoMeterLight:SetChildrenVisible(false)
-	elseif state == 1 then
+	elseif (not g_bSpeedMeterLeft and state == 2)
+		or (g_bSpeedMeterLeft and state == 1) then
 		objSpeedoMeterLight:SetVisible(false)
 		objSpeedoMeterLight:SetChildrenVisible(false)
 		objSpeedoMeterGray:SetVisible(true)
 		objSpeedoMeterGray:SetChildrenVisible(true)
 		objStart:SetVisible(false)
-	elseif state == 2 then
+	elseif (not g_bSpeedMeterLeft and state == 1)
+		or (g_bSpeedMeterLeft and state == 2) then
 		objSpeedoMeterLight:SetVisible(false)
 		objSpeedoMeterLight:SetChildrenVisible(false)
 		objSpeedoMeterGray:SetVisible(true)
@@ -221,13 +188,16 @@ function SpeedoMeter_SetState(self, state)
 		objSpeedoMeterLight:SetVisible(true)
 		objSpeedoMeterLight:SetChildrenVisible(true)
 		objStop:SetVisible(false)
-	elseif state == 4 then
+	elseif (not g_bSpeedMeterLeft and state == 5)
+		or (g_bSpeedMeterLeft and state == 4) then
 		objSpeedoMeterGray:SetVisible(false)
 		objSpeedoMeterGray:SetChildrenVisible(false)
 		objSpeedoMeterLight:SetVisible(true)
 		objSpeedoMeterLight:SetChildrenVisible(true)
 		objStop:SetVisible(false)
-	else
+	elseif (not g_bSpeedMeterLeft and state == 4)
+		or (g_bSpeedMeterLeft and state == 5) then
+		TipLog("[SpeedoMeter_SetState] state = " .. tostring(state) .. ", g_bSpeedMeterLeft = " .. tostring(g_bSpeedMeterLeft))
 		objSpeedoMeterGray:SetVisible(false)
 		objSpeedoMeterGray:SetChildrenVisible(false)
 		objSpeedoMeterLight:SetVisible(true)
@@ -285,8 +255,13 @@ function SuspendCtrl_SetState(self, state)
 	if state == 0 then
 		GoldBank:SetObjPos(0, 0, 82, "father.height")
 	else
+		TipLog("[SuspendCtrl_SetState] state = " .. tostring(state) .. ",  CheckIsSpeedMeterLeft = " .. tostring(g_bSpeedMeterLeft))
 		--GoldBank:SetObjPos(10, 0, 82, "father.height")
-		GoldBank:SetObjPos(67, 0, 139, "father.height")
+		if not g_bSpeedMeterLeft then
+			GoldBank:SetObjPos(10, 0, 82, "father.height")
+		else
+			GoldBank:SetObjPos(67, 0, 139, "father.height")
+		end
 	end
 	self:UpdateLine(attr.linevalue or 0)
 end
@@ -434,7 +409,7 @@ local shadowOffset = 10
 function OnLButtonDown(self, x, y)
 	local attr = self:GetAttribute()
 	--重置点击事件标志位
-	LOG("SuspendWnd OnLButtonDown x="..tostring(x)..", y="..tostring(y))
+	TipLog("SuspendWnd OnLButtonDown x="..tostring(x)..", y="..tostring(y))
 	attr.moveflag = false
 	attr.lbtndown = {x, y}
 	if not attr.anim then
@@ -445,22 +420,28 @@ end
 
 function OnLButtonUp(self, x, y)
 	local attr = self:GetAttribute()
-	LOG("SuspendWnd OnLButtonUp attr.moveflag="..tostring(attr.moveflag)..", attr.lbtndown="..tostring(attr.lbtndown))
+	TipLog("SuspendWnd OnLButtonUp attr.moveflag="..tostring(attr.moveflag)..", attr.lbtndown="..tostring(attr.lbtndown))
 	--按下了左键且没有拖动， 弹起时则认为是点击操作
 	if not attr.moveflag and attr.lbtndown then
-		LOG("SuspendWnd OnLButtonUp can call click")
+		TipLog("SuspendWnd OnLButtonUp can call click")
 		local l, t, r, b = self:GetObjPos()
 		local width, height = r - l, b - t
 		--在右边弹起
-		if x < width - minWidth then
+		TipLog("[OnLButtonUp] g_bSpeedMeterLeft = "..tostring(g_bSpeedMeterLeft)..", x="..tostring(x))
+		if (g_bSpeedMeterLeft and x <= width - minWidth) 
+			 or (not g_bSpeedMeterLeft and x >= minWidth) then
 			local SpeedoMeter = self:GetObject("SpeedoMeter")
 			SpeedoMeter:Click()
 		else
 			--在左边的元宝上弹起
+			--[[
 			if x >= 90 and x <= 118 and y >= 22 and y <= 54 then
 				local GoldBank = self:GetObject("GoldBank")
 				GoldBank:Click()
 			end
+			--]]
+			local GoldBank = self:GetObject("GoldBank")
+			GoldBank:Click()
 		end
 	end
 	attr.lbtndown = nil
@@ -484,13 +465,34 @@ function SaveWindowPos(l, t, w, h)
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
+local g_ShowWndTimerId = nil
+function SetShowWndTimer(bSet)
+	if bSet then
+		if g_ShowWndTimerId then
+			return
+		end
+		g_ShowWndTimerId = timeMgr:SetTimer(function(Itm, id)
+			timeMgr:KillTimer(g_ShowWndTimerId)
+			g_ShowWndTimerId = nil
+			local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+			objHostWnd:BringWindowToTop(true)
+		end,2*1000)
+	else
+		if not g_ShowWndTimerId then
+			return
+		end
+		timeMgr:KillTimer(g_ShowWndTimerId)
+		g_ShowWndTimerId = nil
+	end	
+end
+
 function OnMouseMove(self, x, y)
 	CheckStripAnim(self, false, x, y)
 	local attr = self:GetAttribute()
 	--自己处理离开事件
 	--[[local L, T, R, B = self:GetObjPos()
 	local W, H = R-L, B-T
-	LOG("x="..tostring(x)..", y="..tostring(y)..", W="..tostring(W)..", H="..tostring(H))
+	TipLog("x="..tostring(x)..", y="..tostring(y)..", W="..tostring(W)..", H="..tostring(H))
 	if x < 0 or x >= W or y < 0 or y >= B then
 		self:SetCaptureMouse(false)
 		OnMouseLeave(self)
@@ -509,16 +511,27 @@ function OnMouseMove(self, x, y)
 		local l, t, r, b = self:GetObjPos()
 		local width = r - l
 		--停在右边
-		if x >= width - minWidth then
+		if (g_bSpeedMeterLeft and x >= width-minWidth ) 
+			 or (not g_bSpeedMeterLeft and x >= minWidth) then
 			self:SetState(attr.currentstate >= 3 and 4 or 1)
+			if g_bSpeedMeterLeft and x >= width-minWidth then
+				SetShowWndTimer(true)
+			else
+				SetShowWndTimer(false)
+			end
 		--停在左边
 		else
 			self:SetState(attr.currentstate >= 3 and 5 or 2)
+			if g_bSpeedMeterLeft and x < width-minWidth then
+				SetShowWndTimer(false)
+			else
+				SetShowWndTimer(true)
+			end
 		end
 		return
 	end
 	if attr.lbtndown and  attr.lbtndown[1] ~= x and attr.lbtndown[2] ~= y then
-		LOG("SuspendWnd OnMouseMove x="..tostring(x)..", y="..tostring(y)..", attr.lbtndown.x="..tostring(attr.lbtndown.x)..", attr.lbtndown.y="..tostring(attr.lbtndown.y))
+		TipLog("SuspendWnd OnMouseMove x="..tostring(x)..", y="..tostring(y)..", attr.lbtndown.x="..tostring(attr.lbtndown.x)..", attr.lbtndown.y="..tostring(attr.lbtndown.y))
 		attr.moveflag = true
 	end
 	local tree = self:GetOwner()
@@ -565,6 +578,7 @@ end
 
 function OnMouseLeave(self)
 	--鼠标没弹起不处理离开事件
+	SetShowWndTimer(false)
 	local attr = self:GetAttribute()
 	if attr.hitpoint then
 		return
@@ -646,6 +660,20 @@ function CheckStripAnim(self, isHide, x, y)
 	if isHide then
 		attr.animstrip:SetKeyFrameRect(l, t, r, b, r-minWidth, t, r, b)
 	else
+		local SpeedoMeter = strip:GetObject("SpeedoMeter")
+		--local smL, smT, smR, smB = SpeedoMeter:GetObjPos()
+		local GoldBank = strip:GetObject("GoldBank")
+		--local gbL, gbT, gbR, gbB = GoldBank:GetObjPos()
+		if attr.currentstate == 0 then
+			g_bSpeedMeterLeft = false
+			GoldBank:SetObjPos2(0, 0, 82, "father.height")
+			SpeedoMeter:SetObjPos2("father.width-82", 0, 82, "father.height")
+		else
+			g_bSpeedMeterLeft = true
+			GoldBank:SetObjPos2("father.width-82", 0, 82, "father.height")
+			SpeedoMeter:SetObjPos2(0, 0, 82, "father.height")
+			
+		end
 		attr.animstrip:SetKeyFrameRect(l, t, r, b, 0, t, r, b)
 	end
 	local ownerTree = self:GetOwner()
