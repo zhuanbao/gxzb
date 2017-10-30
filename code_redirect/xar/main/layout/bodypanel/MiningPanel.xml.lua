@@ -183,6 +183,8 @@ function OnMouseLeaveStopBtn(self)
 end
 
 function OnClickStartMining(self)
+	local OwnerCtrl = self:GetOwnerControl()
+	SetStateInfoToUser(OwnerCtrl,nil)
 	if not ClientWorkModule:CheckIsWorking() then
 		ClientWorkModule:NotifyStart()
 	end

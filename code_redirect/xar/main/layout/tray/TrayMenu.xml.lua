@@ -25,6 +25,7 @@ function OnInit_Pause(self)
 end
 
 function OnSelect_Pause(self)
+	UIInterface:SetStateInfoToUser(nil)
 	if ClientWorkModule:CheckIsWorking() then
 		ClientWorkModule:NotifyQuit()
 		local tStatInfo = {}

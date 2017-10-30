@@ -38,6 +38,10 @@ ClientWorkModule.CLIENT_STATE.PREPARE = 1
 ClientWorkModule.CLIENT_STATE.EEEOR = 2
 ClientWorkModule.CLIENT_STATE.AUTO_EXIT = 3
 
+--重试
+ClientWorkModule.CONNECT_MAX_COUNT = 10
+ClientWorkModule.CONNECT_RETRY_COUNT = 0
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -135,6 +139,24 @@ end
 
 function ClientWorkModule:FormatRequestUrl(strParam)
 	return self._strSeverInterfacePrefix .. strParam
+end
+
+function ClientWorkModule:CheckCanReconnect()
+	TipLog("[CheckCanReconnect] current retry cnt = " .. tostring(self.CONNECT_RETRY_COUNT))
+	if self.CONNECT_RETRY_COUNT < self.CONNECT_MAX_COUNT then
+		self.CONNECT_RETRY_COUNT = self.CONNECT_RETRY_COUNT + 1
+		return true
+	end
+	return false
+end
+
+function ClientWorkModule:ResetReconnectCnt()
+	self.CONNECT_RETRY_COUNT = 0
+end
+
+function ClientWorkModule:GetReconnectInterval()
+	local nInterval = (self.CONNECT_RETRY_COUNT + 1 )*5*1000
+	return nInterval
 end
 
 function ClientWorkModule:QuerySvrForWorkID()
@@ -924,7 +946,7 @@ function ClientWorkModule:DownLoadTempQrcode(fnCallBack)
 end
 
 --查询客户端信息
-function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo)
+function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo, bRetry)
 	if bSuccess then
 		self:UpdateSvrPoolCfg(tabInfo)
 		if tabInfo["data"]["status"] ~= 1 then
@@ -940,21 +962,30 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo)
 				UIInterface:UpdateUserBalance()
 			end	
 		end
+		self:ResetReconnectCnt()
 	else
-		if self:CheckIsWorking() then
-			self:NotifyPause()
-			UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+		if bRetry and self:CheckIsWorking() then
+			if not self:CheckCanReconnect() then
+				self:NotifyPause()
+				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+			else
+				local nInterval = self:GetReconnectInterval()
+				UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+				SetOnceTimer(function()
+					self:QueryWorkerInfo(true)
+				end, nInterval)
+			end	
 		end	
 	end
 end
 
-function ClientWorkModule:QueryWorkerInfo()
+function ClientWorkModule:QueryWorkerInfo(bRetry)
 	local strUrl = self:QuerySvrForWorkerInfo()
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[QueryWorkerInfo] strUrl = " .. strUrl)
 	
-	local function fnWorkerInfoCallBack(bRet, tabInfo)
-		self:DispatchEvent("OnQueryWorkerInfo", bRet, tabInfo)
+	local function fnWorkerInfoCallBack(bSuccess, tabInfo)
+		self:DispatchEvent("OnQueryWorkerInfo", bSuccess, tabInfo, bRetry)
 	end
 	
 	self:GetServerJsonData(strUrl, fnWorkerInfoCallBack)
@@ -1027,6 +1058,14 @@ function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 		if tonumber(tabInfo["data"]["rate"]) ~= nil then
 			self._SvrAverageMiningSpeed = tabInfo["data"]["rate"]
 		end
+		self:ResetReconnectCnt()
+	else
+		if not self:CheckCanReconnect() then
+			if self:CheckIsWorking() then
+				self:NotifyPause()
+				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+			end	
+		end	
 	end
 end
 
@@ -1251,6 +1290,7 @@ function ClientWorkModule:ResetGlobalParam()
 		timeMgr:KillTimer(self._WorkingTimerId)
 		self._WorkingTimerId = nil
 	end
+	self:ResetReconnectCnt()
 end
 
 function ClientWorkModule:WorkingTimerHandle()
@@ -1313,6 +1353,7 @@ function ClientWorkModule:OnFinishPrepareWorkID(event, bSuccess)
 		return 
 	end
 	if not bSuccess then
+		--[[
 		UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
 		SetOnceTimer(function()
 			self:GetUserWorkID(
@@ -1322,11 +1363,30 @@ function ClientWorkModule:OnFinishPrepareWorkID(event, bSuccess)
 							  )
 		end, 5*1000)
 		return
+		--]]
+		if not self:CheckCanReconnect() then
+			if self:CheckIsWorking() then
+				self:NotifyPause()
+				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+			end	
+		else
+			local nInterval = self:GetReconnectInterval()
+			UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				self:GetUserWorkID(
+					function(bSuccess)
+						self:DispatchEvent("OnFinishPrepareWorkID", bSuccess)
+					end
+				  )
+			end, nInterval)
+		end
+		return
 	end
 	--获取矿池信息
 	self._UIWorkState = self.UI_STATE.PREPARE_POOL
-	self:QueryWorkerInfo()
+	self:QueryWorkerInfo(true)
 	UIInterface:SetStateInfoToUser(nil)
+	self:ResetReconnectCnt()
 end
 
 function ClientWorkModule:NotifyStart()

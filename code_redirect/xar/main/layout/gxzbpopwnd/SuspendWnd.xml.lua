@@ -135,6 +135,7 @@ function SpeedoMeter_Click(self)
 	TipLog("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
 	if attr.currentstate == 2 or attr.currentstate == 1 then
 		if not ClientWorkModule:CheckIsWorking() then
+			UIInterface:SetStateInfoToUser(nil)
 			ClientWorkModule:NotifyStart()
 			local tStatInfo = {}
 			tStatInfo.fu1 = "startworking"
@@ -143,6 +144,7 @@ function SpeedoMeter_Click(self)
 		end
 	elseif attr.currentstate == 5 or attr.currentstate == 4 then
 		if ClientWorkModule:CheckIsWorking() then
+			UIInterface:SetStateInfoToUser(nil)
 			ClientWorkModule:NotifyQuit()
 			local tStatInfo = {}
 			tStatInfo.fu1 = "stopworking"
