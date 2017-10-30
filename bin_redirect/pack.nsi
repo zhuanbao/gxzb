@@ -772,10 +772,6 @@ Function jixuanzhuang
 FunctionEnd
 
 Function cancel
-	ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
-	${If} $R5 != 1
-		WriteRegDWORD HKCU "software\Share4Money" "instate" 2
-	${EndIf}
 	SendMessage $HWNDPARENT "0x408" "120" ""
 FunctionEnd
 
@@ -787,6 +783,10 @@ Function check-can-install
 		SendMessage $HWNDPARENT "0x408" "1" ""
 	;²»Ö§³Öopencl
 	${Else}
+		ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
+		${If} $R5 != 1
+			WriteRegDWORD HKCU "software\Share4Money" "instate" 2
+		${EndIf}
 		GetDlgItem $0 $HWNDPARENT 1
 		ShowWindow $0 ${SW_HIDE}
 		GetDlgItem $0 $HWNDPARENT 2
