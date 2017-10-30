@@ -91,6 +91,9 @@ Var BuildNum
 Var CheckETHCond
 Var CheckZcashCond
 
+Var Bool_IsReInstall
+Var Int_InState
+
 Var Verision_Channel
 ;主程序至少需要10M空间
 !define NeedSpace 10
@@ -499,7 +502,13 @@ Function .onInit
 	
 	Call GetInstallExeChanel
 	StrCpy $Verision_Channel "${PRODUCT_VERSION}_$strInstallExeChanel"
-
+	
+	StrCpy $Bool_IsReInstall 0 
+	StrCpy $Int_InState "" 
+	ReadRegDWORD $Int_InState HKCU "software\Share4Money" "instate"
+	${If} $Int_InState != ""
+		StrCpy $Bool_IsReInstall 1
+	${EndIf}	
 	Call InitFont
 	${If} ${RunningX64}
 		File "main\program\Share4Peer\msvcp120.dll"
@@ -545,6 +554,8 @@ FunctionEnd
 
 Var Bool_IsInstallSucc
 Var Bool_IsUpdate
+
+
 Function FirstSendStart
 	StrCpy $Bool_IsUpdate 0 
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
@@ -553,8 +564,13 @@ Function FirstSendStart
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	StrCpy $BuildNum $R1
 	${If} $Bool_IsUpdate == 0
-		${SendStat} "installenter" "$Verision_Channel" "" ""
-		StrCpy $InstallProgressName "installprogress"
+		${If} $Bool_IsReInstall == 0 
+			${SendStat} "installenter" "$Verision_Channel" "" ""
+			StrCpy $InstallProgressName "installprogress"
+		${Else}
+			${SendStat} "reinstallenter" "$Verision_Channel" "$Int_InState" ""
+			StrCpy $InstallProgressName "reinstallprogress"
+		${EndIf} 	
 	${Else}
 		${SendStat} "updateenter" "$Verision_Channel" "" ""
 		StrCpy $InstallProgressName "updateprogress"
@@ -569,7 +585,12 @@ Function EnterErrorStat
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	StrCpy $BuildNum $R1
 	${If} $Bool_IsUpdate == 0
-		${SendStat} "installenterfail" "$Verision_Channel" "" ""
+		${If} $Bool_IsReInstall == 0 
+			${SendStat} "installenterfail" "$Verision_Channel" "" ""
+		${Else}
+			${SendStat} "reinstallenterfail" "$Verision_Channel" "$Int_InState" ""
+		${EndIf}
+		
 	${Else}
 		${SendStat} "updateenterfail" "$Verision_Channel" "" ""
 	${EndIf} 
@@ -611,11 +632,13 @@ Function DoInstall
 	;${EndIf}
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R1
 	${If} $Bool_IsUpdate == 0
-		${SendStat} "install" "$Verision_Channel" "$R0" ""
-		;${SendStat} "installmethod" "$R1" "$R0" 1
+		${If} $Bool_IsReInstall == 0 
+			${SendStat} "install" "$Verision_Channel" "$R0" ""
+		${Else}
+			${SendStat} "reinstall" "$Verision_Channel" "$Int_InState" ""
+		${EndIf}
 	${Else}
 		${SendStat} "update" "$Verision_Channel" "$R0" ""
-		;${SendStat} "updatemethod" "$R1" "$R3" 1
 	${EndIf}  
 	WriteRegDWORD HKCU "software\Share4Money" "instate" 0
 	;写入自用的注册表信息
