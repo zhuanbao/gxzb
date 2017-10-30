@@ -1060,12 +1060,14 @@ function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 		end
 		self:ResetReconnectCnt()
 	else
+		--[[
 		if not self:CheckCanReconnect() then
 			if self:CheckIsWorking() then
 				self:NotifyPause()
 				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
 			end	
 		end	
+		--]]
 	end
 end
 
