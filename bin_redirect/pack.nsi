@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.16"
+!define PRODUCT_VERSION "1.0.0.18"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -538,6 +538,7 @@ Function .onInit
 		Call EnterErrorStat
 		StrCpy $CheckETHCond 1
 		StrCpy $CheckZcashCond 1
+		WriteRegDWORD HKCU "software\Share4Money" "instate" 1
 	${EndIf}
 	Call CmdSilentInstall
 FunctionEnd
@@ -616,7 +617,7 @@ Function DoInstall
 		${SendStat} "update" "$Verision_Channel" "$R0" ""
 		;${SendStat} "updatemethod" "$R1" "$R3" 1
 	${EndIf}  
-	
+	WriteRegDWORD HKCU "software\Share4Money" "instate" 0
 	;写入自用的注册表信息
 	WriteRegStr HKLM "software\Share4Money" "InstallSource" $str_ChannelID
 	WriteRegStr HKLM "software\Share4Money" "InstDir" "$INSTDIR"
@@ -675,6 +676,10 @@ Function CmdSilentInstall
 	SetSilent silent
 	${If} $CheckETHCond != 0 
 	${AndIf} $CheckZcashCond != 0	
+		ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
+		${If} $R5 != 1
+			WriteRegDWORD HKCU "software\Share4Money" "instate" 2
+		${EndIf}
 		${SendStat} "$InstallProgressName" "$Verision_Channel" "checkenvfail" ""
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
@@ -767,6 +772,10 @@ Function jixuanzhuang
 FunctionEnd
 
 Function cancel
+	ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
+	${If} $R5 != 1
+		WriteRegDWORD HKCU "software\Share4Money" "instate" 2
+	${EndIf}
 	SendMessage $HWNDPARENT "0x408" "120" ""
 FunctionEnd
 
