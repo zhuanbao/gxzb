@@ -460,6 +460,25 @@ Function GetInstallExeChanel
 	${EndIf}
 FunctionEnd
 
+
+Function CheckReInstall
+	System::Call "*(i 0) i .R0"
+	Push "SOFTWARE\Share4Money"
+	System::Call 'Advapi32::RegOpenKey(i ${HKEY_CURRENT_USER}, t s, i R0) .iR1'
+	System::Call 'Advapi32::RegCloseKey(i R0)'
+	System::Free
+	
+	;ÅÐ¶ÏKEY
+	StrCpy $Bool_IsReInstall 0 
+	${If} $R1 == 0
+		StrCpy $Bool_IsReInstall 1 
+	${EndIf}
+	StrCpy $Int_InState "" 
+	ReadRegDWORD $Int_InState HKCU "software\Share4Money" "instate"	
+	Pop $R1
+	Pop $R0
+FunctionEnd
+
 Function .onInit
 	${InitMutex}
 	${If} ${PackUninstall} == 1
@@ -503,12 +522,7 @@ Function .onInit
 	Call GetInstallExeChanel
 	StrCpy $Verision_Channel "${PRODUCT_VERSION}_$strInstallExeChanel"
 	
-	StrCpy $Bool_IsReInstall 0 
-	StrCpy $Int_InState "" 
-	ReadRegDWORD $Int_InState HKCU "software\Share4Money" "instate"
-	${If} $Int_InState != ""
-		StrCpy $Bool_IsReInstall 1
-	${EndIf}	
+	Call CheckReInstall
 	Call InitFont
 	${If} ${RunningX64}
 		File "main\program\Share4Peer\msvcp120.dll"
