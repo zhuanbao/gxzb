@@ -18,6 +18,7 @@
 #include <openssl/evp.h>
 #pragma comment(lib,"libeay32.lib")
 #pragma comment(lib,"ssleay32.lib")
+#include <sstream>
 
 #include "commonshare/md5.h"
 #include "shortcut/Shortcut.h"
@@ -285,6 +286,8 @@ extern "C" __declspec(dllexport) void SetUpExit()
 {
 	TerminateProcess(GetCurrentProcess(), 0);
 }
+
+
 
 extern "C" __declspec(dllexport) void SendAnyHttpStat(CHAR *fu1,CHAR *version_channel, CHAR *fu5,CHAR *fu6)
 {
@@ -1090,4 +1093,103 @@ extern "C" __declspec(dllexport) BOOL CheckZcashCond()
 {
 	//return CheckZcashACond() || CheckZcashNCond();
 	return CheckZcashNCond();
+}
+
+void EncryptStringByPeerID(const char* szPid , const char* pszData,std::string &strOut)
+{
+	char pszKey[MAX_PATH] = {0};
+	memset(pszKey,0,MAX_PATH);
+	sprintf(pszKey,"RpXVQTFlU7NaeMcV%s",szPid);
+
+	int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
+	char* pszNewKey = new(std::nothrow) char[ubuff+1];
+	memset(pszNewKey,0,ubuff+1);
+
+	strcpy_s(pszNewKey,ubuff+1,pszKey);
+
+	int msglen = strlen(pszData);
+	int flen = ((msglen >> 4) + 1) << 4;
+	unsigned char* out_str = (unsigned char*)malloc(flen + 1);
+	memset(out_str, 0, flen + 1);
+
+	int nlen = 0;
+	EncryptAESToFileHelper((const unsigned char*)pszNewKey, pszData, out_str, nlen);
+	delete[] pszNewKey;
+	if (nlen > 0)
+	{
+		std::string strBase64 = base64_encode(out_str,nlen);
+		strOut = strBase64;
+		free(out_str);
+	}
+	return;
+}
+
+extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *version_channel)
+{
+	TSAUTO();
+	char szPid[256] = {0};
+	extern void GetPeerID(CHAR *);
+	GetPeerID(szPid);
+	std::string strfu1= szPid;
+	std::string strfu2= "";
+	if (NULL != fu2)
+	{
+		strfu2 = fu2;
+	}
+
+	std::string strfu6= "";
+	if (NULL != fu6)
+	{
+		strfu6 = fu6;
+	}
+
+	std::string strfu7= "";
+	std::string strfu8= "";
+	if (NULL != version_channel)
+	{
+		std::string strTmp = version_channel;
+		size_t iPos = strTmp.find("_", 0);
+		if (iPos != std::string::npos)
+		{
+			strfu7 = strTmp.substr(0,iPos);
+			strfu8 = strTmp.substr(iPos+1);
+		}
+		else
+		{
+			strfu7 = strTmp;
+		}
+	}
+	std::string strfu9= "";
+	__time64_t nCurrentTime = 0;
+	_time64(&nCurrentTime);
+
+	{
+		std::stringstream sstmp;
+		sstmp << nCurrentTime;
+		sstmp >> strfu9;
+	}
+
+	CHAR szJson[MAX_PATH] = {0};
+	memset(szJson,0,MAX_PATH);
+	sprintf(szJson, "{\"fu6\":\"%s\",\"fu7\":\"%s\",\"fu8\":\"%s\",\"fu9\":\"%s\"}",
+		strfu6.c_str(),strfu7.c_str(), strfu8.c_str(),strfu9.c_str());
+
+	TSDEBUG4CXX(L"SendEncyptHttpStat szJson = "<<ultra::_A2UTF(szJson));
+
+	std::string strfu5 = "";
+	EncryptStringByPeerID(szPid,szJson,strfu5);
+
+	TSDEBUG4CXX(L"SendEncyptHttpStat strfu5 = "<<strfu5);
+	strfu5 = ultra::URLEncode(strfu5);
+
+	CHAR* szURL = new CHAR[MAX_PATH];
+	memset(szURL, 0, MAX_PATH);
+	sprintf(szURL, "http://pgv.eastredm.com/pc/cc?fu1=%s&fu2=%s&fu3=&fu4=&fu5=%s",strfu1.c_str(),strfu2.c_str(),strfu5.c_str());
+
+	TSDEBUG4CXX(L"SendAnyHttpStat szURL = "<<ultra::_A2UTF(szURL));
+	ResetUserHandle();
+	DWORD dwThreadId = 0;
+	HANDLE hThread = CreateThread(NULL, 0, SendHttpStatThread, (LPVOID)szURL,0, &dwThreadId);
+	CloseHandle(hThread);
+	//SendHttpStatThread((LPVOID)szURL);
 }
