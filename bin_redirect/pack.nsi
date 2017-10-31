@@ -524,6 +524,7 @@ Function .onInit
 	
 	Call CheckReInstall
 	Call InitFont
+	
 	${If} ${RunningX64}
 		File "main\program\Share4Peer\msvcp120.dll"
 		File "main\program\Share4Peer\msvcr120.dll"
@@ -824,6 +825,8 @@ Function check-can-install
 		${If} $R5 != 1
 			WriteRegDWORD HKCU "software\Share4Money" "instate" 2
 		${EndIf}
+		${SendStat} "$InstallProgressName" "$Verision_Channel" "checkenvfail" ""
+		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		GetDlgItem $0 $HWNDPARENT 1
 		ShowWindow $0 ${SW_HIDE}
 		GetDlgItem $0 $HWNDPARENT 2
