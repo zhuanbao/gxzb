@@ -1206,7 +1206,7 @@ extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *
 	sprintf(szJson, "{\"fu6\":\"%s\",\"fu7\":\"%s\",\"fu8\":\"%s\",\"fu9\":\"%s\"}",
 		strfu6.c_str(),strfu7.c_str(), strfu8.c_str(),strfu9.c_str());
 
-	TSDEBUG4CXX(L"SendEncyptHttpStat szJson = "<<ultra::_A2UTF(szJson));
+	//TSDEBUG4CXX(L"SendEncyptHttpStat szJson = "<<ultra::_A2UTF(szJson));
 
 	std::string strfu5 = "";
 	EncryptStringByPeerID(strKey.c_str(),szJson,strfu5);
