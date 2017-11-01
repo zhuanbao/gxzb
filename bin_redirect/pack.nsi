@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.18"
+!define PRODUCT_VERSION "1.0.0.20"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -649,11 +649,14 @@ Function DoInstall
 	${If} $Bool_IsUpdate == 0
 		${If} $Bool_IsReInstall == 0 
 			${SendStat} "install" "$Verision_Channel" "$R0" ""
+			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "install", t "$Verision_Channel"'
 		${Else}
 			${SendStat} "reinstall" "$Verision_Channel" "$Int_InState" ""
+			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "reinstall", t "$Verision_Channel"'
 		${EndIf}
 	${Else}
 		${SendStat} "update" "$Verision_Channel" "$R0" ""
+		System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "update", t "$Verision_Channel"'
 	${EndIf}  
 	WriteRegDWORD HKCU "software\Share4Money" "instate" 0
 	;写入自用的注册表信息
