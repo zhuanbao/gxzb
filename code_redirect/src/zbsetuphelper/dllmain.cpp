@@ -16,6 +16,7 @@
 #include <openssl/rsa.h>
 #include <openssl/aes.h>
 #include <openssl/evp.h>
+
 #pragma comment(lib,"libeay32.lib")
 #pragma comment(lib,"ssleay32.lib")
 #include <sstream>
@@ -24,6 +25,8 @@
 #include "shortcut/Shortcut.h"
 #include "StringOperation.h"
 #include "OpenCL.h"
+#include "base64standard.h"
+
 using namespace std;
 
 extern "C" typedef HRESULT (__stdcall *PSHGetKnownFolderPath)(  const  GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR* pszPath);
@@ -1095,11 +1098,34 @@ extern "C" __declspec(dllexport) BOOL CheckZcashCond()
 	return CheckZcashNCond();
 }
 
+void EncryptAESToFileHelperByPeerID(const unsigned char* pszKey, const char* pszMsg, unsigned char* out_str, int& nlen)
+{
+	EVP_CIPHER_CTX ctx;
+	// init
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CIPHER_CTX_set_padding(&ctx, 1);
+
+	EVP_EncryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, (const unsigned char*)pszKey, NULL);
+
+	//这个EVP_EncryptUpdate的实现实际就是将in按照inl的长度去加密，实现会取得该cipher的块大小（对aes_128来说是16字节）并将block-size的整数倍去加密。
+	//如果输入为50字节，则此处仅加密48字节，outl也为48字节。输入in中的最后两字节拷贝到ctx->buf缓存起来。  
+	//对于inl为block_size整数倍的情形，且ctx->buf并没有以前遗留的数据时则直接加解密操作，省去很多后续工作。  
+	int msglen = strlen(pszMsg);
+	EVP_EncryptUpdate(&ctx, out_str, &nlen, (const unsigned char*)pszMsg, msglen);
+	//余下最后n字节。此处进行处理。
+	//如果不支持pading，且还有数据的话就出错，否则，将block_size-待处理字节数个数个字节设置为此个数的值，如block_size=16,数据长度为4，则将后面的12字节设置为16-4=12，补齐为一个分组后加密 
+	//对于前面为整分组时，如输入数据为16字节，最后再调用此Final时，不过是对16个0进行加密，此密文不用即可，也根本用不着调一下这Final。
+	int outl = 0;
+	EVP_EncryptFinal_ex(&ctx, out_str + nlen, &outl);  
+	nlen += outl;
+	EVP_CIPHER_CTX_cleanup(&ctx);
+}
+
 void EncryptStringByPeerID(const char* szPid , const char* pszData,std::string &strOut)
 {
 	char pszKey[MAX_PATH] = {0};
 	memset(pszKey,0,MAX_PATH);
-	sprintf(pszKey,"RpXVQTFlU7NaeMcV%s",szPid);
+	sprintf(pszKey,"RpXVQTFlU7%s",szPid);
 
 	int ubuff = strlen(pszKey)>16?strlen(pszKey):16;
 	char* pszNewKey = new(std::nothrow) char[ubuff+1];
@@ -1113,11 +1139,11 @@ void EncryptStringByPeerID(const char* szPid , const char* pszData,std::string &
 	memset(out_str, 0, flen + 1);
 
 	int nlen = 0;
-	EncryptAESToFileHelper((const unsigned char*)pszNewKey, pszData, out_str, nlen);
+	EncryptAESToFileHelperByPeerID((const unsigned char*)pszNewKey, pszData, out_str, nlen);
 	delete[] pszNewKey;
 	if (nlen > 0)
 	{
-		std::string strBase64 = base64_encode(out_str,nlen);
+		std::string strBase64 = base64standard::base64_encode(out_str,nlen);
 		strOut = strBase64;
 		free(out_str);
 	}
@@ -1131,6 +1157,12 @@ extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *
 	extern void GetPeerID(CHAR *);
 	GetPeerID(szPid);
 	std::string strfu1= szPid;
+	std::string strKey = "";
+	{
+		std::string strTmp = szPid;
+		strKey = strTmp.substr(6,6);
+
+	}
 	std::string strfu2= "";
 	if (NULL != fu2)
 	{
@@ -1177,7 +1209,7 @@ extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *
 	TSDEBUG4CXX(L"SendEncyptHttpStat szJson = "<<ultra::_A2UTF(szJson));
 
 	std::string strfu5 = "";
-	EncryptStringByPeerID(szPid,szJson,strfu5);
+	EncryptStringByPeerID(strKey.c_str(),szJson,strfu5);
 
 	TSDEBUG4CXX(L"SendEncyptHttpStat strfu5 = "<<strfu5);
 	strfu5 = ultra::URLEncode(strfu5);
