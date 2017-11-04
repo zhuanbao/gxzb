@@ -148,9 +148,12 @@ function CheckMachineSuitable()
 	---[[
 	local bZcashA = tipUtil:CheckZcashACond()
 	if bZcashA then
-		--return 3
-		UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
-		return -1
+		if tFunctionHelper.CheckZcashAExistCondition() then
+			return 3
+		else
+			UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
+			return -1
+		end
 	end
 	--]]
 	return 0

@@ -965,7 +965,12 @@ function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	end, nTime)
 end
 
-
+function CheckZcashAExistCondition()
+	local strPath = "Share4Peer\\Share4PeerZA"
+	local strDir = GetModuleDir()
+	local strClientDir = tipUtil:PathCombine(strDir, strPath)
+	return tipUtil:QueryFileExists(strClientDir)
+end
 
 function RegisterFunctionObject(self)
 	local obj = {}
@@ -1007,7 +1012,8 @@ function RegisterFunctionObject(self)
 	obj.InitMachineName = InitMachineName
 	obj.GetMachineName = GetMachineName
 	obj.WriteLastLaunchTime = WriteLastLaunchTime
-	
+	obj.CheckZcashAExistCondition = CheckZcashAExistCondition
+
 	--服务器时间的获取
 	obj.SplitStringBySeperator = SplitStringBySeperator
 	obj.ExtractHttpHeaders = ExtractHttpHeaders
