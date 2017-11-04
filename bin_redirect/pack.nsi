@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.21"
+!define PRODUCT_VERSION "1.0.0.22"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -581,13 +581,16 @@ Function FirstSendStart
 	${If} $Bool_IsUpdate == 0
 		${If} $Bool_IsReInstall == 0 
 			${SendStat} "installenter" "$Verision_Channel" "" ""
+			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "installenter", t "$Verision_Channel"'
 			StrCpy $InstallProgressName "installprogress"
 		${Else}
 			${SendStat} "reinstallenter" "$Verision_Channel" "$Int_InState" ""
+			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "reinstallenter", t "$Verision_Channel"'
 			StrCpy $InstallProgressName "reinstallprogress"
 		${EndIf} 	
 	${Else}
 		${SendStat} "updateenter" "$Verision_Channel" "" ""
+		System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "updateenter", t "$Verision_Channel"'
 		StrCpy $InstallProgressName "updateprogress"
 	${EndIf} 
 FunctionEnd
