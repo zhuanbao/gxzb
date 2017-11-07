@@ -295,7 +295,7 @@ end
 
 function GetExePath()
 	local strExePath = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\Path")
-	if IsRealString(strExePath) then
+	if IsRealString(strExePath) and tipUtil:QueryFileExists(strExePath) then
 		return tostring(strExePath)
 	else
 		return tipUtil:GetModuleExeName()

@@ -92,6 +92,7 @@ function CreateListener(objRootCtrl)
 				tStatInfo.fu5 = tParam[1]
 				tStatInfo.fu6 = tParam[2]
 				StatisticClient:SendClientErrorReport(tStatInfo)
+				UIInterface:AnalysisClientErrorMsg(tParam)
 			end				
 		end
 	)

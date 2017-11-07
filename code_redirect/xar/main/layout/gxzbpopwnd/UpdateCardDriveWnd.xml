@@ -1,0 +1,260 @@
+<xlue>
+	<objtreetemplate id="GXZB.UpdateCardDriveWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>520</width>
+			<height>298</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
+			</attr>	
+			<children>
+				<obj id="UpdateCardDriveWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
+					</attr>
+					<children>
+						<obj id="UpdateCardDriveWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if not hoverimage then
+										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+										self:AddChild(hoverimage)
+										hoverimage:SetObjPos(-5, -9, 20, -6)
+										hoverimage:SetResID("GXZB.Title.Hoverimage")
+									end
+									hoverimage:SetVisible(true)
+								</event>
+								<event name="OnMouseLeave">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if hoverimage then
+										hoverimage:SetVisible(false)
+									end
+								</event>
+							</eventlist>	
+						</obj>
+						<obj id="UpdateCardDriveWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
+						<obj id="UpdateCardDriveWnd.Title" class="TextObject">
+							<attr>
+								<left>32</left>
+								<top>8</top>
+								<width>100</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
+								<text>共享赚宝提示</text>
+							</attr>
+						</obj>
+						<obj id="UpdateCardDriveWnd.Icon" class="ImageObject">
+							<attr>
+								<left>54</left>
+								<top>92</top>
+								<width>80</width>
+								<height>80</height>
+								<image>logo-mid</image>
+							</attr>
+						</obj>
+						<obj id="UpdateCardDriveWnd.Content.UpdateDrive" class="LayoutObject">
+							<attr>
+								<left>160</left>
+								<top>87</top>
+								<width>330</width>
+								<height>20+3+20+3+20+3</height>
+							</attr>	
+							<children>
+								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc1" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>330</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<endellipsis>1</endellipsis>
+										<text>检测到您的显卡驱动程序版本过低，为了充</text>
+									</attr>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc2" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>20+3</top>
+										<width>330</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<endellipsis>1</endellipsis>
+										<text>分发挥显卡本身的高性能，我们建议您立即</text>
+									</attr>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc3" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>20+3+20+3</top>
+										<width>15</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<endellipsis>1</endellipsis>
+										<text>去</text>
+									</attr>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc4" class="TextLinkEx">
+									<attr>
+										<left>15+1</left>
+										<top>20+3+20+3</top>
+										<width>64</width>
+										<height>20</height>
+										<HAlign>left</HAlign>
+										<VAlign>top</VAlign>
+										<Text>显卡官网</Text>
+										<Font>font.text16</Font>
+										<TextColor>317FFF</TextColor>
+										<TextHoverColor>317FFF</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickUpdateDrive" />
+									</eventlist>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc5" class="TextObject">
+									<attr>
+										<left>15+1+64+1</left>
+										<top>20+3+20+3</top>
+										<width>102</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<text>更新驱动程序。</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="UpdateCardDriveWnd.Content.Restart" class="LayoutObject">
+							<attr>
+								<left>160</left>
+								<top>87+20+3+20+3+20+3</top>
+								<width>310</width>
+								<height>20</height>
+							</attr>	
+							<children>
+								<obj id="UpdateCardDriveWnd.Content.Restart.Desc1" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>208</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<endellipsis>1</endellipsis>
+										<text>显卡驱动程序更新完之后，请</text>
+									</attr>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.Restart.Desc2" class="TextLinkEx">
+									<attr>
+										<left>208</left>
+										<top>0</top>
+										<width>96</width>
+										<height>20</height>
+										<HAlign>left</HAlign>
+										<VAlign>top</VAlign>
+										<Text>重新启动赚宝</Text>
+										<Font>font.text16</Font>
+										<TextColor>317FFF</TextColor>
+										<TextHoverColor>317FFF</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickRestart" />
+									</eventlist>
+								</obj>
+								<obj id="UpdateCardDriveWnd.Content.Restart.Desc3" class="TextObject">
+									<attr>
+										<left>208+92</left>
+										<top>0</top>
+										<width>10</width>
+										<height>20</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text16</font>
+										<text>！</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.UpdateCardDriveWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>520</width>
+			<height>298</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="UpdateCardDriveWnd.xml.lua" func="OnCreate" />
+			<event name="OnShowWindow" file="UpdateCardDriveWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

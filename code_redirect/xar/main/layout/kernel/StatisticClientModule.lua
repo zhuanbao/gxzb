@@ -261,7 +261,6 @@ function StatisticClient:StartRunTimeReport(strState)
 end
 
 function StatisticClient:FailExitProcess(iExitCode)
-	local tStatInfo = {}
 	--[[	
 	tStatInfo.strEC = "failexit"
 	tStatInfo.strEA = GetInstallSrc() or ""
@@ -282,5 +281,18 @@ function StatisticClient:ExitClient(statInfo)
 	ClientWorkModule:NotifyQuit()
 	TipLog("************ Exit ************")
 	--tipUtil:CloseSingletonMutex()
+	tipUtil:Exit("Exit")
+end
+
+function StatisticClient:RestartClient(strRestartCmd)
+	TipLog("************ RestartExit ************")
+	tFunctionHelper.SaveAllConfig()		
+	ClientWorkModule:NotifyQuit()
+	tipUtil:CloseSingletonMutex()
+	local strExePath = tFunctionHelper.GetExePath()
+	if not IsRealString(strRestartCmd) then
+		strRestartCmd = "/working /forceshow /sstartfrom restart"
+	end
+	tipUtil:ShellExecute(0, "open", strExePath, strRestartCmd, 0, "SW_SHOWNORMAL")
 	tipUtil:Exit("Exit")
 end

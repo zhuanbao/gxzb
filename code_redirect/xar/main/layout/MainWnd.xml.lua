@@ -35,7 +35,9 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		TryPopAutoRunTip()
+		if not UIInterface:ShowUpdateDriveWnd() then
+			TryPopAutoRunTip()
+		end	
 		gTipStartTime = tipUtil:GetCurrentUTCTime()
 	end
 end

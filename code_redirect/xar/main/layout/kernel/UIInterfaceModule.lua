@@ -18,6 +18,7 @@ UIInterface._tipNotifyIcon = nil
 UIInterface._cfgDefaultWorkModel = 1
 
 
+
 UIInterface._tPopupWndList = {
 	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
 	[2] = {"GXZB.SuspendWnd", "GXZB.SuspendWndTree"},
@@ -210,6 +211,52 @@ end
 
 function UIInterface:ShowExitRemindWnd()
 	self:ShowPopupWndByName("TipExitRemindWnd.Instance", true)
+end
+
+--
+UIInterface._tabErrorMsg = nil
+UIInterface._bShowUpdateDriveWnd = false
+
+--弹出窗体
+function UIInterface:ShowUpdateDriveWnd()
+	if not self._bShowUpdateDriveWnd then
+		return false
+	end
+	local objHostWnd = self:GetMainHostWnd()
+	local objUpdateCardDriveWnd = hostwndManager:GetHostWnd("GXZB.UpdateCardDriveWnd.ModalInstance")
+	
+	if objHostWnd:GetVisible() then
+		self._tipNotifyIcon:CancleFlashTray() 
+		if objUpdateCardDriveWnd == nil then
+			Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+		end	
+		--[[
+		if not objUpdateCardDriveWnd:GetVisible() then
+			Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+			--self:ShowPopupWndByName("GXZB.UpdateCardDriveWnd.Instance", true)
+		end	
+		--]]
+	else
+		self._tipNotifyIcon:FlashTray()
+	end	
+	return true
+end
+
+--弹出窗体
+function UIInterface:AnalysisClientErrorMsg(tParam)
+	local nClientType = tParam[1]
+	local strErrorMsg = tParam[2]
+	if type(nClientType) ~= "number" then
+		return
+	end
+	if IsRealString(strErrorMsg) 
+		and (string.find(string.lower(strErrorMsg), string.lower("driver version is insufficient for CUDA runtime version")) ~= nil 
+		or string.find(string.lower(strErrorMsg), string.lower("Cannot load nvml")) ~= nil  )then
+		self._tabErrorMsg = tParam
+		--self:ShowPopupWndByName("GXZB.UpdateCardDriveWnd.Instance", true)
+		self._bShowUpdateDriveWnd = true
+		self:ShowUpdateDriveWnd(tParam)
+	end
 end
 
 function UIInterface:PopRemindUpdateWnd()
