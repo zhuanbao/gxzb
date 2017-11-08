@@ -110,7 +110,7 @@ function OnShowWindow(self, bShow)
 			objCheckAutoRun:SetVisible(false)
 		else
 			g_CheckBoxState = true
-			objCheckAutoRun:SetCheck(false, true)
+			objCheckAutoRun:SetCheck(true, true)
 			objCheckAutoRun:SetChildrenVisible(true)
 			objCheckAutoRun:SetVisible(true)
 		end
