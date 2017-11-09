@@ -182,7 +182,7 @@ function ClientWorkModule:QuerySvrForChangeWorkID(strWorkID)
 	end	
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl = self:FormatRequestUrl(strParam)
-	TipLog("[QuerySvrForWorkID] strReguestUrl = " .. strReguestUrl)
+	TipLog("[QuerySvrForChangeWorkID] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
@@ -341,11 +341,15 @@ function ClientWorkModule:QuerySvrForGetHistoryInfo(strtype)
 end
 
 function ClientWorkModule:ReportClientInfoToServer()
-	self:SendMinerInfoToServer(self:QuerySvrForReportClientInfo(),3)
+	local strUrl = self:QuerySvrForReportClientInfo()
+	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	self:SendMinerInfoToServer(strUrl,3)
 end
 
 function ClientWorkModule:ReportMiningPoolInfoToServer()
-	self:SendMinerInfoToServer(self:QuerySvrForReportPoolInfo(),3)
+	local strUrl = self:QuerySvrForReportPoolInfo()
+	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	self:SendMinerInfoToServer(strUrl,3)
 end
 
 function ClientWorkModule:SetMachineNameChangeInfo()
@@ -563,6 +567,7 @@ end
 function ClientWorkModule:SendUnBindInfoToServer()
 	--self:AddListener("OnUnBindCallBack", OnUnBindCallBack)
 	local strUrl = self:GetUnBindUrl()
+	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	if not IsRealString(strUrl) then
 		self:DispatchEvent("OnUnBindCallBack", false)
 		return
@@ -634,6 +639,7 @@ function ClientWorkModule:GetUserWorkID(fnCallBack)
 	
 	if not IsRealString(strWorkID) then
 		local strUrl = self:QuerySvrForWorkID()
+		strUrl = strUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
 		self:GetServerJsonData(strUrl, fnGetWorkIDCallback)
 		return
 	end
@@ -641,6 +647,7 @@ function ClientWorkModule:GetUserWorkID(fnCallBack)
 		or string.find(strWorkID, "_") ~= nil  
 		or string.find(strWorkID, "-") ~= nil then
 		local strUrl = self:QuerySvrForChangeWorkID(strWorkID)
+		strUrl = strUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
 		self:GetServerJsonData(strUrl, fnGetWorkIDCallback)
 		return
 	end	
