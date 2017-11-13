@@ -292,6 +292,21 @@ function UIInterface:PopRemindUpdateWnd()
 	return false
 end
 
+local bFirstPop = true
+
+function UIInterface:GetRemindTipPopInterval()
+	local nTipPopIntervals = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg", "nPopIntervals"})) or 4*3600
+	if not bFirstPop then
+		return nTipPopIntervals
+	end
+	if tFunctionHelper.CheckCfgSetBoot() and not tFunctionHelper.CheckSysSetBoot() then
+		nTipPopIntervals = 1800
+	end
+	bFirstPop = false
+	return nTipPopIntervals
+end
+
+
 function UIInterface:PopTipPre4Hour()
 	--[[
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
@@ -300,25 +315,33 @@ function UIInterface:PopTipPre4Hour()
 	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
 	if true then return end
 	--]]
-
-	local nTipPopIntervals  = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg", "nPopIntervals"})) or 4*3600
-	SetTimer(
-		function(item, id)
-			ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
-				if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
-					local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-					local newgetgold = 0
-					for i = 1, 4 do
-						newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]
-					end
-					if newgetgold > 0 then
-						tUserConfig["nMoneyPer4Hour"] = newgetgold
-						tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-						self:ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-					end	
+	local function DoPopTip(item, id)
+		ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
+			if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
+				local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+				local newgetgold = 0
+				for i = 1, 4 do
+					newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]
 				end
-			end)
-		end,	
+				if newgetgold > 0 then
+					tUserConfig["nMoneyPer4Hour"] = newgetgold
+					tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+					self:ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+				end	
+			end
+		end)
+	end
+		
+	local nTipPopIntervals  = self:GetRemindTipPopInterval()
+	SetOnceTimer(function(item, id)
+					DoPopTip(item, id)
+					local nNextIntervals  = self:GetRemindTipPopInterval()
+					
+					SetTimer(function(nextitem, nextid)
+								DoPopTip(nextitem, nextid)
+							 end,
+					nNewIntervals*1000)
+				 end,
 	nTipPopIntervals*1000)
 end
 
