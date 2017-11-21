@@ -448,9 +448,12 @@ end
 
 function ClientWorkModule:CheckShoudAutoMining()
 	local strCmdline = tipUtil:GetCommandLine()
-	--if string.find(string.lower(tostring(strCmdline)), "/working") then
-	--修改为启动就挖
-	return true
+	--修改为按参数判断是否自动挖
+	if string.find(string.lower(tostring(strCmdline)), "/working") then
+		return true
+	else
+		return false
+	end
 end
 
 function ClientWorkModule:DoAutoMining()
