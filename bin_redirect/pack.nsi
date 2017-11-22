@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.24"
+!define PRODUCT_VERSION "1.0.0.26"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -1277,6 +1277,8 @@ Function finishPage
 		${CreateButton} 131 108 171 52 "立即开始赚宝" lijitiyan $4
 		SendMessage $4 ${WM_SETFONT} $Handle_FontMid 0
 		
+		;暂停倒计时自动挖矿
+		/*
 		StrCpy $Int_TimerCount 10
 		${NSD_CreateLabel} 160 170 120 20 "$Int_TimerCount秒后将自动开始"
 		Pop $Lbl_TimerAutoRun
@@ -1285,6 +1287,7 @@ Function finishPage
 		
 		GetFunctionAddress $0 NSD_TimerAutoRun
 		nsDialogs::CreateTimer $0 1000
+		*/
 	/*${Else}
 		${NSD_CreateLabel} 150 0 200 40 "安装成功"
 		Pop $1
