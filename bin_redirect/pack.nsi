@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.26"
+!define PRODUCT_VERSION "1.0.0.28"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -95,6 +95,8 @@ Var Bool_IsReInstall
 Var Int_InState
 
 Var Verision_Channel
+
+Var Handle_SMutex
 ;主程序至少需要10M空间
 !define NeedSpace 10
 
@@ -309,11 +311,12 @@ FunctionEnd
 
 !macro _InitMutex
 	Push $0
-	System::Call 'kernel32::CreateMutexA(i 0, i 0, t "Global\ethminersetup_{CCE50E5F-9299-4609-9EB5-B9CB4F283E94}") i .r1 ?e'
+	System::Call 'kernel32::CreateMutexA(i 0, i 0, t "Global\gxzbsetup_{CCE50E5F-9299-4609-9EB5-B9CB4F283E94}") i .r1 ?e'
 	Pop $0
 	StrCmp $0 0 +2
 	Abort
 	Pop $0
+	StrCpy $Handle_SMutex $1
 !macroend
 !define InitMutex `!insertmacro _InitMutex`
 
@@ -513,7 +516,7 @@ Function .onInit
 		
 	Call CheckHasInstall
 	Call CheckExeProcExist
-	
+	System::Call "$PLUGINSDIR\zbsetuphelper::TerminateProcessByPrefixName(t 'Share4MoneySetup_')"
 	
 	File "res\Error.ico"
 	File "res\warning.bmp"
@@ -806,6 +809,11 @@ Function CmdSilentInstall
 	
 	RunClent:
 	SetOutPath "$INSTDIR\program"
+	;延迟拉起exe
+	${GetOptions} $R4 "/delay"  $R6
+	IfErrors +3 0
+	System::Call "kernel32::CloseHandle(i $Handle_SMutex)"
+	Sleep 300000
 	ExecShell open "Share4Money.exe" "/sstartfrom installfinish /installmethod silent $R0" SW_SHOWNORMAL
 	ExitInstal:
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
@@ -1388,6 +1396,7 @@ Function un.onInit
 	${FKillProc} "Share4PeerZN"
 	${FKillProc} "ShareCout"
 	${FKillProc} "Share4PeerZA"
+	System::Call "$PLUGINSDIR\zbsetuphelper::TerminateProcessByPrefixName(t 'Share4MoneySetup_')"
 	Call un.UpdateChanel
 	;InitPluginsDir
 	;IfFileExists $PLUGINSDIR 0 +2
