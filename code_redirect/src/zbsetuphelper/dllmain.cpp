@@ -904,6 +904,35 @@ extern "C" __declspec(dllexport) void TerminateProcessByName(const char* szProNa
 	}
 }
 
+extern "C" __declspec(dllexport) void TerminateProcessByPrefixName(const char* szProPrefixName)
+{
+	wchar_t* wszProPrefixName = AnsiToUnicode(szProPrefixName);
+	std::wstring wstrPattern = wszProPrefixName;
+	wstrPattern.append(L"*");
+	TSDEBUG4CXX("Terminate process by name:"<< wstrPattern);
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	DWORD dwCurrentPID = ::GetCurrentProcessId();
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			if(ultra::FnMatch(wstrPattern,pe.szExeFile) && pe.th32ProcessID != 0 &&  pe.th32ProcessID != dwCurrentPID)
+			{
+				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+				TSDEBUG4CXX("Terminate process hProcess = "<< hProcess);
+				BOOL bRet = ::TerminateProcess(hProcess, -4);
+				TSDEBUG4CXX("Terminate process bRet = "<< bRet);
+				break;
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
+	}
+}
+
 void EncryptAESToFileHelper(const unsigned char* pszKey, const char* pszMsg, unsigned char* out_str, int& nlen)
 {
 	EVP_CIPHER_CTX ctx;
