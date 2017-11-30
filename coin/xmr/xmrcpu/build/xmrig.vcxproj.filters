@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\Api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\ApiState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\NetworkState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\ConsoleLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\FileLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Mem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\DonateStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\FailoverStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\SinglePoolStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\SubmitResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Url.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Summary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\DoubleWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Handle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Hashrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\SingleWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Workers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\xmrig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\App_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Cpu_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Mem_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Platform_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\Cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_keccak.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_groestl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_blake256.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_jh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_skein.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\soft_aes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\CryptoNight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\Httpd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\3rdparty\align.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\Api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\ApiState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\NetworkState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IClientListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IConsoleListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IJobResultListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\ILogBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IStrategyListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\interfaces\IWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\ConsoleLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\FileLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\log\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Mem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\JobId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\JobResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\DonateStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\FailoverStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\strategies\SinglePoolStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\SubmitResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\net\Url.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\Summary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\DoubleWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Hashrate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\SingleWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Worker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\workers\Workers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_blake256.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_groestl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_jh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_keccak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\c_skein.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\CryptoNight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\CryptoNight_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\CryptoNight_test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\groestl_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\crypto\skein_port.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\xmr\xmrig\xmrig-2.4.2\src\api\Httpd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\xmr\xmrig\xmrig-2.4.2\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="E:\xmr\xmrig\xmrig-2.4.2\res\app.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D07B39F3-E466-37AC-A878-3401ED79193D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{D9CB5C98-00FD-3F38-8468-D1C785BB3E2E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\res\app.ico" />
+  </ItemGroup>
+</Project>

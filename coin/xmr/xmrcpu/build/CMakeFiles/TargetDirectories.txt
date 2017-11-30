@@ -1,0 +1,5 @@
+E:/xmr/xmrig/xmrig-2.4.2/x86/CMakeFiles/xmrig.dir
+E:/xmr/xmrig/xmrig-2.4.2/x86/CMakeFiles/ALL_BUILD.dir
+E:/xmr/xmrig/xmrig-2.4.2/x86/CMakeFiles/ZERO_CHECK.dir
+E:/xmr/xmrig/xmrig-2.4.2/x86/src/3rdparty/libcpuid/CMakeFiles/cpuid.dir
+E:/xmr/xmrig/xmrig-2.4.2/x86/src/3rdparty/libcpuid/CMakeFiles/ALL_BUILD.dir
