@@ -53,7 +53,7 @@ private:
 
     inline int bfactor(int index = 0) const {
 #       ifdef _WIN32
-        return get(m_bfactors, index, 6);
+        return get(m_bfactors, index, 12);
 #       else
         return get(m_bfactors, index, 0);
 #       endif
