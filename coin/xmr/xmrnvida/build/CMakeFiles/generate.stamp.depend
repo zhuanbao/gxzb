@@ -1,0 +1,46 @@
+# CMake generation dependency list for this directory.
+E:/xmr/xmrig-nvidia-2.4.2/CMakeLists.txt
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/3.9.0-rc3/CMakeSystem.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeSystemSpecificInitialize.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/3.9.0-rc3/CMakeCCompiler.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/3.9.0-rc3/CMakeCXXCompiler.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeGenericSystem.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/Windows.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/WindowsPaths.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeLanguageInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC-C.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/3.9.0-rc3/CMakeRCCompiler.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeRCInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeCXXInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeLanguageInformation.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Compiler/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/CheckIncludeFile.cmake
+E:/xmr/xmrig-nvidia-2.4.2/cmake/FindUV.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+E:/xmr/xmrig-nvidia-2.4.2/cmake/flags.cmake
+E:/xmr/xmrig-nvidia-2.4.2/cmake/CUDA.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindCUDA.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindCUDA/select_compute_arch.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/xmrig-cuda.dir/src/nvidia/xmrig-cuda_generated_cuda_core.cu.obj.depend
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindCUDA/run_nvcc.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/xmrig-cuda.dir/src/nvidia/xmrig-cuda_generated_cuda_extra.cu.obj.depend
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindCUDA/run_nvcc.cmake
+E:/xmr/xmrig-nvidia-2.4.2/cmake/FindNVML.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+E:/xmr/xmrig-nvidia-2.4.2/cmake/FindMHD.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/xmrig-cuda.dir/src/nvidia/xmrig-cuda_generated_cuda_core.cu.obj.cmake.pre-gen
+E:/xmr/xmrig-nvidia-2.4.2/x64/CMakeFiles/xmrig-cuda.dir/src/nvidia/xmrig-cuda_generated_cuda_extra.cu.obj.cmake.pre-gen
