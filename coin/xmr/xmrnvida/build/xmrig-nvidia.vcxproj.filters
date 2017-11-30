@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\api\Api.cpp" />
+    <ClCompile Include="..\src\api\ApiState.cpp" />
+    <ClCompile Include="..\src\api\NetworkState.cpp" />
+    <ClCompile Include="..\src\App.cpp" />
+    <ClCompile Include="..\src\Console.cpp" />
+    <ClCompile Include="..\src\Cpu_stub.cpp" />
+    <ClCompile Include="..\src\log\ConsoleLog.cpp" />
+    <ClCompile Include="..\src\log\FileLog.cpp" />
+    <ClCompile Include="..\src\log\Log.cpp" />
+    <ClCompile Include="..\src\net\Client.cpp" />
+    <ClCompile Include="..\src\net\Job.cpp" />
+    <ClCompile Include="..\src\net\Network.cpp" />
+    <ClCompile Include="..\src\net\strategies\DonateStrategy.cpp" />
+    <ClCompile Include="..\src\net\strategies\FailoverStrategy.cpp" />
+    <ClCompile Include="..\src\net\strategies\SinglePoolStrategy.cpp" />
+    <ClCompile Include="..\src\net\SubmitResult.cpp" />
+    <ClCompile Include="..\src\net\Url.cpp" />
+    <ClCompile Include="..\src\nvidia\CudaCLI.cpp" />
+    <ClCompile Include="..\src\Options.cpp" />
+    <ClCompile Include="..\src\Platform.cpp" />
+    <ClCompile Include="..\src\Summary.cpp" />
+    <ClCompile Include="..\src\workers\CudaWorker.cpp" />
+    <ClCompile Include="..\src\workers\GpuThread.cpp" />
+    <ClCompile Include="..\src\workers\Handle.cpp" />
+    <ClCompile Include="..\src\workers\Hashrate.cpp" />
+    <ClCompile Include="..\src\workers\Workers.cpp" />
+    <ClCompile Include="..\src\xmrig.cpp" />
+    <ClCompile Include="..\src\App_win.cpp" />
+    <ClCompile Include="..\src\Cpu_win.cpp" />
+    <ClCompile Include="..\src\Platform_win.cpp" />
+    <ClCompile Include="..\src\nvidia\NvmlApi.cpp" />
+    <ClCompile Include="..\src\crypto\c_keccak.c" />
+    <ClCompile Include="..\src\crypto\c_groestl.c" />
+    <ClCompile Include="..\src\crypto\c_blake256.c" />
+    <ClCompile Include="..\src\crypto\c_jh.c" />
+    <ClCompile Include="..\src\crypto\c_skein.c" />
+    <ClCompile Include="..\src\crypto\soft_aes.c" />
+    <ClCompile Include="..\src\crypto\CryptoNight.cpp" />
+    <ClCompile Include="..\src\api\Httpd.cpp" />
+    <ClCompile Include="..\src\sharexhelper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\res\resource.h" />
+    <ClInclude Include="..\src\3rdparty\align.h" />
+    <ClInclude Include="..\src\api\Api.h" />
+    <ClInclude Include="..\src\api\ApiState.h" />
+    <ClInclude Include="..\src\api\NetworkState.h" />
+    <ClInclude Include="..\src\App.h" />
+    <ClInclude Include="..\src\Console.h" />
+    <ClInclude Include="..\src\Cpu.h" />
+    <ClInclude Include="..\src\interfaces\IClientListener.h" />
+    <ClInclude Include="..\src\interfaces\IConsoleListener.h" />
+    <ClInclude Include="..\src\interfaces\IJobResultListener.h" />
+    <ClInclude Include="..\src\interfaces\ILogBackend.h" />
+    <ClInclude Include="..\src\interfaces\IStrategy.h" />
+    <ClInclude Include="..\src\interfaces\IStrategyListener.h" />
+    <ClInclude Include="..\src\interfaces\IWorker.h" />
+    <ClInclude Include="..\src\log\ConsoleLog.h" />
+    <ClInclude Include="..\src\log\FileLog.h" />
+    <ClInclude Include="..\src\log\Log.h" />
+    <ClInclude Include="..\src\net\Client.h" />
+    <ClInclude Include="..\src\net\Job.h" />
+    <ClInclude Include="..\src\net\JobId.h" />
+    <ClInclude Include="..\src\net\JobResult.h" />
+    <ClInclude Include="..\src\net\Network.h" />
+    <ClInclude Include="..\src\net\strategies\DonateStrategy.h" />
+    <ClInclude Include="..\src\net\strategies\FailoverStrategy.h" />
+    <ClInclude Include="..\src\net\strategies\SinglePoolStrategy.h" />
+    <ClInclude Include="..\src\net\SubmitResult.h" />
+    <ClInclude Include="..\src\net\Url.h" />
+    <ClInclude Include="..\src\nvidia\CudaCLI.h" />
+    <ClInclude Include="..\src\nvidia\Health.h" />
+    <ClInclude Include="..\src\nvidia\NvmlApi.h" />
+    <ClInclude Include="..\src\Options.h" />
+    <ClInclude Include="..\src\Platform.h" />
+    <ClInclude Include="..\src\Summary.h" />
+    <ClInclude Include="..\src\version.h" />
+    <ClInclude Include="..\src\workers\CudaWorker.h" />
+    <ClInclude Include="..\src\workers\GpuThread.h" />
+    <ClInclude Include="..\src\workers\Handle.h" />
+    <ClInclude Include="..\src\workers\Hashrate.h" />
+    <ClInclude Include="..\src\workers\Workers.h" />
+    <ClInclude Include="..\src\crypto\c_blake256.h" />
+    <ClInclude Include="..\src\crypto\c_groestl.h" />
+    <ClInclude Include="..\src\crypto\c_jh.h" />
+    <ClInclude Include="..\src\crypto\c_keccak.h" />
+    <ClInclude Include="..\src\crypto\c_skein.h" />
+    <ClInclude Include="..\src\crypto\CryptoNight.h" />
+    <ClInclude Include="..\src\crypto\CryptoNight_p.h" />
+    <ClInclude Include="..\src\crypto\CryptoNight_test.h" />
+    <ClInclude Include="..\src\crypto\groestl_tables.h" />
+    <ClInclude Include="..\src\crypto\hash.h" />
+    <ClInclude Include="..\src\crypto\skein_port.h" />
+    <ClInclude Include="..\src\api\Httpd.h" />
+    <ClInclude Include="..\src\sharexhelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\res\app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E08A7D8E-C17C-3BA2-84A8-9E9DFC095604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{EE322F62-EECF-3904-844F-069F8FCBA748}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
