@@ -640,6 +640,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\src\net\Url.h" />
     <ClInclude Include="..\src\Options.h" />
     <ClInclude Include="..\src\Platform.h" />
+    <ClInclude Include="..\src\sharexhelper.h" />
     <ClInclude Include="..\src\Summary.h" />
     <ClInclude Include="..\src\version.h" />
     <ClInclude Include="..\src\workers\DoubleWorker.h" />
@@ -667,6 +668,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\src\net\Url.cpp" />
     <ClCompile Include="..\src\Options.cpp" />
     <ClCompile Include="..\src\Platform.cpp" />
+    <ClCompile Include="..\src\sharexhelper.cpp" />
     <ClCompile Include="..\src\Summary.cpp" />
     <ClCompile Include="..\src\workers\DoubleWorker.cpp" />
     <ClCompile Include="..\src\workers\Handle.cpp" />
