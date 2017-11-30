@@ -41,7 +41,7 @@
 #include "Summary.h"
 #include "version.h"
 #include "workers/Workers.h"
-
+#include "sharexhelper.h"
 
 #ifdef HAVE_SYSLOG_H
 #   include "log/SysLog.h"
@@ -126,7 +126,9 @@ int App::exec()
     }
 
     Mem::allocate(m_options->algo(), m_options->threads(), m_options->doubleHash(), m_options->hugePages());
+
     Summary::print();
+	ShareXHelper::isSaveConfig();
 
 #   ifndef XMRIG_NO_API
     Api::start();

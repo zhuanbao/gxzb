@@ -42,7 +42,7 @@
 #include "rapidjson/error/en.h"
 #include "rapidjson/filereadstream.h"
 #include "version.h"
-
+#include "sharexhelper.h"
 
 #ifndef ARRAY_SIZE
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
