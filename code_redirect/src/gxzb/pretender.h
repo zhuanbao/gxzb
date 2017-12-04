@@ -10,7 +10,7 @@ public:
 	Pretender() : m_bInitOK(FALSE), m_hKernel(NULL)
 	{
 
-
+		SetDependDirToEnvironmentVariable();
 		//const TCHAR *rgszFileName[] = {
 		//	_T("zlib1.dll"), 
 		//	//_T("minizip.dll"),  
@@ -133,6 +133,31 @@ public:
 			}
 		}
 		return bRet;
+	}
+
+	void SetDependDirToEnvironmentVariable()
+	{
+		//设置环境变量
+		TCHAR szEVPath[32768] = {0};
+		TCHAR szNewEVPath[32768] = {0};
+
+		TCHAR szExeDir[MAX_PATH] = {0};
+		GetModuleFileName(NULL, szExeDir, MAX_PATH);
+		PathRemoveFileSpec(szExeDir);
+
+		GetEnvironmentVariable(_T("Path"), szEVPath, 32768);
+		
+		TCHAR szDepDirx86[MAX_PATH] = {0};
+		PathCombine(szDepDirx86,szExeDir,_T("depx86"));
+
+		TCHAR szDepDirx64[MAX_PATH] = {0};
+		PathCombine(szDepDirx64,szExeDir,_T("depx64"));
+
+		_sntprintf(szNewEVPath, 32768, _T("%s;%s;%s;%s"), szDepDirx86,szDepDirx64,szExeDir, szEVPath);	
+
+		SetEnvironmentVariable(_T("Path"), szNewEVPath);
+
+		TSDEBUG4CXX("SetDependDirToEnvironmentVariable : "<<szNewEVPath);
 	}
 private:
 
