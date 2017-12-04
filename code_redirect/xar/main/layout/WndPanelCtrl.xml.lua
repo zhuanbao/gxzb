@@ -86,6 +86,9 @@ function CreateListener(objRootCtrl)
 			elseif tostring(key) == "OnZcashAMsg" then
 				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnZcashAMsg(tParam)
+			elseif tostring(key) == "OnXmrMsg" then
+				local ObjWorkClient = ClientWorkModule:GetWorkClient()
+				ObjWorkClient.OnXmrMsg(tParam)
 			elseif tostring(key) == "OnErrorMsg" then
 				local tStatInfo = {}
 				tStatInfo.fu1 = "clienterrormsg"

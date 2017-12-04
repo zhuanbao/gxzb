@@ -35,6 +35,7 @@ local tabLuaFile = {
 "luacode\\helper.lua",
 "luacode\\helper_token.lua",
 "kernel\\utility.lua",
+"kernel\\CheckSupportClient.lua",
 
 "menu\\SuspendMenu.lua",
 "menu\\SettingMenu.lua",
@@ -45,11 +46,15 @@ local tabLuaFile = {
 "kernel\\GenOilClient.lua",
 "kernel\\ZcashNClient.lua",
 "kernel\\ZcashAClient.lua",
+"kernel\\XmrClient.lua",
+"kernel\\XmrClientHelper.lua",
 }
 LoadLuaModule(tabLuaFile, __document)
 
 local Helper = XLGetGlobal("Helper")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local SupportClientType = XLGetGlobal("SupportClientType")
+
 local ServerCfg = XLGetGlobal("ServerCfg")
 local StatisticClient = XLGetGlobal("StatisticClient")
 local UIInterface = XLGetGlobal("UIInterface")
@@ -57,10 +62,14 @@ local ClientWorkModule = XLGetGlobal("ClientWorkModule")
 local GenOilClient = XLGetGlobal("GenOilClient")
 local ZcashNClient = XLGetGlobal("ZcashNClient")
 local ZcashAClient = XLGetGlobal("ZcashAClient")
+local XmrClient = XLGetGlobal("XmrClient")
+local XmrHelper = XLGetGlobal("XmrHelper")
+
 function InitGlobalObj()
 	StatisticClient:Init()
 	--UIInterface:Init()
 	ClientWorkModule:Init()
+	SupportClientType:Init()
 end
 InitGlobalObj()
 
@@ -77,15 +86,6 @@ end
 
 function TipLog(strLog)
 	tipUtil:Log("onload: " .. tostring(strLog))
-end
-
-function CheckIsDebug()
-	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "Debug")
-	if type(nValue) == "number" and nValue > 0 then
-		ClientWorkModule:SetMiningType(nValue)
-		return true
-	end
-	return false
 end
 
 function SendStartUpReport()
@@ -128,35 +128,6 @@ function SendInitSuccessReport()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "initsuccess"
 	StatisticClient:SendEventReport(tStatInfo)
-end
-
---返回值说明 -1: 需要安装额外的版本 0：不适合挖矿；1：适合挖ETH和ETC 2：挖ZcashN卡 3:挖ZcashA卡
-function CheckMachineSuitable()
-	if tFunctionHelper.GetSystemBits() ~= 64 then
-		LOG("CheckMachineSuitable GetSystemBits ~= 64")
-		return 0
-	end
-	
-	local bEthereum = tipUtil:CheckEthereumCond()
-	if bEthereum then
-		return 1
-	end
-	local bZcashN = tipUtil:CheckZcashNCond()
-	if bZcashN then
-		return 2
-	end
-	---[[
-	local bZcashA = tipUtil:CheckZcashACond()
-	if bZcashA then
-		if tFunctionHelper.CheckZcashAExistCondition() then
-			return 3
-		else
-			UIInterface:ShowPopupWndByName("GXZB.ZcashAPromptWnd.Instance", true)
-			return -1
-		end
-	end
-	--]]
-	return 0
 end
 
 function LoadDynamicFont()
@@ -243,18 +214,6 @@ function CreateMainTipWnd()
 	PopTipWnd(OnCreateFuncF)	
 end
 
---[[
-function IsZcashAClientExist()
-	local strDir = FunctionObj.GetModuleDir()
-	local CLIENT_PATH = "Share4Peer\\Share4PeerZA\\Share4PeerZA.exe"
-	local strWorkExe = tipUtil:PathCombine(strDir, CLIENT_PATH)
-	if not tipUtil:QueryFileExists(strWorkExe) then
-		return false
-	end
-	return true
-end
---]]
-
 function TipMain()	
 	CreateMainTipWnd()
 	tFunctionHelper.InitMachineName()
@@ -264,6 +223,7 @@ function TipMain()
 	end
 	--显示悬浮框
 	UIInterface:UpdateSuspendWndVisible()
+	
 	ClientWorkModule:InitMiningClient()
 	ServerCfg:TryToConnectServer()
 	ClientWorkModule:CheckMachineBindState()
@@ -281,14 +241,8 @@ function PreTipMain()
 	StatisticClient:StartRunTimeReport("noworking")
 	local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	UIInterface:CreatePopupTipWnd()
-	local nMiningType = CheckMachineSuitable()
-	ClientWorkModule:SetMiningType(nMiningType)
-	local bDebug = CheckIsDebug()
-	if nMiningType == 0 and not bDebug then
-		UIInterface:ShowPopupWndByName("GXZB.MachineCheckWnd.Instance", true)
-	elseif nMiningType ~= -1 then
-		TipMain()
-	end
+	
+	TipMain()
 end
 
 PreTipMain()
