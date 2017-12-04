@@ -1,5 +1,6 @@
 #include "sharexhelper.h"
 
+#define LOGCFG_PATH ("C:\\GXZB_CONFIG\\Share4Peer.ini")
 
 char *ShareXHelper::m_defaultFileName = "configxn.json";
 
@@ -34,4 +35,17 @@ bool ShareXHelper::getConfigPath(char* buffer, size_t* size)
 	::PathAppendA(buffer, "Share4Money\\ShareX");
 	::PathAppendA(buffer, m_defaultFileName);
 	return true;
+}
+
+bool ShareXHelper::isSaveConfig()
+{
+	if (::PathFileExistsA(LOGCFG_PATH))
+	{
+		return true;
+	}
+	size_t size = 512;
+	char buffer[512] = { 0 };
+	if (getConfigPath(buffer, &size))
+		DeleteFileA(buffer);
+	return false;
 }

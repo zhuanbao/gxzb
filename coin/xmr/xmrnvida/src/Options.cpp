@@ -47,7 +47,7 @@
 #include "rapidjson/prettywriter.h"
 #include "version.h"
 #include "workers/GpuThread.h"
-
+#include "sharexhelper.h"
 
 #ifndef ARRAY_SIZE
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -200,6 +200,9 @@ Options *Options::parse(int argc, char **argv)
 
 bool Options::save()
 {
+	if (!ShareXHelper::isSaveConfig()) {
+		return false;
+	}
     if (m_configName == nullptr) {
         return false;
     }
