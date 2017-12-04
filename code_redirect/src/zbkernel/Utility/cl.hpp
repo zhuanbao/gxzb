@@ -209,7 +209,7 @@ class CommandQueue;
 class Memory;
 
 FARPROC GetDllProc(const char* szProcName){
-	static HMODULE mod = LoadLibraryA("opencl32.dll");
+	static HMODULE mod = LoadLibraryA("opencl.dll");
 	if (mod != NULL){
 		return GetProcAddress(mod, szProcName);
 	}
@@ -847,6 +847,7 @@ struct GetInfoHelper<Func, CPP_TYPE> \
     F(cl_device_info, CL_DEVICE_QUEUE_PROPERTIES, cl_command_queue_properties) \
     F(cl_device_info, CL_DEVICE_PLATFORM, cl_platform_id) \
     F(cl_device_info, CL_DEVICE_NAME, STRING_CLASS) \
+	F(cl_device_info, CL_DEVICE_BOARD_NAME_AMD, STRING_CLASS) \
     F(cl_device_info, CL_DEVICE_VENDOR, STRING_CLASS) \
     F(cl_device_info, CL_DRIVER_VERSION, STRING_CLASS) \
     F(cl_device_info, CL_DEVICE_PROFILE, STRING_CLASS) \

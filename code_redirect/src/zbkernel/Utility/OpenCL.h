@@ -74,7 +74,7 @@ std::vector<cl::Device> getDevices(std::vector<cl::Platform> const& _platforms, 
 	return devices;
 }
 
-
+//
 void GetDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO) 
 {
 	vector<cl::Platform> v_clPlatforms = getPlatforms();
@@ -87,8 +87,21 @@ void GetDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
 		{
 			cl::Device _clDevice = v_clDevices[uIndex];
 			
-			cl::STRING_CLASS strName = _clDevice.getInfo<CL_DEVICE_NAME>();
-
+			//int error = _clDevice.getInfo<CL_DEVICE_BOARD_NAME_AMD>();
+			cl::STRING_CLASS strName = "";
+			try
+			{
+				strName = _clDevice.getInfo<CL_DEVICE_BOARD_NAME_AMD>();
+				if (strName.empty())
+				{
+					strName = _clDevice.getInfo<CL_DEVICE_NAME>();
+				}
+			}
+			catch(...)
+			{
+				strName = _clDevice.getInfo<CL_DEVICE_NAME>();
+			}
+			
 			cl_device_type nType =  _clDevice.getInfo<CL_DEVICE_TYPE>();
 			
 			cl_ulong uGLOBAL_MEM_SIZE = 0;

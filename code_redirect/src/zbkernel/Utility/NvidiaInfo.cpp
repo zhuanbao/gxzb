@@ -67,7 +67,7 @@ namespace Nvidia {
 		{
 			(*m_NvAPI_GPU_GetUsages)(m_gpuHandles[0], m_gpuUsages);
 			int usage = m_gpuUsages[3];
-			TSDEBUG4CXX(L"[GetNvidiaGpuUsgae] usage = " << usage);
+			//TSDEBUG4CXX(L"[GetNvidiaGpuUsgae] usage = " << usage);
 			//FreeLibrary(hmod);
 			return usage;
 		}

@@ -1,4 +1,5 @@
 #pragma once
+/***************************************************/
 //GenOil 客户端的消息定义
 #define WM_GENOIL_MSG           WM_USER+200
 
@@ -19,8 +20,10 @@
 //解析到错误信息
 #define WP_GENOIL_ERROR_INFO    6
 #define WP_GENOIL_ERROR_OPENCL  7
+/***************************************************/
 
 
+/***************************************************/
 //Zcash N卡 客户端的消息定义
 #define WM_ZCASH_N_MSG           WM_USER+300
 
@@ -40,9 +43,10 @@
 #define WP_ZCASH_N_AUTOEXIT	    5
 //解析到错误信息
 #define WP_ZCASH_N_ERROR_INFO    9
+/***************************************************/
 
 
-
+/***************************************************/
 //Zcash A卡 客户端的消息定义
 #define WM_ZCASH_A_MSG           WM_USER+400
 
@@ -62,6 +66,30 @@
 #define WP_ZCASH_A_AUTOEXIT	    5
 //解析到错误信息
 #define WP_ZCASH_A_ERROR_INFO    9
+/***************************************************/
+
+
+/***************************************************/
+//Xmr 客户端的消息定义
+#define WM_XMR_MSG           WM_USER+500
+
+//WPARAM定义
+//上报速度
+#define WP_XMR_SPEED		 1
+
+//share提交结果
+#define WP_XMR_SHARE         2
+//连接矿次结果
+#define WP_XMR_CONNECT_POOL	 3
+
+
+//错误
+//进程自动退出
+#define WP_XMR_AUTOEXIT	    5
+//解析到错误信息
+#define WP_XMR_ERROR_INFO    9
+/***************************************************/
+
 
 
 //错误信息

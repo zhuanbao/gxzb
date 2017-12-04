@@ -14,4 +14,8 @@ public:
 	virtual void TerminateAllClientInstance() = 0;
 	virtual void OnAutoExit(DWORD dwExitCode) = 0;
 	virtual void RetSet() = 0;
+	virtual void SetMinerType(UINT uNewMinerType) 
+	{
+
+	}
 };
