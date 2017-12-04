@@ -181,6 +181,18 @@ LRESULT LuaMsgWindow::OnZcashAMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, B
 	return 0;
 }
 
+LRESULT LuaMsgWindow::OnXmrMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	;
+	CComVariant vParam[2];
+	vParam[0] = (int)wParam;
+	vParam[1] = (int)lParam;
+
+	DISPPARAMS params = { vParam, NULL, 2, 0 };
+	Fire_LuaEvent("OnXmrMsg", &params);
+	return 0;
+}
+
 
 LRESULT LuaMsgWindow::OnErrorMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
