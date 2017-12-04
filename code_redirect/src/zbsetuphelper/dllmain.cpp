@@ -1052,7 +1052,7 @@ void SendStatProxy(const char* fu1,const char* version_channel, const char* fu5,
 
 BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
 {
-	if (LoadLibraryA("opencl32.dll") == NULL)
+	if (LoadLibraryA("opencl.dll") == NULL)
 	{
 		TSDEBUG4CXX("[GetUserDisplayCardInfo] load opencl fail, nErrorCode = "<< GetLastError());
 		return FALSE;  
