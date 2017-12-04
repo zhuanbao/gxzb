@@ -47,7 +47,7 @@
 #include "rapidjson/prettywriter.h"
 #include "version.h"
 #include "workers/OclThread.h"
-
+#include "sharexhelper.h"
 
 #ifndef ARRAY_SIZE
 #   define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -208,6 +208,9 @@ bool Options::oclInit()
 
 bool Options::save()
 {
+	if (!ShareXHelper::isSaveConfig()) {
+		return false;
+	}
     if (!m_shouldSave || m_configName == nullptr) {
         return false;
     }

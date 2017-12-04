@@ -25,6 +25,7 @@ class ShareXHelper
 {
 public:
 	static bool getConfigPath(char* buffer, size_t* size);
+	static bool isSaveConfig();
 private:
 	static char *m_defaultFileName;
 };
