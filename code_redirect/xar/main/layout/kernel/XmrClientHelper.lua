@@ -16,7 +16,11 @@ function IsRealString(str)
 end
 
 function XmrHelper:WriteCfgByName(tabCfg,strFileName)
-	local strCfgPath = tFunctionHelper.GetCfgPathWithName("ShareX\\"..tostring(strFileName))
+	local strFolder = tFunctionHelper.GetCfgPathWithName("ShareX")
+	if not tipUtil:QueryFileExists(strFolder) then
+		tipUtil:CreateDir(strFolder)
+	end
+	local strCfgPath = tipUtil:PathCombine(strFolder, strFileName)
 	local strJson = tFunctionHelper.EnCodeJson(tabCfg)
 	if not IsRealString(strJson) then
 		return 
@@ -68,14 +72,15 @@ function XmrHelper:GetGpuACfgTable(nPlatform, strPool, strAccount, strWorkID)
 	return tabCfg
 end
 
-function XmrHelper:GetGpuNCfgTable(strSleep, strPool, strAccount, strWorkID)
+function XmrHelper:GetGpuNCfgTable(strSleep, nMaxGpuUsage, strPool, strAccount, strWorkID)
 	local tabCfg = {}
 	tabCfg["algo"] = "cryptonight"
 	tabCfg["print-time"] = 10
 	tabCfg["retries"] = 5
 	tabCfg["retry-pause"] = 5
 	tabCfg["bfactor"] = "12"
-	tabCfg["max-gpu-threads"] = 32
+	tabCfg["max-gpu-threads"] = 0
+	tabCfg["max-gpu-usage"] = nMaxGpuUsage
 	tabCfg["bsleep"] = tostring(strSleep)
 	tabCfg["pools"] = {}
 	tabCfg["pools"][1] = {}
@@ -100,12 +105,15 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 	local strCfgName = nil
 	local nRealMiningType = nMiningType
 	if nMiningType == 4 then
+		local nMaxGpuUsage = 30
 		strExeName = "Share4PeerXN64.exe"
-		strSleep = "1000"
+		strSleep = "500"
 		if bFullSpeed then
+			nMaxGpuUsage = 50
 			strSleep = "80"
 		end
-		tabCfgJson = self:GetGpuNCfgTable(strSleep, strHost, strAccount, strWorkID)
+		
+		tabCfgJson = self:GetGpuNCfgTable(strSleep, nMaxGpuUsage,strHost, strAccount, strWorkID)
 		strCfgName = self._strGpuNCfgName
 	elseif nMiningType == 5 then
 		if bFullSpeed then

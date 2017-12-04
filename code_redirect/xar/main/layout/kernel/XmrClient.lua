@@ -456,7 +456,7 @@ function StartXmrTimer()
 	g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 	g_XmrWorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nCurrentTime = tipUtil:GetCurrentUTCTime()
-		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
+		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 60 then
 			TipLog("[StartXmrTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
 		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
