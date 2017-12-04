@@ -7,6 +7,8 @@ local IPCUtil = XLGetObject("IPC.Util")
 --矿池配置文件名字
 local g_PoolCfgName = "bpcfg.json"
 local g_DefaultPoolType = "x_cb"
+local g_nPlatformId = 0
+
 --常量
 local CLIENT_ZCASHN = 2
 local CLIENT_PATH = "Share4Peer\\Share4PeerZN.exe"
@@ -343,9 +345,11 @@ function OnZcashNMsg(tParam)
 			ResetGlobalErrorParam()
 			g_PreWorkState = CLIENT_STATE_CALCULATE
 			UIInterface:UpdateUIMiningState(CLIENT_STATE_CALCULATE)
+			--[[
 			if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
 				ClientWorkModule:QueryClientInfo(0)
 			end	
+			--]]
 			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
@@ -384,6 +388,9 @@ function OnZcashNMsg(tParam)
 			g_ConnectFailCnt = 0
 			if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
 				GenerateVirtualDAG()
+				if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+					ClientWorkModule:QueryClientInfo(0)
+				end	
 			end	
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
@@ -510,7 +517,9 @@ end
 
 --外部调用函数
 ----------------
-function InitClient()
+function InitClient(nPlatformId, nMiningType)
+	g_nPlatformId = nPlatformId
+	CLIENT_ZCASHN = nMiningType
 	IPCUtil:Init(CLIENT_ZCASHN)
 end
 function Start()

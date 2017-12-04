@@ -7,6 +7,7 @@ local IPCUtil = XLGetObject("IPC.Util")
 --矿池配置文件名字
 local g_PoolCfgName = "apcfg.json"
 local g_DefaultPoolType = "x_ca"
+local g_nPlatformId = 0
 --常量
 local CLIENT_GENOIL = 1
 local CLIENT_PATH = "Share4Peer\\Share4Peer.exe"
@@ -83,12 +84,14 @@ function GTV(obj)
 end
 
 function GetOpenCLPlatformCmd()
+	--[[
 	local iPlatformID = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "Software\\Share4Money", "openclplatform")
 	iPlatformID = tonumber(iPlatformID) or 0
 	if iPlatformID == 0 then
 		return ""
 	end	
-	local strCmdParam = "--opencl-platform " .. tostring(iPlatformID) 
+	--]]
+	local strCmdParam = "--opencl-platform " .. tostring(g_nPlatformId) 
 	return strCmdParam
 end
 
@@ -297,9 +300,11 @@ function OnGenOilMsg(tParam)
 			ResetGlobalErrorParam()
 			g_PreWorkState = CLIENT_STATE_CALCULATE
 			UIInterface:UpdateUIMiningState(CLIENT_STATE_CALCULATE)
+			--[[
 			if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
 				ClientWorkModule:QueryClientInfo(0)
 			end	
+			--]]
 			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
@@ -329,6 +334,9 @@ function OnGenOilMsg(tParam)
 		if tonumber(nParam) ~= nil then
 			UIInterface:UpdateDagProgress(nParam)
 		end
+		if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+			ClientWorkModule:QueryClientInfo(0)
+		end	
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
@@ -452,7 +460,9 @@ end
 
 --外部调用函数
 ----------------
-function InitClient()
+function InitClient(nPlatformId, nMiningType)
+	g_nPlatformId = nPlatformId
+	CLIENT_GENOIL = nMiningType
 	IPCUtil:Init(CLIENT_GENOIL)
 end
 function Start()

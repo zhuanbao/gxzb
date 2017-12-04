@@ -55,6 +55,34 @@ function TipLog(strLog)
 	tipUtil:Log("utility: " .. tostring(strLog))
 end
 
+function GTV(obj)
+	return "[" .. type(obj) .. "`" .. tostring(obj) .. "]"
+end
+
+function _DumpObj(obj, strIndent)
+	if type(strIndent) ~= "string" then return end
+	
+	if type(obj) ~= "table" then
+		TipLog(strIndent .. " obj = " .. GTV(obj));
+		return;
+	end
+	
+	local strIndentUnit = "   ";
+	for key, value in pairs(obj) do
+		TipLog(strIndent .. " obj(" .. tostring(obj) .. ")[" .. GTV(key) .. "] = " .. GTV(value));
+		_DumpObj(value, strIndent .. strIndentUnit);
+	end
+end
+
+function DumpObj(obj, strObjName) --打印Table表信息
+	local strIndent = "";
+	if type(strObjName) == "string" then
+		strIndent = strObjName;
+	end
+	_DumpObj(obj, strIndent);
+end
+
+
 function LoadTableFromFile(strDatFilePath)
 	local tResult = nil
 
@@ -94,6 +122,20 @@ function DeCodeJson(strInfo,fnFail)
 		end
 	end
 	return tabInfo
+end
+
+function EnCodeJson(tabInfo,funFail)
+	local strJson = nil	
+	local ret,errMessage=pcall(function()
+								strJson = g_JsonFun:encode(tabInfo)
+							   end) 
+	if not ret then
+		TipLog("ret:" .. (ret and "true" or "false" )  .. " \nerrMessage:" .. (errMessage or "null")); 
+		if type(funFail) == "function" then
+			funFail()
+		end
+	end
+	return strJson
 end
 
 function GetFileNameFromPath(strPath)
@@ -976,6 +1018,7 @@ function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
 	obj.TipLog = TipLog
+	obj.DumpObj = DumpObj
 	obj.IsNilString = IsNilString
 	obj.IsRealString = IsRealString
 	obj.MessageBox = MessageBox
@@ -983,6 +1026,7 @@ function RegisterFunctionObject(self)
 	obj.FetchValueByPath = FetchValueByPath
 	
 	obj.DeCodeJson = DeCodeJson
+	obj.EnCodeJson = EnCodeJson
 	obj.GetFileNameFromPath = GetFileNameFromPath
 	obj.GetCommandStrValue = GetCommandStrValue
 	obj.GetTimeStamp = GetTimeStamp

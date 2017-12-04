@@ -5,27 +5,26 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
-local g_PoolCfgName = "bpcfg.json"
-local g_DefaultPoolType = "x_cb"
+local g_PoolCfgName = "cpcfg.json"
+local g_DefaultPoolType = "x_cc"
 local g_nPlatformId = 0
-
 --常量
-local CLIENT_ZCASHA = 3
-local CLIENT_PATH = "Share4Peer\\Share4PeerZA\\Share4PeerZA.exe"
+local CLIENT_XMR_X = nil
+local CLIENT_PATH = "Share4Peer\\"
+
 local COUTAGENT_PATH = "ShareCout.exe"
 --上报速度
-local WP_ZCASH_A_SPEED = 1
---上报GPU温度
-local WP_ZCASH_A_GPUTEMP = 2
+local WP_XMR_SPEED = 1
+
 --share提交结果
-local WP_ZCASH_A_SHARE = 3
+local WP_XMR_SHARE = 2
 --连接矿次结果
-local WP_ZCASH_A_CONNECT_POOL = 4
+local WP_XMR_CONNECT_POOL = 3
 --错误
 --进程自动退出
-local WP_ZCASH_A_AUTOEXIT = 5
+local WP_XMR_AUTOEXIT = 5
 --解析到错误信息
-local WP_ZCASH_A_ERROR_INFO = 6
+local WP_XMR_ERROR_INFO = 9
 
 
 --客户端状态
@@ -41,34 +40,30 @@ local g_HashRateSumCounter = 0 --速度累加的计数器
 local g_PerSpeed = 10 --服务端返回的平均速度((元宝/Hour)/SOL)
 local g_MiningSpeedPerHour = 0 --根据矿工当前速度计算的挖矿平均速度(元宝/Hour)
 
-local g_MiningMode_Min = 0
-local g_MiningMode_Max = nil
-local g_MiningMode_Cur = g_MiningMode_Max
+local g_bFullSpeed = false
 
 local g_ConnectFailCnt = 0
 --链接矿次失败只会输出一次信息
 local g_MaxConnectFailCnt = 1
 
-local g_strCmdLineFormat = nil
+local g_strHost = nil --矿池地址
 local g_strAccount = nil
-local g_strPool = nil
+local g_strPool = nil  --这个只是上报时用到的矿池代号
 local g_PoolIndex = 0
 
-local g_ZcashAWorkingTimerId = nil 
+local g_XmrWorkingTimerId = nil 
 local g_ClientReTryCnt = 0 
 local g_ClientMaxReTryCnt = 3 
 local g_LastClientOutputRightInfoTime = 0
-local g_ControlSpeedCmdLine = nil 
 
 --local g_LastGetSpeedTime = 0
 local g_LastGetRealTimeIncomeTime = 0
 local g_LastRealTimeIncome = 0
 local g_LastAverageHashRate = 0
 
-local g_ZcashADAGTimerId = nil
+local g_XmrDAGTimerId = nil
 
---
-local g_ZcashARealTimeIncomeTimerId = nil
+local g_XmrRealTimeIncomeTimerId = nil
 local g_ClientOutputSpeed = 0 --0H/s
 
 function IsNilString(AString)
@@ -84,7 +79,7 @@ end
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
-		tipUtil:Log("ZcashClient: " .. tostring(strLog))
+		tipUtil:Log("XmrClient: " .. tostring(strLog))
 	end
 end
 
@@ -197,24 +192,24 @@ function GetNewMiningCmdInfo()
 	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
 	local strPoolKey = GetPoolCfgName()
 	local tPoolList = tUserConfig["tSvrPoolInfo"][strPoolKey]
-	g_strCmdLineFormat = nil
+	g_strHost = nil
 	g_strAccount = nil
 	g_strPool = nil
 	g_PoolIndex = g_PoolIndex + 1
 	if g_PoolIndex <= #tPoolList then
 		local tabPoolItem = tPoolList[g_PoolIndex]
 		if type(tabPoolItem) == "table" then
-			if IsRealString(tabPoolItem["cmdlineformat_a"]) then
-				g_strCmdLineFormat = tabPoolItem["cmdlineformat_a"]
+			if IsRealString(tabPoolItem["host"]) then
+				g_strHost = tabPoolItem["host"]
 				g_strAccount = tabPoolItem["account"]
 				g_strPool = tabPoolItem["p"]
 			end
 		end	
 	end
-	if g_strCmdLineFormat == nil then
+	if g_strHost == nil then
 		g_PoolIndex = 0
 	end
-	return g_strCmdLineFormat
+	return g_strHost
 end
 
 function GetCurrentMiningCmdLine()
@@ -226,16 +221,14 @@ function GetCurrentMiningCmdLine()
 	if not IsRealString(strWorkID) then
 		return nil
 	end
-	if g_strCmdLineFormat == nil then
+	if g_strHost == nil then
 		GetNewMiningCmdInfo()
 	end
-	if g_strCmdLineFormat == nil then
+	if g_strHost == nil then
 		return nil
 	end
-	local strCmdLine = g_strCmdLineFormat
-	strCmdLine = string.gsub(strCmdLine,"(<account>)",g_strAccount)
-	strCmdLine = string.gsub(strCmdLine,"(<workid>)",strWorkID)
-	return strCmdLine
+	strExeName = XmrHelper:InitXmr(CLIENT_XMR_X, g_bFullSpeed, g_strHost, g_strAccount, strWorkID, g_nPlatformId)
+	return strExeName
 end
 
 function UpdateSpeed(nHashRate)
@@ -289,12 +282,13 @@ function WhenGetShare()
 end
 
 function GenerateVirtualDAG()
-	if g_ZcashADAGTimerId == nil then
+	if g_XmrDAGTimerId == nil then
+		TipLog("[GenerateVirtualDAG] start virtual dag")
 		local nProgress = 1
-		g_ZcashADAGTimerId = timeMgr:SetTimer(function(Itm, id)
+		g_XmrDAGTimerId = timeMgr:SetTimer(function(Itm, id)
 			if nProgress >= 100 then
-				timeMgr:KillTimer(g_ZcashADAGTimerId)
-				g_ZcashADAGTimerId = nil
+				timeMgr:KillTimer(g_XmrDAGTimerId)
+				g_XmrDAGTimerId = nil
 				return 
 			end
 			nProgress = nProgress + 3
@@ -302,23 +296,24 @@ function GenerateVirtualDAG()
 				nProgress = 100
 				KillVirtualDAG()
 			end
+			TipLog("[GenerateVirtualDAG] nProgress = " .. GTV(nProgress))
 			UIInterface:UpdateDagProgress(nProgress)
 		end, 1000)
 	end
 end
 
 function KillVirtualDAG()
-	if g_ZcashADAGTimerId then
-		timeMgr:KillTimer(g_ZcashADAGTimerId)
-		g_ZcashADAGTimerId = nil
+	if g_XmrDAGTimerId then
+		timeMgr:KillTimer(g_XmrDAGTimerId)
+		g_XmrDAGTimerId = nil
 	end
 end
 
 function StartRealTimeIncomeTimer()
-	if g_ZcashARealTimeIncomeTimerId ~= nil then
+	if g_XmrRealTimeIncomeTimerId ~= nil then
 		return
 	end
-	g_ZcashARealTimeIncomeTimerId = timeMgr:SetTimer(function(Itm, id)
+	g_XmrRealTimeIncomeTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nSpanTime = 0
 		if g_LastGetRealTimeIncomeTime == 0 then
 			nSpanTime = 5
@@ -327,16 +322,17 @@ function StartRealTimeIncomeTimer()
 		end	
 		g_LastGetRealTimeIncomeTime = tipUtil:GetCurrentUTCTime()
 		local nRealTimeIncome = GetRealTimeIncome(g_ClientOutputSpeed, nSpanTime)
+		
 		if nRealTimeIncome > 0 then
 			UIInterface:UpdateRealTimeIncome(nRealTimeIncome)
 		end
 	end, 5000)	
 end
 
-function OnZcashAMsg(tParam)
+function OnXmrMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
-	TipLog("[OnZcashAMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
-	if nMsgType == WP_ZCASH_A_SPEED then
+	TipLog("[OnXmrMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
+	if nMsgType == WP_XMR_SPEED then
 		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
@@ -351,8 +347,8 @@ function OnZcashAMsg(tParam)
 			--tFunctionHelper.ReportMiningPoolInfoToServer()
 		end
 		if type(nParam) == "number" and nParam > 0 then
-			--多乘了1000
-			nParam = nParam/1000
+			--多乘了100
+			nParam = nParam/100
 			g_ClientOutputSpeed = nParam
 			g_HashRateSum = g_HashRateSum + nParam
 			g_HashRateSumCounter = g_HashRateSumCounter + 1
@@ -363,7 +359,7 @@ function OnZcashAMsg(tParam)
 			if g_LastGetSpeedTime == 0 then
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 			else
-				local nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetSpeedTime
+				nSpanTime = tipUtil:GetCurrentUTCTime() - g_LastGetSpeedTime
 				local nRealTimeIncome = GetRealTimeIncome(nParam, nSpanTime)
 				g_LastGetSpeedTime = tipUtil:GetCurrentUTCTime()
 				if nRealTimeIncome > 0 then
@@ -372,21 +368,23 @@ function OnZcashAMsg(tParam)
 			end
 			--]]
 		end
-	elseif nMsgType == WP_ZCASH_A_SHARE then
-		KillVirtualDAG()
+	elseif nMsgType == WP_XMR_SHARE then
+		--KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
 		if nParam == 0 then
 			WhenGetShare()
 			--处理提交share
 		end	
-	elseif nMsgType == WP_ZCASH_A_CONNECT_POOL then
+	elseif nMsgType == WP_XMR_CONNECT_POOL then
 		if nParam == 0 then
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
-			GenerateVirtualDAG()
-			if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
-				ClientWorkModule:QueryClientInfo(0)
+			if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
+				GenerateVirtualDAG()
+				if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+					ClientWorkModule:QueryClientInfo(0)
+				end	
 			end	
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
@@ -394,21 +392,21 @@ function OnZcashAMsg(tParam)
 				ReStartClientByNextPool()
 			end
 		end
-	elseif nMsgType == WP_ZCASH_A_AUTOEXIT then
+	elseif nMsgType == WP_XMR_AUTOEXIT then
 		g_PreWorkState = CLIENT_STATE_AUTO_EXIT
 		local tStatInfo = {}
 		tStatInfo.fu1 = "runerror"
 		tStatInfo.fu5 = "autoexit"
-		tStatInfo.fu6 = tostring(3)
+		tStatInfo.fu6 = tostring(2)
 		tStatInfo.fu7 = tostring(nParam)
 		StatisticClient:SendClientErrorReport(tStatInfo)
 		ReTryStartClient()
-	elseif nMsgType == WP_ZCASH_A_ERROR_INFO then
+	elseif nMsgType == WP_XMR_ERROR_INFO then
 		KillVirtualDAG()
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
 		if nParam == 3 then
-			UIInterface:SetStateInfoToUser("请安装最新的显卡驱动")
+			--UIInterface:SetStateInfoToUser("请安装最新的显卡驱动")
 		end
 	end	
 end
@@ -418,44 +416,31 @@ end
 --]]
 function InitCmdLine()
 	local nWorkModel = UIInterface:GetCurrentWorkModel()
-	if nWorkModel == 1 then
-		g_MiningMode_Cur = g_MiningMode_Min
-		SetControlSpeedCmdLine(g_MiningMode_Min)
+	if nWorkModel == 0 then
+		g_bFullSpeed = true
 	else
-		g_MiningMode_Cur = g_MiningMode_Max
-		SetControlSpeedCmdLine(nil)
-	end
-end
-
-function SetControlSpeedCmdLine(nIntensity)
-	if nIntensity ~= nil then
-		g_ControlSpeedCmdLine = "-i " .. tostring(nIntensity)
-	else
-		g_ControlSpeedCmdLine = nil
+		g_bFullSpeed = false
 	end
 end
 
 function ChangeMiningSpeed()
 	local nWorkModel = UIInterface:GetCurrentWorkModel()
-	if nWorkModel ~= 1 then
-		if g_MiningMode_Cur ~= g_MiningMode_Max then
-			g_MiningMode_Cur = g_MiningMode_Max
-			SetControlSpeedCmdLine(nil)
+	if nWorkModel == 0 then
+		if not g_bFullSpeed then
+			g_bFullSpeed = true
 			Quit()
 			Start()			
 		end	
 	else
 		if LimitSpeedCond() then
-			if g_MiningMode_Cur ~= g_MiningMode_Min then
-				g_MiningMode_Cur = g_MiningMode_Min
-				SetControlSpeedCmdLine(g_MiningMode_Min)
+			if g_bFullSpeed then
+				g_bFullSpeed = false
 				Quit()
 				Start()	
 			end	
 		else
-			if g_Intensity_Cur ~= g_MiningMode_Max then
-				g_Intensity_Cur = g_MiningMode_Max
-				SetControlSpeedCmdLine(nil)
+			if not g_bFullSpeed then
+				g_bFullSpeed = true
 				Quit()
 				Start()
 			end
@@ -463,21 +448,22 @@ function ChangeMiningSpeed()
 	end
 end
 --3分钟还没有纠错 就当已经不能挖矿了
-function StartZcashATimer()
-	if g_ZcashAWorkingTimerId then
-		timeMgr:KillTimer(g_ZcashAWorkingTimerId)
-		g_ZcashAWorkingTimerId = nil
+function StartXmrTimer()
+	if g_XmrWorkingTimerId then
+		timeMgr:KillTimer(g_XmrWorkingTimerId)
+		g_XmrWorkingTimerId = nil
 	end
 	g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
-	g_ZcashAWorkingTimerId = timeMgr:SetTimer(function(Itm, id)
+	g_XmrWorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nCurrentTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
-			TipLog("[StartZcashATimer] error occur and correct time out, try to restart")
+			TipLog("[StartXmrTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
 		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
-			TipLog("[StartZcashATimer] output time out, try to restart")
+			TipLog("[StartXmrTimer] output time out, try to restart")
 			ReTryStartClient()
 		end
+		
 		ChangeMiningSpeed()
 	end, 1000)
 end
@@ -485,16 +471,16 @@ end
 function ResetGlobalParam()
 	g_PreWorkState = nil
 	g_MiningSpeedPerHour = 0
-	if g_ZcashAWorkingTimerId then
-		timeMgr:KillTimer(g_ZcashAWorkingTimerId)
-		g_ZcashAWorkingTimerId = nil
+	if g_XmrWorkingTimerId then
+		timeMgr:KillTimer(g_XmrWorkingTimerId)
+		g_XmrWorkingTimerId = nil
 	end
 	--g_LastGetSpeedTime = 0
 	g_LastGetRealTimeIncomeTime = 0
 	g_ClientOutputSpeed = 0
-	if g_ZcashARealTimeIncomeTimerId then
-		timeMgr:KillTimer(g_ZcashARealTimeIncomeTimerId)
-		g_ZcashARealTimeIncomeTimerId = nil
+	if g_XmrRealTimeIncomeTimerId then
+		timeMgr:KillTimer(g_XmrRealTimeIncomeTimerId)
+		g_XmrRealTimeIncomeTimerId = nil
 	end
 	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
@@ -512,41 +498,23 @@ end
 ----------------
 function InitClient(nPlatformId, nMiningType)
 	g_nPlatformId = nPlatformId
-	CLIENT_ZCASHA = nMiningType
-	IPCUtil:Init(CLIENT_ZCASHA)
+	CLIENT_XMR_X = nMiningType
+	IPCUtil:Init(CLIENT_XMR_X)
 end
 function Start()
-	local strPoolCmd = GetCurrentMiningCmdLine()
-	if strPoolCmd == nil then
+	local strExeName = GetCurrentMiningCmdLine()
+	if strExeName == nil then
 		return 1
 	end
 	local strDir = tFunctionHelper.GetModuleDir()
-	local strWorkExe = tipUtil:PathCombine(strDir, CLIENT_PATH)
-	local strCmdLine = "\"" .. strWorkExe .. "\"" .. " " .. strPoolCmd
+	local strCmdLine = tipUtil:PathCombine(strDir, CLIENT_PATH .. tostring(strExeName))
 	--控制台输出代理
 	local strCoutAgent = tipUtil:PathCombine(strDir, COUTAGENT_PATH)
 	strCmdLine =  "\"" .. strCoutAgent .. "\" " .. strCmdLine
-	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	local tabUserCmd =tUserConfig["tabUserCmd"]
-	if type(tabUserCmd) ~= "table" then
-		tabUserCmd = {}
-	end
-	local strUserCmd = tabUserCmd["za"]
-	--[[
-	local strPlatform = tFunctionHelper.GetOpenCLPlatformCmd()
-	if IsRealString(strPlatform) then
-		strCmdLine = strCmdLine .. " " .. strPlatform
-	end
-	--]]
-	if IsRealString(strUserCmd) then
-		strCmdLine = strCmdLine .. " " .. strUserCmd
-	end
-	if IsRealString(g_ControlSpeedCmdLine) then
-		strCmdLine = strCmdLine .. " " .. g_ControlSpeedCmdLine
-	end
+
 	TipLog("[Start] strCmdLine = " .. GTV(strCmdLine))
 	IPCUtil:Start(strCmdLine)
-	StartZcashATimer()
+	StartXmrTimer()
 	return 0
 end
 
@@ -566,7 +534,7 @@ end
 
 function ReStartClientByNewPoolList()
 	Quit()
-	g_strCmdLineFormat = nil
+	g_strHost = nil
 	g_strAccount = nil
 	g_strPool = nil
 	g_PoolIndex = 0
@@ -636,8 +604,8 @@ function GetDefaultPoolType()
 end
 
 function GetSpeedFormat(nSpeed)
-	local strSpeed = string.format("%0.6f",tostring(nSpeed))
-	--strSpeed = strSpeed .. "SOL/s"
+	local strSpeed = string.format("%0.2f",tostring(nSpeed))
+	--strSpeed = strSpeed .. "H/s"
 	return strSpeed
 end
 
@@ -652,7 +620,7 @@ function RegisterFunctionObject(self)
 	local obj = {}
 	obj.InitClient = InitClient
 	obj.InitCmdLine = InitCmdLine
-	obj.OnZcashAMsg = OnZcashAMsg
+	obj.OnXmrMsg = OnXmrMsg
 	obj.Start = Start
 	obj.Quit = Quit
 	obj.Pause = Pause
@@ -667,6 +635,6 @@ function RegisterFunctionObject(self)
 	obj.GetDefaultPoolType = GetDefaultPoolType
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
-	XLSetGlobal("ZcashAClient", obj)
+	XLSetGlobal("XmrClient", obj)
 end
 RegisterFunctionObject()

@@ -1473,8 +1473,10 @@ end
 function ClientWorkModule:GetMiningType()
 	return self._MiningType
 end
---初始化客户端,根据需要 1:ETH 2:ZcashN
+--
 function ClientWorkModule:InitMiningClient()
+	local nPlatformId, nMiningType = SupportClientType:GetNextClientInfo()
+	self:SetMiningType(nMiningType)
 	if self._MiningType == 1 then
 		--LoadGenOilClient()
 		--self._WorkClient = XLGetGlobal("Global.GenOilClient")
@@ -1487,8 +1489,14 @@ function ClientWorkModule:InitMiningClient()
 		--LoadZcashAClient()
 		--self._WorkClient = XLGetGlobal("Global.ZcashAClient")
 		self._WorkClient = ZcashAClient
+	elseif self._MiningType == 4 
+			or  self._MiningType == 5 
+			or  self._MiningType == 6 
+			or  self._MiningType == 7 
+			then
+		self._WorkClient = XmrClient
 	end
-	self._WorkClient.InitClient()
+	self._WorkClient.InitClient(nPlatformId, self._MiningType)
 end
 
 
