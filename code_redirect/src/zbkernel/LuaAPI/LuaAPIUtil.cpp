@@ -5816,7 +5816,7 @@ int LuaAPIUtil::GetLongTypeHighAndLowWord(lua_State* pLuaState)
 
 BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
 {
-	if (LoadLibraryA("opencl32.dll") == NULL)
+	if (LoadLibraryA("opencl.dll") == NULL)
 	{
 		TSDEBUG4CXX("[GetUserDisplayCardInfo] load opencl fail, nErrorCode = "<< GetLastError());
 		return FALSE;  
@@ -5939,6 +5939,14 @@ int LuaAPIUtil::GetAllDisplayCardInfo(lua_State* pLuaState)
 
 		lua_pushstring(pLuaState, "memory_size");
 		lua_pushnumber(pLuaState, iter->memory_size);
+		lua_settable(pLuaState, -3);
+		
+		lua_pushstring(pLuaState, "platformid");
+		lua_pushnumber(pLuaState, iter->platformid);
+		lua_settable(pLuaState, -3);
+		
+		lua_pushstring(pLuaState, "cache_size");
+		lua_pushnumber(pLuaState, iter->cache_size);
 		lua_settable(pLuaState, -3);
 
 		lua_rawseti(pLuaState, -2, i + 1);

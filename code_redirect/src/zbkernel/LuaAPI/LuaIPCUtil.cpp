@@ -6,6 +6,7 @@
 #include "../MinerType/ClientGenOil.h"
 #include "../MinerType/ClientZcashN.h"
 #include "../MinerType/ClientZcashA.h"
+#include "../MinerType/ClientXmr.h"
 
 CMinerClient *g_pClient = NULL;
 
@@ -53,6 +54,7 @@ XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] =
 	{"Pause", Pause},
 	{"Resume", Resume},
 	{"IsWorkProcessRunning",IsWorkProcessRunning},
+	{"SetMinerType",SetMinerType},
 	{NULL, NULL}
 };
 
@@ -119,6 +121,10 @@ int LuaIPCUtil::Init(lua_State* pLuaState)
 	else if(uMinerType == MINER_ZCASH_A)
 	{
 		g_pClient = new CClientZcashA();
+	}
+	else if(uMinerType >= MINER_XMR_B && uMinerType <= MINER_XMR_E)
+	{
+		g_pClient = new CClientXmr(uMinerType);
 	}
 	return 0;
 }
@@ -350,4 +356,14 @@ BOOL LuaIPCUtil::EnableDebugPrivilege()
 		return FALSE;     
 	}     
 	return TRUE;     
+}
+
+int LuaIPCUtil::SetMinerType(lua_State* pLuaState)
+{
+	UINT uMinerType = (DWORD)lua_tointeger(pLuaState, 2);
+	if (g_pClient)
+	{
+		g_pClient->SetMinerType(uMinerType);
+	}
+	return 0;
 }

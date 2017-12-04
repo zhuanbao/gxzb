@@ -10,6 +10,8 @@ typedef enum
 	MINER_GENOIL = 1,
 	MINER_ZCASH_N = 2,
 	MINER_ZCASH_A = 3,
+	MINER_XMR_B = 4,
+	MINER_XMR_E = 7,
 }MinerType;
 
 
@@ -32,6 +34,8 @@ public:
 	static int Pause(lua_State* luaState);
 	static int Resume(lua_State* luaState);
 	static int IsWorkProcessRunning(lua_State* pLuaState);
+
+	static int SetMinerType(lua_State* pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
 	static HANDLE m_hWorkProcess;
