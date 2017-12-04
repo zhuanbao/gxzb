@@ -483,6 +483,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MinerType\ClientXmr.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MinerType\ClientXmr.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MinerType\ClientZcashA.cpp"
 				>
 			</File>
