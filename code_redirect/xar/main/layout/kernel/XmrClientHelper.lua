@@ -105,11 +105,11 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 	local strCfgName = nil
 	local nRealMiningType = nMiningType
 	if nMiningType == 4 then
-		local nMaxGpuUsage = 30
+		local nMaxGpuUsage = 35
 		strExeName = "Share4PeerXN64.exe"
-		strSleep = "500"
+		strSleep = "108"
 		if bFullSpeed then
-			nMaxGpuUsage = 50
+			nMaxGpuUsage = 45
 			strSleep = "80"
 		end
 		
