@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.30"
+!define PRODUCT_VERSION "1.0.0.32"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -69,7 +69,7 @@ VIAddVersionKey /LANG=2052 "OriginalFilename" Share4MoneySetup.exe
 
 
 ;page
-Page custom check-can-install
+;Page custom check-can-install
 Page custom check-can-install2
 Page custom loadingPage
 Page custom finishPage
@@ -356,6 +356,24 @@ Function CloseExe
 	${FKillProc} "Share4PeerZN"
 	${FKillProc} "ShareCout"
 	${FKillProc} "Share4PeerZA"
+	${FKillProc} "Share4PeerXC"
+	${FKillProc} "Share4PeerXN64"
+	${FKillProc} "Share4PeerXA"
+	${FKillProc} "Share4PeerXA64"
+FunctionEnd
+
+Function un.CloseExe
+	${FKillProc} "Share4Money"
+	${FKillProc} "Share4Peer"
+	${FKillProc} "ShareGenoil"
+	${FKillProc} "zbsetuphelper-cl"
+	${FKillProc} "Share4PeerZN"
+	${FKillProc} "ShareCout"
+	${FKillProc} "Share4PeerZA"
+	${FKillProc} "Share4PeerXC"
+	${FKillProc} "Share4PeerXN64"
+	${FKillProc} "Share4PeerXA"
+	${FKillProc} "Share4PeerXA64"
 FunctionEnd
 
 Function CheckHasInstall
@@ -396,12 +414,7 @@ Function CheckExeProcExist
 		Abort
 		${FKillProc} "Share4Money"
 	${EndIf}
-	${FKillProc} "Share4Peer"
-	${FKillProc} "ShareGenoil"
-	${FKillProc} "zbsetuphelper-cl"
-	${FKillProc} "Share4PeerZN"
-	${FKillProc} "ShareCout"
-	${FKillProc} "Share4PeerZA"
+	Call CloseExe
 FunctionEnd
 
 !macro InitBaseCfgDir
@@ -488,11 +501,12 @@ Function .onInit
 		WriteUninstaller "$EXEDIR\main\uninst.exe"
 		Abort
 	${EndIf}
+	/*
 	;ETH 0:支持ETH 1：非64位系统 2：显卡不支持(3G)
 	StrCpy $CheckETHCond 9
 	;Zcash 0:支持Zcash 1：非64位系统 2：显卡不支持(2G)
 	StrCpy $CheckZcashCond 9
-	
+	*/
 	StrCpy $IsSilentInst 0
 	${GetParameters} $R0
 	ClearErrors
@@ -507,7 +521,7 @@ Function .onInit
 	SetOutPath "$PLUGINSDIR"
 	SetOverwrite on
 		File "zbsetuphelper.dll"
-		File "main\program\OpenCL32.dll"
+		;File "main\program\OpenCL32.dll"
 		File "main\program\Microsoft.VC90.CRT.manifest"
 		File "main\program\msvcp90.dll"
 		File "main\program\msvcr90.dll"
@@ -529,6 +543,11 @@ Function .onInit
 	Call InitFont
 	
 	Call FirstSendStart
+	
+	File "license.txt"
+	Call UpdateChanel
+	!insertmacro InitBaseCfgDir
+	/*
 	${If} ${RunningX64}
 		File "main\program\Share4Peer\msvcp120.dll"
 		File "main\program\Share4Peer\msvcr120.dll"
@@ -568,6 +587,7 @@ Function .onInit
 		StrCpy $CheckZcashCond 1
 		WriteRegDWORD HKCU "software\Share4Money" "instate" 1
 	${EndIf}
+	*/
 	Call CmdSilentInstall
 FunctionEnd
 
@@ -722,8 +742,8 @@ Function CmdSilentInstall
 	IfErrors 0 +2
 		Return
 	SetSilent silent
-	${If} $CheckETHCond != 0 
-	${AndIf} $CheckZcashCond != 0	
+	;${If} $CheckETHCond != 0 
+	;${AndIf} $CheckZcashCond != 0	
 		ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
 		${If} $R5 != 1
 			WriteRegDWORD HKCU "software\Share4Money" "instate" 2
@@ -732,7 +752,7 @@ Function CmdSilentInstall
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Abort
 		Return
-	${EndIf}
+	;${EndIf}
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
 	IfFileExists $0 0 StartInstall
 		${GetFileVersion} $0 $1
@@ -827,7 +847,7 @@ FunctionEnd
 Function cancel
 	SendMessage $HWNDPARENT "0x408" "120" ""
 FunctionEnd
-
+/*
 Function check-can-install
 	;支持赚宝
 	${If} $CheckETHCond == 0 
@@ -888,7 +908,7 @@ Function check-can-install
 		nsDialogs::Show
 	${EndIf}
 FunctionEnd
-
+*/
 Function onMsgBoxCloseCallback
 	${If} $MSG = ${WM_CLOSE}
 		EnableWindow $HWNDPARENT 1
@@ -1390,12 +1410,7 @@ Function un.onInit
 		Abort
 		${FKillProc} "Share4Money"
 	${EndIf}
-	${FKillProc} "Share4Peer"
-	${FKillProc} "ShareGenoil"
-	${FKillProc} "zbsetuphelper-cl"
-	${FKillProc} "Share4PeerZN"
-	${FKillProc} "ShareCout"
-	${FKillProc} "Share4PeerZA"
+	Call un.CloseExe
 	System::Call "$PLUGINSDIR\zbsetuphelper::TerminateProcessByPrefixName(t 'Share4MoneySetup_')"
 	Call un.UpdateChanel
 	;InitPluginsDir
