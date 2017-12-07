@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.32"
+!define PRODUCT_VERSION "1.0.0.34"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -744,14 +744,14 @@ Function CmdSilentInstall
 	SetSilent silent
 	;${If} $CheckETHCond != 0 
 	;${AndIf} $CheckZcashCond != 0	
-		ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
-		${If} $R5 != 1
-			WriteRegDWORD HKCU "software\Share4Money" "instate" 2
-		${EndIf}
-		${SendStat} "$InstallProgressName" "$Verision_Channel" "checkenvfail" ""
-		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
-		Abort
-		Return
+		; ReadRegDWORD $R5 HKCU "software\Share4Money" "instate"
+		; ${If} $R5 != 1
+			; WriteRegDWORD HKCU "software\Share4Money" "instate" 2
+		; ${EndIf}
+		; ${SendStat} "$InstallProgressName" "$Verision_Channel" "checkenvfail" ""
+		; System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
+		; Abort
+		; Return
 	;${EndIf}
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
 	IfFileExists $0 0 StartInstall
