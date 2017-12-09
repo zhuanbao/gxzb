@@ -342,7 +342,7 @@ function UIInterface:PopTipPre4Hour()
 					SetTimer(function(nextitem, nextid)
 								DoPopTip(nextitem, nextid)
 							 end,
-					nNewIntervals*1000)
+					nNextIntervals*1000)
 				 end,
 	nTipPopIntervals*1000)
 end
