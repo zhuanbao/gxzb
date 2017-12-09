@@ -28,9 +28,17 @@ SupportClientType._VENDOR = {}
 SupportClientType._VENDOR.AMD = 1
 SupportClientType._VENDOR.NVIDIA = 2
 
+SupportClientType._tabDisplayCard = nil
+
 SupportClientType._ClientIndex = 0
 
+function TipLog(strLog)
+	tipUtil:Log("CheckSupportClient: " .. tostring(strLog))
+end
+
 function SupportClientType:Init() 
+	self._tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
+	self:CheckIsGpuEnvChange(self._tabDisplayCard)
 	self:GetMachineSupportClient()
 end
 
@@ -39,6 +47,81 @@ function SupportClientType:IsWow64()
 		return false
 	end
 	return true
+end
+
+--主要是判断显卡名称，显存大小，显卡驱动版本是否变化过
+function SupportClientType:CheckIsGpuEnvChange(tabNewGPUInfo)	
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tGPUInfo"]) ~= "table" or #tUserConfig["tGPUInfo"] < 1 then
+		self:SaveNewGpuEnvInfo(tabNewGPUInfo)
+		self:ClearCrash()
+		TipLog("First ini gpu environment")
+		return
+	end
+	local tabOldGPUInfo = tUserConfig["tGPUInfo"]
+
+	for iOld = 1,#tabOldGPUInfo do
+		local tabOldGPUItem = tabOldGPUInfo[iOld]
+		if tabOldGPUItem["vendor"] == self._VENDOR.AMD or tabOldGPUItem["vendor"] == self._VENDOR.NVIDIA then
+			local bComper = false
+			for iNew = 1,#tabNewGPUInfo do
+				local tabNewGPUItem = tabNewGPUInfo[iNew]
+				if string.lower(tabOldGPUItem["name"]) == string.lower(tabNewGPUItem["name"])
+					and string.lower(tabOldGPUItem["version"]) == string.lower(tabNewGPUItem["version"])
+					and string.lower(tabOldGPUItem["memory_size"]) == string.lower(tabNewGPUItem["memory_size"]) then
+					bComper = true
+					break
+				end
+			end
+			if not bComper then
+				self:SaveNewGpuEnvInfo(tabNewGPUInfo)
+				self:ClearCrash()
+				TipLog("Gpu environment has changed")
+				return
+			end
+		end	
+	end
+end
+
+function SupportClientType:ClearCrash()
+	tipUtil:DeleteRegKey("HKEY_CURRENT_USER", "Software\\Share4Money\\Crash")
+end
+
+function SupportClientType:SetCrashDebugFlag(nClientType)
+	local nValue = tFunctionHelper.RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType))
+	if type(nValue) ~= "number" then
+		tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType), 1)
+	end	
+end
+
+function SupportClientType:ClearCrashDebugFlag(nClientType)
+	local nValue = tFunctionHelper.RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType))
+	if nValue == 1 then
+		tFunctionHelper.RegDeleteValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType))
+	end	
+end
+
+function SupportClientType:SetNoCrashFlag(nClientType)
+	local nValue = tFunctionHelper.RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType))
+	if nValue ~= 0 then
+		tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType), 0)
+	end	
+end
+
+function SupportClientType:CheckHasCrashed(nClientType)
+	local nValue = tFunctionHelper.RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\Crash\\" .. tostring(nClientType))
+	if nValue == nil or tonumber(nValue) ~= 1 then
+		return false
+	else
+		return true
+	end
+end
+
+function SupportClientType:SaveNewGpuEnvInfo(tabNewGPUInfo)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tGPUInfo"] = nil
+	tUserConfig["tGPUInfo"] = tabNewGPUInfo
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
 --先按币种数来排，再按支持的客户端个数来排
@@ -80,7 +163,7 @@ end
 
 
 function SupportClientType:GetMachineSupportClient()
-	local tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
+	local tabDisplayCard = self._tabDisplayCard
 	if type(tabDisplayCard) == "table" then
 		for index=1,#tabDisplayCard do
 			local tabItem = tabDisplayCard[index]
@@ -90,33 +173,45 @@ function SupportClientType:GetMachineSupportClient()
 				local tabClientType = {}
 				tabClientType["ClientType"] = {}
 				if self:IsWow64() then
-					if tabItem["memory_size"] >= 3000000000 and (tabItem["vendor"] == self._VENDOR.AMD or tabItem["vendor"] == self._VENDOR.NVIDIA) then
+					if tabItem["memory_size"] >= 3000000000 
+						and (tabItem["vendor"] == self._VENDOR.AMD or tabItem["vendor"] == self._VENDOR.NVIDIA) 
+						and not self:CheckHasCrashed(1) then
 						tabClientType["ETC"] = {}
 						tabClientType["ETC"][#tabClientType["ETC"]+1] = 1
 						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 1
 					end
-					if tabItem["memory_size"] >= 2000000000 and tabItem["vendor"] == self._VENDOR.NVIDIA then
+					if tabItem["memory_size"] >= 2000000000 
+						and tabItem["vendor"] == self._VENDOR.NVIDIA 
+						and not self:CheckHasCrashed(2) then
 						tabClientType["ZCASH"] = {}
 						tabClientType["ZCASH"][#tabClientType["ZCASH"]+1] = 2
 						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 2
 					end
-					if tabItem["memory_size"] >= 2000000000 and tabItem["vendor"] == self._VENDOR.AMD then
+					if tabItem["memory_size"] >= 2000000000 
+						and tabItem["vendor"] == self._VENDOR.AMD
+						and not self:CheckHasCrashed(3) then
 						--tabClientType["ZCASH"] = {}
 						--tabClientType["ZCASH"][#tabClientType["ZCASH"]+1] = 3
 						--tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 3
 					end
-					if tabItem["memory_size"] >= 1*1024*1024*1024 and tabItem["vendor"] == self._VENDOR.NVIDIA then
+					if tabItem["memory_size"] >= 1*1024*1024*1024 
+						and tabItem["vendor"] == self._VENDOR.NVIDIA
+						and not self:CheckHasCrashed(4) then
 						tabClientType["XMR"] = {}
 						tabClientType["XMR"][#tabClientType["XMR"]+1] = 4
 						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 4
 					end
-					if tabItem["memory_size"] >= 1*1024*1024*1024 and tabItem["vendor"] == self._VENDOR.AMD then
+					if tabItem["memory_size"] >= 1*1024*1024*1024 
+						and tabItem["vendor"] == self._VENDOR.AMD
+						and not self:CheckHasCrashed(5) then
 						tabClientType["XMR"] = {}
 						tabClientType["XMR"][#tabClientType["XMR"]+1] = 5
 						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 5
 					end
 				else
-					if tabItem["memory_size"] >= 1*1024*1024*1024 and tabItem["vendor"] == self._VENDOR.AMD then
+					if tabItem["memory_size"] >= 1*1024*1024*1024 
+						and tabItem["vendor"] == self._VENDOR.AMD
+						and not self:CheckHasCrashed(6) then
 						tabClientType["XMR"] = {}
 						tabClientType["XMR"][#tabClientType["XMR"]+1] = 6
 						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 6

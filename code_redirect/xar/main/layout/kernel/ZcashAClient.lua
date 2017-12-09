@@ -337,6 +337,7 @@ function OnZcashAMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnZcashAMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
 	if nMsgType == WP_ZCASH_A_SPEED then
+		SupportClientType:SetNoCrashFlag(CLIENT_ZCASHA)
 		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
@@ -500,6 +501,7 @@ function ResetGlobalParam()
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
+	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 
 function ResetGlobalErrorParam()
@@ -545,6 +547,7 @@ function Start()
 		strCmdLine = strCmdLine .. " " .. g_ControlSpeedCmdLine
 	end
 	TipLog("[Start] strCmdLine = " .. GTV(strCmdLine))
+	SupportClientType:SetCrashDebugFlag(CLIENT_ZCASHA)
 	IPCUtil:Start(strCmdLine)
 	StartZcashATimer()
 	return 0

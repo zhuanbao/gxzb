@@ -10,6 +10,7 @@ local g_DefaultPoolType = "x_cc"
 local g_nPlatformId = 0
 --常量
 local CLIENT_XMR_X = nil
+local CLIENT_XMR_X_REAL = nil
 local CLIENT_PATH = "Share4Peer\\"
 
 local COUTAGENT_PATH = "ShareCout.exe"
@@ -65,6 +66,8 @@ local g_XmrDAGTimerId = nil
 
 local g_XmrRealTimeIncomeTimerId = nil
 local g_ClientOutputSpeed = 0 --0H/s
+
+local g_bNoPrepare = false
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -227,7 +230,8 @@ function GetCurrentMiningCmdLine()
 	if g_strHost == nil then
 		return nil
 	end
-	strExeName = XmrHelper:InitXmr(CLIENT_XMR_X, g_bFullSpeed, g_strHost, g_strAccount, strWorkID, g_nPlatformId)
+	local strExeName, nRealMiningType = XmrHelper:InitXmr(CLIENT_XMR_X, g_bFullSpeed, g_strHost, g_strAccount, strWorkID, g_nPlatformId)
+	CLIENT_XMR_X_REAL = nRealMiningType
 	return strExeName
 end
 
@@ -333,6 +337,7 @@ function OnXmrMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnXmrMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
 	if nMsgType == WP_XMR_SPEED then
+		SupportClientType:SetNoCrashFlag(CLIENT_XMR_X_REAL)
 		KillVirtualDAG()
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
@@ -381,7 +386,9 @@ function OnXmrMsg(tParam)
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
 			if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
-				GenerateVirtualDAG()
+				if not g_bNoPrepare then
+					GenerateVirtualDAG()
+				end	
 				if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
 					ClientWorkModule:QueryClientInfo(0)
 				end	
@@ -429,7 +436,8 @@ function ChangeMiningSpeed()
 		if not g_bFullSpeed then
 			g_bFullSpeed = true
 			Quit()
-			Start()			
+			Start()		
+			g_bNoPrepare = true
 		end	
 	else
 		if LimitSpeedCond() then
@@ -437,12 +445,14 @@ function ChangeMiningSpeed()
 				g_bFullSpeed = false
 				Quit()
 				Start()	
+				g_bNoPrepare = true
 			end	
 		else
 			if not g_bFullSpeed then
 				g_bFullSpeed = true
 				Quit()
 				Start()
+				g_bNoPrepare = true
 			end
 		end	
 	end
@@ -486,6 +496,8 @@ function ResetGlobalParam()
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
+	g_bNoPrepare = false
+	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 
 function ResetGlobalErrorParam()
@@ -513,6 +525,7 @@ function Start()
 	strCmdLine =  "\"" .. strCoutAgent .. "\" " .. strCmdLine
 
 	TipLog("[Start] strCmdLine = " .. GTV(strCmdLine))
+	SupportClientType:SetCrashDebugFlag(CLIENT_XMR_X_REAL)
 	IPCUtil:Start(strCmdLine)
 	StartXmrTimer()
 	return 0

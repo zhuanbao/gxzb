@@ -250,7 +250,9 @@ function UIInterface:AnalysisClientErrorMsg(tParam)
 		return
 	end
 	if IsRealString(strErrorMsg) 
-		and (string.find(string.lower(strErrorMsg), string.lower("driver version is insufficient for CUDA runtime version")) ~= nil 
+		--由于字符串截断的问题暂时只匹配关键字insufficient
+		--and (string.find(string.lower(strErrorMsg), string.lower("driver version is insufficient for CUDA runtime version")) ~= nil 
+		and (string.find(string.lower(strErrorMsg), string.lower("insufficient")) ~= nil 
 		or string.find(string.lower(strErrorMsg), string.lower("Cannot load nvml")) ~= nil  )then
 		self._tabErrorMsg = tParam
 		--self:ShowPopupWndByName("GXZB.UpdateCardDriveWnd.Instance", true)

@@ -62,6 +62,8 @@ local g_LastGetSpeedTime = 0
 local g_LastRealTimeIncome = 0
 local g_LastAverageHashRate = 0
 
+local g_bNoPrepare = false
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -295,6 +297,7 @@ function OnGenOilMsg(tParam)
 	local nMsgType, nParam = tParam[1],tParam[2]
 	TipLog("[OnGenOilMsg] nMsgType = " .. GTV(nMsgType) .. ", nParam = " .. GTV(nParam))
 	if nMsgType == WP_GENOIL_SPEED then
+		SupportClientType:SetNoCrashFlag(CLIENT_GENOIL)
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
 			ResetGlobalErrorParam()
@@ -329,9 +332,11 @@ function OnGenOilMsg(tParam)
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		if g_PreWorkState ~= CLIENT_STATE_PREPARE then
 			g_PreWorkState = CLIENT_STATE_PREPARE
-			UIInterface:UpdateUIMiningState(CLIENT_STATE_PREPARE)
+			if not g_bNoPrepare then
+				UIInterface:UpdateUIMiningState(CLIENT_STATE_PREPARE)
+			end	
 		end
-		if tonumber(nParam) ~= nil then
+		if tonumber(nParam) ~= nil and not g_bNoPrepare then
 			UIInterface:UpdateDagProgress(nParam)
 		end
 		if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
@@ -399,7 +404,8 @@ function ChangeMiningSpeed()
 			g_GlobalWorkSizeMultiplier_Cur = g_GlobalWorkSizeMultiplier_Max
 			SetControlSpeedCmdLine(nil)
 			Quit()
-			Start()			
+			Start()	
+			g_bNoPrepare = true
 		end	
 	else
 		if LimitSpeedCond() then
@@ -408,6 +414,7 @@ function ChangeMiningSpeed()
 				SetControlSpeedCmdLine(g_GlobalWorkSizeMultiplier_Min)
 				Quit()
 				Start()	
+				g_bNoPrepare = true
 			end	
 		else
 			if g_GlobalWorkSizeMultiplier_Cur ~= g_GlobalWorkSizeMultiplier_Max then
@@ -415,6 +422,7 @@ function ChangeMiningSpeed()
 				SetControlSpeedCmdLine(nil)
 				Quit()
 				Start()
+				g_bNoPrepare = true
 			end
 		end	
 	end
@@ -450,6 +458,8 @@ function ResetGlobalParam()
 	g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
+	g_bNoPrepare = false
+	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 
 function ResetGlobalErrorParam()
@@ -493,6 +503,7 @@ function Start()
 		strCmdLine = strCmdLine .. " " .. g_ControlSpeedCmdLine
 	end
 	TipLog("[Start] strCmdLine = " .. GTV(strCmdLine))
+	SupportClientType:SetCrashDebugFlag(CLIENT_GENOIL)
 	IPCUtil:Start(strCmdLine)
 	StartGenOilTimer()
 	return 0

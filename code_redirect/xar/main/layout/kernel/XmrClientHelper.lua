@@ -126,7 +126,7 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 			local nMaxGpuUsage = 60
 			tabCfgJson = self:GetCpuCfgTable(nMaxGpuUsage, strHost, strAccount, strWorkID)
 			strCfgName = self._strCpuCfgName
-			nRealMiningType = 5
+			nRealMiningType = 7
 			IPCUtil:SetMinerType(7)
 		end	
 	elseif nMiningType == 6 then
@@ -140,7 +140,7 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 			local nMaxGpuUsage = 60
 			tabCfgJson = self:GetCpuCfgTable(nMaxGpuUsage, strHost, strAccount, strWorkID)
 			strCfgName = self._strCpuCfgName
-			nRealMiningType = 6
+			nRealMiningType = 7
 			IPCUtil:SetMinerType(7)
 		end	
 	elseif nMiningType == 7 then
