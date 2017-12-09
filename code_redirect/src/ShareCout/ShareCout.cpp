@@ -45,6 +45,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	si.dwFlags = STARTF_FORCEOFFFEEDBACK; // we don't want the "app starting" cursor
 	// all other default options are already good : we want subprocess to share the same console and to inherit our STD handles
 	TSDEBUG4CXX(L"pszCommandLine = "<< pszCommandLine); 
+	::SetErrorMode(::SetErrorMode(0)|SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX|SEM_NOGPFAULTERRORBOX|SEM_NOALIGNMENTFAULTEXCEPT);
 	if (!CreateProcess(	NULL, pszCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 	{
 		TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
