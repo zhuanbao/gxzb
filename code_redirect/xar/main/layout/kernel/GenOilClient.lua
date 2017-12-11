@@ -345,7 +345,7 @@ function OnGenOilMsg(tParam)
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
-		WhenGetShare()
+		--WhenGetShare()
 		--处理提交share
 	elseif nMsgType == WP_GENOIL_CONNECT_POOL then
 		if nParam == 0 then

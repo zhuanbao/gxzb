@@ -380,7 +380,7 @@ function OnZcashNMsg(tParam)
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
 		if nParam == 0 then
-			WhenGetShare()
+			--WhenGetShare()
 			--处理提交share
 		end	
 	elseif nMsgType == WP_ZCASH_N_CONNECT_POOL then
