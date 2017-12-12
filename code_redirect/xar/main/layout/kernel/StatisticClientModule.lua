@@ -221,7 +221,7 @@ function StatisticClient:SendRunTimeReport(strState)
 	tStatInfo.fu5 = self._strLastReportRunTimeState
 	if tStatInfo.fu5 == "working" then
 		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
-		tStatInfo.fu7 = ClientWorkModule:GetMiningType()
+		tStatInfo.fu7 = ClientWorkModule:GetRealMiningType()
 	end
 	--[[
 	local tabMemoryInfo = tipUtil:GetMemoryStatus()

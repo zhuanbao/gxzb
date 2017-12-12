@@ -481,7 +481,7 @@ function StartZcashNTimer()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
 			TipLog("[StartZcashNTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
-		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 100 then
 			TipLog("[StartZcashNTimer] output time out, try to restart")
 			ReTryStartClient()
 		end
@@ -599,8 +599,9 @@ function ReTryStartClient()
 	g_ClientReTryCnt = g_ClientReTryCnt + 1
 	TipLog("[ReTryStartClient] g_ClientReTryCnt = " .. GTV(g_ClientReTryCnt))
 	if g_ClientReTryCnt >= g_ClientMaxReTryCnt then
-		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
-		ClientWorkModule:QuitMinerSuccess()
+		--UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		--ClientWorkModule:QuitMinerSuccess()
+		ClientWorkModule:StartNextClient()
 		return
 	end
 	if Start() ~= 0 then

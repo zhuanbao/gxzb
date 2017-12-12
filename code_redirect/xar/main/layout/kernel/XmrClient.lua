@@ -469,7 +469,7 @@ function StartXmrTimer()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 60 then
 			TipLog("[StartXmrTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
-		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 100 then
 			TipLog("[StartXmrTimer] output time out, try to restart")
 			ReTryStartClient()
 		end
@@ -570,8 +570,9 @@ function ReTryStartClient()
 	g_ClientReTryCnt = g_ClientReTryCnt + 1
 	TipLog("[ReTryStartClient] g_ClientReTryCnt = " .. GTV(g_ClientReTryCnt))
 	if g_ClientReTryCnt >= g_ClientMaxReTryCnt then
-		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
-		ClientWorkModule:QuitMinerSuccess()
+		--UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		--ClientWorkModule:QuitMinerSuccess()
+		ClientWorkModule:StartNextClient()
 		return
 	end
 	if Start() ~= 0 then
@@ -629,6 +630,11 @@ function OnUpdateBalance()
 	end
 end
 
+function GetRealMiningType()
+	return CLIENT_XMR_X_REAL
+end
+
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	obj.InitClient = InitClient
@@ -648,6 +654,7 @@ function RegisterFunctionObject(self)
 	obj.GetDefaultPoolType = GetDefaultPoolType
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
+	obj.GetRealMiningType = GetRealMiningType
 	XLSetGlobal("XmrClient", obj)
 end
 RegisterFunctionObject()

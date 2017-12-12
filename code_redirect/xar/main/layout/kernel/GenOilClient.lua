@@ -54,7 +54,7 @@ local g_PoolIndex = 0
 
 local g_GenOilWorkingTimerId = nil 
 local g_ClientReTryCnt = 0 
-local g_ClientMaxReTryCnt = 3 
+local g_ClientMaxReTryCnt = 2 
 local g_LastClientOutputRightInfoTime = 0
 local g_ControlSpeedCmdLine = nil -- --cl-global-work 1000
 
@@ -439,7 +439,7 @@ function StartGenOilTimer()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
 			TipLog("[StartGenOilTimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
-		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 60*5 then
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 100 then
 			TipLog("[StartGenOilTimer] output time out, try to restart")
 			ReTryStartClient()
 		end
@@ -548,8 +548,9 @@ function ReTryStartClient()
 	g_ClientReTryCnt = g_ClientReTryCnt + 1
 	TipLog("[ReTryStartClient] g_ClientReTryCnt = " .. GTV(g_ClientReTryCnt))
 	if g_ClientReTryCnt >= g_ClientMaxReTryCnt then
-		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
-		ClientWorkModule:QuitMinerSuccess()
+		--UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		--ClientWorkModule:QuitMinerSuccess()
+		ClientWorkModule:StartNextClient()
 		return
 	end
 	if Start() ~= 0 then

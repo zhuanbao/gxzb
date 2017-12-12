@@ -58,6 +58,11 @@ function ServerCfg:SaveServerCfgtoLocal()
 	else
 		tUserConfig["tServerConfig"]["tRemindCfg"] = nil
 	end
+	if type(self._ServerConfig["tPriority"]) == "table" then
+		tUserConfig["tServerConfig"]["tPriority"] = self._ServerConfig["tPriority"]	
+	else
+		tUserConfig["tServerConfig"]["tPriority"] = nil
+	end
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 

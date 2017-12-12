@@ -104,7 +104,7 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 	local tabCfgJson = nil
 	local strCfgName = nil
 	local nRealMiningType = nMiningType
-	if nMiningType == 4 then
+	if nMiningType == SupportClientType.ClientType.XMR_N64 then
 		local nMaxGpuUsage = 35
 		strExeName = "Share4PeerXN64.exe"
 		strSleep = "108"
@@ -115,35 +115,35 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 		
 		tabCfgJson = self:GetGpuNCfgTable(strSleep, nMaxGpuUsage,strHost, strAccount, strWorkID)
 		strCfgName = self._strGpuNCfgName
-	elseif nMiningType == 5 then
+	elseif nMiningType == SupportClientType.ClientType.XMR_A64 then
 		if bFullSpeed then
 			strExeName = "Share4PeerXA64.exe"
 			tabCfgJson = self:GetGpuACfgTable(nPlatform, strHost, strAccount, strWorkID)
 			strCfgName = self._strGpuACfgName
-			IPCUtil:SetMinerType(5)
+			IPCUtil:SetMinerType(SupportClientType.ClientType.XMR_A64)
 		else
 			strExeName = "Share4PeerXC.exe"
 			local nMaxGpuUsage = 60
 			tabCfgJson = self:GetCpuCfgTable(nMaxGpuUsage, strHost, strAccount, strWorkID)
 			strCfgName = self._strCpuCfgName
-			nRealMiningType = 7
-			IPCUtil:SetMinerType(7)
+			nRealMiningType = SupportClientType.ClientType.XMR_C32
+			IPCUtil:SetMinerType(SupportClientType.ClientType.XMR_C32)
 		end	
-	elseif nMiningType == 6 then
+	elseif nMiningType == SupportClientType.ClientType.XMR_A32 then
 		if bFullSpeed then
 			strExeName = "Share4PeerXA.exe"
 			tabCfgJson = self:GetGpuACfgTable(nPlatform, strHost, strAccount, strWorkID)
 			strCfgName = self._strGpuACfgName
-			IPCUtil:SetMinerType(6)
+			IPCUtil:SetMinerType(SupportClientType.ClientType.XMR_A32)
 		else
 			strExeName = "Share4PeerXC.exe"
 			local nMaxGpuUsage = 60
 			tabCfgJson = self:GetCpuCfgTable(nMaxGpuUsage, strHost, strAccount, strWorkID)
 			strCfgName = self._strCpuCfgName
-			nRealMiningType = 7
-			IPCUtil:SetMinerType(7)
+			nRealMiningType = SupportClientType.ClientType.XMR_C32
+			IPCUtil:SetMinerType(SupportClientType.ClientType.XMR_C32)
 		end	
-	elseif nMiningType == 7 then
+	elseif nMiningType == SupportClientType.ClientType.XMR_C32 then
 		strExeName = "Share4PeerXC.exe"
 		local nMaxGpuUsage = 60
 		if bFullSpeed then

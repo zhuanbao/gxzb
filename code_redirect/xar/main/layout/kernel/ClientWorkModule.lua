@@ -1473,9 +1473,29 @@ end
 function ClientWorkModule:GetMiningType()
 	return self._MiningType
 end
+
+function ClientWorkModule:GetRealMiningType()
+	if self._WorkClient ~= nil and type(self._WorkClient.GetRealMiningType) == "table" then
+		return self._WorkClient.GetRealMiningType()
+	else
+		return self._MiningType
+	end
+end
+
+function ClientWorkModule:StartNextClient()
+	if self:InitMiningClient() then
+		self:NotifyStart()
+	else
+		self:NotifyQuit()
+		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+	end
+end
 --
 function ClientWorkModule:InitMiningClient()
 	local nPlatformId, nMiningType = SupportClientType:GetNextClientInfo()
+	if nMiningType == nil then
+		return false
+	end
 	self:SetMiningType(nMiningType)
 	if self._MiningType == 1 then
 		--LoadGenOilClient()

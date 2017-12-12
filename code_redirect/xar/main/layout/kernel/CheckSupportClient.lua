@@ -19,11 +19,22 @@ ObjectBase = XLGetGlobal("ObjectBase")
 SupportClientType = ObjectBase:New()
 XLSetGlobal("SupportClientType", SupportClientType)
 
+--常量定义
+SupportClientType.ClientType = {}
+SupportClientType.ClientType.ETC_NA64 = 1
+SupportClientType.ClientType.ZCASH_N64 = 2
+SupportClientType.ClientType.ZCASH_A64 = 3
+SupportClientType.ClientType.XMR_N64 = 4
+SupportClientType.ClientType.XMR_A64 = 5
+SupportClientType.ClientType.XMR_A32 = 6
+SupportClientType.ClientType.XMR_C32 = 7
+
+
 SupportClientType._tabSupportClientInfo = nil
 SupportClientType._nCoinCnt = 0
 SupportClientType._nClientCnt = 0
 
-SupportClientType._tabCoinType = {"ETC","ZCASH","XMR"}
+SupportClientType._tabCoinType = {"etc","zcash","xmr"}
 SupportClientType._VENDOR = {}
 SupportClientType._VENDOR.AMD = 1
 SupportClientType._VENDOR.NVIDIA = 2
@@ -31,6 +42,7 @@ SupportClientType._VENDOR.NVIDIA = 2
 SupportClientType._tabDisplayCard = nil
 
 SupportClientType._ClientIndex = 0
+
 
 function TipLog(strLog)
 	tipUtil:Log("CheckSupportClient: " .. tostring(strLog))
@@ -125,40 +137,43 @@ function SupportClientType:SaveNewGpuEnvInfo(tabNewGPUInfo)
 end
 
 --先按币种数来排，再按支持的客户端个数来排
-function SupportClientType:GetSupportCoinAndClientInfo(tabInfo) 
+function SupportClientType:GetCoinAndClientTypeCnt(tabInfo) 
 	local nCoin = 0
-	local nClient = 0
-	for index=1,#self._tabCoinType do
-		if type(tabInfo[self._tabCoinType[index]]) == "table" then
-			nCoin = nCoin+1
+	local nClient = #tabInfo
+	for ctype=1,#self._tabCoinType do
+		local strCoinType = self._tabCoinType[ctype]
+		for index=1,#tabInfo do
+			if tabInfo[index]["ctype"] == strCoinType then
+				nCoin = nCoin+1
+				break
+			end
 		end
 	end
-	nClient = #tabInfo["ClientType"]
 	return nCoin, nClient
 end
 
-function SupportClientType:ComparePlatform(tabInfo)
-	local nCoin, nClient = self:GetSupportCoinAndClientInfo(tabInfo)
+function SupportClientType:ComparePlatform(tabInfo, nPlatformId)
+	local nCoin, nClient = self:GetCoinAndClientTypeCnt(tabInfo)
 	if nCoin > self._nCoinCnt or (nCoin == self._nCoinCnt and nClient > self._nClientCnt)then
 		self._tabSupportClientInfo = tabInfo
 		self._nCoinCnt = nCoin
 		self._nClientCnt = nClient
+		self._nPlatformId = nPlatformId
 	end
 
 end
 
-function SupportClientType:InsertCoinInfoToTab(strCoinType,nClientType)
+function SupportClientType:InsertClientInfoToTab(strCoinType,nClientType)
 	if type(self._tabSupportClientInfo) ~= "table" then
 		self._tabSupportClientInfo = {}
-		self._tabSupportClientInfo["ClientType"] = {}
 	end
-	if type(self._tabSupportClientInfo[strCoinType]) ~= "table" then
-		self._tabSupportClientInfo[strCoinType] = {}
-		self._nCoinCnt = self._nCoinCnt + 1
-	end
-	self._tabSupportClientInfo[strCoinType][#self._tabSupportClientInfo[strCoinType]+1] = nClientType
-	self._tabSupportClientInfo["ClientType"][#self._tabSupportClientInfo["ClientType"]+1] = nClientType
-	self._nClientCnt = #self._tabSupportClientInfo["ClientType"]
+	self._tabSupportClientInfo[#self._tabSupportClientInfo+1] = {}
+	self._tabSupportClientInfo[#self._tabSupportClientInfo]["mtype"] = nClientType
+	self._tabSupportClientInfo[#self._tabSupportClientInfo]["ctype"] = strCoinType
+	
+	local nCoin, nClient = self:GetCoinAndClientTypeCnt(self._tabSupportClientInfo)
+	self._nCoinCnt = nCoin
+	self._nClientCnt = nClient
 end
 
 
@@ -170,62 +185,83 @@ function SupportClientType:GetMachineSupportClient()
 			if type(tabItem) == "table" 
 				and type(tabItem["memory_size"]) == "number"
 				and type(tabItem["vendor"]) == "number" then
-				local tabClientType = {}
-				tabClientType["ClientType"] = {}
+				local tabClient = {}
 				if self:IsWow64() then
 					if tabItem["memory_size"] >= 3000000000 
 						and (tabItem["vendor"] == self._VENDOR.AMD or tabItem["vendor"] == self._VENDOR.NVIDIA) 
-						and not self:CheckHasCrashed(1) then
-						tabClientType["ETC"] = {}
-						tabClientType["ETC"][#tabClientType["ETC"]+1] = 1
-						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 1
+						and not self:CheckHasCrashed(self.ClientType.ETC_NA64) then
+						tabClient[#tabClient+1] = {}
+						tabClient[#tabClient]["mtype"] = self.ClientType.ETC_NA64
+						tabClient[#tabClient]["ctype"] = "etc"
 					end
 					if tabItem["memory_size"] >= 2000000000 
 						and tabItem["vendor"] == self._VENDOR.NVIDIA 
-						and not self:CheckHasCrashed(2) then
-						tabClientType["ZCASH"] = {}
-						tabClientType["ZCASH"][#tabClientType["ZCASH"]+1] = 2
-						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 2
+						and not self:CheckHasCrashed(self.ClientType.ZCASH_N64) then
+						tabClient[#tabClient+1] = {}
+						tabClient[#tabClient]["mtype"] = self.ClientType.ZCASH_N64
+						tabClient[#tabClient]["ctype"] = "zcash"
 					end
 					if tabItem["memory_size"] >= 2000000000 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(3) then
-						--tabClientType["ZCASH"] = {}
-						--tabClientType["ZCASH"][#tabClientType["ZCASH"]+1] = 3
-						--tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 3
+						and not self:CheckHasCrashed(self.ClientType.ZCASH_A64) then
+						--tabClient[#tabClient+1] = {}
+						--tabClient[#tabClient]["mtype"] = self.ClientType.ZCASH_A64
+						--tabClient[#tabClient]["ctype"] = "zcash"
 					end
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.NVIDIA
-						and not self:CheckHasCrashed(4) then
-						tabClientType["XMR"] = {}
-						tabClientType["XMR"][#tabClientType["XMR"]+1] = 4
-						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 4
+						and not self:CheckHasCrashed(self.ClientType.XMR_N64) then
+						tabClient[#tabClient+1] = {}
+						tabClient[#tabClient]["mtype"] = self.ClientType.XMR_N64
+						tabClient[#tabClient]["ctype"] = "xmr"
 					end
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(5) then
-						tabClientType["XMR"] = {}
-						tabClientType["XMR"][#tabClientType["XMR"]+1] = 5
-						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 5
+						and not self:CheckHasCrashed(self.ClientType.XMR_A64) then
+						tabClient[#tabClient+1] = {}
+						tabClient[#tabClient]["mtype"] = self.ClientType.XMR_A64
+						tabClient[#tabClient]["ctype"] = "xmr"
 					end
 				else
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(6) then
-						tabClientType["XMR"] = {}
-						tabClientType["XMR"][#tabClientType["XMR"]+1] = 6
-						tabClientType["ClientType"][#tabClientType["ClientType"]+1] = 6
+						and not self:CheckHasCrashed(self.ClientType.XMR_A32) then						
+						tabClient[#tabClient+1] = {}
+						tabClient[#tabClient]["mtype"] = self.ClientType.XMR_A32
+						tabClient[#tabClient]["ctype"] = "xmr"
 					end
 				end	
-				tabClientType["PlatformId"] = tabItem["platformid"]
-				self:ComparePlatform(tabClientType)
+				local nPlatformId = tabItem["platformid"]
+				self:ComparePlatform(tabClient, nPlatformId)
 			end					
 		end
 	end
 	--全部加入CPU的客户端
 	--7: CPU      Share4PeerXC.exe  XMR
-	self:InsertCoinInfoToTab("XMR", 7)
+	self:InsertClientInfoToTab("xmr", self.ClientType.XMR_C32)
+	self:SortClientTable()
 	tFunctionHelper.DumpObj(self._tabSupportClientInfo, "DisplayCardInfo")
+end
+
+function SupportClientType:SortClientTable()
+	local tPriority = ServerCfg:GetLocalServerCfgData({"tPriority"})
+	if type(tPriority) ~= "table" or #tPriority < 1 then
+		return
+	end
+	local tabClientInfo = {}
+	for nPIndex=1,#tPriority do
+		local nClientType = tPriority[nPIndex]
+		for nCIndex=1,#self._tabSupportClientInfo do
+			if self._tabSupportClientInfo[nCIndex]["mtype"] == nClientType then
+				table.insert(tabClientInfo,self._tabSupportClientInfo[nCIndex])
+				break
+			end
+		end
+	end
+	self._tabSupportClientInfo = tabClientInfo
+	local nCoin, nClient = self:GetCoinAndClientTypeCnt(self._tabSupportClientInfo)
+	self._nCoinCnt = nCoin
+	self._nClientCnt = nClient
 end
 
 function SupportClientType:CheckIsDebug()
@@ -238,17 +274,16 @@ function SupportClientType:CheckIsDebug()
 end
 
 function SupportClientType:GetNextClientInfo() 
-	local nPlatformId = self._tabSupportClientInfo["PlatformId"]
-	local bDeBug,nMiningType = self:CheckIsDebug()
+	local bDeBug,nClientType = self:CheckIsDebug()
 	if not bDeBug then
-		local tabInfo = self._tabSupportClientInfo["ClientType"]
+		local tabInfo = self._tabSupportClientInfo
 		self._ClientIndex = self._ClientIndex + 1
 		if self._ClientIndex > #tabInfo then
-			self._ClientIndex = #tabInfo
+			return
 		end
-		nMiningType = tabInfo[self._ClientIndex]
+		nClientType = tabInfo[self._ClientIndex]
 	end	
-	return nPlatformId, nMiningType
+	return self._nPlatformId, nClientType
 end
 
 
