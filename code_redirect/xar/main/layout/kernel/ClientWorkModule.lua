@@ -1517,6 +1517,7 @@ function ClientWorkModule:InitMiningClient()
 		self._WorkClient = XmrClient
 	end
 	self._WorkClient.InitClient(nPlatformId, self._MiningType)
+	return true
 end
 
 

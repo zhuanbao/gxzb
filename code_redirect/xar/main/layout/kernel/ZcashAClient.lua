@@ -56,7 +56,7 @@ local g_PoolIndex = 0
 
 local g_ZcashAWorkingTimerId = nil 
 local g_ClientReTryCnt = 0 
-local g_ClientMaxReTryCnt = 3 
+local g_ClientMaxReTryCnt = 2 
 local g_LastClientOutputRightInfoTime = 0
 local g_ControlSpeedCmdLine = nil 
 

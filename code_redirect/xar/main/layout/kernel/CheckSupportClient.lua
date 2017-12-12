@@ -281,7 +281,7 @@ function SupportClientType:GetNextClientInfo()
 		if self._ClientIndex > #tabInfo then
 			return
 		end
-		nClientType = tabInfo[self._ClientIndex]
+		nClientType = tabInfo[self._ClientIndex]["mtype"]
 	end	
 	return self._nPlatformId, nClientType
 end
