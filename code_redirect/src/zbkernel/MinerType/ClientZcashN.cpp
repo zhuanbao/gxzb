@@ -237,6 +237,12 @@ void CClientZcashN::RegexString(const char *szBuffer)
 		PostErrorMsg(strBuffer.c_str(),"error: cannot connect to the pool");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect to the pool");
 	}
+	else if(boost::icontains(strBuffer,"Stratum authorization timeout") || boost::icontains(strBuffer,"Lost connection with the server"))
+	{
+		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 3);
+		PostErrorMsg(strBuffer.c_str(),"error:");
+		TSDEBUG4CXX(L"[RegexString]: " << L"Error:lost connect when running");
+	}
 	else if(boost::icontains(strBuffer,"Error: CUDA driver version is insufficient for CUDA runtime version"))
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
@@ -247,7 +253,7 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	{
 		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 99);
 		PostErrorMsg(strBuffer.c_str(),"error");
-		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
+		TSDEBUG4CXX(L"[RegexString]: " << L"Error:other");
 	}
 	//发生错误但是进程继续运行
 	
