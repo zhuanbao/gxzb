@@ -47,7 +47,7 @@ local g_MiningMode_Cur = g_MiningMode_Max
 
 local g_ConnectFailCnt = 0
 --链接矿次失败只会输出一次信息
-local g_MaxConnectFailCnt = 1
+local g_MaxConnectFailCnt = 7
 
 local g_strCmdLineFormat = nil
 local g_strAccount = nil
@@ -409,7 +409,7 @@ function OnZcashAMsg(tParam)
 		g_PreWorkState = CLIENT_STATE_EEEOR
 		g_LastClientOutputTime = tipUtil:GetCurrentUTCTime()
 		if nParam == 3 then
-			UIInterface:SetStateInfoToUser("请安装最新的显卡驱动")
+			--UIInterface:SetStateInfoToUser("请安装最新的显卡驱动")
 		end
 	end	
 end
@@ -580,12 +580,14 @@ end
 
 function ReStartClientByNextPool()
 	Quit()
-	--连接下一个矿池
-	GetNewMiningCmdInfo()
-	if Start() ~= 0 then
-		UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
-		ClientWorkModule:QuitMinerSuccess()
-		return
+	if GetNewMiningCmdInfo() then
+		if Start() ~= 0 then
+			UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
+			ClientWorkModule:QuitMinerSuccess()
+			return
+		end
+	else
+		ReTryStartClient()
 	end
 end
 

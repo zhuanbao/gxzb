@@ -536,12 +536,14 @@ end
 
 function ReStartClientByNextPool()
 	Quit()
-	--连接下一个矿池
-	GetNewMiningCmdInfo()
-	if Start() ~= 0 then
-		UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
-		ClientWorkModule:QuitMinerSuccess()
-		return
+	if GetNewMiningCmdInfo() then
+		if Start() ~= 0 then
+			UIInterface:SetStateInfoToUser("获取赚宝任务失败,请稍后再试")
+			ClientWorkModule:QuitMinerSuccess()
+			return
+		end
+	else
+		ReTryStartClient()
 	end
 end
 

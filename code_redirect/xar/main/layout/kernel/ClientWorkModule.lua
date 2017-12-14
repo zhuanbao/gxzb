@@ -1351,7 +1351,7 @@ function ClientWorkModule:TryToExecuteMiner()
 end
 
 function ClientWorkModule:OnUpdateCfgFinish(event, bUpdate)
-	TipLog("[OnUpdateCfgFinish] self._UIWorkState =" .. tostring(self._UIWorkState)))
+	TipLog("[OnUpdateCfgFinish] self._UIWorkState =" .. tostring(self._UIWorkState))
 	if self._UIWorkState == self.UI_STATE.PREPARE_POOL then
 		self:TryToExecuteMiner()
 	elseif self._UIWorkState == self.UI_STATE.CALCULATE
@@ -1486,6 +1486,7 @@ end
 
 function ClientWorkModule:StartNextClient()
 	if self:InitMiningClient() then
+		self:ResetGlobalParam()
 		self:NotifyStart()
 	else
 		self:NotifyQuit()

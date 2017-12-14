@@ -44,6 +44,8 @@ SupportClientType._tabDisplayCard = nil
 SupportClientType._ClientIndex = 0
 
 
+SupportClientType._DebugType = nil
+
 function TipLog(strLog)
 	tipUtil:Log("CheckSupportClient: " .. tostring(strLog))
 end
@@ -282,6 +284,12 @@ function SupportClientType:GetNextClientInfo()
 			return
 		end
 		nClientType = tabInfo[self._ClientIndex]["mtype"]
+	else
+		if self._DebugType ~= nClientType then
+			self._DebugType = nClientType
+		else
+			return
+		end
 	end	
 	return self._nPlatformId, nClientType
 end
