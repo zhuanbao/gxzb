@@ -524,12 +524,14 @@ function Resume()
 end
 
 function ReStartClientByNewPoolList()
+	TipLog("[ReStartClientByNewPoolList] restart")
 	Quit()
 	g_strCmdLineFormat = nil
 	g_strAccount = nil
 	g_strPool = nil
 	g_PoolIndex = 0
 	Start()
+	g_bNoPrepare = true
 end
 
 function ReStartClientByNextPool()

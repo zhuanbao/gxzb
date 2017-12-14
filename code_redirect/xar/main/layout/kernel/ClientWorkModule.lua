@@ -683,6 +683,7 @@ end
 function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 	--更新配置先
 	--然后转发消息
+	TipLog("[OnSvrPoolCfgUpdate] bUpdate = " .. tostring(bUpdate))
 	if bUpdate and tabInfo then
 		local tUserConfig = self:GetUserConfig()
 		
@@ -728,7 +729,7 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 		end
 		self:StartClient()
 	elseif GetUIWorkState() == UI_STATE_CALCULATE or GetUIWorkState() == UI_STATE_STARTING then
-		if bUpdated then
+		if bUpdate then
 			g_WorkClient.ReStartClientByNewPoolList()
 		end
 	end
@@ -1350,11 +1351,12 @@ function ClientWorkModule:TryToExecuteMiner()
 end
 
 function ClientWorkModule:OnUpdateCfgFinish(event, bUpdate)
+	TipLog("[OnUpdateCfgFinish] self._UIWorkState =" .. tostring(self._UIWorkState)))
 	if self._UIWorkState == self.UI_STATE.PREPARE_POOL then
 		self:TryToExecuteMiner()
 	elseif self._UIWorkState == self.UI_STATE.CALCULATE
 		or self._UIWorkState == self.UI_STATE.STARTING then
-		if bUpdated then
+		if bUpdate then
 			self._WorkClient.ReStartClientByNewPoolList()
 		end
 	end
