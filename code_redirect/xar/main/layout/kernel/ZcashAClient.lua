@@ -71,6 +71,8 @@ local g_ZcashADAGTimerId = nil
 local g_ZcashARealTimeIncomeTimerId = nil
 local g_ClientOutputSpeed = 0 --0H/s
 
+local g_bHasQuerySpeed = false
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -386,7 +388,8 @@ function OnZcashAMsg(tParam)
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
 			GenerateVirtualDAG()
-			if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+			if not g_bHasQuerySpeed and ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+				g_bHasQuerySpeed = true
 				ClientWorkModule:QueryClientInfo(0)
 			end	
 		else	
@@ -501,6 +504,7 @@ function ResetGlobalParam()
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
+	g_bHasQuerySpeed = false
 	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 
@@ -575,7 +579,6 @@ function ReStartClientByNewPoolList()
 	g_strPool = nil
 	g_PoolIndex = 0
 	Start()
-	g_bNoPrepare = true
 end
 
 function ReStartClientByNextPool()

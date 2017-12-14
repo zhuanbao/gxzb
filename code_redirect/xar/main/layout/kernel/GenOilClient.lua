@@ -63,6 +63,7 @@ local g_LastRealTimeIncome = 0
 local g_LastAverageHashRate = 0
 
 local g_bNoPrepare = false
+local g_bHasQuerySpeed = false
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -339,7 +340,8 @@ function OnGenOilMsg(tParam)
 		if tonumber(nParam) ~= nil and not g_bNoPrepare then
 			UIInterface:UpdateDagProgress(nParam)
 		end
-		if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+		if not g_bHasQuerySpeed and ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+			g_bHasQuerySpeed = true
 			ClientWorkModule:QueryClientInfo(0)
 		end	
 	elseif nMsgType == WP_GENOIL_SHARE then
@@ -459,6 +461,7 @@ function ResetGlobalParam()
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 	g_bNoPrepare = false
+	g_bHasQuerySpeed = false
 	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 

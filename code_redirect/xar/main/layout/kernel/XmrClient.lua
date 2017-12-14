@@ -68,6 +68,7 @@ local g_XmrRealTimeIncomeTimerId = nil
 local g_ClientOutputSpeed = 0 --0H/s
 
 local g_bNoPrepare = false
+local g_bHasQuerySpeed = false
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -389,7 +390,8 @@ function OnXmrMsg(tParam)
 				if not g_bNoPrepare then
 					GenerateVirtualDAG()
 				end	
-				if ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+				if not g_bHasQuerySpeed and ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+					g_bHasQuerySpeed = true
 					ClientWorkModule:QueryClientInfo(0)
 				end	
 			end	
@@ -497,6 +499,7 @@ function ResetGlobalParam()
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
 	g_bNoPrepare = false
+	g_bHasQuerySpeed = false
 	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
 end
 
