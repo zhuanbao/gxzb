@@ -845,8 +845,8 @@ function UIInterface:ReportAndExit()
 		tUserConfig["tWindow"]["tMain"] = tUserConfig["tWindow"]["tMain"] or {}
 		tUserConfig["tWindow"]["tMain"].nLeft = l
 		tUserConfig["tWindow"]["tMain"].nTop = t
-		tUserConfig["tWindow"]["tMain"].nWidth  = w
-		tUserConfig["tWindow"]["tMain"].nHeight = h
+		tUserConfig["tWindow"]["tMain"].nWidth  = 420
+		tUserConfig["tWindow"]["tMain"].nHeight = 652
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 	end
 	self:DestroyMainWnd()

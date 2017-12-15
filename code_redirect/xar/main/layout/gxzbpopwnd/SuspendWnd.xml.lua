@@ -17,7 +17,8 @@ function OnCreate(self)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local tSuspend = tFunctionHelper.FetchValueByPath(tUserConfig, {"tWindow", "tSuspend"})
 	if type(tSuspend) == "table" and type(tSuspend.nLeft) == "number" and type(tSuspend.nTop) == "number" and type(tSuspend.nWidth) == "number" and type(tSuspend.nHeight) == "number" then
-		self:Move(tSuspend.nLeft, tSuspend.nTop, tSuspend.nWidth, tSuspend.nHeight)
+		--写死高和宽
+		self:Move(tSuspend.nLeft, tSuspend.nTop, 154, 82)
 	else	
 		PopupInDeskRightTop(self)
 	end
@@ -462,8 +463,9 @@ function SaveWindowPos(l, t, w, h)
 	tUserConfig["tWindow"]["tSuspend"] = tUserConfig["tWindow"]["tSuspend"] or {}
 	tUserConfig["tWindow"]["tSuspend"].nLeft = l
 	tUserConfig["tWindow"]["tSuspend"].nTop = t
-	tUserConfig["tWindow"]["tSuspend"].nWidth  = w
-	tUserConfig["tWindow"]["tSuspend"].nHeight = h
+	--这里写死高和宽
+	tUserConfig["tWindow"]["tSuspend"].nWidth  = 154  
+	tUserConfig["tWindow"]["tSuspend"].nHeight = 82
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 

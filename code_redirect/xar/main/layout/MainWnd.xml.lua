@@ -68,7 +68,8 @@ function OnCreate( self )
 	 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local tMain = tFunctionHelper.FetchValueByPath(tUserConfig, {"tWindow", "tMain"})
 	if type(tMain) == "table" and type(tMain.nLeft) == "number" and type(tMain.nTop) == "number" and type(tMain.nWidth) == "number" and type(tMain.nHeight) == "number" then
-		self:Move(tMain.nLeft, tMain.nTop, tMain.nWidth, tMain.nHeight)
+		--写死高和宽
+		self:Move(tMain.nLeft, tMain.nTop, 420, 652)
 	else	
 		PopupInDeskMiddle(self)
 	end
