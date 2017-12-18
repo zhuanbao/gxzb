@@ -755,23 +755,23 @@ Function CmdSilentInstall
 	;${EndIf}
 	ReadRegStr $0 HKLM "software\Share4Money" "Path"
 	IfFileExists $0 0 StartInstall
-		${GetFileVersion} $0 $1
-		${VersionCompare} $1 ${PRODUCT_VERSION} $2
-		${If} $2 == "2" ;已安装的版本低于该版本
-			Goto StartInstall
-		${Else}
-			System::Call "kernel32::GetCommandLineA() t.R1"
-			System::Call "kernel32::GetModuleFileName(i 0, t R2R2, i 256)"
-			${WordReplace} $R1 $R2 "" +1 $R3
-			${StrFilter} "$R3" "-" "" "" $R4
-			ClearErrors
-			${GetOptions} $R4 "/write"  $R0
-			IfErrors 0 +4
-			${SendStat} "$InstallProgressName" "$Verision_Channel" "coverfail" ""
-			System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
-			Abort
-			Goto StartInstall
-		${EndIf}
+    ${GetFileVersion} $0 $1
+    ${VersionCompare} $1 ${PRODUCT_VERSION} $2
+    ${If} $2 == "2" ;已安装的版本低于该版本
+        Goto StartInstall
+    ${Else}
+        System::Call "kernel32::GetCommandLineA() t.R1"
+        System::Call "kernel32::GetModuleFileName(i 0, t R2R2, i 256)"
+        ${WordReplace} $R1 $R2 "" +1 $R3
+        ${StrFilter} "$R3" "-" "" "" $R4
+        ClearErrors
+        ${GetOptions} "$R4" "/write"  $R0
+        IfErrors 0 +4
+        ${SendStat} "$InstallProgressName" "$Verision_Channel" "coverfail" ""
+        System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
+        Abort
+        Goto StartInstall
+    ${EndIf}
 	StartInstall:
 	;发退出消息
 	Call CloseExe
