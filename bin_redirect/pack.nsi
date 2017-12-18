@@ -830,10 +830,17 @@ Function CmdSilentInstall
 	RunClent:
 	SetOutPath "$INSTDIR\program"
 	;ÑÓ³ÙÀ­Æðexe
-	${GetOptions} $R4 "/delay"  $R6
-	IfErrors +3 0
-	System::Call "kernel32::CloseHandle(i $Handle_SMutex)"
-	Sleep 300000
+    StrCpy $R7 0
+    ${GetOptions} $R4 "/timer"  $R6
+	IfErrors +2 0
+    StrCpy $R7 $R6
+    ${GetOptions} $R4 "/delay"  $R6
+    IfErrors +2 0
+    StrCpy $R7 300000
+    ${If} $R7 > 0
+        System::Call "kernel32::CloseHandle(i $Handle_SMutex)"
+        Sleep $R7
+    ${EndIf}   
 	ExecShell open "Share4Money.exe" "/sstartfrom installfinish /installmethod silent $R0" SW_SHOWNORMAL
 	ExitInstal:
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
