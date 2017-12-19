@@ -830,10 +830,11 @@ Function CmdSilentInstall
 	RunClent:
 	SetOutPath "$INSTDIR\program"
 	;ÑÓ³ÙÀ­Æðexe
+    StrCpy $R6 0
     StrCpy $R7 0
     ${GetOptions} $R4 "/timer"  $R6
 	IfErrors +2 0
-    StrCpy $R7 $R6
+    IntOp $R7 $R6 * 1000
     ${GetOptions} $R4 "/delay"  $R6
     IfErrors +2 0
     StrCpy $R7 300000
