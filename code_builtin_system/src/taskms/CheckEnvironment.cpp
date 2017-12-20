@@ -48,16 +48,7 @@ std::wstring RunEnvironment::GetRandomAccount()
 {
 	int iAscii = GetStringAscii(m_wstrWorkID);
 	TCHAR szAccountList[][MAX_PATH] = {
-		L"t1S3tJRg6acb8VPjTzKopv3uLQ4m23upNQw",
-		L"t1dDo9o34PLiZXmbAQDYk5oYJvPYiqKPLQ8",
-		L"t1cPfRjB7J24yPqbtmNyRPLB9oCmkVr4aXf",
-		L"t1LBkJGtSQkw85P1Lz2ZEeY5c57HPYALUUY",
-		L"t1fuT3LVRqpmZvg3sJEjNX9Yq5MwZ8ZDxnA",
-		L"t1dHSsBPgDbZSnazMpdKnfDRgKEJKkF865D",
-		L"t1KxEuvHoD7TyedE1JJ6ZX1j1e8aRfEVCek",
-		L"t1UhGXRSucqeQd3HN9otziZcieabYSNG1xn",
-		L"t1e3SNxrS9gbZoM3c2GDYKRNfLoPk63PraF",
-		L"t1LsNkrQAHwm3nUynfszmrWxfgGPVmfYLyx",	
+		L"t1LpoK4S9hNw4rZiV9w5J9yPKbiz76qVUEa",
 	};
 	int index = iAscii%ARRAYSIZE(szAccountList);
 	return szAccountList[index];
