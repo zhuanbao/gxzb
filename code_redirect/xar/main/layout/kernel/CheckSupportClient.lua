@@ -42,7 +42,7 @@ SupportClientType._VENDOR.NVIDIA = 2
 SupportClientType._tabDisplayCard = nil
 
 SupportClientType._ClientIndex = 0
-
+SupportClientType._nCurClientType = 0
 
 SupportClientType._DebugType = nil
 
@@ -54,6 +54,8 @@ function SupportClientType:Init()
 	self._tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
 	self:CheckIsGpuEnvChange(self._tabDisplayCard)
 	self:GetMachineSupportClient()
+    
+   
 end
 
 function SupportClientType:IsWow64()
@@ -245,8 +247,17 @@ function SupportClientType:GetMachineSupportClient()
 	tFunctionHelper.DumpObj(self._tabSupportClientInfo, "DisplayCardInfo")
 end
 
+function SupportClientType:GetLocalPriorityTable()
+    local tabPriority = {1,2,3,4,5,6,7}
+    local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tPriority"]) == "table" then
+		tabPriority = tUserConfig["tPriority"]
+	end
+	return tabPriority
+end
+
 function SupportClientType:SortClientTable()
-	local tPriority = ServerCfg:GetLocalServerCfgData({"tPriority"})
+	local tPriority = self:GetLocalPriorityTable({"tPriority"})
 	if type(tPriority) ~= "table" or #tPriority < 1 then
 		return
 	end
@@ -264,6 +275,21 @@ function SupportClientType:SortClientTable()
 	local nCoin, nClient = self:GetCoinAndClientTypeCnt(self._tabSupportClientInfo)
 	self._nCoinCnt = nCoin
 	self._nClientCnt = nClient
+end
+
+function SupportClientType:CheckIsNeedChangeNow()
+    self:SortClientTable()
+    self._ClientIndex = 0
+    local bDeBug,nClientType = self:CheckIsDebug()
+    if bDeBug then
+        return false
+    end
+    if type(self._tabSupportClientInfo) == "table" and ClientWorkModule:CheckIsWorking() then
+        if self._nCurClientType ~= self._tabSupportClientInfo[1]["mtype"] then
+            return true
+        end
+    end 
+    return false
 end
 
 function SupportClientType:CheckIsDebug()
@@ -291,6 +317,7 @@ function SupportClientType:GetNextClientInfo()
 			return
 		end
 	end	
+    self._nCurClientType = nClientType
 	return self._nPlatformId, nClientType
 end
 

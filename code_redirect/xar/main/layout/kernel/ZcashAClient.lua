@@ -505,7 +505,7 @@ function ResetGlobalParam()
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
 	g_bHasQuerySpeed = false
-	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
+	SupportClientType:ClearCrashDebugFlag(CLIENT_ZCASHA)
 end
 
 function ResetGlobalErrorParam()

@@ -500,7 +500,7 @@ function ResetGlobalParam()
 	KillVirtualDAG()
 	g_bNoPrepare = false
 	g_bHasQuerySpeed = false
-	SupportClientType:ClearCrashDebugFlag(CLIENT_GENOIL)
+	SupportClientType:ClearCrashDebugFlag(CLIENT_XMR_X_REAL)
 end
 
 function ResetGlobalErrorParam()

@@ -288,6 +288,13 @@ function RegSetValue(sPath, value)
 	return false
 end
 
+function ConvertTableStrToNum(tabStr)
+    for idx=1,#tabStr do
+        tabStr[idx] = tonumber(tabStr[idx]) or 0
+    end
+    return tabStr
+end
+
 function QueryAllUsersDir()	--获取AllUser路径
 	local bRet = false
 	local strPublicEnv = "%PUBLIC%"
@@ -1041,7 +1048,7 @@ function RegisterFunctionObject(self)
 	obj.RegQueryValue = RegQueryValue
 	obj.RegDeleteValue = RegDeleteValue
 	obj.RegSetValue = RegSetValue
-	
+	obj.ConvertTableStrToNum = ConvertTableStrToNum
 	
 	obj.QueryAllUsersDir = QueryAllUsersDir
 	obj.GetPeerID = GetPeerID

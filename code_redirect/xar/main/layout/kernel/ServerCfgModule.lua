@@ -58,11 +58,6 @@ function ServerCfg:SaveServerCfgtoLocal()
 	else
 		tUserConfig["tServerConfig"]["tRemindCfg"] = nil
 	end
-	if type(self._ServerConfig["tPriority"]) == "table" then
-		tUserConfig["tServerConfig"]["tPriority"] = self._ServerConfig["tPriority"]	
-	else
-		tUserConfig["tServerConfig"]["tPriority"] = nil
-	end
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
@@ -174,6 +169,7 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strServerPath) or {}
 		
 		self._ServerConfig = tServerConfig
+        RewardBindWX:CheckCanShowRewardEnter(self._ServerConfig)
 		--保存配置到本地
 		self:SaveServerCfgtoLocal()
 		--4小时1次提醒

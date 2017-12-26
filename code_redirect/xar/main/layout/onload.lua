@@ -48,6 +48,8 @@ local tabLuaFile = {
 "kernel\\ZcashAClient.lua",
 "kernel\\XmrClient.lua",
 "kernel\\XmrClientHelper.lua",
+
+"activity\\rewardbindweixin.lua",
 }
 LoadLuaModule(tabLuaFile, __document)
 
@@ -65,12 +67,15 @@ local ZcashAClient = XLGetGlobal("ZcashAClient")
 local XmrClient = XLGetGlobal("XmrClient")
 local XmrHelper = XLGetGlobal("XmrHelper")
 
+local RewardBindWX = XLGetGlobal("RewardBindWX")
 function InitGlobalObj()
 	local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	StatisticClient:Init()
 	--UIInterface:Init()
 	ClientWorkModule:Init()
 	SupportClientType:Init()
+    
+    RewardBindWX:Init()
 end
 InitGlobalObj()
 
@@ -113,7 +118,8 @@ function SendStartUpReport()
 				end
 				tStatInfo.fu6 = tStatInfo.fu6 .. (tabItem["vendor"] or "") .. "|"
 								.. (tabItem["name"] or "") .. "|"
-								.. (nMemSize)
+								.. (nMemSize) .. "|"
+                                .. (tabItem["version"] or "")
 			end					
 		end
 	end
@@ -215,6 +221,11 @@ function CreateMainTipWnd()
 	PopTipWnd(OnCreateFuncF)	
 end
 
+--整个UI完成之后，需要处理的地方
+function OnFinishCreateUI()
+    RewardBindWX:AddEnterListener()
+end
+
 function TipMain()	
 	CreateMainTipWnd()
 	tFunctionHelper.InitMachineName()
@@ -232,6 +243,7 @@ function TipMain()
 		TipLog("[TipMain] try to auto mining")
 		ClientWorkModule:DoAutoMining()
 	end
+    OnFinishCreateUI()
 end
 
 function PreTipMain()

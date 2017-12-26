@@ -105,6 +105,12 @@ function ResetUIVisible(OwnerCtrl)
 	--ObjBtnBegainMining:Show(false) 
 	local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
 	ObjTextLinkUnBind:Show(true)
+    
+    local objRewardFail = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Fail")
+    objRewardFail:SetVisible(false)
+    local objRewardSuccess = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Success")
+    objRewardSuccess:Show(false)
+    
 end
 
 function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
@@ -167,6 +173,10 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					tStatInfo.fu1 = "bindwx"
 					tStatInfo.fu5 = "success"
 					StatisticClient:SendEventReport(tStatInfo)
+                    
+                    if RewardBindWX:HasShowedRewardEnter() then
+                        RewardBindWX:GetBindWeiXinRewardInfo()
+                    end    
 				end	
 				bQuerying = false
 			end)

@@ -107,7 +107,7 @@ function XmrHelper:InitXmr(nMiningType, bFullSpeed, strHost, strAccount, strWork
 	if nMiningType == SupportClientType.ClientType.XMR_N64 then
 		local nMaxGpuUsage = 35
 		strExeName = "Share4PeerXN64.exe"
-		strSleep = "108"
+		strSleep = "98"
 		if bFullSpeed then
 			nMaxGpuUsage = 45
 			strSleep = "80"

@@ -224,6 +224,9 @@ function UpdateUIByBalance(self, nBalance)
 	end
 	if not CheckCanTakeCash() then
 		SetMsgToUser(self, "今天已提现，请明天再来~")
+    else
+        local ObjMsgToUser = gOwnerCtrl:GetControlObject("TakeCashPanel.Panel.MsgToUser")
+        ObjMsgToUser:SetVisible(false)
 	end
 end
 

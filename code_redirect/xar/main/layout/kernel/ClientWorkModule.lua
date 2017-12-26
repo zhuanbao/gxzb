@@ -224,6 +224,13 @@ function ClientWorkModule:QuerySvrForReportClientInfo()
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
 	end	
 	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetMachineName()))
+    
+    local strChannel = tFunctionHelper.GetInstallSrc() or ""
+    strInterfaceParam = strInterfaceParam .. "&channel=" .. Helper:UrlEncode(tostring(strChannel))
+    
+     local strVersion = tFunctionHelper.GetGXZBVersion() or ""
+    strInterfaceParam = strInterfaceParam .. "&version=" .. Helper:UrlEncode(tostring(strVersion))
+    
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
 	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
@@ -532,6 +539,7 @@ function ClientWorkModule:InitListener()
 	self:AddListener("OnQueryWorkerInfo", self.OnQueryWorkerInfo, self)
 	self:AddListener("OnQueryClientInfo", self.OnQueryClientInfo, self)
 	self:AddListener("OnFinishPrepareWorkID", self.OnFinishPrepareWorkID, self)
+    self:AddListener("OnPriorityChange", self.OnPriorityChange, self)
 end
 
 function ClientWorkModule:SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
@@ -827,6 +835,40 @@ function ClientWorkModule:GetSvrPoolCfg()
 	--]]
 end
 
+function ClientWorkModule:CheckIsPriorityChange(tabNew)
+    local tabOld = SupportClientType:GetLocalPriorityTable()
+    if type(tabNew) ~= "table" then 
+        TipLog("[CheckIsPriorityChange] tabNew is not table")
+        return false
+    end
+    if type(tabOld) ~= "table" and type(tabNew) == "table" then 
+        TipLog("[CheckIsPriorityChange] tabOld is not table, but tabNew is a table")
+        return true
+    end
+    for idx=1,#tabNew do
+        if tabNew[idx] ~= tabOld[idx] then
+            TipLog("[CheckIsPriorityChange] Priority has change")
+            return true
+        end
+    end
+    TipLog("[CheckIsPriorityChange] Priority has not change")
+    return false
+end
+
+function ClientWorkModule:UpdatePriority(tabInfo)
+    if type(tabInfo["data"]["efficiency"]) ~= "table" then
+        TipLog("[UpdatePriority] no efficiency info")
+        return
+    end
+    local tabPriorityNew = tFunctionHelper.ConvertTableStrToNum(tabInfo["data"]["efficiency"])
+	if self:CheckIsPriorityChange(tabPriorityNew) then
+        local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+        tUserConfig["tPriority"] = tabPriorityNew
+        tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+        self:DispatchEvent("OnPriorityChange")
+    end
+end
+
 --二维码绑定
 function ClientWorkModule:OnBindResultCallback(event, bSuccess, tabInfo, fnCallBack)
 	fnCallBack(bSuccess, tabInfo)
@@ -1053,6 +1095,7 @@ end
 function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 	if bSuccess then
 		self:UpdateSvrPoolCfg(tabInfo)
+        self:UpdatePriority(tabInfo)
 		if tabInfo["data"]["status"] ~= 1 then
 			if self:CheckIsBinded() then
 				self:UnBindingClientFromServer()
@@ -1403,6 +1446,14 @@ function ClientWorkModule:OnFinishPrepareWorkID(event, bSuccess)
 	self:ResetReconnectCnt()
 end
 
+
+function ClientWorkModule:OnPriorityChange(event)  
+    if SupportClientType:CheckIsNeedChangeNow() then
+        self._WorkClient.Quit()
+        self:StartNextClient()
+    end
+end
+
 function ClientWorkModule:NotifyStart()
 	self._UIWorkState = self.UI_STATE.STARTING
 	UIInterface:OnStart()
@@ -1487,7 +1538,12 @@ end
 function ClientWorkModule:StartNextClient()
 	if self:InitMiningClient() then
 		self:ResetGlobalParam()
-		self:NotifyStart()
+		--self:NotifyStart()
+        self._UIWorkState = self.UI_STATE.PREPARE_WORKID
+        local function fnCallBack(bSuccess)
+            self:DispatchEvent("OnFinishPrepareWorkID", bSuccess)
+        end
+        self:GetUserWorkID(fnCallBack)
 	else
 		self:NotifyQuit()
 		UIInterface:SetStateInfoToUser("赚宝进程运行失败")

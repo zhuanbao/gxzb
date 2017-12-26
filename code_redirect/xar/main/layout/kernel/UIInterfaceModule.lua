@@ -272,7 +272,7 @@ function UIInterface:PopRemindUpdateWnd()
 	local nLocalCnt = tFunctionHelper.FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nCnt"}) or 0
 	local nLocaLastUtc = tFunctionHelper.FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nLastUTC"}) or 0
 	local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
-	local strNewVersion = tonumber(ServerCfg:GetServerCfgData({"tNewVersionInfo", "strVersion"})) or "1.0.0.1"
+	local strNewVersion = ServerCfg:GetServerCfgData({"tNewVersionInfo", "strVersion"}) or "1.0.0.1"
 	TipLog("PopRemindUpdateWnd strVersion="..tostring(strVersion)
 		.."\n strNewVersion="..tostring(strNewVersion)
 		.."\n nLocalCnt="..tostring(nLocalCnt)
@@ -861,3 +861,4 @@ function UIInterface:ReportAndExit()
 	
 	StatisticClient:SendEventReport(tStatInfo)
 end
+

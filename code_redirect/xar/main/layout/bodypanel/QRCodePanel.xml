@@ -322,6 +322,36 @@
 								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickUnBindWeiXin" />
 							</eventlist>
 						</obj>
+                        <obj id="QRCodePanel.Panel.Reward.Fail" class="TextObject">
+							<attr>
+								<left>(father.width-300)/2</left>
+								<top>424</top>
+								<width>300</width>
+								<height>16</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>FF0000</textcolor>
+								<font>font.text13</font>
+								<text>您已经领取过该福利，一个微信ID仅能领取一次</text>
+								<visible>false</visible>
+							</attr>
+						</obj>
+                        <obj id="QRCodePanel.Panel.Reward.Success" class="TextLinkEx">
+							<attr>
+								<left>(father.width-360)/2</left>
+								<top>424</top>
+								<width>360</width>
+								<height>16</height>
+								<HAlign>center</HAlign>
+								<VAlign>center</VAlign>
+								<Text>您已经成功获得9999元宝！您已满足提现条件，立即体验</Text>
+								<Font>font.yahei13.underline</Font>
+								<TextColor>FF0000</TextColor>
+								<TextHoverColor>FF0000</TextHoverColor>
+                                <Underline>false</Underline>
+								<Show>false</Show>
+							</attr>
+						</obj>
 					</children>
 				</obj>
 			</children>
