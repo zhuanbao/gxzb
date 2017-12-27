@@ -258,6 +258,7 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 
 		ZeroMemory(&pi, sizeof(pi));
 		TSDEBUG4CXX(L"strCmdLine = "<< bstrParams.m_str); 
+		::SetErrorMode(::SetErrorMode(0)|SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX|SEM_NOGPFAULTERRORBOX|SEM_NOALIGNMENTFAULTEXCEPT);
 		if(!CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
 		{
 			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
