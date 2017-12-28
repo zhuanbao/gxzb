@@ -611,7 +611,7 @@ end
 
 function UIInterface:OnUserChangePanel()
 	if not ClientWorkModule:CheckIsBinded() then
-		return
+		--return
 	end
 	ClientWorkModule:QueryWorkerInfo()
 end
