@@ -223,7 +223,7 @@ function UpdateUIByBalance(self, nBalance)
 		ObjEdit:SetText("可提现"..tostring(gCanTakeMoney).."元")
 	end
 	if not CheckCanTakeCash() then
-		SetMsgToUser(self, "今天已提现，请明天再来~")
+		SetMsgToUser("今天已提现，请明天再来~")
     else
         local ObjMsgToUser = gOwnerCtrl:GetControlObject("TakeCashPanel.Panel.MsgToUser")
         ObjMsgToUser:SetVisible(false)
