@@ -260,7 +260,7 @@ function OnClickBindWeiXin(self)
 end
 
 function OnClickFAQ(self)
-	Helper.tipUtil:OpenURL("http://www.eastredm.com/#Faq")
+	Helper.tipUtil:OpenURL("http://www.share4money.cn/#Faq")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "openfaq"
 	StatisticClient:SendClickReport(tStatInfo)
