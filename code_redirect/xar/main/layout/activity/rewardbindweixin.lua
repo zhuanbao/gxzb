@@ -129,7 +129,6 @@ end
 
 function RewardBindWX:GetBindWeiXinRewardInfo()
 	local strUrl = self:QuerySvrForRewardInfo()
-    strUrl = ClientWorkModule:QuerySvrForReportClientInfo()
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[GetRewardInfo] strUrl = " .. strUrl)
 	
