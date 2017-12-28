@@ -109,7 +109,8 @@ function ClientWorkModule:GetHeartbeatInterval()
 end
 
 function ClientWorkModule:CheckMachineBindState()
-	if self:CheckIsBinded() then
+    local tUserConfig = self:GetUserConfig()
+	if type(tUserConfig["tUserInfo"]) == "table" and IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
 		self:QueryWorkerInfo()
 	end
 end
