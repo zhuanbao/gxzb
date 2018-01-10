@@ -353,6 +353,10 @@ function OnGenOilMsg(tParam)
 		if nParam == 0 then
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
+            if not g_bHasQuerySpeed then
+                g_bHasQuerySpeed = true
+                ClientWorkModule:QueryClientInfo(0)
+            end	
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
 			if g_ConnectFailCnt > g_MaxConnectFailCnt then
