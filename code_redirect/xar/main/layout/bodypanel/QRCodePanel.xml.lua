@@ -63,7 +63,7 @@ function AutoJumpToPanel(OwnerCtrl)
 		strPanle = "TakeCashPanel"
 		strInfo = "秒后开始提现"
 	end
-	local nTotalTime = 3
+	local nTotalTime = 5
 	local strText = nTotalTime .. strInfo
 	textActiveTime:SetText(strText)
 	textActiveTime:SetVisible(true)
