@@ -25,7 +25,7 @@ function GetSubTable()
 			["nHolds"] = 15,
 		},
         ["tRBindPID"] = {"1","2","3","4","5","6","7","9"},
-        ["strActivity"] = "http://conf.eastredm.com/static/activity",
+        ["strActivity"] = "http://conf.eastredm.com/static/activity.dat",
 		["tExtraHelper"] = {
 			
 		},
