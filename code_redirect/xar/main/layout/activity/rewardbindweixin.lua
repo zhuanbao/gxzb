@@ -194,6 +194,11 @@ function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
             ObjResultBkg:SetVisible(true)
             return
         end
+        local nBalance = tabInfo["data"]["balance"]
+        if type(nBalance) == "number" then
+            ClientWorkModule:SetUserCurrentBalance(nBalance)
+            UIInterface:UpdateUserBalance()
+        end    
         if type(self._tabContent) == "table" 
             and type(self._tabContent["tScanText"] == "table")
             and IsRealString(self._tabContent["tScanText"][3]) then
