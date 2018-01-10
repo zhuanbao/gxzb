@@ -169,7 +169,7 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strServerPath) or {}
 		
 		self._ServerConfig = tServerConfig
-        RewardBindWX:CheckCanShowRewardEnter(self._ServerConfig)
+        Activity:TryToGetServerActivity(self._ServerConfig["strActivity"])
 		--保存配置到本地
 		self:SaveServerCfgtoLocal()
 		--4小时1次提醒

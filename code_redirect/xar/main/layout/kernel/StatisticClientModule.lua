@@ -21,6 +21,8 @@ StatisticClient._nCpuUsagePrecent = 0
 StatisticClient._nMemoryLoadPrecent = 0
 StatisticClient._nGpuUsagePrecent = 0
 
+StatisticClient._tabSendOnceTable = {}
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -153,6 +155,7 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 				     .. "&fu8=" .. (MakeMaxParamLen(tStat.fu8) or "")
 				     .. "&fu9=" .. (MakeMaxParamLen(tStat.fu9) or "")
 					 .. "&fu10=" .. ParamEncode(strWorkID or "")
+                     .. "&fu11=" .. (MakeMaxParamLen(tStat.fu11) or "")
 	local strParam = ClientWorkModule:MakeInterfaceMd5(strApiInterface, strInterfaceParam)
 	local strStatisticUrl = self:FormatRequestUrl(strParam)
 	strStatisticUrl = strStatisticUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
@@ -222,6 +225,7 @@ function StatisticClient:SendRunTimeReport(strState)
 	if tStatInfo.fu5 == "working" then
 		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
 		tStatInfo.fu7 = ClientWorkModule:GetRealMiningType()
+        tStatInfo.fu11 = ClientWorkModule:GetClientLastAverageHashRate() .. "_" .. tostring(UIInterface:GetCurrentWorkModel() or 1)
 	end
 	--[[
 	local tabMemoryInfo = tipUtil:GetMemoryStatus()
@@ -295,4 +299,16 @@ function StatisticClient:RestartClient(strRestartCmd)
 	end
 	tipUtil:ShellExecute(0, "open", strExePath, strRestartCmd, 0, "SW_SHOWNORMAL")
 	tipUtil:Exit("Exit")
+end
+
+function StatisticClient:SendOnceReport(strType,strName, fnStat)
+    if type(self._tabSendOnceTable[strType]) ~= "table" then
+        self._tabSendOnceTable[strType] = {}
+        self._tabSendOnceTable[strType][strName] = true
+        fnStat()
+    end
+    if not self._tabSendOnceTable[strType][strName] then
+        self._tabSendOnceTable[strType][strName] = true
+        fnStat()
+    end
 end

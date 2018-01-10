@@ -310,6 +310,10 @@ function QueryAllUsersDir()	--获取AllUser路径
 end
 
 function GetPeerID()
+    local strDebugPeerID = RegQueryValue("HKEY_CURRENT_USER\\Software\\Share4Money\\PeerId")
+    if IsRealString(strDebugPeerID) then
+        return strDebugPeerID
+    end
 	local strPeerID = RegQueryValue("HKEY_LOCAL_MACHINE\\Software\\Share4Money\\PeerId")
 	local strDecryptPeerID = tipUtil:DecryptString(strPeerID,"RpXVQTFlU7NaeMcV")
 	if IsRealString(strDecryptPeerID) then

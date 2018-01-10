@@ -103,13 +103,22 @@ function ResetUIVisible(OwnerCtrl)
 	textActiveTime:SetVisible(false)
 	--local ObjBtnBegainMining= OwnerCtrl:GetControlObject("QRCodePanel.Panel.BegainMining")
 	--ObjBtnBegainMining:Show(false) 
-	local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
-	ObjTextLinkUnBind:Show(true)
+
+    local ObjDescBkg = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Desc.Bkg")
+    local ObjDescText = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Desc.Text")
+    ObjDescBkg:SetVisible(true)
+    ObjDescText:SetVisible(true)
     
-    local objRewardFail = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Fail")
-    objRewardFail:SetVisible(false)
-    local objRewardSuccess = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Success")
-    objRewardSuccess:Show(false)
+    local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
+    if Helper:IsRealString(ObjDescText:GetText())then
+        ObjTextLinkUnBind:Show(false)
+    else
+        ObjTextLinkUnBind:Show(true)
+    end
+    local objResultBkg = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Result.Bkg")
+    local objResultText = OwnerCtrl:GetControlObject("QRCodePanel.Panel.Reward.Result.Text")
+    objResultBkg:SetVisible(false)
+    objResultText:SetVisible(false)
     
 end
 
@@ -174,7 +183,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					tStatInfo.fu5 = "success"
 					StatisticClient:SendEventReport(tStatInfo)
                     
-                    if RewardBindWX:HasShowedRewardEnter() then
+                    if RewardBindWX and RewardBindWX:HasShowedRewardEnter() then
                         RewardBindWX:GetBindWeiXinRewardInfo()
                     end    
 				end	
@@ -265,7 +274,7 @@ function OnVisibleChange(self, bVisible)
 	--]]
 end
 --如果上一个二维码的有效期超过30秒 则继续用
-function GetGetQRCode(self)
+function GetQRCode(self)
 	if gLastQRCodeBitmap ~= nil 
 		and type(gLastTabInfo) == "table" 
 		and type(gLastTabInfo["data"]) == "table"
@@ -283,14 +292,12 @@ function OnShowPanel(self, bShow)
 	gBinding = bShow
 	if bShow then
 		ResetUIVisible(self)
-		GetGetQRCode(self)
+		GetQRCode(self)
 	else
 		ResetGlobalParam()
 		ResetUIVisible(self)
 	end
 end
-
-
 
 
 

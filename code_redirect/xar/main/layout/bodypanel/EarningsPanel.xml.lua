@@ -340,6 +340,9 @@ function OnClickHourBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
+    attr.Data = {}
+    attr.Data["reqFailed"] = true
+    barobj:Update()
 	ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet
@@ -358,6 +361,9 @@ function OnClickDayBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
+    attr.Data = {}
+    attr.Data["reqFailed"] = true
+    barobj:Update()
 	ClientWorkModule:GetHistoryToServer("d30", function(bRet, tabInfo)
 		attr.Data = tabInfo
 		attr.Data["reqFailed"] = not bRet

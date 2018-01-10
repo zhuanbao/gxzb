@@ -1,0 +1,11 @@
+﻿<XLUE>
+	<resource>
+		<!--绑定奖励活动-->
+		<bitmap id="GXZB.Activity.BindReward.Icon1" path="activity\GXZB.Activity.BindReward.Icon1.png"/>
+		<bitmap id="GXZB.Activity.BindReward.Icon2" path="activity\GXZB.Activity.BindReward.Icon2.png"/>
+        <bitmap id="GXZB.Activity.BindReward.Recv1" path="activity\GXZB.Activity.BindReward.Recv1.png"/>
+        <bitmap id="GXZB.Activity.BindReward.Recv2" path="activity\GXZB.Activity.BindReward.Recv2.png"/>
+        <bitmap id="GXZB.Activity.BindReward.Result" path="activity\GXZB.Activity.BindReward.Result.png"/>
+		
+	</resource>
+</XLUE>

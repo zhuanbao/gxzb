@@ -17,6 +17,7 @@
 			
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 			<SetStateInfoToUser file="MiningPanel.xml.lua" func="SetStateInfoToUser"/>
+            <ShowBindWeiXin file="MiningPanel.xml.lua" func="ShowBindWeiXin"/>
 		</method_def>
 		<event_def>
 			
@@ -222,9 +223,9 @@
 						</obj>
 						<obj id="MiningPanel.Panel.State" class="TextObject">
 							<attr>
-								<left>(father.width-210)/2</left>
+								<left>(father.width-370)/2</left>
 								<top>376+42</top>
-								<width>210</width>
+								<width>370</width>
 								<height>24</height>
 								<valign>center</valign>
 								<halign>center</halign>
@@ -234,25 +235,50 @@
 								<visible>0</visible>
 							</attr>
 						</obj>
-						<obj id="MiningPanel.Panel.BindWeiXin" class="TextLinkEx">
+                        <obj id="MiningPanel.Panel.BindWeiXin" class="LayoutObject">
 							<attr>
-								<left>(father.width-200)/2</left>
-								<top>376+42</top>
-								<width>200</width>
-								<height>24</height>
-								<HAlign>center</HAlign>
-								<VAlign>center</VAlign>
-								<Text>点这里扫微信提人民币</Text>
-								<Font>font.yahei13.underline</Font>
-								<TextColor>AF8656</TextColor>
-								<TextHoverColor>AF8656</TextHoverColor>
-								<Underline>false</Underline>
-								<Show>false</Show>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
 							</attr>
-							<eventlist>
-								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickBindWeiXin" />
-							</eventlist>
-						</obj>
+                            <children>
+                                <obj id="MiningPanel.Panel.BindWeiXin.Icon" class="ImageObject">
+                                    <attr>
+                                        <left>10</left>
+                                        <top>376+42-2</top>
+                                        <width>28</width>
+                                        <height>28</height>
+                                        <image></image>
+                                        <valign>center</valign>
+                                        <halign>center</halign>
+                                        <zorder>50</zorder>
+                                        <drawmode>1</drawmode>
+                                        <antialias>2</antialias>
+                                        <visible>0</visible>
+                                    </attr>
+                                </obj>
+                                <obj id="MiningPanel.Panel.BindWeiXin.Text" class="TextLinkEx">
+                                    <attr>
+                                        <left>(father.width-374)/2</left>
+                                        <top>376+42</top>
+                                        <width>374</width>
+                                        <height>24</height>
+                                        <HAlign>center</HAlign>
+                                        <VAlign>center</VAlign>
+                                        <Text>点这里扫微信提人民币</Text>
+                                        <Font>font.yahei13.underline</Font>
+                                        <TextColor>AF8656</TextColor>
+                                        <TextHoverColor>AF8656</TextHoverColor>
+                                        <Underline>false</Underline>
+                                        <Show>false</Show>
+                                    </attr>
+                                    <eventlist>
+                                        <event name="OnClick" file="MiningPanel.xml.lua" func="OnClickBindWeiXin" />
+                                    </eventlist>
+                                </obj>
+                            </children>
+                        </obj>
 					</children>
 				</obj>
 			</children>

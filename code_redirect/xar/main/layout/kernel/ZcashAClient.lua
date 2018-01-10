@@ -388,7 +388,7 @@ function OnZcashAMsg(tParam)
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
 			GenerateVirtualDAG()
-			if not g_bHasQuerySpeed and ClientWorkModule:GetSvrAverageMiningSpeed() == 0 then
+			if not g_bHasQuerySpeed then
 				g_bHasQuerySpeed = true
 				ClientWorkModule:QueryClientInfo(0)
 			end	
@@ -478,7 +478,7 @@ function StartZcashATimer()
 		if g_PreWorkState == CLIENT_STATE_EEEOR and  nCurrentTime - g_LastClientOutputRightInfoTime > 30 then
 			TipLog("[StartZcashATimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
-		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 100 then
+		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 3*60 then
 			TipLog("[StartZcashATimer] output time out, try to restart")
 			ReTryStartClient()
 		end
@@ -488,7 +488,7 @@ end
 
 function ResetGlobalParam()
 	g_PreWorkState = nil
-	g_MiningSpeedPerHour = 0
+	--g_MiningSpeedPerHour = 0
 	if g_ZcashAWorkingTimerId then
 		timeMgr:KillTimer(g_ZcashAWorkingTimerId)
 		g_ZcashAWorkingTimerId = nil
@@ -500,7 +500,7 @@ function ResetGlobalParam()
 		timeMgr:KillTimer(g_ZcashARealTimeIncomeTimerId)
 		g_ZcashARealTimeIncomeTimerId = nil
 	end
-	g_LastAverageHashRate = 0
+	--g_LastAverageHashRate = 0
 	--进程范围内 只有更新余额的时候 才清0
 	--g_LastRealTimeIncome = 0
 	KillVirtualDAG()
@@ -528,6 +528,9 @@ function Start()
 	end
 	local strDir = tFunctionHelper.GetModuleDir()
 	local strWorkExe = tipUtil:PathCombine(strDir, CLIENT_PATH)
+    if not tipUtil:QueryFileExists(strWorkExe) then
+        return 2
+    end
 	local strCmdLine = "\"" .. strWorkExe .. "\"" .. " " .. strPoolCmd
 	--控制台输出代理
 	local strCoutAgent = tipUtil:PathCombine(strDir, COUTAGENT_PATH)
@@ -622,6 +625,14 @@ function GetAverageHashRate()
 	return nAverageHashRate
 end
 
+function GetLastAverageHashRate()
+    local nRate = g_LastAverageHashRate
+	if g_LastAverageHashRate == 0 and g_HashRateSumCounter > 0 then
+		nRate = g_HashRateSum/g_HashRateSumCounter
+	end	 
+    return nRate
+end
+
 function GetCurrentClientWorkState()
 	return g_PreWorkState
 end
@@ -670,6 +681,7 @@ function RegisterFunctionObject(self)
 	obj.Resume = Resume
 	obj.ReStartClientByNewPoolList = ReStartClientByNewPoolList
 	obj.GetAverageHashRate = GetAverageHashRate
+    obj.GetLastAverageHashRate = GetLastAverageHashRate
 	obj.GetCurrentClientWorkState = GetCurrentClientWorkState
 	obj.GetCurrentMiningSpeed = GetCurrentMiningSpeed
 	obj.GetCurrentAccount = GetCurrentAccount

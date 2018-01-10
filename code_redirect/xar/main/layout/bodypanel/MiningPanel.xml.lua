@@ -15,11 +15,13 @@ function ChangeBindEntryVisible(OwnerCtrl)
 	if Helper:IsRealString(ObjTextState:GetText()) then
 		return
 	end
-	local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")
+	--local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")
 	if not ClientWorkModule:CheckIsBinded() then
-		ObjBindWeiXinEntry:Show(true)
+		--ObjBindWeiXinEntry:Show(true)
+        ShowBindWeiXin(OwnerCtrl, true)
 	else
-		ObjBindWeiXinEntry:Show(false)
+		--ObjBindWeiXinEntry:Show(false)
+        ShowBindWeiXin(OwnerCtrl, false)
 	end
 end
 
@@ -393,8 +395,9 @@ end
 function SetStateInfoToUser(self, strInfo)
 	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
 	if strInfo ~= nil then
-		local ObjBindWeiXinEntry = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
-		ObjBindWeiXinEntry:Show(false)
+		--local ObjBindWeiXinEntry = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+		--ObjBindWeiXinEntry:Show(false)
+        ShowBindWeiXin(self, false)
 		ObjTextState:SetText(strInfo)
 		ObjTextState:SetVisible(true)
 	else
@@ -404,8 +407,46 @@ function SetStateInfoToUser(self, strInfo)
 	end
 end
 
+function AdjustBindWeiXinPosition(self)
+    local nAdjustLen = 0
+    local ObjBind = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+    local ObjBindText = self:GetControlObject("MiningPanel.Panel.BindWeiXin.Text")
+    local ObjBindIcon = self:GetControlObject("MiningPanel.Panel.BindWeiXin.Icon")
+    
+    local nFLeft, nFTop, nFRight, nFBottom = ObjBind:GetObjPos()
+    local nFWidth = nFRight - nFLeft
+    
+    local nTLeft, nTTop, nTRight, nTBottom = ObjBindText:GetObjPos()
+    
+    local nILeft, nITop, nIRight, nIBottom = ObjBindIcon:GetObjPos()
+    local nIWidth = nIRight - nILeft
+     
+    local nTextLen = ObjBindText:GetTextExtent()
+    local nTotalLen = nTextLen
+    
+    local strIconID = ObjBindIcon:GetResID()
+    if Helper:IsRealString(strIconID) then
+        local nGap = 2
+        nTotalLen = nTotalLen+nIWidth+nGap
+        ObjBindIcon:SetObjPos((nFWidth-nTotalLen)/2, nITop, (nFWidth-nTotalLen)/2+nIWidth, nIBottom) 
+        nAdjustLen = nIWidth+nGap
+    end
+    ObjBindText:SetObjPos((nFWidth-nTotalLen)/2+nAdjustLen, nTTop, (nFWidth-nTotalLen)/2+nAdjustLen+nTextLen, nTBottom) 
+end
 
-
+function ShowBindWeiXin(self,bShow)
+    local ObjBindText = self:GetControlObject("MiningPanel.Panel.BindWeiXin.Text")
+    ObjBindText:Show(bShow)
+    
+    local ObjBindIcon = self:GetControlObject("MiningPanel.Panel.BindWeiXin.Icon")
+    local strIconID = ObjBindIcon:GetResID()
+    if bShow and Helper:IsRealString(strIconID) then
+        ObjBindIcon:SetVisible(true)
+    else
+        ObjBindIcon:SetVisible(false)
+    end
+    AdjustBindWeiXinPosition(self)
+end
 
 
 

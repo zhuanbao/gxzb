@@ -393,6 +393,13 @@ function ClientWorkModule:GetClientMiningSpeed()
 	return self._WorkClient.GetCurrentMiningSpeed()
 end
 
+function ClientWorkModule:GetClientLastAverageHashRate()
+	if self._WorkClient == nil then
+		return 0
+	end
+	return self._WorkClient.GetLastAverageHashRate()
+end
+
 function ClientWorkModule:GetUIWorkState()
 	return self._UIWorkState
 end
@@ -579,11 +586,11 @@ end
 function ClientWorkModule:SendUnBindInfoToServer()
 	--self:AddListener("OnUnBindCallBack", OnUnBindCallBack)
 	local strUrl = self:GetUnBindUrl()
-	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
-	if not IsRealString(strUrl) then
+    if not IsRealString(strUrl) then
 		self:DispatchEvent("OnUnBindCallBack", false)
 		return
-	end
+	end 
+	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	local function fnCallback(bRet, tabInfo)	
 		self:DispatchEvent("OnUnBindCallBack", bRet, tabInfo)
 	end
@@ -1388,6 +1395,9 @@ function ClientWorkModule:TryToExecuteMiner()
 		if nRet == 1 then
 			self:NotifyPause()
 			UIInterface:SetStateInfoToUser("连接赚宝服务器失败,请重试")
+        elseif nRet == 2 then
+            self:NotifyPause()
+			UIInterface:SetStateInfoToUser("可执行文件不存在，可能被杀毒软件误杀，请添加信任")
 		end	
 		return
 	end

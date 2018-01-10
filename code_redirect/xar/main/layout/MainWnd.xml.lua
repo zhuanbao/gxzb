@@ -39,7 +39,13 @@ function OnShowWindow(self, bShow)
 			TryPopAutoRunTip()
 		end	
 		gTipStartTime = tipUtil:GetCurrentUTCTime()
-	end
+        
+        StatisticClient:SendOnceReport("event", "showmainwnd", function()
+            local tStatInfo = {}
+		    tStatInfo.fu1 = "showmainwnd"
+            StatisticClient:SendEventReport(tStatInfo)
+        end)
+    end   
 end
 
 

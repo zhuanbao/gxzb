@@ -294,7 +294,7 @@
 							<attr>
 								<left>10</left>
 								<top>346</top>
-								<width>father.width - 10</width>
+								<width>father.width - 10*2</width>
 								<height>16</height>
 								<valign>center</valign>
 								<halign>center</halign>
@@ -322,35 +322,83 @@
 								<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickUnBindWeiXin" />
 							</eventlist>
 						</obj>
-                        <obj id="QRCodePanel.Panel.Reward.Fail" class="TextObject">
+                        <obj id="QRCodePanel.Panel.Reward.Desc" class="LayoutObject">
 							<attr>
-								<left>(father.width-300)/2</left>
-								<top>424</top>
-								<width>300</width>
-								<height>16</height>
-								<valign>center</valign>
-								<halign>center</halign>
-								<textcolor>FF0000</textcolor>
-								<font>font.text13</font>
-								<text>您已经领取过该福利，一个微信ID仅能领取一次</text>
-								<visible>false</visible>
+								<left>(father.width-317)/2</left>
+								<top>379</top>
+								<width>317</width>
+								<height>70</height>
 							</attr>
+                            <children>
+                                 <obj id="QRCodePanel.Panel.Reward.Desc.Bkg" class="ImageObject">
+                                    <attr>
+                                        <left>0</left>
+                                        <top>0</top>
+                                        <width>father.width</width>
+                                        <height>father.height</height>
+                                        <image></image>
+                                        <valign>center</valign>
+                                        <halign>center</halign>
+                                        <antialias>2</antialias>
+                                        <visible>false</visible>
+                                        <cursor>IDC_HAND</cursor>
+                                    </attr>
+                                </obj>
+                                <obj id="QRCodePanel.Panel.Reward.Desc.Text" class="TextObject">
+                                    <attr>
+                                        <left>0</left>
+                                        <top>36</top>
+                                        <width>father.width</width>
+                                        <height>32</height>
+                                        <valign>center</valign>
+                                        <halign>center</halign>
+                                        <textcolor>AF8656</textcolor>
+                                        <font>font.text13</font>
+                                        <text></text>
+                                        <visible>false</visible>
+                                        <cursor>IDC_HAND</cursor>
+                                    </attr>
+                                </obj>
+                            </children>
 						</obj>
-                        <obj id="QRCodePanel.Panel.Reward.Success" class="TextLinkEx">
+                        <obj id="QRCodePanel.Panel.Reward.Result" class="LayoutObject">
 							<attr>
-								<left>(father.width-360)/2</left>
-								<top>424</top>
-								<width>360</width>
-								<height>16</height>
-								<HAlign>center</HAlign>
-								<VAlign>center</VAlign>
-								<Text>您已经成功获得9999元宝！您已满足提现条件，立即体验</Text>
-								<Font>font.yahei13.underline</Font>
-								<TextColor>FF0000</TextColor>
-								<TextHoverColor>FF0000</TextHoverColor>
-                                <Underline>false</Underline>
-								<Show>false</Show>
+								<left>(father.width-317)/2</left>
+								<top>379</top>
+								<width>317</width>
+								<height>70</height>
 							</attr>
+                            <children>
+                                 <obj id="QRCodePanel.Panel.Reward.Result.Bkg" class="ImageObject">
+                                    <attr>
+                                        <left>0</left>
+                                        <top>0</top>
+                                        <width>father.width</width>
+                                        <height>father.height</height>
+                                        <image></image>
+                                        <valign>center</valign>
+                                        <halign>center</halign>
+                                        <antialias>2</antialias>
+                                        <visible>false</visible>
+                                    </attr>
+                                </obj>
+                                <obj id="QRCodePanel.Panel.Reward.Result.Text" class="TextObject">
+                                    <attr>
+                                        <left>(father.width-280)/2</left>
+                                        <top>0</top>
+                                        <width>280</width>
+                                        <height>father.height</height>
+                                        <valign>center</valign>
+                                        <halign>center</halign>
+                                        <textcolor>AF8656</textcolor>
+                                        <font>font.text13</font>
+                                        <text></text>
+                                        <visible>false</visible>
+                                        <multiline>1</multiline>
+                                        <zorder>100</zorder>
+                                    </attr>
+                                </obj>
+                            </children>
 						</obj>
 					</children>
 				</obj>
