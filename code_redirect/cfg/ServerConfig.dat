@@ -1,19 +1,19 @@
 function GetSubTable()
 	local t = {
 		["tNewVersionInfo"] = {
-			["strVersion"] = "1.0.0.100",
-			["strContent"] = "1、修改了XX\n2、优化了xx\n3、see more",
-			["strPacketURL"] = "http://xmp.down.sandai.net/xmp/xmppushersetup_2.0.0.87.sbear",
-			["strMD5"] = "5D36F5356AF87DC5EE6D93C156143BE5",
+            ["strVersion"] = "1.0.0.38",
+			["strContent"] = "1、bug修复\n2、性能优化",
+			["strPacketURL"] = "http://down.eastredm.com/download/Share4MoneySetup_0003.exe",
+			["strMD5"] = "3D1544B77E0BCFF7D1B49E3FF3C9B4D9",
 			["tRemindUpdate"] = {
 				["nCnt"] = 1, 
 				["nSpanSec"] = 86400*1,  
 			},
 			["tForceUpdate"] = {
-				["strVersion"] = "1.0.0.17",
-				["tVersion"] = {"1-18"},
-				["strPacketURL"] = "http://xmp.down.sandai.net/xmp/xmppushersetup_2.0.0.87.sbear",
-				["strMD5"] = "5D36F5356AF87DC5EE6D93C156143BE5",
+				["strVersion"] = "1.0.0.38",
+				["tVersion"] = {"1-37"},
+				["strPacketURL"] = "http://down.eastredm.com/download/Share4MoneySetup_0003.exe",
+				["strMD5"] = "3D1544B77E0BCFF7D1B49E3FF3C9B4D9",
 			},
 		},
 		["tServerInterfaceCfg"] = {
@@ -24,13 +24,11 @@ function GetSubTable()
 			["nPopIntervals"] = 4*60*60,
 			["nHolds"] = 15,
 		},
+        ["tRBindPID"] = {"1","2","3","4","5","6","7","9"},
+        ["strActivity"] = "http://conf.eastredm.com/static/active.dat",
 		["tExtraHelper"] = {
 			
 		},
-		["tReportInfo"] = {
-			["strOnlinePID"] = "1234",
-			["nOnlineInterval"] = "60*10",
-		},
-	}	
+	}
 	return t
 end

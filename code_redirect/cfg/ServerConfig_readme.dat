@@ -1,0 +1,36 @@
+function GetSubTable()
+	local t = {
+		["tNewVersionInfo"] = {
+			["strVersion"] = "1.0.0.100",
+			["strContent"] = "1、修改了XX\n2、优化了xx\n3、see more",
+			["strPacketURL"] = "http://xmp.down.sandai.net/xmp/xmppushersetup_2.0.0.87.sbear",
+			["strMD5"] = "5D36F5356AF87DC5EE6D93C156143BE5",
+			["tRemindUpdate"] = {
+				["nCnt"] = 1, 
+				["nSpanSec"] = 86400*1,  
+			},
+			["tForceUpdate"] = {
+				["strVersion"] = "1.0.0.17",
+				["tVersion"] = {"1-18"},
+				["strPacketURL"] = "http://xmp.down.sandai.net/xmp/xmppushersetup_2.0.0.87.sbear",
+				["strMD5"] = "5D36F5356AF87DC5EE6D93C156143BE5",
+			},
+		},
+		["tServerInterfaceCfg"] = {
+			["nQueryBindInterval"] = 5,
+			["nReportCalcInterval"] = 60,
+		},
+		["tRemindCfg"] = {
+			["nPopIntervals"] = 4*60*60,
+			["nHolds"] = 15,
+		},
+		["tExtraHelper"] = {
+			
+		},
+		["tReportInfo"] = {
+			["strOnlinePID"] = "1234",
+			["nOnlineInterval"] = "60*10",
+		},
+	}	
+	return t
+end
