@@ -807,7 +807,7 @@ function UIInterface:UnBindFail()
 	tStatInfo.fu5 = "fail"
 	StatisticClient:SendEventReport(tStatInfo)
 	
-	local wnd = GetMainHostWnd()
+	local wnd = self:GetMainHostWnd()
 	if not wnd then
 		return
 	end
