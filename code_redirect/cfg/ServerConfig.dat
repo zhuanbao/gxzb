@@ -1,19 +1,19 @@
 function GetSubTable()
 	local t = {
 		["tNewVersionInfo"] = {
-            ["strVersion"] = "1.0.0.38",
+            ["strVersion"] = "1.0.0.42",
 			["strContent"] = "1、bug修复\n2、性能优化",
 			["strPacketURL"] = "http://down.eastredm.com/download/Share4MoneySetup_0003.exe",
-			["strMD5"] = "3D1544B77E0BCFF7D1B49E3FF3C9B4D9",
+			["strMD5"] = "D82926F376770DD31111611E9CD1377B",
 			["tRemindUpdate"] = {
 				["nCnt"] = 1, 
 				["nSpanSec"] = 86400*1,  
 			},
 			["tForceUpdate"] = {
-				["strVersion"] = "1.0.0.38",
-				["tVersion"] = {"1-37"},
+				["strVersion"] = "1.0.0.42",
+				["tVersion"] = {"1-41"},
 				["strPacketURL"] = "http://down.eastredm.com/download/Share4MoneySetup_0003.exe",
-				["strMD5"] = "3D1544B77E0BCFF7D1B49E3FF3C9B4D9",
+				["strMD5"] = "D82926F376770DD31111611E9CD1377B",
 			},
 		},
 		["tServerInterfaceCfg"] = {
