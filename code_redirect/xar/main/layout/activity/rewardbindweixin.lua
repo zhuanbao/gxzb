@@ -30,7 +30,7 @@ function TipLog(strLog)
 end
 
 function RewardBindWX:Init()
-	self:InitListener()
+
 end
 
 function RewardBindWX:InitListener()
@@ -208,6 +208,7 @@ function RewardBindWX:CheckCanShowRewardEnter(tabInfo)
     if type(tabContent) ~= "table" then
         return
     end
+    self:InitListener()
     self._tabCond = tabContent
     self._tabContent = tabReward
     self._bShouldReward = true
@@ -216,6 +217,9 @@ function RewardBindWX:CheckCanShowRewardEnter(tabInfo)
 end
 
 function RewardBindWX:CycleShowBindEnter()
+    if not self._bShouldReward then
+        return
+    end
     local nCycleTime = self._tabCond["nCycleTime"] or 10
     if self._CycleTimerId then
 		timeMgr:KillTimer(self._CycleTimerId)
