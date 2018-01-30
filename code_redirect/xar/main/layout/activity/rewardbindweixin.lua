@@ -12,6 +12,8 @@ XLSetGlobal("RewardBindWX", RewardBindWX)
 RewardBindWX._bShouldReward = false
 RewardBindWX._tabContent = {}
 
+RewardBindWX._nBindIdx = nil
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -33,19 +35,26 @@ end
 
 function RewardBindWX:InitListener()
 	self:AddListener("OnRewardInfo", self.OnRewardInfo, self)
+    self:AddListener("OnShowQRCode", self.OnShowQRCode, self)
 end
 
 function RewardBindWX:UpdateQrCodePanel()
+    if not self._bShouldReward then
+        return
+    end
+    local tBindInfo = self._tabContent["tDescInfo"]["tBindText"][self._nBindIdx]
+    local nScanTextIdx = tBindInfo[3]
+    local tabScanText = self._tabContent["tDescInfo"]["tScanText"][nScanTextIdx]
+    
 	local ObjDescBkg = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Bkg")
     local ObjDescText = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Text")
     local ObjUnbind = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.UnBind")
-    local nType = self._tabContent["nType"]
+    local nType = tBindInfo[2]
     if type(nType) == "number" and nType > 0 then
         local strRecvId = "GXZB.Activity.BindReward.Recv" .. tostring(nType)
         ObjDescBkg:SetResID(strRecvId)
         ObjDescBkg:SetVisible(true)
     end
-    local tabScanText = self._tabContent["tScanText"]
     if type(tabScanText) == "table" then
         if IsRealString(tabScanText[1]) then
             ObjDescText:SetText(tabScanText[1])
@@ -54,20 +63,32 @@ function RewardBindWX:UpdateQrCodePanel()
             
         end
         if IsRealString(tabScanText[2]) then
-            ObjDescBkg:AttachListener("OnLButtonUp", false, function()
+            if self._dwCookie_DescBkg_OnLButtonUp then
+                ObjDescBkg:RemoveListener("OnLButtonUp", self._dwCookie_DescBkg_OnLButtonUp)
+            end
+            self._dwCookie_DescBkg_OnLButtonUp = ObjDescBkg:AttachListener("OnLButtonUp", false, function()
                                                     ObjDescText:SetText(tabScanText[2])
                                                     local tStatInfo = {}
                                                     tStatInfo.fu1 = "qrcodereward"
                                                     tStatInfo.fu5 = "redpacket"
+                                                    tStatInfo.fu6 = self._nBindIdx
                                                     StatisticClient:SendClickReport(tStatInfo)
                                                 end)
-            ObjDescText:AttachListener("OnLButtonUp", false, function()
+            if self._dwCookie_DescText_OnLButtonUp then
+                ObjDescText:RemoveListener("OnLButtonUp", self._dwCookie_DescText_OnLButtonUp)
+            end
+            self._dwCookie_DescText_OnLButtonUp = ObjDescText:AttachListener("OnLButtonUp", false, function()
                                                     ObjDescText:SetText(tabScanText[2])
+                                                    local tStatInfo = {}
                                                     tStatInfo.fu1 = "qrcodereward"
                                                     tStatInfo.fu5 = "redpacket"
+                                                    tStatInfo.fu6 = self._nBindIdx
                                                     StatisticClient:SendClickReport(tStatInfo)
                                                 end)
-            ObjDescText:AttachListener("OnVisibleChange", false, function(Obj, bVisible)
+            if self._dwCookie_DescText_OnVisibleChange then
+                ObjDescText:RemoveListener("OnLButtonUp", self._dwCookie_DescText_OnVisibleChange)
+            end
+            self._dwCookie_DescText_OnVisibleChange = ObjDescText:AttachListener("OnVisibleChange", false, function(Obj, bVisible)
                                                     if bVisible then
                                                         ObjDescText:SetText(tabScanText[1])
                                                     end 
@@ -77,6 +98,14 @@ function RewardBindWX:UpdateQrCodePanel()
 end
 
 function RewardBindWX:UpdateBindWeixinEntry()
+    if not self._bShouldReward then
+        return
+    end
+    local tBindInfo = self._tabContent["tDescInfo"]["tBindText"][self._nBindIdx]
+    local strEntryText = tBindInfo[1]
+    local nType = tBindInfo[2]
+    local nScanTextIdx = tBindInfo[3]
+    local tabScanText = self._tabContent["tDescInfo"]["tScanText"][nScanTextIdx]
 	local wnd = UIInterface:GetMainHostWnd()
 	if not wnd then
 		return
@@ -89,15 +118,26 @@ function RewardBindWX:UpdateBindWeixinEntry()
     local ObjBindText = ObjMiningPanel:GetControlObject("MiningPanel.Panel.BindWeiXin.Text")
     local ObjBindIcon = ObjMiningPanel:GetControlObject("MiningPanel.Panel.BindWeiXin.Icon")
     
-    ObjBindText:SetText(self._tabContent["strBindText"])
-    local nType = self._tabContent["nType"]
+    ObjBindText:SetText(strEntryText)
     if type(nType) == "number" and nType > 0 then
         local strIconId = "GXZB.Activity.BindReward.Icon" .. tostring(nType)
         ObjBindIcon:SetResID(strIconId)
+    else
+        ObjBindIcon:SetResID("")
     end
     if not ClientWorkModule:CheckIsBinded() then
         ObjBindIcon:SetVisible(true)
         ObjMiningPanel:ShowBindWeiXin(true)
+        if self._dwCookie_BindEntry_OnClick then
+            ObjBindText:RemoveListener("OnClick", self._dwCookie_BindEntry_OnClick)
+        end    
+        self._dwCookie_BindEntry_OnClick = ObjBindText:AttachListener("OnClick", false, function()
+                                                    local tStatInfo = {}
+                                                    tStatInfo.fu1 = "bindentry"
+                                                    tStatInfo.fu5 = "redpacket"
+                                                    tStatInfo.fu6 = self._nBindIdx
+                                                    StatisticClient:SendClickReport(tStatInfo)
+                                                end)
     end    
 end
 
@@ -116,18 +156,51 @@ function RewardBindWX:RestoreBindWeixinEntry()
     ObjBindWeiXinEntry:SetTextHoverColorID("AF8656")
 end
 
+function RewardBindWX:RandSort()
+    local tabRand = {}
+    local nCnt = #self._tabCond["tShow"]
+    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,6)))
+    for Idx=1, nCnt do
+        local index = math.random(1,#self._tabCond["tShow"]) 
+        local nValue = self._tabCond["tShow"][index]
+        table.remove(self._tabCond["tShow"],index)
+        tabRand[Idx] = nValue
+    end
+    self._tabCond["tShow"] = tabRand
+    tFunctionHelper.DumpObj(self._tabCond["tShow"], "tShow")
+end
+
+function RewardBindWX:CheckCondition(tabInfo)
+    local nUtc = tFunctionHelper.GetCurrentServerTime()
+    local nBeginTime = tonumber(tabInfo["nBeginTime"]) or 0
+    local nEndTime = tonumber(tabInfo["nEndTime"]) or 9999999999
+    if nUtc < nBeginTime or nUtc > nEndTime then
+        return false
+    end
+    if not tFunctionHelper.CheckPeerIDList(tabInfo["tPID"]) then
+        return false
+    end
+    if type(tabInfo["tShow"]) ~= "table" or #tabInfo["tShow"] < 1 then
+        return false
+    end
+    return true
+end
+
 function RewardBindWX:CheckCanShowRewardEnter(tabInfo)
     local tabReward = tabInfo["tRBindCfg"]
-    if type(tabReward) ~= "table" and type(tabReward["tInfo"]) ~= "table" then
+    if type(tabReward) ~= "table" 
+        or type(tabReward["tCondition"]) ~= "table" 
+        or type(tabReward["tDescInfo"]) ~= "table" 
+        or type(tabReward["tDescInfo"]["tBindText"]) ~= "table" 
+        or type(tabReward["tDescInfo"]["tScanText"]) ~= "table" then
         return
     end
     local tabContent = nil
-    local tabData = tabReward["tInfo"]
-    for Idx=1,#tabData do
-        local tabItem = tabData[Idx]
+    local tabCondition = tabReward["tCondition"]
+    for Idx=1,#tabCondition do
+        local tabItem = tabCondition[Idx]
         if type(tabItem) == "table"
-            and IsRealString(tabItem["strBindText"])
-            and tFunctionHelper.CheckPeerIDList(tabItem["tPID"]) then
+            and self:CheckCondition(tabItem) then
             tabContent = tabItem
             break
         end
@@ -135,10 +208,41 @@ function RewardBindWX:CheckCanShowRewardEnter(tabInfo)
     if type(tabContent) ~= "table" then
         return
     end
-    self._tabContent = tabContent
+    self._tabCond = tabContent
+    self._tabContent = tabReward
     self._bShouldReward = true
+    self:RandSort()
+    self:CycleShowBindEnter()
+end
+
+function RewardBindWX:CycleShowBindEnter()
+    local nCycleTime = self._tabCond["nCycleTime"] or 10
+    if self._CycleTimerId then
+		timeMgr:KillTimer(self._CycleTimerId)
+		self._CycleTimerId = nil
+	end
+    local nIdx = self._nBindIdx or 1 
+    self._nBindIdx = self._tabCond["tShow"][nIdx]
     self:UpdateBindWeixinEntry()
     self:UpdateQrCodePanel()
+    if self._bShowQRCode then
+        return
+    end
+    self._CycleTimerId = timeMgr:SetTimer(function(Itm, id)
+        if ClientWorkModule:CheckIsBinded() then
+            if self._CycleTimerId then
+                timeMgr:KillTimer(self._CycleTimerId)
+                self._CycleTimerId = nil
+            end
+        end    
+        nIdx = nIdx + 1
+        if nIdx > #self._tabCond["tShow"] then
+            nIdx = 1
+        end
+        self._nBindIdx = self._tabCond["tShow"][nIdx]
+        self:UpdateBindWeixinEntry()
+        self:UpdateQrCodePanel()
+	end, nCycleTime*1000)
 end
 
 function RewardBindWX:HasShowedRewardEnter()
@@ -176,6 +280,10 @@ function RewardBindWX:GetBindWeiXinRewardInfo()
 end
 
 function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
+    local tBindInfo = self._tabContent["tDescInfo"]["tBindText"][self._nBindIdx]
+    local nScanTextIdx = tBindInfo[3]
+    local tabScanText = self._tabContent["tDescInfo"]["tScanText"][nScanTextIdx]
+    
     local ObjDescBkg = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Bkg")
     local ObjDescText = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Text")
     ObjDescBkg:SetVisible(false)
@@ -199,20 +307,23 @@ function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
             ClientWorkModule:SetUserCurrentBalance(nBalance)
             UIInterface:UpdateUserBalance()
         end    
-        if type(self._tabContent) == "table" 
-            and type(self._tabContent["tScanText"] == "table")
-            and IsRealString(self._tabContent["tScanText"][3]) then
+        if type(tabScanText) == "table" 
+            and IsRealString(tabScanText[3]) then
             ObjResultText:SetCursorID("IDC_HAND")
             ObjResultText:SetTextFontResID("font.text13.underline")
-            ObjResultText:SetText(self._tabContent["tScanText"][3])
+            ObjResultText:SetText(tabScanText[3])
             ObjResultText:SetVisible(true)
             ObjResultBkg:SetResID("GXZB.Activity.BindReward.Result")
             ObjResultBkg:SetVisible(true)
-            ObjResultText:AttachListener("OnLButtonUp", false, function()
+            if self._dwCookie_ResultText_OnLButtonUp then
+                ObjResultText:RemoveListener("OnLButtonUp", self._dwCookie_ResultText_OnLButtonUp)
+            end
+            self._dwCookie_ResultText_OnLButtonUp = ObjResultText:AttachListener("OnLButtonUp", false, function()
                                             UIInterface:ChangeMainBodyPanel("TakeCashPanel")
                                             local tStatInfo = {}
                                             tStatInfo.fu1 = "qrcodereward"
                                             tStatInfo.fu5 = "takecash"
+                                            tStatInfo.fu6 = self._nBindIdx
                                             StatisticClient:SendClickReport(tStatInfo)
                                         end)
         end
@@ -240,5 +351,16 @@ function RewardBindWX:GetQrCodePanleObjectByID(strObjID)
     return ObjCtrl
 end
 
-
+function RewardBindWX:OnShowQRCode(event, bShow)
+    if bShow then
+        self._bShowQRCode = true
+        if self._CycleTimerId then
+            timeMgr:KillTimer(self._CycleTimerId)
+            self._CycleTimerId = nil
+        end
+    else
+        self._bShowQRCode = false
+        self:CycleShowBindEnter()
+    end
+end
 

@@ -227,10 +227,14 @@ function ClientWorkModule:QuerySvrForReportClientInfo()
 	strInterfaceParam = strInterfaceParam .. "&workerName=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetMachineName()))
     
     local strChannel = tFunctionHelper.GetInstallSrc() or ""
-    strInterfaceParam = strInterfaceParam .. "&channel=" .. Helper:UrlEncode(tostring(strChannel))
+    if IsRealString(strChannel) then
+        strInterfaceParam = strInterfaceParam .. "&channel=" .. Helper:UrlEncode(tostring(strChannel))
+    end    
     
-     local strVersion = tFunctionHelper.GetGXZBVersion() or ""
-    strInterfaceParam = strInterfaceParam .. "&version=" .. Helper:UrlEncode(tostring(strVersion))
+    local strVersion = tFunctionHelper.GetGXZBVersion() or ""
+    if IsRealString(strVersion) then
+        strInterfaceParam = strInterfaceParam .. "&version=" .. Helper:UrlEncode(tostring(strVersion))
+    end
     
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)

@@ -78,12 +78,30 @@ function Activity:OnGetServerActivity(event, strPath)
     RewardBindWX:CheckCanShowRewardEnter(tActivityCfg)
 end
 
-function Activity:TryToGetServerActivity(strActivityUrl)
+function Activity:TryToGetServerActivity(tabActivity)
+    if type(tabActivity) ~= "table" or #tabActivity < 0 then
+        return
+    end
+    local tabActInfo = nil
+    for Idx=1,#tabActivity do
+        local tabItem = tabActivity[Idx]
+        if type(tabItem) == "table" 
+            and tFunctionHelper.CheckForceVersion(tabItem["tVersion"]) 
+            and IsRealString(tabItem["strUrl"]) then
+            tabActInfo = tabItem
+            break
+        end
+    end
+    if tabActInfo == nil then
+        return
+    end
+    strActivityUrl = tabActInfo["strUrl"]
 	local function fnDownLoadCallBack(strActivityPath)
 		self:DispatchEvent("OnGetServerActivity", strActivityPath)
 	end
+    
 	self:AddListener("OnGetServerActivity", self.OnGetServerActivity, self)
-
+    
     local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(strActivityUrl)
     local strSaveDir = tipUtil:GetSystemTempPath()
 	local strSavePath = tipUtil:PathCombine(strSaveDir, strFileName)

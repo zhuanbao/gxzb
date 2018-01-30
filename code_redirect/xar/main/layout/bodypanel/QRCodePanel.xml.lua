@@ -297,6 +297,9 @@ function OnShowPanel(self, bShow)
 		ResetGlobalParam()
 		ResetUIVisible(self)
 	end
+    if RewardBindWX then
+        RewardBindWX:DispatchEvent("OnShowQRCode", bShow)
+    end
 end
 
 
