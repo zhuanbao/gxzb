@@ -224,7 +224,7 @@
 						<obj id="MiningPanel.Panel.State" class="TextObject">
 							<attr>
 								<left>(father.width-370)/2</left>
-								<top>376+42</top>
+								<top>376+42+10-24</top>
 								<width>370</width>
 								<height>24</height>
 								<valign>center</valign>
@@ -238,7 +238,7 @@
                         <obj id="MiningPanel.Panel.BindWeiXin" class="LayoutObject">
 							<attr>
 								<left>0</left>
-								<top>0</top>
+								<top>12</top>
 								<width>father.width</width>
 								<height>father.height</height>
 							</attr>
