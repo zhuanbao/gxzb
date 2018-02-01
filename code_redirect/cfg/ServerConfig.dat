@@ -26,6 +26,12 @@ function GetSubTable()
 		},
         ["tRBindPID"] = {"1","2","3","4","5","6","7","9"},
         ["strActivity"] = "http://conf.eastredm.com/static/activity.dat",
+        ["tActivity"] = {
+            [1] = {
+                ["tVersion"] = {"44"},
+                ["strUrl"] = "http://conf.eastredm.com/static/activity_v1.2",
+            },
+        },
 		["tExtraHelper"] = {
 			
 		},
