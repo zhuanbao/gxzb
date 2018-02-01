@@ -29,7 +29,7 @@ function GetSubTable()
         ["tActivity"] = {
             [1] = {
                 ["tVersion"] = {"44"},
-                ["strUrl"] = "http://conf.eastredm.com/static/activity_v1.2",
+                ["strUrl"] = "http://conf.eastredm.com/static/activity_v1.2.dat",
             },
         },
 		["tExtraHelper"] = {
