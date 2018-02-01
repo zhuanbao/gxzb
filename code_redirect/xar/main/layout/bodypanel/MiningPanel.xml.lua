@@ -3,6 +3,7 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local objGraphicFac = XLGetObject("Xunlei.XLGraphic.Factory.Object")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local g_UnBindFailTimerId = nil
+local g_bShowBindEntry = false
 
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
@@ -11,11 +12,6 @@ function TipLog(strLog)
 end
 
 function ChangeBindEntryVisible(OwnerCtrl)
-	local ObjTextState = OwnerCtrl:GetControlObject("MiningPanel.Panel.State")
-	if Helper:IsRealString(ObjTextState:GetText()) then
-		return
-	end
-	--local ObjBindWeiXinEntry = OwnerCtrl:GetControlObject("MiningPanel.Panel.BindWeiXin")
 	if not ClientWorkModule:CheckIsBinded() then
 		--ObjBindWeiXinEntry:Show(true)
         ShowBindWeiXin(OwnerCtrl, true)
@@ -34,21 +30,11 @@ function UpdateClientUnBindState(self)
 end
 
 function UpdateClientUnBindFailState(self)
-	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
-	if ObjTextState:GetVisible() then
-		return
-	end
-	ChangeBindEntryVisible(self)
-	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
-	local strPreText = ObjTextState:GetText()
-	ObjTextState:SetText("解除绑定失败，请稍后重试！")
-	ObjTextState:SetVisible(true)
+    SetStateInfoToUser(self, "解除绑定失败，请稍后重试！")
 	g_UnBindFailTimerId = timeMgr:SetTimer(function(Itm, id)
 		timeMgr:KillTimer(g_UnBindFailTimerId)
 		g_UnBindFailTimerId = nil
-		ObjTextState:SetVisible(false)
-		ObjTextState:SetText(strPreText or "")
-		ChangeBindEntryVisible(self)
+		SetStateInfoToUser(self, nil)
 	end,3*1000)
 end
 
@@ -384,27 +370,23 @@ function OnShowPanel(self, bShow)
 		AdjustSpeedTextPosition(self)
 		ChangeBindEntryVisible(self)
 	else
-		local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
-		ObjTextState:SetText("")
-		ObjTextState:SetVisible(false)
 		ChangeBindEntryVisible(self)
+        SetStateInfoToUser(self, nil)
 	end
 end
 
 
 function SetStateInfoToUser(self, strInfo)
-	local ObjTextState = self:GetControlObject("MiningPanel.Panel.State")
-	if strInfo ~= nil then
-		--local ObjBindWeiXinEntry = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
-		--ObjBindWeiXinEntry:Show(false)
-        ShowBindWeiXin(self, false)
-		ObjTextState:SetText(strInfo)
-		ObjTextState:SetVisible(true)
+    local ObjState = self:GetControlObject("MiningPanel.Panel.State")
+    local ObjBindWeixin = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+	if strInfo ~= nil and g_bShowBindEntry then
+        ObjBindWeixin:SetObjPos2("(father.width-370)/2", 376+40-10, 370, 28)
+        ObjState:SetObjPos2("(father.width-370)/2", 376+42+15, 370, 24)
 	else
-		ObjTextState:SetText("")
-		ObjTextState:SetVisible(false)
-		ChangeBindEntryVisible(self)
+        ObjState:SetObjPos2("(father.width-370)/2", 376+42, 370, 24)
+        ObjBindWeixin:SetObjPos2("(father.width-370)/2", 376+40, 370, 28)
 	end
+    ObjState:SetText(strInfo or "")
 end
 
 function AdjustBindWeiXinPosition(self)
@@ -415,7 +397,6 @@ function AdjustBindWeiXinPosition(self)
     
     local nFLeft, nFTop, nFRight, nFBottom = ObjBind:GetObjPos()
     local nFWidth = nFRight - nFLeft
-    
     local nTLeft, nTTop, nTRight, nTBottom = ObjBindText:GetObjPos()
     
     local nILeft, nITop, nIRight, nIBottom = ObjBindIcon:GetObjPos()
@@ -423,7 +404,6 @@ function AdjustBindWeiXinPosition(self)
      
     local nTextLen = ObjBindText:GetTextExtent()
     local nTotalLen = nTextLen
-    
     local strIconID = ObjBindIcon:GetResID()
     if Helper:IsRealString(strIconID) then
         local nGap = 2
@@ -431,10 +411,20 @@ function AdjustBindWeiXinPosition(self)
         ObjBindIcon:SetObjPos((nFWidth-nTotalLen)/2, nITop, (nFWidth-nTotalLen)/2+nIWidth, nIBottom) 
         nAdjustLen = nIWidth+nGap
     end
-    ObjBindText:SetObjPos((nFWidth-nTotalLen)/2+nAdjustLen, nTTop, (nFWidth-nTotalLen)/2+nAdjustLen+nTextLen, nTBottom) 
+    ObjBindText:SetObjPos((nFWidth-nTotalLen)/2+nAdjustLen, nTTop, (nFWidth-nTotalLen)/2+nAdjustLen+nTextLen+1, nTBottom) 
 end
 
 function ShowBindWeiXin(self,bShow)
+    g_bShowBindEntry = bShow
+    local ObjState = self:GetControlObject("MiningPanel.Panel.State")
+    local ObjBindWeixin = self:GetControlObject("MiningPanel.Panel.BindWeiXin")
+    if bShow and Helper:IsRealString(ObjState:GetText()) then
+        ObjBindWeixin:SetObjPos2("(father.width-370)/2", 376+40-10, 370, 28)
+        ObjState:SetObjPos2("(father.width-370)/2", 376+42+15, 370, 24)
+    else
+        ObjBindWeixin:SetObjPos2("(father.width-370)/2", 376+40, 370, 28)
+        ObjState:SetObjPos2("(father.width-370)/2", 376+42, 370, 24)
+    end
     local ObjBindText = self:GetControlObject("MiningPanel.Panel.BindWeiXin.Text")
     ObjBindText:Show(bShow)
     
