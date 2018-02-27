@@ -247,6 +247,13 @@ void CClientXmr::RegexString(const char *szBuffer)
 		PostErrorMsg(strBuffer.c_str(),"dns error: unknown node or service");
 		TSDEBUG4CXX(L"[RegexString]: " << L"unknown node or service");
 	}
+	//connect error: "connection timed out"
+	if (boost::icontains(strBuffer,"connect error: \"connection timed out\""))
+	{
+		PostWndMsg(WP_XMR_CONNECT_POOL, 2);
+		PostErrorMsg(strBuffer.c_str(),"connect error: connection timed out");
+		TSDEBUG4CXX(L"[RegexString]: " << L"connection timed out");
+	}
 	return;
 }
 

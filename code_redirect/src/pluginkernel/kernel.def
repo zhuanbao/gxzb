@@ -1,0 +1,6 @@
+LIBRARY	"pluginkernel"
+
+EXPORTS
+InitXLUE
+UnInitXLUE
+InitMsgWnd

@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,46
- PRODUCTVERSION 1,0,0,46
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -62,7 +62,7 @@ VS_VERSION_INFO VERSIONINFO
  FILEFLAGS 0x0L
 #endif
  FILEOS 0x4L
- FILETYPE 0x2L
+ FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
@@ -70,12 +70,13 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "深圳开心豆豆科技有限公司"
-            VALUE "FileDescription", "zbsetuphelper Module"
-            VALUE "FileVersion", "1, 0, 0, 46"
-            VALUE "InternalName", "zbsetuphelper"
+            VALUE "FileDescription", "SharePlugin Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "SharePlugin"
             VALUE "LegalCopyright", "Copyright (c) 2016-2018 深圳开心豆豆科技有限公司"
-            VALUE "OriginalFilename", "zbsetuphelper.dll"
-            VALUE "ProductVersion", "1, 0, 0, 46"
+            VALUE "OriginalFilename", "SharePlugin.exe"
+            VALUE "ProductName", "共享赚宝"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -84,6 +85,15 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "..\\res\\mainexe.ico"
 #endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 
