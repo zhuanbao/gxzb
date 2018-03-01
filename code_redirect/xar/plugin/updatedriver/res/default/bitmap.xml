@@ -1,0 +1,23 @@
+<XLUE>
+	<resource>
+		<texture id="SharePlugin.MainWnd.Bkg" type="NineInOne" image="bitmap\SharePlugin.MainWnd.Bkg.png" />
+		<bitmap id="SharePlugin.Caption.Logo" path="bitmap\SharePlugin.Caption.Logo.png" />
+		<bitmap id="SharePlugin.Img.Logo" path="bitmap\SharePlugin.Img.Logo.png" />
+		<imagelist id="SharePlugin.Btn.Cancel" vertical="0" varyblock="1" splitter="1" image="bitmap\SharePlugin.Btn.Cancel.png"/>
+			<texture id="SharePlugin.Btn.Cancel.normal" type="ThreeInOneH" imagelist="SharePlugin.Btn.Cancel" index="1" />
+			<texture id="SharePlugin.Btn.Cancel.hover" type="ThreeInOneH" imagelist="SharePlugin.Btn.Cancel" index="2" />
+			<texture id="SharePlugin.Btn.Cancel.down" type="ThreeInOneH" imagelist="SharePlugin.Btn.Cancel" index="3" />
+		<imagelist id="SharePlugin.Btn.Confirm" vertical="0" varyblock="1" splitter="1" image="bitmap\SharePlugin.Btn.Confirm.png"/>
+			<texture id="SharePlugin.Btn.Confirm.normal" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="1" />
+			<texture id="SharePlugin.Btn.Confirm.hover" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="2" />
+			<texture id="SharePlugin.Btn.Confirm.down" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="3" />
+		
+		<texture id="SharePlugin.Update.ProgressBar" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProgressBar.png" />
+		<texture id="SharePlugin.Update.ProgressBkg" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProgressBkg.png" />	
+		
+		<texture id="SharePlugin.Caption.Close" image="bitmap\SharePlugin.Caption.Close.png" />
+		<texture id="SharePlugin.Caption.Min" image="bitmap\SharePlugin.Caption.Min.png" />
+		<bitmap id="SharePlugin.Caption.BtnHoverImg" path="bitmap\SharePlugin.Caption.BtnHoverImg.png" />
+
+	</resource>
+</XLUE>

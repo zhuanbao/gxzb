@@ -1,0 +1,14 @@
+<XLUE>
+	<resource>
+		<color id="system.black" red="0" green="0" blue="0" alpha="255" />
+		<color id="system.gray" red="204" green="211" blue="214" alpha="255"/>
+		<color id="system.blue" red="0" green="0" blue="255" alpha="255" />
+		<color id="system.white" red="255" green="255" blue="255" alpha="255" />
+		<color id="system.red" red="255" green="0" blue="0" alpha="255" />
+		<color id="transparent.mask" red="0" green="0" blue="0" alpha="100" />
+		
+		<color id="6D5539" value="#6D5539"/>
+		<color id="B08756" value="#B08756"/>
+		<color id="317FFF" value="#317FFF"/>
+	</resource>
+</XLUE>

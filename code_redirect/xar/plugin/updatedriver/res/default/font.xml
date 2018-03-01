@@ -1,0 +1,9 @@
+﻿<XLUE>
+	<resource>
+		<font id="default.font" height="12" facename="defaultfont" /> 
+		<font id="font.text12" height="12" facename="defaultfont" />
+		<font id="font.text13" height="13" facename="defaultfont" /> 
+		<font id="font.text16" height="16" facename="defaultfont" />
+		<font id="font.text20" height="20" facename="defaultfont" />
+	</resource>
+</XLUE>
