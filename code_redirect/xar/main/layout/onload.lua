@@ -36,6 +36,7 @@ local tabLuaFile = {
 "luacode\\helper_token.lua",
 "kernel\\utility.lua",
 "kernel\\CheckSupportClient.lua",
+"kernel\\ProfitMaxModule.lua",
 
 "menu\\SuspendMenu.lua",
 "menu\\SettingMenu.lua",
@@ -56,6 +57,7 @@ LoadLuaModule(tabLuaFile, __document)
 local Helper = XLGetGlobal("Helper")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local SupportClientType = XLGetGlobal("SupportClientType")
+local ProfitMax = XLGetGlobal("ProfitMax")
 
 local ServerCfg = XLGetGlobal("ServerCfg")
 local StatisticClient = XLGetGlobal("StatisticClient")
@@ -73,6 +75,7 @@ function InitGlobalObj()
 	--UIInterface:Init()
 	ClientWorkModule:Init()
 	SupportClientType:Init()
+	ProfitMax:Init()
 end
 InitGlobalObj()
 

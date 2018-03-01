@@ -218,6 +218,15 @@ UIInterface._tabErrorMsg = nil
 UIInterface._bShowUpdateDriveWnd = false
 
 --弹出窗体
+
+function UIInterface:ShowMaxSpeedWnd()
+	local objHostWnd = self:GetMainHostWnd()
+	local objMaxSpeedWnd = hostwndManager:GetHostWnd("GXZB.MaxSpeedDriveWnd.ModalInstance")
+	if objMaxSpeedWnd == nil then
+		Helper:CreateModalWnd("GXZB.MaxSpeedDriveWnd", "GXZB.MaxSpeedDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+	end
+end
+
 function UIInterface:ShowUpdateDriveWnd()
 	if not self._bShowUpdateDriveWnd then
 		return false

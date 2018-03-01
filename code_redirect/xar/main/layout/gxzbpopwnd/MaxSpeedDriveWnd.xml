@@ -1,0 +1,155 @@
+<xlue>
+	<objtreetemplate id="GXZB.MaxSpeedDriveWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>520</width>
+			<height>298</height>
+		</attr>
+		<obj id="root" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>520</width>
+				<height>298</height>
+				<texture>msgbox.bkg</texture>
+			</attr>	
+			<children>
+				<obj id="MaxSpeedDriveWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
+					</attr>
+					<children>
+						<obj id="MaxSpeedDriveWnd.Caption.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
+								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
+								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
+								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MaxSpeedDriveWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if not hoverimage then
+										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
+										self:AddChild(hoverimage)
+										hoverimage:SetObjPos(-5, -9, 20, -6)
+										hoverimage:SetResID("GXZB.Title.Hoverimage")
+									end
+									hoverimage:SetVisible(true)
+								</event>
+								<event name="OnMouseLeave">
+									local self = ...
+									local hoverimage = self:GetObject("hoverimage")
+									if hoverimage then
+										hoverimage:SetVisible(false)
+									end
+								</event>
+							</eventlist>	
+						</obj>
+						<obj id="MaxSpeedDriveWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
+						<obj id="MaxSpeedDriveWnd.Title" class="TextObject">
+							<attr>
+								<left>32</left>
+								<top>8</top>
+								<width>100</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
+								<text>共享赚宝提示</text>
+							</attr>
+						</obj>
+						<obj id="MaxSpeedDriveWnd.Icon" class="ImageObject">
+							<attr>
+								<left>54</left>
+								<top>92</top>
+								<width>80</width>
+								<height>80</height>
+								<image>logo-mid</image>
+							</attr>
+						</obj>
+						<obj id="MaxSpeedDriveWnd.Content" class="TextObject">
+							<attr>
+								<left>54+80+21</left>
+								<top>80</top>
+								<width>290</width>
+								<height>100</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16</font>
+								<text>检测到您的显卡驱动程序不匹配，为了充分发挥显卡本身的高性能，建议您升级显卡驱动至官方推荐版本000.00。升级后您的赚宝速度可达0000-9999元宝/小时</text>
+								<multiline>1</multiline>
+								<endellipsis>1</endellipsis>
+							</attr>
+						</obj>
+						<obj id="MaxSpeedDriveWnd.Btn.Update" class="TipAddin.Button">
+							<attr>
+								<Text>立即升级</Text>
+								<TextFont>font.text13</TextFont>
+								<TextColor>system.white</TextColor>
+								<left>(father.width-102)/2</left>
+								<top>92+80+30</top>
+								<width>102</width>
+								<height>38</height>
+								<NormalBkgID>texture.button.confirm.normal</NormalBkgID>
+								<HoverBkgID>texture.button.confirm.hover</HoverBkgID>
+								<DownBkgID>texture.button.confirm.down</DownBkgID>
+								<DisableBkgID>texture.button.confirm.down</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="MaxSpeedDriveWnd.xml.lua" func="OnClickUpdate" />
+							</eventlist>	
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.MaxSpeedDriveWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>520</width>
+			<height>298</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="MaxSpeedDriveWnd.xml.lua" func="OnCreate" />
+			<event name="OnShowWindow" file="MaxSpeedDriveWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

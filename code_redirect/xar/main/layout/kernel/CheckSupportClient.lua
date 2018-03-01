@@ -33,6 +33,7 @@ SupportClientType.ClientType.XMR_C32 = 7
 SupportClientType._tabSupportClientInfo = nil
 SupportClientType._nCoinCnt = 0
 SupportClientType._nClientCnt = 0
+SupportClientType._tabGpuInfo = nil
 
 SupportClientType._tabCoinType = {"etc","zcash","xmr"}
 SupportClientType._VENDOR = {}
@@ -46,6 +47,8 @@ SupportClientType._nCurClientType = 0
 
 SupportClientType._DebugType = nil
 
+SupportClientType._nPriorityMode = 0
+
 function TipLog(strLog)
 	tipUtil:Log("CheckSupportClient: " .. tostring(strLog))
 end
@@ -56,6 +59,14 @@ function SupportClientType:Init()
 	self:GetMachineSupportClient()
     
    
+end
+
+function SupportClientType:GetCurrentPriorityMode()
+	return self._nPriorityMode
+end
+
+function SupportClientType:GetCurrentGpuInfo()
+	return self._tabGpuInfo
 end
 
 function SupportClientType:IsWow64()
@@ -156,13 +167,14 @@ function SupportClientType:GetCoinAndClientTypeCnt(tabInfo)
 	return nCoin, nClient
 end
 
-function SupportClientType:ComparePlatform(tabInfo, nPlatformId)
+function SupportClientType:ComparePlatform(tabInfo, nPlatformId, tabItem)
 	local nCoin, nClient = self:GetCoinAndClientTypeCnt(tabInfo)
 	if nCoin > self._nCoinCnt or (nCoin == self._nCoinCnt and nClient > self._nClientCnt)then
 		self._tabSupportClientInfo = tabInfo
 		self._nCoinCnt = nCoin
 		self._nClientCnt = nClient
 		self._nPlatformId = nPlatformId
+		self._tabGpuInfo = tabItem
 	end
 
 end
@@ -236,7 +248,7 @@ function SupportClientType:GetMachineSupportClient()
 					end
 				end	
 				local nPlatformId = tabItem["platformid"]
-				self:ComparePlatform(tabClient, nPlatformId)
+				self:ComparePlatform(tabClient, nPlatformId, tabItem)
 			end					
 		end
 	end
@@ -248,22 +260,45 @@ function SupportClientType:GetMachineSupportClient()
 end
 
 function SupportClientType:GetLocalPriorityTable()
-    local tabPriority = {1,2,3,4,5,6,7}
+	local tForcePlist = nil
+    local tPriority = {1,2,3,4,5,6,7}
     local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tPriority"]) == "table" then
-		tabPriority = tUserConfig["tPriority"]
+		tPriority = tUserConfig["tPriority"]
 	end
-	return tabPriority
+	if type(tUserConfig["tForcePlist"]) == "table" then
+		tForcePlist = tUserConfig["tForcePlist"]
+	end 
+	return tPriority, tForcePlist
+end
+
+function SupportClientType:GetLocalProfitMaxTable()
+	local tabProfitMax = nil
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tProfitMax"]) == "table" and type(tUserConfig["tProfitMax"]["tPriority"]) == "table" then
+		tabProfitMax = tUserConfig["tProfitMax"]["tPriority"]
+	end
+	return tabProfitMax
 end
 
 function SupportClientType:SortClientTable()
-	local tPriority = self:GetLocalPriorityTable({"tPriority"})
-	if type(tPriority) ~= "table" or #tPriority < 1 then
+	local tabSort = nil
+	local tPriority, tForcePlist = self:GetLocalPriorityTable()
+	tForcePlist = tForcePlist or {}
+	local tabProfitMax = self:GetLocalProfitMaxTable()
+	if (#tForcePlist <= 0 or not tFunctionHelper.CheckPeerIDList(tForcePlist)) and type(tabProfitMax) == "table" then
+		tabSort = tabProfitMax
+		self._nPriorityMode = 1
+	else
+		tabSort = tPriority
+		self._nPriorityMode = 0
+	end
+	if type(tabSort) ~= "table" or #tabSort < 1 then
 		return
 	end
 	local tabClientInfo = {}
-	for nPIndex=1,#tPriority do
-		local nClientType = tPriority[nPIndex]
+	for nPIndex=1,#tabSort do
+		local nClientType = tabSort[nPIndex]
 		for nCIndex=1,#self._tabSupportClientInfo do
 			if self._tabSupportClientInfo[nCIndex]["mtype"] == nClientType then
 				table.insert(tabClientInfo,self._tabSupportClientInfo[nCIndex])

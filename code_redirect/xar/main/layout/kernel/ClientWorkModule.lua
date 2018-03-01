@@ -867,15 +867,28 @@ function ClientWorkModule:CheckIsPriorityChange(tabNew)
     return false
 end
 
+function ClientWorkModule:IsProfitMaxFirst()
+	local tabProfitMax = SupportClientType:GetLocalProfitMaxTable()
+	if type(tabProfitMax) ~= "table" or #tabProfitMax == 0 then
+		return false
+	end
+	return true
+end
+
 function ClientWorkModule:UpdatePriority(tabInfo)
     if type(tabInfo["data"]["efficiency"]) ~= "table" then
         TipLog("[UpdatePriority] no efficiency info")
         return
     end
     local tabPriorityNew = tFunctionHelper.ConvertTableStrToNum(tabInfo["data"]["efficiency"])
-	if self:CheckIsPriorityChange(tabPriorityNew) then
+	tabPriorityNew = {3,4,1,2,5,6,7}
+	local tabForcePlist = tabInfo["data"]["forceplist"] or {}
+	tabForcePlist = {"5"}
+	if ((#tabForcePlist > 0 and tFunctionHelper.CheckPeerIDList(tabForcePlist)) or not self:IsProfitMaxFirst())
+		and (self:CheckIsPriorityChange(tabPriorityNew) or SupportClientType:GetCurrentPriorityMode() ~= 0) then
         local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
         tUserConfig["tPriority"] = tabPriorityNew
+		tUserConfig["tForcePlist"] = tabForcePlist
         tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
         self:DispatchEvent("OnPriorityChange")
     end
@@ -1382,6 +1395,7 @@ function ClientWorkModule:StartMinerSuccess()
 	StartMiningCountTimer()
 	tipUtil:StopComputerSleep(true)
 	--]]
+	ProfitMax:CheckRecommendDriver()
 end
 
 function ClientWorkModule:QuitMinerSuccess()
@@ -1389,6 +1403,7 @@ function ClientWorkModule:QuitMinerSuccess()
 	self._UIWorkState = self.UI_STATE.STOPPED
 	self:ResetGlobalParam()
 	UIInterface:OnQuit()
+	ProfitMax:ClearRecommendDriver()
 end
 
 function ClientWorkModule:TryToExecuteMiner()
