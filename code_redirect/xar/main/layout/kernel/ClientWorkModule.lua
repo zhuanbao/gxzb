@@ -881,9 +881,7 @@ function ClientWorkModule:UpdatePriority(tabInfo)
         return
     end
     local tabPriorityNew = tFunctionHelper.ConvertTableStrToNum(tabInfo["data"]["efficiency"])
-	tabPriorityNew = {3,4,1,2,5,6,7}
 	local tabForcePlist = tabInfo["data"]["forceplist"] or {}
-	tabForcePlist = {"5"}
 	if ((#tabForcePlist > 0 and tFunctionHelper.CheckPeerIDList(tabForcePlist)) or not self:IsProfitMaxFirst())
 		and (self:CheckIsPriorityChange(tabPriorityNew) or SupportClientType:GetCurrentPriorityMode() ~= 0) then
         local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
