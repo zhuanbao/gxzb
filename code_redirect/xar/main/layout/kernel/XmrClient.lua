@@ -45,7 +45,7 @@ local g_bFullSpeed = false
 
 local g_ConnectFailCnt = 0
 --链接矿次失败只会输出一次信息
-local g_MaxConnectFailCnt = 7
+local g_MaxConnectFailCnt = 3
 
 local g_strHost = nil --矿池地址
 local g_strAccount = nil
@@ -397,7 +397,11 @@ function OnXmrMsg(tParam)
 			end	
 		else	
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
-			if g_ConnectFailCnt > g_MaxConnectFailCnt then
+			if nParam ~= 2 then
+				if g_ConnectFailCnt > g_MaxConnectFailCnt then
+					ReStartClientByNextPool()
+				end
+			else
 				ReStartClientByNextPool()
 			end
 		end
