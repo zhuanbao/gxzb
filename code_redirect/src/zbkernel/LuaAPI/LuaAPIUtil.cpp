@@ -177,7 +177,9 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	//快捷键
 	{"SetKeyboardHook", FSetKeyboardHook},
 	{"DelKeyboardHook", FDelKeyboardHook},
-	
+	{"RegisterBosskey", RegisterBosskey},
+	{"UnRegisterBosskey", UnRegisterBosskey},
+
 	{"CloseSingletonMutex", CloseSingletonMutex},
 
 	{"SetFileToClipboard", SetFileToClipboard},
@@ -6074,4 +6076,35 @@ int LuaAPIUtil::FGetGPUUsage(lua_State *pLuaState)
 		lua_pushnil(pLuaState);
 	}
 	return 1;
+}
+
+
+int LuaAPIUtil::RegisterBosskey(lua_State *pLuaState)
+{
+	TSAUTO();
+	LONG lnNewValue = (LONG)lua_tointeger(pLuaState, 2);
+	// TODO: 在此添加实现代码
+	LONG ivkey = lnNewValue >> 16;
+	LONG ifkey = lnNewValue - (ivkey << 16);
+	ATOM _atom;
+	_atom = GlobalFindAtom(L"gxzb_hotkey");
+	if(0 == _atom)
+	{
+		_atom = GlobalAddAtom(L"gxzb_hotkey");
+	}
+	::UnregisterHotKey(LuaMsgWindow::Instance()->m_hWnd, _atom);
+	::RegisterHotKey(LuaMsgWindow::Instance()->m_hWnd, _atom, ifkey, ivkey);
+	return 0;
+}
+
+int LuaAPIUtil::UnRegisterBosskey(lua_State *pLuaState)
+{
+	TSAUTO();
+	ATOM _atom;
+	_atom = GlobalFindAtom(L"gxzb_hotkey");
+	if(0 != _atom)
+	{
+		::UnregisterHotKey(LuaMsgWindow::Instance()->m_hWnd, _atom);
+	}
+	return 0;
 }

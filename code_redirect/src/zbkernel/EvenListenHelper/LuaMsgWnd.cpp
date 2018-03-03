@@ -235,13 +235,35 @@ LRESULT CALLBACK LuaMsgWindow::KeyboardProc(int code, WPARAM wParam, LPARAM lPar
 		return CallNextHookEx (LuaMsgWindow::Instance()->m_hKeyboardHook, code, wParam, lParam);
 	HWND hFocus = ::GetActiveWindow();
 
-	
+	LONG lctrl = 0;
+	LONG lshift = 0;
+	LONG lalt = 0;
+	if(GetAsyncKeyState(   
+		VK_CONTROL)<0 )
+	{
+		lctrl = 1;
+
+	} 
+	if(GetAsyncKeyState(   
+		VK_SHIFT)<0 )
+	{
+		lshift = 1;
+
+	}
+	if(GetAsyncKeyState(   
+		VK_MENU )<0 )
+	{
+		lalt = 1;
+	}	
 	CComVariant avarParams[5];
-	avarParams[1] = CComVariant((LONG)wParam);
+	avarParams[4] = CComVariant((LONG)wParam);
+	avarParams[3] = CComVariant((LONG)lctrl);
+	avarParams[2] = CComVariant((LONG)lshift);
+	avarParams[1] = CComVariant((LONG)lalt);
 	avarParams[0] = CComVariant((LONG)(ULONG_PTR)hFocus);
-	TSDEBUG4CXX("VKey : "<<(const unsigned int)wParam);
+	TSDEBUG4CXX(" Ctrl : "<<lctrl <<" , Atl : "<<lalt<<" , Shift : "<<lshift <<" , VKey : "<<(const unsigned int)wParam);
 	CComVariant varResult;
-	DISPPARAMS params = { avarParams, NULL, 2, 0 };
+	DISPPARAMS params = { avarParams, NULL, 5, 0 };
 	if(lParam & 0x80000000) //µ¯Æð
 	{
 		LuaMsgWindow::Instance()->Fire_LuaEvent("OnKeyUp", &params);
@@ -267,4 +289,15 @@ void LuaMsgWindow::CloseSingletonMutex()
 		DestroyWindow();
 		m_hWnd = NULL;
 	}
+}
+
+LRESULT LuaMsgWindow::OnHotKey(UINT , WPARAM /*wParam*/, LPARAM lParam , BOOL& )
+{
+	TSAUTO();//
+	CComVariant avarParams[2];
+	avarParams[1] = (LONG) HIWORD(lParam);
+	avarParams[0] = (LONG) LOWORD(lParam);
+	DISPPARAMS params = { avarParams, NULL, 2, 0 };
+	LuaMsgWindow::Instance()->Fire_LuaEvent("OnHotKey", &params);
+	return S_OK;
 }

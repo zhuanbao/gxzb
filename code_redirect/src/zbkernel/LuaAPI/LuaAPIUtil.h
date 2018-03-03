@@ -203,6 +203,8 @@ public:
 
 	static int FSetKeyboardHook(lua_State* pLuaState);
 	static int FDelKeyboardHook(lua_State* pLuaState);
+	static int RegisterBosskey(lua_State* pLuaState);
+	static int UnRegisterBosskey(lua_State* pLuaState);
 
 	//ºÙ«–∞Â
 	static int SetFileToClipboard(lua_State* pLuaState);

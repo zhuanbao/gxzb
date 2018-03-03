@@ -48,6 +48,7 @@ public:
 		MESSAGE_HANDLER(WM_XMR_MSG, OnXmrMsg)
 
 		MESSAGE_HANDLER(WM_ERROR_INFO, OnErrorMsg)
+		MESSAGE_HANDLER(WM_HOTKEY,		OnHotKey)
 	END_MSG_MAP()
 private:
 	LuaMsgWindow(void);
@@ -73,6 +74,7 @@ public:
 	LRESULT OnXmrMsg(UINT , WPARAM , LPARAM , BOOL&);
 
 	LRESULT OnErrorMsg(UINT , WPARAM , LPARAM , BOOL&);
+	LRESULT OnHotKey(UINT , WPARAM /*wParam*/, LPARAM lParam , BOOL& );
 public:
 	void SetKeyboardHook(void);
 	void DelKeyboardHook(void);
