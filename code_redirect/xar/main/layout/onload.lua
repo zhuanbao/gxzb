@@ -227,6 +227,7 @@ function OnFinishCreateUI()
 end
 
 function TipMain()	
+	tFunctionHelper.RegisterHotKey()
 	CreateMainTipWnd()
 	tFunctionHelper.InitMachineName()
 	tFunctionHelper.SaveConfigInTimer()

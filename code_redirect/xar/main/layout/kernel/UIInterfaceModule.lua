@@ -17,6 +17,9 @@ UIInterface._tipNotifyIcon = nil
 --配置默认值
 UIInterface._cfgDefaultWorkModel = 1
 
+--
+UIInterface._bBossKeyHide = false
+UIInterface._tHideWnd = {}
 
 
 UIInterface._tPopupWndList = {
@@ -58,7 +61,51 @@ function UIInterface:GetCurrentWorkModel()
 	return nWorkModel
 end
 
+function UIInterface:HideAllWnd()
+	hostwndManager:BeginEnumHostWnd()
+	local hostwnd = hostwndManager:GetNextHostWnd()
+	while hostwnd do
+		if hostwnd:GetVisible() then
+			table.insert(self._tHideWnd, hostwnd)
+			hostwnd:SetVisible(false)
+		end
+		hostwnd = hostwndManager:GetNextHostWnd()
+	end
+	self._tipNotifyIcon:Hide()
+end
 
+function UIInterface:ShowAllWnd()
+	for i = 1, #self._tHideWnd do
+		self._tHideWnd[i]:SetVisible(true)
+	end
+	self._tHideWnd = {}
+	self._tipNotifyIcon:Show()
+end
+
+
+function UIInterface:CheckBossKey(nCurValue)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tConfig"]) ~= "table" then
+		return
+	end
+	if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
+		return
+	end
+	local bCheck = tUserConfig["tConfig"]["BossKey"]["bCheck"]
+	local nValue = tUserConfig["tConfig"]["BossKey"]["nValue"]
+	if not bCheck or nValue < 0 or nValue ~= nCurValue then
+		return
+	end
+	local objMainWnd = self:GetMainHostWnd()
+	if self._bBossKeyHide then
+		self:ShowAllWnd()
+		
+		self._bBossKeyHide = false
+	else
+		self:HideAllWnd()
+		self._bBossKeyHide = true
+	end
+end
 
 function UIInterface:SaveLastRemindBindUTC()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}

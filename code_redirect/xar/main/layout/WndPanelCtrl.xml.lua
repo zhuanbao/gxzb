@@ -76,7 +76,10 @@ function CreateListener(objRootCtrl)
 					if mainwnd then
 						mainwnd:BringWindowToTop(true)
 					end
+					UIInterface:ShowAllWnd()
 				end
+			elseif tostring(key) == "OnHotKey" then
+				OnHotKey(tParam)
 			elseif tostring(key) == "OnGenOilMsg" then
 				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnGenOilMsg(tParam)
@@ -100,6 +103,14 @@ function CreateListener(objRootCtrl)
 		end
 	)
 end
+
+function OnHotKey(tParam)
+	local v1, v2 = tParam[1], tParam[2]
+	local mapKey = v2 * 0x10000
+	mapKey = BitOr(mapKey, v1)
+	UIInterface:CheckBossKey(mapKey)
+end
+
 
 function IsRealString(AString)
     return type(AString) == "string" and AString ~= ""

@@ -1025,6 +1025,22 @@ function CheckZcashAExistCondition()
 	return tipUtil:QueryFileExists(strClientDir)
 end
 
+function RegisterHotKey()
+	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tConfig"]) ~= "table" then
+		return
+	end
+	if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
+		return
+	end
+	local bCheck = tUserConfig["tConfig"]["BossKey"]["bCheck"]
+	local nValue = tUserConfig["tConfig"]["BossKey"]["nValue"]
+	if not bCheck or nValue < 0 then
+		return
+	end
+	tipUtil:RegisterBosskey(nValue)
+end
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -1068,7 +1084,8 @@ function RegisterFunctionObject(self)
 	obj.GetMachineName = GetMachineName
 	obj.WriteLastLaunchTime = WriteLastLaunchTime
 	obj.CheckZcashAExistCondition = CheckZcashAExistCondition
-
+	obj.RegisterHotKey = RegisterHotKey
+	
 	--服务器时间的获取
 	obj.SplitStringBySeperator = SplitStringBySeperator
 	obj.ExtractHttpHeaders = ExtractHttpHeaders
@@ -1096,6 +1113,7 @@ function RegisterFunctionObject(self)
 	obj.MergeOldUserCfg = MergeOldUserCfg
 	obj.GetOldCfgContent = GetOldCfgContent
 	
+
 	--下载
 	obj.CheckMD5 = CheckMD5
 	obj.NewAsynGetHttpFile = NewAsynGetHttpFile

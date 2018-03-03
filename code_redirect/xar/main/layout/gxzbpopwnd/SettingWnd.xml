@@ -163,7 +163,7 @@
 										<obj id="SettingWnd.Content.MachineIDArea.EditBkg" class="TextureObject">
 											<attr>
 												<left>70+120+5</left>
-												<top>0</top>
+												<top>5</top>
 												<width>230</width>
 												<height>24</height>
 												<texture>setting-edit-bkg</texture>
@@ -322,6 +322,118 @@
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectWorkModelRadio" />
 											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>28+34+5+34+5+5+34+5+34+5</top>
+										<width>father.width-2</width>
+										<height>34+20</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.BossKeyArea.SettingName" class="TextObject">
+											<attr>
+												<left>70</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13</font>
+												<text>老板键</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.BossKeyArea.Check" class="CheckBox">
+											<attr>
+												<left>70+120+5</left>
+												<top>5</top>
+												<width>85</width>
+												<height>25</height>
+												<ImgWidth>13</ImgWidth>
+												<ImgHeight>13</ImgHeight>
+												<CheckNormal>setting_checkbox.check</CheckNormal>
+												<CheckHover>setting_checkbox.check</CheckHover>
+												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
+												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<Select>false</Select>
+												<Text>启用老板键</Text>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectBossKey" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.BossKeyArea.EditBkg" class="TextureObject">
+											<attr>
+												<left>70+120+5+85+5</left>
+												<top>5</top>
+												<width>140</width>
+												<height>24</height>
+												<texture>setting-edit-bkg</texture>
+											</attr>	
+											<children>
+												<obj id="SettingWnd.Content.BossKeyArea.Edit" class="EditObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+														<transparent>1</transparent>
+														<viewinset>2, 2, 2, 2</viewinset>
+														<textcolor>555555</textcolor>
+														<font>font.text13</font>
+														<text></text>
+													</attr>
+													<eventlist>
+														<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnBossKeyFocusChange" />
+														<event name="OnKeyDown" file="SettingWnd.xml.lua" func="OnBossKeyDown" />
+														<event name="OnChange" file="SettingWnd.xml.lua" func="OnBossKeyChange" />
+													</eventlist>
+												</obj>
+											</children>
+										</obj>
+										<obj id="SettingWnd.Content.BossKeyArea.About" class="ImageObject">
+											<attr>
+												<left>70+120+5+85+5+140+5</left>
+												<top>9</top>
+												<width>16</width>
+												<height>16</height>
+												<cursor>IDC_HAND</cursor>
+												<image>bitmap.menu.about.normal</image>
+											</attr>
+											<eventlist>
+												<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnterAbout" />
+												<event name="OnMouseLeave" file="SettingWnd.xml.lua" func="OnMouseLeaveAbout" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.BossKeyArea.Tip" class="TextureObject">
+											<attr>
+												<left>70+120+5+85+5</left>
+												<top>24+10</top>
+												<width>260</width>
+												<height>20</height>
+												<texture>texture.general.tip.bkg</texture>
+												<zorder>50</zorder>
+												<visible>0</visible>
+											</attr>
+											<children>
+												<obj id="SettingWnd.Content.BossKeyArea.TipText" class="TextObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+														<valign>center</valign>
+														<halign>center</halign>
+														<textcolor>555555</textcolor>
+														<font>font.text12</font>
+														<text>老板键注册失败，请选择功能键+字母键/数字键</text>
+														<visible>0</visible>
+													</attr>
+												</obj>
+											</children>
 										</obj>
 									</children>
 								</obj>

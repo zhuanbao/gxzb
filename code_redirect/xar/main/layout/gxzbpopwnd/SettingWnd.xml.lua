@@ -1,4 +1,5 @@
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local tipUtil = XLGetObject("API.Util")
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 --local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
@@ -10,6 +11,8 @@ local g_AutoRunState = false
 local g_nWorkModel = 1
 local g_SuspendedWndState = 0
 
+local g_strBossKey = "Alt+Z"
+local g_nBossKeyValue = 0x5A0001
 --[[
 function CheckIsSysAutoRun()
 	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
@@ -34,6 +37,20 @@ function SetAutoRun()
 	end
 end
 --]]
+
+local g_tKey2String = 
+{
+	[9] = "Tab", [13] = "回车", [20] = "Caps Lock", [32] = "空格", [33] = "PageUp",
+	[34] = "PageDown", [35] = "End", [36] = "Home", [37] = "←", [38] = "↑",
+	[39] = "→", [40] = "↓", [45] = "Insert", [96] = "小键盘0", [97] = "小键盘1",
+	[98] = "小键盘2", [99] = "小键盘3", [100] = "小键盘4", [101] = "小键盘5", [102] = "小键盘6",
+	[103] = "小键盘7", [104] = "小键盘8", [105] = "小键盘9", [106] = "小键盘*", [107] = "小键盘+",
+	[109] = "小键盘-", [111] = "小键盘/", [112] = "F1", [113] = "F2", [114] = "F3", [115] = "F4",
+	[116] = "F5", [117] = "F6", [118] = "F7", [119] = "F8", [120] = "F9", [121] = "F10",
+	[122] = "F11", [123] = "F12", [144] = "Num Lock", [186] = ";", [187] = "+", [188] = ",",
+	[189] = "-", [190] = ".", [191] = "/", [192] = "`", [219] = "[", [220] = "\\", [221] = "]",
+	[222] = "\'", [16] = "Shift", [17] = "Ctrl", [18] = "Alt"
+}
 
 function SaveSettingConfig(objTree)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -71,10 +88,26 @@ function SaveSettingConfig(objTree)
 	end
 	tUserConfig["tConfig"]["ShowBall"]["nState"] = g_SuspendedWndState
 	
-	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+	
 	--更新球的状态
 	local isWorking = ClientWorkModule:CheckIsWorking()
 	UIInterface:UpdateSuspendWndVisible()
+	
+	--老板键
+	local ObjCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Check")
+	if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
+		tUserConfig["tConfig"]["BossKey"] = {}
+	end
+	tUserConfig["tConfig"]["BossKey"]["strDesc"] = g_strBossKey
+	tUserConfig["tConfig"]["BossKey"]["nValue"] = g_nBossKeyValue
+	local ObjAttr = ObjCheckBoxBossKey:GetAttribute()
+    tUserConfig["tConfig"]["BossKey"]["bCheck"] = ObjAttr.Select
+	if ObjAttr.Select then
+		tFunctionHelper.RegisterHotKey()
+	else
+		tipUtil:UnRegisterBosskey()
+	end
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
 function DestoryDialog(self)
@@ -99,6 +132,19 @@ function OnSelectAutoRun(self, event, bSelect)
 	tStatInfo.fu1 = "autorun"
 	tStatInfo.fu6 = "settingwnd"
 	StatisticClient:SendClickReport(tStatInfo)
+end
+
+function OnSelectBossKey(self, event, bSelect)
+	local objTree = self:GetOwner()
+	local ObjEditBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Edit")
+	
+	if bSelect then
+		ObjEditBossKey:SetEnable(true)
+		ObjEditBossKey:SetTextColorID("555555")
+	else
+		ObjEditBossKey:SetEnable(false)
+		ObjEditBossKey:SetTextColorID("BCB9B5")
+	end
 end
 
 function SetEditTextState(self, bFocus)
@@ -167,11 +213,91 @@ function SetSettingWndEditFocus(ObjEdit, x, y)
 	end
 end
 
+
+
 function OnLButtonDownCaption(self, x, y)
 	local editMachineID = self:GetObject("tree:SettingWnd.Content.MachineIDArea.Edit")
 	SetSettingWndEditFocus(editMachineID, x, y)
 end
 
+function OnBossKeyFocusChange(self, bFocus)
+	if bFocus then
+		self:SetSelAll()
+	else
+		self:SetSelNone()
+	end
+end
+
+
+function OnBossKeyChange(self)
+	--local xmpEdit = self:GetOwnerControl()
+	--local owerAttr = xmpEdit:GetAttribute()
+	--self:SetText(owerAttr.Text)
+	-- 最后个参数表示执行完此函数后不再调用下个事件处理函数
+	self:SetText(g_strBossKey)
+	return 0, true, false
+end
+
+function ShowRegHotKeyErrorInfo(ObjTree, bShow)
+	local ObjTip = ObjTree:GetUIObject("SettingWnd.Content.BossKeyArea.Tip")
+	local ObjTipText = ObjTree:GetUIObject("SettingWnd.Content.BossKeyArea.TipText")
+	ObjTip:SetVisible(bShow)
+    ObjTipText:SetVisible(bShow)
+end
+
+function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
+	if BitAnd(uFlags, 0x4000) == 0 and uChar ~= 16 and uChar ~= 17 and uChar ~= 18 then -- 第一次
+		local ObjTree = self:GetOwner()
+		local text = ""
+		local iValue = uChar * 0x10000
+		if (uChar >= 48 and uChar <= 57) or (uChar >= 65 and uChar <= 90) or (uChar >= 96 and uChar <= 105) then
+			if g_tKey2String[uChar] ~= nil then
+				text = g_tKey2String[uChar]
+			else
+				text = string.upper(string.char(uChar))
+			end	
+			ShowRegHotKeyErrorInfo(ObjTree, false)
+		--[[
+		elseif uChar == 8 or uChar == 46 then -- BackSpace
+			g_strBossKey = "无"
+			self:SetText("无")
+			g_nBossKeyValue = 0
+			return 0, true, false
+		--]]
+		else
+			g_strBossKey = "无"
+			self:SetText("无")
+			g_nBossKeyValue = 0
+			ShowRegHotKeyErrorInfo(ObjTree, true)
+			return 0, true, false
+		end
+		
+		local wKeyText = ""
+		if tipUtil:GetKeyState(0x11) < 0 then -- VK_CONTROL
+			wKeyText = "Ctrl+"
+			iValue = iValue + 0x2
+		elseif tipUtil:GetKeyState(0x12) < 0 then -- VK_ALT
+			wKeyText = wKeyText .. "Alt+"
+			iValue = iValue + 0x1
+		elseif tipUtil:GetKeyState(0x10) < 0 then -- VK_SHIFT
+			wKeyText = wKeyText .. "Shift+"
+			iValue = iValue + 0x4
+		end
+		text = wKeyText .. text
+		g_strBossKey = text
+		self:SetText(text)
+		g_nBossKeyValue = iValue
+	end	
+	return 0, true, false
+end
+
+function OnMouseEnterAbout(self)
+	Helper.Tip:SetTips("如果老板来了，按老板键，赚宝会自动隐藏")
+end
+
+function OnMouseLeaveAbout(self)
+	Helper.Tip:DestoryTipWnd()
+end
 
 function OnCreate(self)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -237,6 +363,31 @@ function OnCreate(self)
 			ObjRadioFull:SetCheck(true, true)
 		else
 			ObjRadioIntelligent:SetCheck(true, true)
+		end
+		
+		--老板键
+		local ObjCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Check")
+		if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
+			tUserConfig["tConfig"]["BossKey"] = {}
+		end
+		local strBossKey = tUserConfig["tConfig"]["BossKey"]["strDesc"]
+		local nBossKeyValue = tUserConfig["tConfig"]["BossKey"]["nValue"]
+		if Helper:IsRealString(strBossKey) and nBossKeyValue ~= nil then
+			g_strBossKey = strBossKey
+			g_nBossKeyValue = nBossKeyValue
+		end
+		local ObjEditBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Edit")
+		ObjEditBossKey:SetText(g_strBossKey)
+		local bBossKeyCheck = tUserConfig["tConfig"]["BossKey"]["bCheck"]
+		
+		if bBossKeyCheck then
+			ObjCheckBoxBossKey:SetCheck(true, true)
+			ObjEditBossKey:SetEnable(true)
+			ObjEditBossKey:SetTextColorID("555555")
+		else
+			ObjCheckBoxBossKey:SetCheck(false, true)
+			ObjEditBossKey:SetEnable(false)
+			ObjEditBossKey:SetTextColorID("BCB9B5")
 		end
 	end
 end
