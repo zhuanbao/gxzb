@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.44"
+!define PRODUCT_VERSION "1.0.0.46"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -60,7 +60,7 @@ VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=2052 "Comments" ""
 VIAddVersionKey /LANG=2052 "CompanyName" "深圳开心豆豆科技有限公司"
-VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2016-2017 深圳开心豆豆科技有限公司"
+VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2016-2018 深圳开心豆豆科技有限公司"
 VIAddVersionKey /LANG=2052 "FileDescription" "${PRODUCT_NAME}安装程序"
 VIAddVersionKey /LANG=2052 "FileVersion" ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductVersion" ${PRODUCT_VERSION}
@@ -360,6 +360,7 @@ Function CloseExe
 	${FKillProc} "Share4PeerXN64"
 	${FKillProc} "Share4PeerXA"
 	${FKillProc} "Share4PeerXA64"
+	${FKillProc} "SharePlugin"
 FunctionEnd
 
 Function un.CloseExe
@@ -374,6 +375,7 @@ Function un.CloseExe
 	${FKillProc} "Share4PeerXN64"
 	${FKillProc} "Share4PeerXA"
 	${FKillProc} "Share4PeerXA64"
+	${FKillProc} "SharePlugin"
 FunctionEnd
 
 Function CheckHasInstall
