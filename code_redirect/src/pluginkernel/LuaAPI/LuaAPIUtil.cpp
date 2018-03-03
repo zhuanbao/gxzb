@@ -219,7 +219,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"UnregisterHotKey", UnregisterHotKeyEx },
 	{"GlobalAddAtom", GlobalAddAtomEx },
 	{"GlobalDeleteAtom", GlobalDeleteAtomEx },
-	{"GetKeyState", GetKeyState },
+	
 	{"Execute",Execute},
 	{"IsValidFileName", IsValidFileName},
 	{"ShellOpen", ShellOpen},
@@ -5333,13 +5333,6 @@ int LuaAPIUtil::GlobalDeleteAtomEx( lua_State* luaState )
 	DWORD id = lua_tointeger( luaState, 2 );
 	GlobalDeleteAtom( (ATOM)id );
 	return 0;
-}
-
-int LuaAPIUtil::GetKeyState( lua_State* luaState )
-{
-	int nVirtKey = lua_tointeger(luaState,2);
-	lua_pushinteger( luaState, (SHORT)::GetKeyState( nVirtKey ));
-	return 1;
 }
 
 int LuaAPIUtil::Execute(lua_State* luaState)

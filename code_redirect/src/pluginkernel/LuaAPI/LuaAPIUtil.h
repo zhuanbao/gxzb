@@ -243,7 +243,6 @@ public:
 	static int GlobalDeleteAtomEx(lua_State* luaState);
 	static int RegisterHotKeyEx(lua_State* luaState);
 	static int UnregisterHotKeyEx(lua_State* luaState);
-	static int GetKeyState(lua_State* luaState);
 	static int Execute(lua_State* luaState);
 
 	static int IsValidFileName(lua_State* luaState);
