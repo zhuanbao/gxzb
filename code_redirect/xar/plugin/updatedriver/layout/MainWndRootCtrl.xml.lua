@@ -385,10 +385,35 @@ function CheckIsInstallSuccess()
 	for index=1,#tabDisplayCard do
 		local tabItem = tabDisplayCard[index]
 		if tabItem["vendor"] == 2 and tabItem["version"] == g_strUpdateDriverVer then
-			tFunctionHelper.TipLog("[CheckIsInstallSuccess] return true")
+			tFunctionHelper.TipLog("[CheckIsInstallSuccess] api return true")
 			return true
 		end
 	end
+	
+	local strRootPath = "HKEY_LOCAL_MACHINE"
+	local strSubPath = "SYSTEM\\CurrentControlSet\\Control\\Class"
+	local tabKeyList = tipUtil:EnumRegLeftSubKey(strRootPath, strSubPath); 
+	for idx=1, #tabKeyList do
+		local strPath = strRootPath .. "\\" .. strSubPath .. "\\" .. tabKeyList[idx] .. "\\Class"
+		local strClassValue = tFunctionHelper.RegQueryValue(strPath)
+		if strClassValue == "Display" then
+			local tabChildKeyList = tipUtil:EnumRegLeftSubKey(strRootPath, strSubPath .. "\\" .. tabKeyList[idx]); 
+			for icdx=1, #tabChildKeyList do
+				local strChildPath = strRootPath .. "\\" .. strSubPath .. "\\" .. tabKeyList[idx] .. "\\" .. tabChildKeyList[icdx] .. "\\DriverVersion"
+				local strDriverVersion = tFunctionHelper.RegQueryValue(strChildPath)
+				tFunctionHelper.TipLog("[strDriverVersion] strDriverVersion = " .. tostring(strDriverVersion))
+				if IsRealString(strDriverVersion) then
+					local strRegVer = string.gsub(strDriverVersion, "%.", "") 
+					local strCurVer = string.gsub(g_strUpdateDriverVer, "%.", "")
+					if string.find(strRegVer, ".+" .. strCurVer .. "$") ~= nil then
+						tFunctionHelper.TipLog("[CheckIsInstallSuccess] reg return true")
+						return true
+					end
+				end
+			end
+		end
+	end
+	
 	tFunctionHelper.TipLog("[CheckIsInstallSuccess] return false")
 	return false
 end
