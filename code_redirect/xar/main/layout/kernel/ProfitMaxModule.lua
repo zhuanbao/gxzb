@@ -133,7 +133,7 @@ function ProfitMax:CalculateProfitPriority(bRet, tabGpuSpeed)
 	tUserConfig["tProfitMax"]["nLastQueryServer"] = tipUtil:GetCurrentUTCTime()
 	tUserConfig["tProfitMax"]["tRate"] = self._tabCoinRate
 	tUserConfig["tProfitMax"]["tServerGpuSpeed"] = tabGpuSpeed
-	tUserConfig["tProfitMax"]["tUserGpuInfo"] = SupportClientType:GetCurrentGpuInfo()
+	--tUserConfig["tProfitMax"]["tUserGpuInfo"] = SupportClientType:GetCurrentGpuInfo()
 	if self:CheckIsPriorityChange(tabSort) then
 		tUserConfig["tProfitMax"]["tPriority"] = tabSort
 		if SupportClientType:GetCurrentPriorityMode() == 1 then
@@ -251,7 +251,7 @@ function ProfitMax:CheckShowRecommendCond()
 		self:SetIgnoreMark()
 		return false
 	end
-	local tabUserGpuInfo = tUserConfig["tProfitMax"]["tUserGpuInfo"]
+	local tabUserGpuInfo = SupportClientType:GetCurrentGpuInfo()
 	if type(tabUserGpuInfo) ~= "table" then
 		return false
 	end
