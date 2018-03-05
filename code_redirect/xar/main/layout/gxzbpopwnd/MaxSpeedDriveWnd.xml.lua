@@ -46,7 +46,7 @@ function RunUpdateDriverPlugin()
 	local strPluginXarDir = tipUtil:PathCombine(strInstallDir, "xar\\plugin")
 	local strXarName = "updatedriver"
 	local strWndID = "updatedrv"
-	local strCmd = "/xarpath " .. strPluginXarDir .. " /xarname " .. strXarName .. " /wndid " .. strWndID .. " /driverver " .. g_strDriverVer
+	local strCmd = "/xarpath \"" .. strPluginXarDir .. "\" /xarname " .. strXarName .. " /wndid " .. strWndID .. " /driverver " .. g_strDriverVer
 	tipUtil:ShellExecute(0, "runas", strPluginExePath, strCmd, 0, "SW_SHOWNORMAL")
 end
 
