@@ -35,7 +35,7 @@ function SetCloseBtnEnable(bEnable)
 end
 
 function SetIgnoreMark()
-	RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\RecommendDriver\\Ignore", 1)
+	tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\RecommendDriver\\Ignore", 1)
 end
 
 function GetHookDllPath()
