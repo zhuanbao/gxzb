@@ -3,6 +3,10 @@ local tipUtil = XLGetObject("API.Util")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local g_strDriverVer = nil
 
+function TipLog(strLog)
+	tipUtil:Log("MaxSpeedDriveWnd: " .. tostring(strLog))
+end
+
 function IsRealString(str)
 	return type(str) == "string" and str ~= ""
 end
@@ -48,6 +52,7 @@ function RunUpdateDriverPlugin()
 	local strWndID = "updatedrv"
 	local strCmd = "/xarpath \"" .. strPluginXarDir .. "\" /xarname " .. strXarName .. " /wndid " .. strWndID .. " /driverver " .. g_strDriverVer
 	tipUtil:ShellExecute(0, "runas", strPluginExePath, strCmd, 0, "SW_SHOWNORMAL")
+	TipLog("[RunUpdateDriverPlugin] strCmd = " .. tostring(strCmd))
 end
 
 function OnClickUpdate(self)

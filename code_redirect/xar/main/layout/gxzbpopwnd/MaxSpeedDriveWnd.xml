@@ -108,9 +108,9 @@
 								<Text>立即升级</Text>
 								<TextFont>font.text13</TextFont>
 								<TextColor>system.white</TextColor>
-								<left>(father.width-102)/2</left>
+								<left>54+80+21+290-158</left>
 								<top>92+80+30</top>
-								<width>102</width>
+								<width>158</width>
 								<height>38</height>
 								<NormalBkgID>texture.button.confirm.normal</NormalBkgID>
 								<HoverBkgID>texture.button.confirm.hover</HoverBkgID>
