@@ -381,12 +381,15 @@ end
 
 function CheckIsInstallSuccess()
 	local tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
+	tFunctionHelper.DumpObj(tabDisplayCard, "tabDisplayCard")
 	for index=1,#tabDisplayCard do
 		local tabItem = tabDisplayCard[index]
 		if tabItem["vendor"] == 2 and tabItem["version"] == g_strUpdateDriverVer then
+			tFunctionHelper.TipLog("[CheckIsInstallSuccess] return true")
 			return true
 		end
 	end
+	tFunctionHelper.TipLog("[CheckIsInstallSuccess] return false")
 	return false
 end
 
