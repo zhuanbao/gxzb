@@ -278,18 +278,22 @@ end
 function ProfitMax:CheckRecommendDriver()
 	self:ClearRecommendDriver()
     if SupportClientType:GetCurrentPriorityMode() ~= 1 then
+		TipLog("[CheckRecommendDriver] GetCurrentPriorityMode is not 1")
 		return
 	end
 	if self:IsExistIgnoreMark() then
+		TipLog("[CheckRecommendDriver] exist ignore mark")
 		return
 	end
 	if not self:CheckLastRecommendTime() then
+		TipLog("[CheckRecommendDriver] last recommend time return false")
 		return
 	end
 	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
 		self._RecommendTimerID = nil
 		--if true then
 		if ClientWorkModule:CheckIsWorking() and ProfitMax:CheckShowRecommendCond() then
+			TipLog("[CheckRecommendDriver] try to show max speed window")
 			UIInterface:ShowMaxSpeedWnd()
 		end
 	end, 600*1000)
