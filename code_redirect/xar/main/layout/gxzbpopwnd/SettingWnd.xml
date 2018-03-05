@@ -385,6 +385,7 @@
 														<textcolor>555555</textcolor>
 														<font>font.text13</font>
 														<text></text>
+														<disableime>1</disableime>
 													</attr>
 													<eventlist>
 														<event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnBossKeyFocusChange" />

@@ -250,7 +250,21 @@ function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
 		local ObjTree = self:GetOwner()
 		local text = ""
 		local iValue = uChar * 0x10000
-		if (uChar >= 48 and uChar <= 57) or (uChar >= 65 and uChar <= 90) or (uChar >= 96 and uChar <= 105) then
+		local iFnKey = 0
+		local wKeyText = ""
+		if tipUtil:GetKeyState(0x11) < 0 then -- VK_CONTROL
+			wKeyText = "Ctrl+"
+			iFnKey  = iFnKey+0x2
+		end	
+		if tipUtil:GetKeyState(0x12) < 0 then -- VK_ALT
+			wKeyText = wKeyText .. "Alt+"
+			iFnKey  = iFnKey+0x2
+		end
+		if tipUtil:GetKeyState(0x10) < 0 then -- VK_SHIFT
+			wKeyText = wKeyText .. "Shift+"
+			iFnKey = iFnKey + 0x4
+		end
+		if iFnKey > 0 and ((uChar >= 48 and uChar <= 57) or (uChar >= 65 and uChar <= 90) or (uChar >= 96 and uChar <= 105)) then
 			if g_tKey2String[uChar] ~= nil then
 				text = g_tKey2String[uChar]
 			else
@@ -265,6 +279,7 @@ function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
 			return 0, true, false
 		--]]
 		else
+			
 			g_strBossKey = "无"
 			self:SetText("无")
 			g_nBossKeyValue = 0
@@ -272,17 +287,6 @@ function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
 			return 0, true, false
 		end
 		
-		local wKeyText = ""
-		if tipUtil:GetKeyState(0x11) < 0 then -- VK_CONTROL
-			wKeyText = "Ctrl+"
-			iValue = iValue + 0x2
-		elseif tipUtil:GetKeyState(0x12) < 0 then -- VK_ALT
-			wKeyText = wKeyText .. "Alt+"
-			iValue = iValue + 0x1
-		elseif tipUtil:GetKeyState(0x10) < 0 then -- VK_SHIFT
-			wKeyText = wKeyText .. "Shift+"
-			iValue = iValue + 0x4
-		end
 		text = wKeyText .. text
 		g_strBossKey = text
 		self:SetText(text)
