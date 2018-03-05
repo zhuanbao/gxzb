@@ -258,7 +258,7 @@ function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
 		end	
 		if tipUtil:GetKeyState(0x12) < 0 then -- VK_ALT
 			wKeyText = wKeyText .. "Alt+"
-			iFnKey  = iFnKey+0x2
+			iFnKey  = iFnKey+0x1
 		end
 		if tipUtil:GetKeyState(0x10) < 0 then -- VK_SHIFT
 			wKeyText = wKeyText .. "Shift+"
@@ -290,7 +290,7 @@ function OnBossKeyDown(self, uChar, uRepeatCount, uFlags)
 		text = wKeyText .. text
 		g_strBossKey = text
 		self:SetText(text)
-		g_nBossKeyValue = iValue
+		g_nBossKeyValue = iValue+iFnKey
 	end	
 	return 0, true, false
 end
