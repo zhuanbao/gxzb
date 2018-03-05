@@ -258,6 +258,12 @@ function OnDownLoadSuccess(strPath)
 	tFunctionHelper.TipLog("[OnDownLoadSuccess] strPath: " .. tostring(strPath))
 	ObjText:SetText("安装包校验成功")
 	g_strPackagePath = strPath
+	
+	local tStatInfo = {}
+	tStatInfo.fu5 = "download"
+	tStatInfo.fu6 = "success"
+	StatisticClient:SendEventReport(tStatInfo)
+	
 	RunInStallExe(strPath)
 end
 
@@ -430,6 +436,10 @@ function DoInstallSuccess()
 	ObjRecommend:SetText("已成功升级显卡驱动程序！需要重启电脑后才能生效")
 	SetCloseBtnEnable(true)
 	SetIgnoreMark()
+	local tStatInfo = {}
+	tStatInfo.fu5 = "installfinish"
+	tStatInfo.fu6 = "success"
+	StatisticClient:SendEventReport(tStatInfo)
 end
 
 function OnListenerFunc(strKey, ...)
