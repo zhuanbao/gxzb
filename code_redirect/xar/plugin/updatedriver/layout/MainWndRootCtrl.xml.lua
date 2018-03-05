@@ -6,6 +6,7 @@ local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 
 local g_objListen = objFactory:CreateInstance()
+local g_strUpdateDriverVer = nil
 local g_strDriverLink = nil
 local g_nFileSize = 0
 local g_OwnerCtrl = nil
@@ -184,6 +185,7 @@ function InitCtrl(self)
 	if not bRet or not IsRealString(strDriverVer) then
 		return false
 	end
+	g_strUpdateDriverVer = strDriverVer
 	FormatDriverUrl(strDriverVer)
 	if not IsRealString(g_strDriverLink) then
 		return false
@@ -377,6 +379,17 @@ function UpdateInStallProgress(fPercent)
 	end
 end
 
+function CheckIsInstallSuccess()
+	local tabDisplayCard = tipUtil:GetAllDisplayCardInfo()
+	for index=1,#tabDisplayCard do
+		local tabItem = tabDisplayCard[index]
+		if tabItem["vendor"] == 2 and tabItem["version"] == g_strUpdateDriverVer then
+			return true
+		end
+	end
+	return false
+end
+
 function DoInStallExe(hParentProc, tabProcInfo)
 	g_hSetupProcPID = tabProcInfo["PID"]
 	g_fLastPercent = 0
@@ -395,6 +408,10 @@ function DoInStallExe(hParentProc, tabProcInfo)
 			_InstallTimerID = nil
 		end	
 		if nRet == 0 then
+			if not CheckIsInstallSuccess() then
+				ShowInstallFail()
+				return
+			end
 			UpdateInStallProgress(1)
 			DoInstallSuccess()	
 		end
