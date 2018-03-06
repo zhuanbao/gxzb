@@ -918,3 +918,14 @@ function UIInterface:ReportAndExit()
 	StatisticClient:SendEventReport(tStatInfo)
 end
 
+function UIInterface:ShowRemindRebootTip()
+	local wnd = self:GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	objMiningPanel:ShowRemindRebootTip()
+end

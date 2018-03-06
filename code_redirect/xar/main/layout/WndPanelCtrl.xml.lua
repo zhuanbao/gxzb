@@ -99,6 +99,8 @@ function CreateListener(objRootCtrl)
 				tStatInfo.fu6 = tParam[2]
 				StatisticClient:SendClientErrorReport(tStatInfo)
 				UIInterface:AnalysisClientErrorMsg(tParam)
+			elseif tostring(key) == "OnDriverReboot" then
+				UIInterface:ShowRemindRebootTip(tParam)
 			end				
 		end
 	)

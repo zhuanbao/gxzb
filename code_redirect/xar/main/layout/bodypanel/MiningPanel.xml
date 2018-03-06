@@ -18,6 +18,7 @@
 			<OnShowPanel file="MiningPanel.xml.lua" func="OnShowPanel"/>
 			<SetStateInfoToUser file="MiningPanel.xml.lua" func="SetStateInfoToUser"/>
             <ShowBindWeiXin file="MiningPanel.xml.lua" func="ShowBindWeiXin"/>
+			<ShowRemindRebootTip file="MiningPanel.xml.lua" func="ShowRemindRebootTip"/>
 		</method_def>
 		<event_def>
 			
@@ -153,6 +154,23 @@
 									</attr>
 								</obj>
 							</children>
+						</obj>
+						 <obj id="MiningPanel.Panel.RemindReboot.Icon" class="ImageObject">
+							<attr>
+								<left>father.width-98*2+98</left>
+								<top>94+220+30+2</top>
+								<width>20</width>
+								<height>20</height>
+								<image>GXZB.SmallWarning</image>
+								<valign>center</valign>
+								<halign>center</halign>
+								<zorder>50</zorder>
+								<visible>0</visible>
+							</attr>
+							<eventlist>
+								<event name="OnMouseEnter" file="MiningPanel.xml.lua" func="OnMouseEnterRemindReboot" />
+								<event name="OnMouseLeave" file="MiningPanel.xml.lua" func="OnMouseLeaveRemindReboot" />
+							</eventlist>
 						</obj>
 						<obj id="MiningPanel.Panel.Amount" class="LayoutObject">
 							<attr>

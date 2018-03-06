@@ -54,5 +54,6 @@
 		<texture id="GXZB.QRCodePanel.QRCode.FailedBKG" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCode.FailedBKG.png" />
 		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
 		
+		<bitmap id="GXZB.SmallWarning" path="bitmap\smallwarning.png"/>
 	</resource>
 </XLUE>
