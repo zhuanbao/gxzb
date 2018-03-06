@@ -137,6 +137,12 @@ LRESULT LuaMsgWindow::OnP2SDownloadProgress(UINT /*uMsg*/, WPARAM wParam, LPARAM
 	return 0;
 }
 
+LRESULT LuaMsgWindow::OnDriverReboot(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	TSAUTO();
+	return 0;
+}
+
 void LuaMsgWindow::SetKeyboardHook()
 {
 	if (NULL==m_hKeyboardHook)

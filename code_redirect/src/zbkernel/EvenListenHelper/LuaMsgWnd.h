@@ -7,6 +7,9 @@
 #define LUA_MSG_MUTEX _T("{MutexWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}")
 
 #include <XLLuaRuntime.h>
+
+#define WM_DRIVER_REBOOT WM_USER+1
+
 typedef void (*funResultCallBack) (DWORD userdata1,DWORD userdata2, const char* pszKey,  DISPPARAMS* pParams);
 
 struct SOLUTION_SS
@@ -49,6 +52,7 @@ public:
 
 		MESSAGE_HANDLER(WM_ERROR_INFO, OnErrorMsg)
 		MESSAGE_HANDLER(WM_HOTKEY,		OnHotKey)
+		MESSAGE_HANDLER(WM_DRIVER_REBOOT, OnDriverReboot)
 	END_MSG_MAP()
 private:
 	LuaMsgWindow(void);
@@ -75,6 +79,7 @@ public:
 
 	LRESULT OnErrorMsg(UINT , WPARAM , LPARAM , BOOL&);
 	LRESULT OnHotKey(UINT , WPARAM /*wParam*/, LPARAM lParam , BOOL& );
+	LRESULT OnDriverReboot(UINT , WPARAM , LPARAM , BOOL&);
 public:
 	void SetKeyboardHook(void);
 	void DelKeyboardHook(void);

@@ -301,3 +301,13 @@ LRESULT LuaMsgWindow::OnHotKey(UINT , WPARAM /*wParam*/, LPARAM lParam , BOOL& )
 	LuaMsgWindow::Instance()->Fire_LuaEvent("OnHotKey", &params);
 	return S_OK;
 }
+
+LRESULT LuaMsgWindow::OnDriverReboot(UINT , WPARAM wParam, LPARAM lParam , BOOL& )
+{
+	TSAUTO();//
+	CComVariant vParam[1];
+	vParam[0] = (int)wParam;
+	DISPPARAMS params = { vParam, NULL, 1, 0 };
+	LuaMsgWindow::Instance()->Fire_LuaEvent("OnDriverReboot", &params);
+	return S_OK;
+}

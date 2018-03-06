@@ -4,6 +4,8 @@
 #include "..\P2SDownload\P2SDownloadDefine.h"
 
 #include <XLLuaRuntime.h>
+#define WM_DRIVER_REBOOT WM_USER+1
+
 typedef void (*funResultCallBack) (DWORD userdata1,DWORD userdata2, const char* pszKey,  DISPPARAMS* pParams);
 
 struct SOLUTION_SS
@@ -91,6 +93,8 @@ public:
 		MESSAGE_HANDLER(WM_P2SDOWNLOADFINISH, OnP2SDownloadFinish)
 		MESSAGE_HANDLER(WM_P2SDOWNLOADERROR, OnP2SDownloadError)
 		MESSAGE_HANDLER(WM_P2SDOWNLOADPROGRESS, OnP2SDownloadProgress)
+		MESSAGE_HANDLER(WM_P2SDOWNLOADPROGRESS, OnP2SDownloadProgress)
+		MESSAGE_HANDLER(WM_DRIVER_REBOOT, OnDriverReboot)
 	END_MSG_MAP()
 private:
 	LuaMsgWindow(void);
@@ -113,6 +117,7 @@ public:
 	LRESULT OnP2SDownloadFinish(UINT , WPARAM , LPARAM , BOOL&);
 	LRESULT OnP2SDownloadError(UINT , WPARAM , LPARAM , BOOL&);
 	LRESULT OnP2SDownloadProgress(UINT , WPARAM , LPARAM , BOOL&);
+	LRESULT OnDriverReboot(UINT , WPARAM , LPARAM , BOOL&);
 public:
 	void SetKeyboardHook(void);
 	void DelKeyboardHook(void);
