@@ -4,6 +4,7 @@ local tipUtil = XLGetObject("API.Util")
 local objFactory = XLGetObject("APIListen.Factory")
 local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+local ObjectFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 
 local g_objListen = objFactory:CreateInstance()
 local g_strUpdateDriverVer = nil
@@ -462,6 +463,27 @@ function DoInStallExe(hParentProc, tabProcInfo)
 	end, 6*1000)
 end
 
+function ShowWarningInfo()
+	local ObjContent = g_OwnerCtrl:GetControlObject("RootCtrl.Content")
+	local ObjRecommend = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Recommend")
+	local l, t, r, b = ObjRecommend:GetObjPos()
+	
+	local ObjWarning = ObjectFactory:CreateUIObject("RootCtrl.Content.Warning", "TextObject")
+	ObjContent:AddChild(ObjWarning)
+	ObjWarning:SetText("重新启动之前，该设备可能无法正常工作。")
+	
+	ObjWarning:SetVAlign("center")
+	ObjWarning:SetHAlign("left")
+	ObjWarning:SetTextColorResID("system.red")
+	ObjWarning:SetTextFontResID("font.text16")
+	ObjWarning:SetObjPos(l, t+50, l+310, t+50+20)
+end
+
+function PostReBootMsg()
+	local WM_DRIVER_REBOOT = 0x0400+1
+	tipUtil:PostWndMessage("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", nil, WM_DRIVER_REBOOT, 1, 0) 
+end
+
 function DoInstallSuccess()
 	g_hInstProcPID = nil
 	g_hSetupProcPID = nil
@@ -478,7 +500,10 @@ function DoInstallSuccess()
 	ObjBtnReLater:Show(true)
 	
 	local ObjRecommend = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Recommend")
-	ObjRecommend:SetText("已成功升级显卡驱动程序！需要重启电脑后才能生效")
+	ObjRecommend:SetText("已成功升级显卡驱动程序！需要重启电脑后才能生效。\r\n ")
+	
+	ShowWarningInfo()
+	PostReBootMsg()	
 	SetCloseBtnEnable(true)
 	SetIgnoreMark()
 	local tStatInfo = {}
