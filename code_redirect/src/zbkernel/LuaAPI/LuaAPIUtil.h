@@ -161,7 +161,7 @@ public:
 	//互斥量函数
 	static int CreateNamedMutex(lua_State* pLuaState);
 	static int CloseNamedMutex(lua_State* pLuaState);
-
+	static int CheckMutexExist(lua_State* pLuaState);
 	
 	//系统，进程
 	static int FGetCurrentProcessId(lua_State* pLuaState);

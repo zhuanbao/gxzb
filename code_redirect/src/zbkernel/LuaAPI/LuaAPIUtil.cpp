@@ -141,6 +141,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	//互斥量函数
 	{"CreateMutex", CreateNamedMutex},
 	{"CloseMutex", CloseNamedMutex},
+	{"CheckMutexExist", CheckMutexExist},
 	
 	//系统
 	{"GetCurrentProcessId", FGetCurrentProcessId},
@@ -3004,6 +3005,29 @@ int LuaAPIUtil::CloseNamedMutex(lua_State* pLuaState)
 	return 0;
 }
 
+//互斥量函数
+int LuaAPIUtil::CheckMutexExist(lua_State* pLuaState)
+{
+	HANDLE hMutex = NULL;
+	BOOL bRet = FALSE;
+	LuaAPIUtil** ppUtil = (LuaAPIUtil **)luaL_checkudata(pLuaState, 1, API_UTIL_CLASS);
+	if (ppUtil != NULL)
+	{
+		const char* utf8MutexName = luaL_checkstring(pLuaState, 2);
+		CComBSTR bstrMutexName;
+		LuaStringToCComBSTR(utf8MutexName,bstrMutexName);
+
+		hMutex = OpenMutex(SYNCHRONIZE, FALSE, bstrMutexName.m_str);
+		if (hMutex != NULL)
+		{
+			bRet = TRUE;
+			CloseHandle(hMutex);
+			hMutex = NULL;
+		}
+	}
+	lua_pushboolean(pLuaState, bRet);
+	return 1;
+}
 
 int LuaAPIUtil::PostWndMessage(lua_State* pLuaState)
 {
