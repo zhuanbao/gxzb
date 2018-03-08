@@ -38,6 +38,7 @@ vendor_t Parse_Vendor(const char* name) {
 
 std::vector<cl::Platform> getPlatforms()
 {
+	TSAUTO();
 	vector<cl::Platform> platforms;
 	try
 	{
@@ -77,6 +78,7 @@ std::vector<cl::Device> getDevices(std::vector<cl::Platform> const& _platforms, 
 //
 void GetDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO) 
 {
+	TSAUTO();
 	vector<cl::Platform> v_clPlatforms = getPlatforms();
 	if (v_clPlatforms.empty())
 		return;

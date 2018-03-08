@@ -5842,6 +5842,7 @@ int LuaAPIUtil::GetLongTypeHighAndLowWord(lua_State* pLuaState)
 
 BOOL GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
 {
+	TSAUTO();
 	if (LoadLibraryA("opencl.dll") == NULL)
 	{
 		TSDEBUG4CXX("[GetUserDisplayCardInfo] load opencl fail, nErrorCode = "<< GetLastError());
@@ -5939,6 +5940,7 @@ int LuaAPIUtil::CheckZcashACond(lua_State* pLuaState)
 
 int LuaAPIUtil::GetAllDisplayCardInfo(lua_State* pLuaState)
 {
+	TSAUTO();
 	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
 	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
 	{
