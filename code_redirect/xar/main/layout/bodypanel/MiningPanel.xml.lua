@@ -5,8 +5,6 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local g_UnBindFailTimerId = nil
 local g_bShowBindEntry = false
 
-local g_bShowRemindReboot = false
-
 function TipLog(strLog)
 	if type(tipUtil.Log) == "function" then
 		tipUtil:Log("MiningPanel: " .. tostring(strLog))
@@ -66,7 +64,7 @@ function UpdateMiningSpeed(self, nSpeed)
 		ObjMiningSpeed:SetChildrenVisible(true)
 		ObjMiningSpeed:SetVisible(true)
 		ShowAnim(self, true)
-		if g_bShowRemindReboot then
+		if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
 			local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 			ObjReboot:SetVisible(true)
 		end	
@@ -85,7 +83,7 @@ function UpdateMiningState(self,nMiningState)
 			ObjMiningSpeed:SetChildrenVisible(true)
 			ObjMiningSpeed:SetVisible(true)
 			ShowAnim(self, true)
-			if g_bShowRemindReboot then
+			if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
 				local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 				ObjReboot:SetVisible(true)
 			end
@@ -287,7 +285,7 @@ function AdjustSpeedTextPosition(self)
 		nLenSpeed = nMaxLen
 	end
 	local nNewLeft = (width-(nLenDesc+gap)-nLenSpeed)/2
-	if g_bShowRemindReboot then
+	if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
 		local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 		local nRLeft, nRTop, nRRight, nRBottom = ObjReboot:GetObjPos()
 		nNewLeft = nNewLeft - ((nRRight-nRLeft)/2+2)
@@ -388,6 +386,7 @@ function OnShowPanel(self, bShow)
 		AdjustAmountTextPosition(self)
 		AdjustSpeedTextPosition(self)
 		ChangeBindEntryVisible(self)
+		ChangeMiningFailVisible(self)
 	else
 		ChangeBindEntryVisible(self)
         SetStateInfoToUser(self, nil)
@@ -457,15 +456,8 @@ function ShowBindWeiXin(self,bShow)
     AdjustBindWeiXinPosition(self)
 end
 
-function ShowRemindRebootTip(self)
-	g_bShowRemindReboot = true
-    local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
-    if ObjMiningSpeed:GetVisible() then
-		local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
-		ObjReboot:SetVisible(true)
-		AdjustSpeedTextPosition(self)
-    end
-	
+function ShowRemindRebootWarning(self)
+	ChangeMiningFailVisible(self)
 end
 
 function OnMouseEnterRemindReboot(self)
@@ -475,6 +467,27 @@ end
 function OnMouseLeaveRemindReboot(self)
 	Helper.Tip:DestoryTipWnd()
 end
+
+function ChangeMiningFailVisible(self)
+	local ObjMiningFail = self:GetControlObject("MiningPanel.Panel.MiningFail")
+	local ObjMiningFailDesc = self:GetControlObject("MiningPanel.Panel.MiningFail.Description")
+	if tFunctionHelper.CheckIsUpdatingDriver() and not ClientWorkModule:CheckIsWorking() then
+		ObjMiningFailDesc:SetText("正在更新显卡驱动程序，请稍后重试...")
+		ObjMiningFail:SetChildrenVisible(true)
+		ObjMiningFail:SetVisible(true)
+		return
+	end
+	if tFunctionHelper.IsNeedRebootAfterUpdateDriver() and not ClientWorkModule:CheckIsWorking() then
+		ObjMiningFailDesc:SetText("显卡驱动程序已更新，请重启电脑")
+		ObjMiningFail:SetChildrenVisible(true)
+		ObjMiningFail:SetVisible(true)
+		return
+	end
+	ObjMiningFailDesc:SetText("")
+	ObjMiningFail:SetChildrenVisible(false)
+	ObjMiningFail:SetVisible(false)
+end
+
 
 
 

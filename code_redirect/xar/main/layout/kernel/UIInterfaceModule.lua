@@ -882,6 +882,7 @@ function UIInterface:OnStart()
 end	
 
 function UIInterface:OnQuit()
+	self:ShowRemindRebootWarning()
 	self:UpdateSuspendWndVisible()
 	self:OnWorkStateChange()
 	--Statistic:SendMiningReport(0, true)
@@ -918,7 +919,7 @@ function UIInterface:ReportAndExit()
 	StatisticClient:SendEventReport(tStatInfo)
 end
 
-function UIInterface:ShowRemindRebootTip()
+function UIInterface:ShowRemindRebootWarning()
 	local wnd = self:GetMainHostWnd()
 	if not wnd then
 		return
@@ -927,5 +928,5 @@ function UIInterface:ShowRemindRebootTip()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
-	objMiningPanel:ShowRemindRebootTip()
+	objMiningPanel:ShowRemindRebootWarning()
 end

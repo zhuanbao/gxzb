@@ -66,6 +66,10 @@ function OnClickUpdate(self)
 	tStatInfo.fu5 = ClientWorkModule:GetRealMiningType() or 0
 	StatisticClient:SendClickReport(tStatInfo)
 	UpadteRecommendTime(true)
+	if ClientWorkModule:CheckIsWorking() then
+		ClientWorkModule:NotifyQuit()
+	end
+	UIInterface:ShowRemindRebootWarning()
 end
 
 function ShowContent(objtree)

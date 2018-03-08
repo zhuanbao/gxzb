@@ -1487,6 +1487,9 @@ function ClientWorkModule:OnPriorityChange(event)
 end
 
 function ClientWorkModule:NotifyStart()
+	if not self:CheckCanStartNow() then
+		return
+	end
 	self._UIWorkState = self.UI_STATE.STARTING
 	UIInterface:OnStart()
 	--[[
@@ -1611,6 +1614,13 @@ function ClientWorkModule:InitMiningClient()
 	return true
 end
 
-
+function ClientWorkModule:CheckCanStartNow()
+	if tFunctionHelper.CheckIsUpdatingDriver() then
+		UIInterface:ShowRemindRebootWarning()
+		TipLog("[CheckCanStartNow] updating driver, can not start")
+		return false
+	end
+	return true
+end
 
 

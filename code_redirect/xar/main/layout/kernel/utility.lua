@@ -1041,6 +1041,30 @@ function RegisterHotKey()
 	tipUtil:RegisterBosskey(nValue)
 end
 
+function CheckIsUpdatingDriver()
+	local strMutexName = "mutex_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}_updatedrv"
+	local bRet = tipUtil:CheckMutexExist(strMutexName)
+	return bRet
+end
+
+function IsNeedRebootAfterUpdateDriver()
+	local strRegPath = "HKEY_CURRENT_USER\\Software\\Share4Money\\RecommendDriver\\LastRebootTime"
+	local nLastRebootTime = RegQueryValue(strRegPath)
+	if type(nLastRebootTime) ~= "number" or nLastRebootTime == 0 then
+		return false
+	end
+	local nCurUtc = tipUtil:GetCurrentUTCTime()
+	local dwTickCount = tipUtil:GetTickCount()
+	local nRebootTime = nCurUtc - math.floor(dwTickCount/1000)
+	
+	if math.abs(nRebootTime - nLastRebootTime) > 5 then
+		RegDeleteValue(strRegPath)
+		return false
+	end
+	return true
+end
+
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -1085,6 +1109,8 @@ function RegisterFunctionObject(self)
 	obj.WriteLastLaunchTime = WriteLastLaunchTime
 	obj.CheckZcashAExistCondition = CheckZcashAExistCondition
 	obj.RegisterHotKey = RegisterHotKey
+	obj.CheckIsUpdatingDriver = CheckIsUpdatingDriver
+	obj.IsNeedRebootAfterUpdateDriver = IsNeedRebootAfterUpdateDriver
 	
 	--服务器时间的获取
 	obj.SplitStringBySeperator = SplitStringBySeperator
