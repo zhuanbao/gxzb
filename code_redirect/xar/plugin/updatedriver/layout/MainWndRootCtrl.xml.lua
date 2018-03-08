@@ -528,14 +528,15 @@ function DoInstallSuccess()
 	ObjRecommend:SetText("已成功升级显卡驱动程序！需要重启电脑后才能生效。\r\n ")
 	
 	ShowWarningInfo()
-	PostReBootMsg()	
-	SetCloseBtnEnable(true)
+	
 	SetIgnoreMark()
 	SetSystemLastRebootTime()
+	PostReBootMsg()	
 	local tStatInfo = {}
 	tStatInfo.fu5 = "installfinish"
 	tStatInfo.fu6 = "success"
 	StatisticClient:SendEventReport(tStatInfo)
+	SetCloseBtnEnable(true)
 end
 
 function OnListenerFunc(strKey, ...)
