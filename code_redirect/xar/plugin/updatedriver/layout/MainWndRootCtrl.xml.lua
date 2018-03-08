@@ -40,6 +40,29 @@ function SetIgnoreMark()
 	tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\RecommendDriver\\Ignore", 1)
 end
 
+local g_strMutexName = "mutex_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}_updatedrv"
+local g_hMutex = nil
+function CreateMutex()
+	local bRet, hMutex = tipUtil:CreateMutex(g_strMutexName)
+	if hMutex then
+		g_hMutex = hMutex
+	end
+end
+
+function CloseMutex()
+	if g_hMutex ~= nil then
+		tipUtil:CloseMutex(g_hMutex)
+		g_hMutex = nil
+	end	
+end
+
+function SetSystemLastRebootTime()
+	local nCurUtc = tipUtil:GetCurrentUTCTime()
+	local dwTickCount = tipUtil:GetTickCount()
+	local nLastRebootTime = tipUtil:GetCurrentUTCTime() -  math.floor(tipUtil:GetTickCount()/1000)
+	tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\RecommendDriver\\LastRebootTime", nLastRebootTime)
+end
+
 function GetHookDllPath()
 	local strHookName = "zbmonreboot.dll"
 	local strDir = tFunctionHelper.GetModuleDir()
@@ -252,7 +275,7 @@ function OnDownLoadError(nCode)
 	
 	local ObjHomePage = g_OwnerCtrl:GetControlObject("RRootCtrl.Content.Content.DownFail.HomePage")
 	ObjDownFail:SetVisible(true)
-
+	CloseMutex()
 end
 
 function OnDownLoadSuccess(strPath)
@@ -279,6 +302,7 @@ function ShowInstallFail()
 	ObjInstallFail:SetVisible(true)
 	local ObjHandInstall = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Content.InstallFail.HandInstall")
 	ObjHandInstall:SetVisible(true)
+	CloseMutex()
 end
 
 function RunInStallExe(strPath)
@@ -485,6 +509,7 @@ function PostReBootMsg()
 end
 
 function DoInstallSuccess()
+	CloseMutex()
 	g_hInstProcPID = nil
 	g_hSetupProcPID = nil
 	local ObjProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress")
@@ -506,6 +531,7 @@ function DoInstallSuccess()
 	PostReBootMsg()	
 	SetCloseBtnEnable(true)
 	SetIgnoreMark()
+	SetSystemLastRebootTime()
 	local tStatInfo = {}
 	tStatInfo.fu5 = "installfinish"
 	tStatInfo.fu6 = "success"
@@ -535,6 +561,7 @@ function OnListenerFunc(strKey, ...)
 end
 
 function Start(self)
+	CreateMutex()
 	g_objListen:AttachListener(OnListenerFunc)
 	local p2sUtil = XLGetObject("P2S.Util")
 	g_nState = 1
