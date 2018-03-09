@@ -114,7 +114,7 @@ end
 function OnMouseEnterTitleBtn(self)
 	local strID = self:GetID()
 	local ObjImg = self:GetObject(strID..".HoverImg")
-	if ObjImg then
+	if ObjImg and self:IsEnable() then
 		ObjImg:SetVisible(true)
 	end
 end
