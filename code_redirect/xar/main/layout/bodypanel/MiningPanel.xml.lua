@@ -285,12 +285,15 @@ function AdjustSpeedTextPosition(self)
 		nLenSpeed = nMaxLen
 	end
 	local nNewLeft = (width-(nLenDesc+gap)-nLenSpeed)/2
+	local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 	if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
-		local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 		local nRLeft, nRTop, nRRight, nRBottom = ObjReboot:GetObjPos()
 		nNewLeft = nNewLeft - ((nRRight-nRLeft)/2+2)
 		
 		ObjReboot:SetObjPos(98+nNewLeft+(nLenDesc+gap)+nLenSpeed+2, nRTop, 98+nNewLeft+(nLenDesc+gap)+nLenSpeed+2+(nRRight-nRLeft), nRBottom)
+		ObjReboot:SetVisible(true)
+	else
+		ObjReboot:SetVisible(false)
 	end
 	ObjTextDesc:SetObjPos(nNewLeft, 0, nNewLeft+nLenDesc, height)
 	ObjTextSpeed:SetObjPos(nNewLeft+(nLenDesc+gap), 0, nNewLeft+(nLenDesc+gap)+nLenSpeed, height)
