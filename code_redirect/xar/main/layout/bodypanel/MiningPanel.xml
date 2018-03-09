@@ -165,6 +165,7 @@
 								<valign>center</valign>
 								<halign>center</halign>
 								<zorder>50</zorder>
+								<cursor>IDC_HAND</cursor>
 								<visible>0</visible>
 							</attr>
 							<eventlist>

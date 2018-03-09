@@ -191,8 +191,8 @@
 						</obj>
 						<obj id="TakeCashPanel.Panel.UnBindWeiXin" class="TextLinkEx">
 							<attr>
-								<left>255+13</left>
-								<top>325+33+50</top>
+								<left>255+13+7</left>
+								<top>325+33+50+1</top>
 								<width>60</width>
 								<height>16</height>
 								<HAlign>center</HAlign>

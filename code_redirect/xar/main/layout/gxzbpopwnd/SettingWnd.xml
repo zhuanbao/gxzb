@@ -402,7 +402,7 @@
 												<width>16</width>
 												<height>16</height>
 												<cursor>IDC_HAND</cursor>
-												<image>bitmap.menu.about.normal</image>
+												<image>settingwndtip</image>
 											</attr>
 											<eventlist>
 												<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnterAbout" />
