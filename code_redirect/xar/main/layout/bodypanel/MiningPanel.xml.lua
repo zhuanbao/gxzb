@@ -64,9 +64,11 @@ function UpdateMiningSpeed(self, nSpeed)
 		ObjMiningSpeed:SetChildrenVisible(true)
 		ObjMiningSpeed:SetVisible(true)
 		ShowAnim(self, true)
+		local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 		if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
-			local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 			ObjReboot:SetVisible(true)
+		else
+			ObjReboot:SetVisible(false)
 		end	
 	end	
 	local ObjMiningState = self:GetControlObject("MiningPanel.Panel.MiningState")	
@@ -83,9 +85,11 @@ function UpdateMiningState(self,nMiningState)
 			ObjMiningSpeed:SetChildrenVisible(true)
 			ObjMiningSpeed:SetVisible(true)
 			ShowAnim(self, true)
+			local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 			if tFunctionHelper.IsNeedRebootAfterUpdateDriver() then
-				local ObjReboot = self:GetControlObject("MiningPanel.Panel.RemindReboot.Icon")
 				ObjReboot:SetVisible(true)
+			else
+				ObjReboot:SetVisible(false)
 			end
 		end
 	elseif ClientWorkModule:CheckIsPrepare() then
@@ -291,7 +295,6 @@ function AdjustSpeedTextPosition(self)
 		nNewLeft = nNewLeft - ((nRRight-nRLeft)/2+2)
 		
 		ObjReboot:SetObjPos(98+nNewLeft+(nLenDesc+gap)+nLenSpeed+2, nRTop, 98+nNewLeft+(nLenDesc+gap)+nLenSpeed+2+(nRRight-nRLeft), nRBottom)
-		ObjReboot:SetVisible(true)
 	else
 		ObjReboot:SetVisible(false)
 	end
