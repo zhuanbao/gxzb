@@ -11,17 +11,17 @@ typedef bool ProccessPredFuncionType(const wchar_t* szFileName);
 
 static bool IsShare4MoneyFileName(const wchar_t* szFileName)
 {
-	const wchar_t* greenShieldFileName = L"share4money.exe";
+	const wchar_t* exeFileName = L"share4money.exe";
 	std::size_t i = 0;
 	for(;; ++i) {
-		if(std::towlower(szFileName[i]) != greenShieldFileName[i]) {
+		if(std::towlower(szFileName[i]) != exeFileName[i]) {
 			return false;
 		}
-		if(szFileName[i] == L'\0' || greenShieldFileName[i] == L'\0') {
+		if(szFileName[i] == L'\0' || exeFileName[i] == L'\0') {
 			break;
 		}
 	}
-	return szFileName[i] == L'\0' && greenShieldFileName[i] == L'\0';
+	return szFileName[i] == L'\0' && exeFileName[i] == L'\0';
 }
 
 static bool IsShare4MoneySetupFileName(const wchar_t* szFileName)
