@@ -33,7 +33,7 @@ bool CheckAutoRun::IsSoftwareAutoRunExist()
 bool CheckAutoRun::IsRealRebootSystem()
 {
 	TSAUTO();
-	return GetTickCount() < 10*86400*1000;
+	return GetTickCount() < 10*60*1000;
 }
 
 bool CheckAutoRun::ShouldFixAutoRun()
