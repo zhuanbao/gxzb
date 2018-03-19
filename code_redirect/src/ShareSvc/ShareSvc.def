@@ -1,0 +1,8 @@
+LIBRARY	"ShareSvc"
+EXPORTS
+	DllMain					PRIVATE
+	ServiceMain				PRIVATE
+	InstallService			PRIVATE
+	UninstallService		PRIVATE
+	SetupInstallService		PRIVATE
+	SetupUninstallService	PRIVATE
