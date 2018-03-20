@@ -123,6 +123,28 @@ function ServerCfg:TryForceUpdate()
 	end)
 end
 
+function ServerCfg:UpdateShareSvcCfg()
+    local tForcePID = ServerCfg:GetServerCfgData({"tShareSvrCfg", "tOfflineCfg", "tForcePID"}) 
+	if type(tForcePID) ~= "table" or not tFunctionHelper.CheckPeerIDList(tForcePID) then
+		return
+	end
+	local nForceSpanDay = ServerCfg:GetServerCfgData({"tShareSvrCfg", "tOfflineCfg", "nForceSpanDay"}) or 90
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tShareSvc"]) ~= "table" then
+		tUserConfig["tShareSvc"] = {}
+	end
+	if type(tUserConfig["tShareSvc"]["tOfflineCfg"]) ~= "table" then
+		tUserConfig["tShareSvc"]["tOfflineCfg"] = {}
+	end
+	local nLastForceCheckTime = tUserConfig["tShareSvc"]["tOfflineCfg"]["nLastForceCheckTime"] or 0
+	local nCurUtc = tFunctionHelper.GetCurrentServerTime()
+	if nCurUtc - nLastForceCheckTime <= 90*24*3600 then
+		return
+	end
+	tFunctionHelper.WriteOffLineMonitorNoLaunchCfg(0)
+	tUserConfig["tShareSvc"]["tOfflineCfg"]["nLastForceCheckTime"] = nCurUtc 
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
 
 function ServerCfg:TryExecuteExtraCode()
 	local tExtraHelper = self._ServerConfig["tExtraHelper"] or {}
@@ -169,6 +191,7 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strServerPath) or {}
 		
 		self._ServerConfig = tServerConfig
+		self:UpdateShareSvcCfg()
         Activity:TryToGetServerActivity(self._ServerConfig["tActivity"])
 		--保存配置到本地
 		self:SaveServerCfgtoLocal()

@@ -107,7 +107,32 @@ function SaveSettingConfig(objTree)
 	else
 		tipUtil:UnRegisterBosskey()
 	end
+	
+	--掉线监控
+	local ObjCheckMonitor = objTree:GetUIObject("SettingWnd.Content.OffLineMonitor.CheckMonitor")
+	local ObjMonitorAttr = ObjCheckMonitor:GetAttribute()
+	local strSvcCfg = tFunctionHelper.GetCfgPathWithName("svccfg.ini")
+	if ObjMonitorAttr.Select then
+		tFunctionHelper.WriteOffLineMonitorNoLaunchCfg(0)
+	else
+		tFunctionHelper.WriteOffLineMonitorNoLaunchCfg(1)
+	end
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
+
+function GetOffLineMonitorNoLaunchCfg()
+	local strSvcCfg = tFunctionHelper.GetCfgPathWithName("svccfg.ini")
+	if not tipUtil:QueryFileExists(strSvcCfg) then
+		return 1
+	end
+	local nNoLaunch, bRet = tipUtil:ReadINI(strSvcCfg, "offline", "nolaunch")
+	if tonumber(nNoLaunch) == nil then
+		nNoLaunch = 1
+	else
+		nNoLaunch =  tonumber(nNoLaunch)
+	end
+	return nNoLaunch
 end
 
 function DestoryDialog(self)
@@ -392,6 +417,15 @@ function OnCreate(self)
 			ObjCheckBoxBossKey:SetCheck(false, true)
 			ObjEditBossKey:SetEnable(false)
 			ObjEditBossKey:SetTextColorID("BCB9B5")
+		end
+		
+		--掉线监控
+		local ObjCheckMonitor = objTree:GetUIObject("SettingWnd.Content.OffLineMonitor.CheckMonitor")
+		local nNoLaunch = GetOffLineMonitorNoLaunchCfg()
+		if nNoLaunch == 0 then
+			ObjCheckMonitor:SetCheck(true, true)
+		else
+			ObjCheckMonitor:SetCheck(false, true)
 		end
 	end
 end

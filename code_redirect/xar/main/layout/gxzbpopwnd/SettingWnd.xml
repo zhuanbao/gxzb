@@ -325,10 +325,52 @@
 										</obj>
 									</children>
 								</obj>
-								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
+								<obj id="SettingWnd.Content.OffLineMonitor" class="LayoutObject">
 									<attr>
 										<left>1</left>
 										<top>28+34+5+34+5+5+34+5+34+5</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.OffLineMonitor.SettingName" class="TextObject">
+											<attr>
+												<left>70</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13</font>
+												<text>掉线监控</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.OffLineMonitor.CheckMonitor" class="CheckBox">
+											<attr>
+												<left>70+120+5</left>
+												<top>5</top>
+												<width>150</width>
+												<height>25</height>
+												<ImgWidth>13</ImgWidth>
+												<ImgHeight>13</ImgHeight>
+												<CheckNormal>setting_checkbox.check</CheckNormal>
+												<CheckHover>setting_checkbox.check</CheckHover>
+												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
+												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<Select>false</Select>
+												<Text>开启客户端掉线监控，掉线10分钟后自动上线</Text>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>28+34+5+34+5+5+34+5+34+5+34+5</top>
 										<width>father.width-2</width>
 										<height>34+20</height>
 									</attr>
@@ -412,7 +454,7 @@
 										<obj id="SettingWnd.Content.BossKeyArea.Tip" class="TextureObject">
 											<attr>
 												<left>70+120+5+85+5</left>
-												<top>24+10</top>
+												<top>24+8</top>
 												<width>260</width>
 												<height>20</height>
 												<texture>texture.general.tip.bkg</texture>

@@ -42,6 +42,8 @@ ClientWorkModule.CLIENT_STATE.AUTO_EXIT = 3
 ClientWorkModule.CONNECT_MAX_COUNT = 10
 ClientWorkModule.CONNECT_RETRY_COUNT = 0
 
+ClientWorkModule._ReConnectSvrTimerId = nil
+
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -156,7 +158,10 @@ function ClientWorkModule:ResetReconnectCnt()
 end
 
 function ClientWorkModule:GetReconnectInterval()
-	local nInterval = (self.CONNECT_RETRY_COUNT + 1 )*5*1000
+	local nInterval = (self.CONNECT_RETRY_COUNT + 1 )*15*1000
+	if nInterval > 60*1000 then
+		nInterval = 60*1000
+	end
 	return nInterval
 end
 
@@ -795,56 +800,7 @@ function ClientWorkModule:GetSvrPoolCfg()
 		end
 		fnGetNewPoolCallback(nil)
 	 end
-	)	
-	--self:GetServerJsonData(strUrl, fnGetPoolCallback)
-	--[[
-	NewAsynGetHttpContent(strUrl, false
-	, function(nRet, strContent, respHeaders)
-		TipLog("[GetWorkPoolCfg] nRet:"..tostring(nRet)
-				.." strContent:"..tostring(strContent))
-				
-		if 0 ~= nRet then
-			TipLog("[GetSvrPoolCfg] query sever failed")	
-			OnSvrPoolCfgUpdate(false, false, nLastCfg)
-			return
-		end
-		----forlocal
-		strContent = GetLocalSvrCfgWithName("zcash_poolcfg.json")
-		----
-		local tabInfo = DeCodeJson(strContent)
-		if type(tabInfo) ~= "table" 
-			or type(tabInfo["data"]) ~= "table" 
-			or type(tabInfo["data"]["pool"]) ~= "table" 
-			or #tabInfo["data"]["pool"] == 0 then
-			TipLog("[GetSvrPoolCfg] parse Json failed.")
-			OnSvrPoolCfgUpdate(false, false, nLastCfg)
-			return 
-		end
-		local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-		if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
-			tUserConfig["tSvrPoolInfo"] = {}
-		end
-		local strPoolKey = g_WorkClient.GetPoolCfgName()
-		if type(tUserConfig["tSvrPoolInfo"][strPoolKey]) ~= "table" then
-			tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
-		end
-		
-		local tabPool = tabInfo["data"]["pool"]
-		local tabUserPool = {}
-		for index = 1, #tabPool do
-			if type(tabPool[index]) == "table" and CheckPeerIDList(tabPool[index]["pidlist"]) then
-				tabUserPool[#tabUserPool+1] = tabPool[index]
-			end
-		end
-		tUserConfig["tSvrPoolInfo"][strPoolKey] = tabUserPool
-		
-		if nLastCfg ~= nil then
-			tUserConfig["tSvrPoolInfo"][strPoolKey]["nLastUpdateCfgTime"] = nLastCfg
-		end	
-		SaveConfigToFileByKey("tUserConfig")
-		OnSvrPoolCfgUpdate(true, true, nLastCfg)
-	end)
-	--]]
+	)
 end
 
 function ClientWorkModule:CheckIsPriorityChange(tabNew)
@@ -1045,16 +1001,14 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo, bRetry)
 		self:ResetReconnectCnt()
 	else
 		if bRetry and self:CheckIsWorking() then
-			if not self:CheckCanReconnect() then
-				self:NotifyPause()
-				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
-			else
-				local nInterval = self:GetReconnectInterval()
-				UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
-				SetOnceTimer(function()
-					self:QueryWorkerInfo(true)
-				end, nInterval)
-			end	
+			--[[
+			local nInterval = self:GetReconnectInterval()
+			UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				self:QueryWorkerInfo(true)
+			end, nInterval)
+			--]]
+			self:CheckAndReTryConnectServer()
 		end	
 	end
 end
@@ -1069,58 +1023,12 @@ function ClientWorkModule:QueryWorkerInfo(bRetry)
 	end
 	
 	self:GetServerJsonData(strUrl, fnWorkerInfoCallBack)
-	
-	--[[
-	NewAsynGetHttpContent(strReguestUrl, false
-	, function(nRet, strContent, respHeaders)
-		TipLog("[QueryWorkerInfo] nRet:"..tostring(nRet)
-				.." strContent:"..tostring(strContent))
-				
-		if 0 == nRet then
-			-- forlocal
-			strContent = GetLocalSvrCfgWithName("getWorkerInfo.json")
-			--
-			local tabInfo = DeCodeJson(strContent)
-			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 
-				or type(tabInfo["data"]) ~= "table" then
-				TipLog("[QueryWorkerInfo] parse info error.")
-				if fnCallBack ~= nil then
-					fnCallBack(false)
-				end
-				return 
-			end
-			UpdateSvrPoolCfg(tabInfo)
-			if fnCallBack ~= nil then
-				fnCallBack(true)
-			end
-			-- 绑定 未绑定 解绑 是否 status 不一样
-			if tabInfo["data"]["status"] ~= 1 then
-				if CheckIsBinded() then
-					UnBindingClientFromServer()
-					--return
-				end	
-			end
-			if tonumber(tabInfo["data"]["balance"]) ~= nil then
-				--g_Balance = tabInfo["data"]["balance"]
-				if g_Balance ~= tonumber(tabInfo["data"]["balance"]) then
-					SetUserCurrentBalance(tabInfo["data"]["balance"])
-					UpdateUserBalance()
-				end	
-			end
-		else
-			if fnCallBack ~= nil then
-				fnCallBack(false)
-			end
-			TipLog("[QueryWorkerInfo] query sever failed.")
-		end
-	end)
-	--]]
 end
 
 --查询客户端信息
 function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 	if bSuccess then
+		self:ResetReconnectCnt()
 		self:UpdateSvrPoolCfg(tabInfo)
         self:UpdatePriority(tabInfo)
 		if tabInfo["data"]["status"] ~= 1 then
@@ -1139,16 +1047,8 @@ function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 		if tonumber(tabInfo["data"]["rate"]) ~= nil then
 			self._SvrAverageMiningSpeed = tabInfo["data"]["rate"]
 		end
-		self:ResetReconnectCnt()
 	else
-		--[[
-		if not self:CheckCanReconnect() then
-			if self:CheckIsWorking() then
-				self:NotifyPause()
-				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
-			end	
-		end	
-		--]]
+		self:CheckAndReTryConnectServer()
 	end
 end
 
@@ -1374,6 +1274,10 @@ function ClientWorkModule:ResetGlobalParam()
 		self._WorkingTimerId = nil
 	end
 	self:ResetReconnectCnt()
+	if self._ReConnectSvrTimerId then
+		timeMgr:KillTimer(self._ReConnectSvrTimerId)
+		self._ReConnectSvrTimerId = nil
+	end
 end
 
 function ClientWorkModule:WorkingTimerHandle()
@@ -1492,39 +1396,6 @@ function ClientWorkModule:NotifyStart()
 	end
 	self._UIWorkState = self.UI_STATE.STARTING
 	UIInterface:OnStart()
-	--[[
-	local function OnQueryWorkerInfo(bRet)
-		if GetUIWorkState() ~= UI_STATE_PREPARE_POOL then
-			return 
-		end
-		if not bRet then
-			SetStateInfoToUser("连接服务器失败，重试中...")
-			SetOnceTimer(function()
-				QueryWorkerInfo(OnQueryWorkerInfo)
-			end, 5*1000)
-			return
-		end	
-		SetStateInfoToUser(nil)
-	end
-	
-	local function OnGetUserWorkID(bWorkID, strInfo)
-		if GetUIWorkState() ~= UI_STATE_PREPARE_WORKID then
-			return 
-		end
-		if not bWorkID then
-			SetStateInfoToUser("连接服务器失败，重试中...")
-			SetOnceTimer(function()
-				GetUserWorkID(OnGetUserWorkID)
-			end, 5*1000)
-			
-			return
-		end
-		--获取矿池信息
-		g_UIWorkState = UI_STATE_PREPARE_POOL
-		QueryWorkerInfo(OnQueryWorkerInfo)
-		SetStateInfoToUser(nil)
-	end
-	--]]
 	self._UIWorkState = self.UI_STATE.PREPARE_WORKID
 	local function fnCallBack(bSuccess)
 		self:DispatchEvent("OnFinishPrepareWorkID", bSuccess)
@@ -1580,8 +1451,10 @@ function ClientWorkModule:StartNextClient()
         end
         self:GetUserWorkID(fnCallBack)
 	else
-		self:NotifyQuit()
-		UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		if not self:CheckAndReTryConnectServer() then
+			self:NotifyQuit()
+			UIInterface:SetStateInfoToUser("赚宝进程运行失败")
+		end	
 	end
 end
 --
@@ -1623,4 +1496,27 @@ function ClientWorkModule:CheckCanStartNow()
 	return true
 end
 
-
+function ClientWorkModule:CheckAndReTryConnectServer()
+	if self._ReConnectSvrTimerId then
+		timeMgr:KillTimer(self._ReConnectSvrTimerId)
+		self._ReConnectSvrTimerId = nil
+	end
+	if self:GetClientCurrentState() == self.CLIENT_STATE.CALCULATE or self:GetClientCurrentState() == self.CLIENT_STATE.PREPARE then
+		return false
+	end
+	--无条件暂停一下，因为可能当前客户端状态为nil
+	if self:CheckIsWorking() then
+		self:NotifyQuit()
+	end	
+	SupportClientType:ResetClientIndex() 
+	self:InitMiningClient()
+	self._UIWorkState = self.UI_STATE.PREPARE_POOL
+	UIInterface:OnStart()
+	local nInterval = self:GetReconnectInterval()
+	UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+	self._ReConnectSvrTimerId = SetOnceTimer(function()
+		self._ReConnectSvrTimerId = nil
+		self:QueryWorkerInfo(true)
+	end, nInterval)	
+	return true	
+end

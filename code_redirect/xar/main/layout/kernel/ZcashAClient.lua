@@ -33,6 +33,8 @@ local CLIENT_STATE_CALCULATE = 0
 local CLIENT_STATE_PREPARE = 1
 local CLIENT_STATE_EEEOR = 2
 local CLIENT_STATE_AUTO_EXIT = 3
+local CLIENT_STATE_CONNECT_FAILED = 4
+local CLIENT_STATE_TIMEOUT = 5
 
 --全局参数
 local g_PreWorkState = nil
@@ -393,6 +395,7 @@ function OnZcashAMsg(tParam)
 				ClientWorkModule:QueryClientInfo(0)
 			end	
 		else	
+			g_PreWorkState = CLIENT_STATE_CONNECT_FAILED
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
 			if g_ConnectFailCnt > g_MaxConnectFailCnt then
 				ReStartClientByNextPool()
@@ -479,6 +482,7 @@ function StartZcashATimer()
 			TipLog("[StartZcashATimer] error occur and correct time out, try to restart")
 			ReTryStartClient()
 		elseif nCurrentTime - g_LastClientOutputRightInfoTime > 3*60 then
+			g_PreWorkState = CLIENT_STATE_TIMEOUT
 			TipLog("[StartZcashATimer] output time out, try to restart")
 			ReTryStartClient()
 		end

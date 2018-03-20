@@ -1064,6 +1064,24 @@ function IsNeedRebootAfterUpdateDriver()
 	return true
 end
 
+function GetOffLineMonitorNoLaunchCfg()
+	local strSvcCfg = GetCfgPathWithName("svccfg.ini")
+	if not tipUtil:QueryFileExists(strSvcCfg) then
+		return 1
+	end
+	local nNoLaunch, bRet = tipUtil:ReadINI(strSvcCfg, "offline", "nolaunch")
+	if tonumber(nNoLaunch) == nil then
+		nNoLaunch = 1
+	else
+		nNoLaunch =  tonumber(nNoLaunch)
+	end
+	return nNoLaunch
+end
+
+function WriteOffLineMonitorNoLaunchCfg(nValue)
+	local strSvcCfg = GetCfgPathWithName("svccfg.ini")
+	tipUtil:WriteINI("offline", "nolaunch", nValue, strSvcCfg)
+end
 
 function RegisterFunctionObject(self)
 	local obj = {}
@@ -1138,7 +1156,8 @@ function RegisterFunctionObject(self)
 	obj.SaveConfigToFileByKey = SaveConfigToFileByKey
 	obj.MergeOldUserCfg = MergeOldUserCfg
 	obj.GetOldCfgContent = GetOldCfgContent
-	
+	obj.GetOffLineMonitorNoLaunchCfg = GetOffLineMonitorNoLaunchCfg
+	obj.WriteOffLineMonitorNoLaunchCfg = WriteOffLineMonitorNoLaunchCfg
 
 	--下载
 	obj.CheckMD5 = CheckMD5

@@ -2,6 +2,7 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tipUtil = XLGetObject("API.Util")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local g_strDriverVer = nil
+local g_nCurHashRate = 0
 
 function TipLog(strLog)
 	tipUtil:Log("MaxSpeedDriveWnd: " .. tostring(strLog))
@@ -99,16 +100,28 @@ function ShowContent(objtree)
 		return
 	end
 	g_strDriverVer = tabClientSpeed["VerRef"]
-	local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
-	local nMinSpeed = nRate*tabClientSpeed["MinSpeed"]
-	local strContent = string.format("检测到您的显卡驱动程序不匹配，为了充分发挥显卡本身的高性能，建议您升级显卡驱动至官方推荐版本%s。升级后您的赚宝速度可达%.0f-%.0f元宝/小时", g_strDriverVer, nMinSpeed, nMaxSpeed)
+	local strSpeedDesc = ""
+	if g_nCurHashRate <= 0 then
+		local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
+		strSpeedDesc = string.format("升级后您的赚宝速度可高达%.0f元宝/小时", nMaxSpeed)
+	else
+		local fPrecent = tabClientSpeed["MaxSpeed"]/g_nCurHashRate*100
+		strSpeedDesc = string.format("升级后您的赚宝速度可提升%.0f%%。", fPrecent)
+	end
+	--local nMinSpeed = nRate*tabClientSpeed["MinSpeed"]
+	local strContent = string.format("检测到您的显卡驱动程序不匹配，为了充分发挥显卡本身的高性能，建议您升级显卡驱动至官方推荐版本%s。%s", g_strDriverVer, strSpeedDesc)
 	local objContent = objtree:GetUIObject("MaxSpeedDriveWnd.Content")
 	objContent:SetText(strContent)
+end
+
+function SetCurrentHashRate(nCurHashRate)
+	g_nCurHashRate = nCurHashRate
 end
 
 function OnCreate(self)
 	local userData = self:GetUserData()
 	if userData and userData.parentWnd then
+		SetCurrentHashRate(userData.nCurHashRate or 0)
 		local objtree = self:GetBindUIObjectTree()
 		local objRootLayout = objtree:GetUIObject("root")
 		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()

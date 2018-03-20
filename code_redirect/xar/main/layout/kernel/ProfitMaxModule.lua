@@ -215,7 +215,7 @@ end
 function ProfitMax:CheckShowRecommendCond()
 	local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
 	if nHashRate == 0 then
-		return false
+		--return false
 	end
 	local nClient = ClientWorkModule:GetRealMiningType()
 	if nClient == 7 then
@@ -272,7 +272,7 @@ function ProfitMax:CheckShowRecommendCond()
 		    return false
 		end
 	end
-	return true
+	return true, nHashRate
 end
 
 function ProfitMax:CheckRecommendDriver()
@@ -292,9 +292,10 @@ function ProfitMax:CheckRecommendDriver()
 	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
 		self._RecommendTimerID = nil
 		--if true then
-		if ClientWorkModule:CheckIsWorking() and ProfitMax:CheckShowRecommendCond() then
+		local bCheck, nHashRate = ProfitMax:CheckShowRecommendCond()
+		if ClientWorkModule:CheckIsWorking() and bCheck then
 			TipLog("[CheckRecommendDriver] try to show max speed window")
-			UIInterface:ShowMaxSpeedWnd()
+			UIInterface:ShowMaxSpeedWnd(nHashRate)
 		end
 	end, 600*1000)
 end

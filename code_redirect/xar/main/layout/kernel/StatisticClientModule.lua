@@ -212,12 +212,14 @@ function StatisticClient:SendOnlineReport(tStatInfo)
 end
 
 --心跳包
-function StatisticClient:SendRunTimeReport(strState)
+function StatisticClient:SendRunTimeReport(strState, nTimeSpanInSec)
 	local nSpanTime = math.abs(tipUtil:GetCurrentUTCTime() - self._nLastReportRunTimeUTC)
 	if nSpanTime == 0 then
 		self._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
 		self._strLastReportRunTimeState = strState
 		return
+	elseif nSpanTime > nTimeSpanInSec then
+		nSpanTime = nTimeSpanInSec
 	end
 	local tStatInfo = {}
 	tStatInfo.fu1 = "runtime"
@@ -256,11 +258,11 @@ function StatisticClient:StartRunTimeReport(strState)
 	if self._RunTimeReportTimerId ~= nil then
 		timeMgr:KillTimer(self._RunTimeReportTimerId)
 		self._RunTimeReportTimerId = nil
-		self:SendRunTimeReport(strState)
+		self:SendRunTimeReport(strState, nTimeSpanInSec)
 	end
 	self._nLastReportRunTimeUTC = tipUtil:GetCurrentUTCTime()
 	self._RunTimeReportTimerId = timeMgr:SetTimer(function(item, id)
-		self:SendRunTimeReport(strState)
+		self:SendRunTimeReport(strState, nTimeSpanInSec)
 	end, nTimeSpanInMs)
 end
 

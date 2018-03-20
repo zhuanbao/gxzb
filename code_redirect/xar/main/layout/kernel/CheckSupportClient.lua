@@ -336,6 +336,10 @@ function SupportClientType:CheckIsDebug()
 	return false
 end
 
+function SupportClientType:ResetClientIndex() 
+	self._ClientIndex = 0
+end
+
 function SupportClientType:GetNextClientInfo() 
 	local bDeBug,nClientType = self:CheckIsDebug()
 	if not bDeBug then
