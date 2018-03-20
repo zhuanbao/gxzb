@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pluginkernel", "..\pluginke
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zbmonreboot", "..\zbmonreboot\zbmonreboot.vcproj", "{6833F076-318B-4440-BF3B-53FC9684E782}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShareSvc", "..\ShareSvc\ShareSvc.vcproj", "{31624B35-0835-47AE-9E4E-0B03CA14EDC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -75,6 +77,12 @@ Global
 		{6833F076-318B-4440-BF3B-53FC9684E782}.Release|Win32.ActiveCfg = Release|Win32
 		{6833F076-318B-4440-BF3B-53FC9684E782}.Release|Win32.Build.0 = Release|Win32
 		{6833F076-318B-4440-BF3B-53FC9684E782}.Release|x64.ActiveCfg = Release|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Debug|Win32.Build.0 = Debug|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Debug|x64.ActiveCfg = Debug|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Release|Win32.ActiveCfg = Release|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Release|Win32.Build.0 = Release|Win32
+		{31624B35-0835-47AE-9E4E-0B03CA14EDC2}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
