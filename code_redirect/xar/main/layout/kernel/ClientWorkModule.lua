@@ -332,7 +332,7 @@ end
 function ClientWorkModule:QuerySvrForReportStopMiningInfo(strStatus)
 	local tUserConfig = self:GetUserConfig()
 	if not IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
-		TipLog("[QuerySvrForReportClientInfo] no work id")
+		TipLog("[QuerySvrForReportStopMiningInfo] no work id")
 		return
 	end
 	local strInterfaceName = "eventWork"
@@ -344,7 +344,7 @@ function ClientWorkModule:QuerySvrForReportStopMiningInfo(strStatus)
 	strInterfaceParam = strInterfaceParam .. "&status=" .. Helper:UrlEncode(tostring(strStatus))
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
-	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
+	TipLog("[QuerySvrForReportStopMiningInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
@@ -604,9 +604,14 @@ function ClientWorkModule:SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
 	self:GetServerJsonData(strUrl, fnCallback)
 end
 
-function ClientWorkModule:SendStopMiningInfoToServer(strStatus, fnCallback)
+function ClientWorkModule:SendStopMiningInfoToServer(strStatus, func)
 	local strUrl = self:QuerySvrForReportStopMiningInfo(strStatus)
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	local function fnCallback(bRet, tabInfo)
+		if type(func) == "function" then
+			func(bRet, tabInfo)
+		end
+	end
 	self:GetServerJsonData(strUrl, fnCallback)
 end
 
