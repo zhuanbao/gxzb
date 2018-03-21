@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.46"
+!define PRODUCT_VERSION "1.0.0.48"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -529,6 +529,7 @@ Function .onInit
 		File "main\program\msvcr90.dll"
 		File "main\program\Microsoft.VC90.ATL.manifest"
 		File "main\program\ATL90.dll"
+		File "main\program\ShareSvc.dll"
 		
 	Call CheckHasInstall
 	Call CheckExeProcExist
@@ -732,6 +733,8 @@ Function DoInstall
 	ExecShell open "$SYSDIR\setx.exe" "GPU_SINGLE_ALLOC_PERCENT 100" SW_HIDE
 	StrCpy $Bool_IsInstallSucc 1
 	;${SendStat} "$InstallProgressName" "doinstallsuccess" "$BuildNum_$str_ChannelID" 1
+	;最后一步注册服务
+	System::Call '$PLUGINSDIR\ShareSvc::SetupInstallService() ?u' 
 FunctionEnd
 
 Function CmdSilentInstall
@@ -1414,6 +1417,7 @@ Function un.onInit
 		File "main\program\msvcr90.dll"
 		File "main\program\Microsoft.VC90.ATL.manifest"
 		File "main\program\ATL90.dll"
+		File "main\program\ShareSvc.dll"
 	System::Call "$PLUGINSDIR\zbsetuphelper::FindProcessByName(t 'Share4Money.exe') i.r0"
 	${If} $0 != 0
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "检测到${PRODUCT_NAME}正在运行，是否强制结束？" IDYES +2
@@ -1448,6 +1452,8 @@ Section Uninstall
 	RMDir /r "$INSTDIR\program"
 	;删配置
 	RMDir /r "$BaseCfgDir\Share4Money"
+	;最后一步卸载服务
+	System::Call '$PLUGINSDIR\ShareSvc::SetupUninstallService() ?u'
 	
 	StrCpy "$R0" "$INSTDIR"
 	System::Call 'Shlwapi::PathIsDirectoryEmpty(t R0)i.s'
