@@ -1459,12 +1459,12 @@ function ClientWorkModule:NotifyResume()
 	end	
 end
 
-function ClientWorkModule:NotifyQuit(bExit)
+function ClientWorkModule:NotifyQuit(bNotReport)
 	if self._WorkClient then
 		self._WorkClient.Quit()
 		self:QuitMinerSuccess()
 	end	
-	if not bExit then
+	if not bNotReport then
 		self:SendStopMiningInfoToServer("stop")	
 	end
 end
@@ -1551,7 +1551,7 @@ function ClientWorkModule:CheckAndReTryConnectServer()
 	end
 	--无条件暂停一下，因为可能当前客户端状态为nil
 	if self:CheckIsWorking() then
-		self:NotifyQuit()
+		self:NotifyQuit(true)
 	end	
 	SupportClientType:ResetClientIndex() 
 	self:InitMiningClient()

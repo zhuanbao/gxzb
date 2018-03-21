@@ -302,7 +302,7 @@ end
 function StatisticClient:RestartClient(strRestartCmd)
 	TipLog("************ RestartExit ************")
 	tFunctionHelper.SaveAllConfig()		
-	ClientWorkModule:NotifyQuit()
+	ClientWorkModule:NotifyQuit(true)
 	tipUtil:CloseSingletonMutex()
 	local strExePath = tFunctionHelper.GetExePath()
 	if not IsRealString(strRestartCmd) then
