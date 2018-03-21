@@ -44,6 +44,8 @@ ClientWorkModule.CONNECT_RETRY_COUNT = 0
 
 ClientWorkModule._ReConnectSvrTimerId = nil
 
+--
+ClientWorkModule._nLastPushCalcReportUTC = 0
 function IsNilString(AString)
 	if AString == nil or AString == "" then
 		return true
@@ -279,6 +281,14 @@ function ClientWorkModule:QuerySvrForPushCalcInfo(nSpeed)
 	end
 	strInterfaceParam = strInterfaceParam .. "&p=" .. Helper:UrlEncode((tostring(strPoolInfo)))
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(self._WorkClient.GetCurrentAccount())))
+	--运行时长
+	local nWorkingTime =  tFunctionHelper.GetCurrentServerTime() - self._nLastPushCalcReportUTC
+	if nWorkingTime < 0 and  nWorkingTime > 60 then
+		nWorkingTime = 60
+	end
+	self._nLastPushCalcReportUTC = tFunctionHelper.GetCurrentServerTime()
+	strInterfaceParam = strInterfaceParam .. "&workTime=" .. Helper:UrlEncode((tostring(nWorkingTime)))
+	
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
 	TipLog("[QuerySvrForPushCalcInfo] strReguestUrl = " .. strReguestUrl)
@@ -316,6 +326,25 @@ function ClientWorkModule:QuerySvrForWorkerInfo()
 	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self:FormatRequestUrl(strParam)
 	TipLog("[QuerySvrForWorkInfo] strReguestUrl = " .. strReguestUrl)
+	return strReguestUrl
+end
+
+function ClientWorkModule:QuerySvrForReportStopMiningInfo(strStatus)
+	local tUserConfig = self:GetUserConfig()
+	if not IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
+		TipLog("[QuerySvrForReportClientInfo] no work id")
+		return
+	end
+	local strInterfaceName = "eventWork"
+	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetPeerID()))
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
+		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strOpenID"]))
+	end	
+	strInterfaceParam = strInterfaceParam .. "&status=" .. Helper:UrlEncode(tostring(strStatus))
+	local strParam = self:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  self:FormatRequestUrl(strParam)
+	TipLog("[QuerySvrForReportClientInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
 
@@ -572,6 +601,12 @@ function ClientWorkModule:SendMinerInfoToServer(strUrl,nRetryTimes,fnSuccess)
 			end	
 		end
 	end
+	self:GetServerJsonData(strUrl, fnCallback)
+end
+
+function ClientWorkModule:SendStopMiningInfoToServer(strStatus, fnCallback)
+	local strUrl = self:QuerySvrForReportStopMiningInfo(strStatus)
+	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	self:GetServerJsonData(strUrl, fnCallback)
 end
 
@@ -1394,6 +1429,7 @@ function ClientWorkModule:NotifyStart()
 	if not self:CheckCanStartNow() then
 		return
 	end
+	self._nLastPushCalcReportUTC = tFunctionHelper.GetCurrentServerTime()
 	self._UIWorkState = self.UI_STATE.STARTING
 	UIInterface:OnStart()
 	self._UIWorkState = self.UI_STATE.PREPARE_WORKID
@@ -1404,6 +1440,7 @@ function ClientWorkModule:NotifyStart()
 end
 
 function ClientWorkModule:NotifyPause()
+	self._nLastPushCalcReportUTC = 0
 	if self._WorkClient then
 		self._WorkClient.Pause()
 		self:QuitMinerSuccess()
@@ -1417,11 +1454,14 @@ function ClientWorkModule:NotifyResume()
 	end	
 end
 
-function ClientWorkModule:NotifyQuit()
+function ClientWorkModule:NotifyQuit(bExit)
 	if self._WorkClient then
 		self._WorkClient.Quit()
 		self:QuitMinerSuccess()
 	end	
+	if not bExit then
+		self:SendStopMiningInfoToServer("stop")	
+	end
 end
 
 

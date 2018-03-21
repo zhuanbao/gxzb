@@ -156,6 +156,7 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 				     .. "&fu9=" .. (MakeMaxParamLen(tStat.fu9) or "")
 					 .. "&fu10=" .. ParamEncode(strWorkID or "")
                      .. "&fu11=" .. (MakeMaxParamLen(tStat.fu11) or "")
+					 .. "&fu12=" .. (MakeMaxParamLen(tStat.fu12) or "")
 	local strParam = ClientWorkModule:MakeInterfaceMd5(strApiInterface, strInterfaceParam)
 	local strStatisticUrl = self:FormatRequestUrl(strParam)
 	strStatisticUrl = strStatisticUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
@@ -172,7 +173,7 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 	tipAsynUtil:AsynSendHttpStat(strStatisticUrl, function()
 		self._nStatCount = self._nStatCount - 1
 		if self._nStatCount == 0 and self._bForceExit then
-			self:ExitClient()
+			self:ExitClient(tStat)
 		end
 	end)
 	
@@ -180,7 +181,7 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 	if self._bForceExit and iStatCount > 0 and self._StatTimeoutTimerId == nil then	--开启定时退出定时器
 		self._StatTimeoutTimerId = timeMgr:SetTimer(function(Itm, id)
 			Itm:KillTimer(id)
-			self:ExitClient()
+			self:ExitClient(tStat)
 		end, 15000 * iStatCount)
 	end
 end
@@ -227,7 +228,9 @@ function StatisticClient:SendRunTimeReport(strState, nTimeSpanInSec)
 	if tStatInfo.fu5 == "working" then
 		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
 		tStatInfo.fu7 = ClientWorkModule:GetRealMiningType()
-        tStatInfo.fu11 = ClientWorkModule:GetClientLastAverageHashRate() .. "_" .. tostring(UIInterface:GetCurrentWorkModel() or 1)
+		local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
+        tStatInfo.fu11 = nHashRate .. "_" .. tostring(UIInterface:GetCurrentWorkModel() or 1)
+		tStatInfo.fu12 = nHashRate
 	end
 	--[[
 	local tabMemoryInfo = tipUtil:GetMemoryStatus()
@@ -282,12 +285,18 @@ function StatisticClient:FailExitProcess(iExitCode)
 	self:SendEventReport(tStatInfo)
 end
 
-function StatisticClient:ExitClient(statInfo)
+function StatisticClient:ExitClient(tStat)
 	tFunctionHelper.SaveAllConfig()		
-	ClientWorkModule:NotifyQuit()
+	ClientWorkModule:NotifyQuit(true)
 	TipLog("************ Exit ************")
 	--tipUtil:CloseSingletonMutex()
-	tipUtil:Exit("Exit")
+	if type(tStat.fnCallBack) == "function" then
+		tStat.fnCallBack(ClientWorkModule, "exit", function(bRet,tabInfo)
+			tipUtil:Exit("Exit")
+		end)
+	else
+		tipUtil:Exit("Exit")
+	end	
 end
 
 function StatisticClient:RestartClient(strRestartCmd)

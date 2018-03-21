@@ -428,9 +428,9 @@ function InitMachineName()
 	if not IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) then 
 		local strDeviceName = tipUtil:GetDeviceName()
 		if IsRealString(strDeviceName) then
-			local iMajor,iMinor = tipUtil:NewGetOSVersion()
-			local strWinVer = "Windows " .. tostring(iMajor) .. "." .. tostring(iMinor)
-			strDeviceName = tostring(strDeviceName) .. "(" .. strWinVer .. ")"
+			--local iMajor,iMinor = tipUtil:NewGetOSVersion()
+			--local strWinVer = "Windows " .. tostring(iMajor) .. "." .. tostring(iMinor)
+			--strDeviceName = tostring(strDeviceName) .. "(" .. strWinVer .. ")"
 			TipLog("[InitMachineName] strDeviceName = " .. tostring(strDeviceName))
 			tUserConfig["tUserInfo"]["strMachineName"] = strDeviceName
 		else
