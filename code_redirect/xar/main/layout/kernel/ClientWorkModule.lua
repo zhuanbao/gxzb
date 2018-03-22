@@ -164,6 +164,7 @@ function ClientWorkModule:GetReconnectInterval()
 	if nInterval > 60*1000 then
 		nInterval = 60*1000
 	end
+	self.CONNECT_RETRY_COUNT = self.CONNECT_RETRY_COUNT + 1
 	return nInterval
 end
 
@@ -1313,7 +1314,7 @@ function ClientWorkModule:ResetGlobalParam()
 		timeMgr:KillTimer(self._WorkingTimerId)
 		self._WorkingTimerId = nil
 	end
-	self:ResetReconnectCnt()
+	--self:ResetReconnectCnt()
 	if self._ReConnectSvrTimerId then
 		timeMgr:KillTimer(self._ReConnectSvrTimerId)
 		self._ReConnectSvrTimerId = nil
