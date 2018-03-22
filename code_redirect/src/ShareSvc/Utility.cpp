@@ -7,6 +7,10 @@
 #include <sstream>
 #include <TlHelp32.h>
 #include <cwctype>
+#include <WtsApi32.h>
+#include <ProfInfo.h>
+#include <UserEnv.h>
+#pragma comment(lib, "UserEnv.lib")
 
 #include "ScopeResourceHandle.h"
 #include "WTSProvider.h"
@@ -102,6 +106,20 @@ bool LaunchShare4Money(DWORD dwProcessId)
 			TSERROR4CXX("ProcessIdToSessionId fail. Error: " << ::GetLastError());
 			return false;
 		}
+		TSERROR4CXX("dwProcessId = " << dwProcessId);
+		TSERROR4CXX("sessionId = " << sessionId);
+
+		TCHAR szActiveUserName[MAX_PATH] = {0};
+		LPTSTR pszUserName = NULL;
+		DWORD cbUserName = 0;
+		if (!::WTSQuerySessionInformation(0, sessionId, WTSUserName, &pszUserName, &cbUserName))
+		{
+			TSERROR4CXX("WTSQuerySessionInformation fail. Error: " << ::GetLastError());
+			return false;
+		}
+		::memcpy(szActiveUserName, pszUserName, cbUserName);
+		::WTSFreeMemory(pszUserName);
+
 
 		WTSProvider wtsProvider;
 
@@ -164,6 +182,24 @@ bool LaunchShare4Money(DWORD dwProcessId)
 		std::size_t exeFilePathLength = std::wcslen(exeFilePath);
 		exeFilePath[exeFilePathLength++] = L'\"';
 		std::copy(launchParameters, launchParameters + sizeof(launchParameters) / sizeof(launchParameters[0]), exeFilePath + exeFilePathLength);
+		
+		LPVOID pEnv = NULL;
+		if (!::CreateEnvironmentBlock(&pEnv, hDuplicateToken, FALSE))
+		{
+			TSERROR4CXX("CreateEnvironmentBlock fail. Error: " << ::GetLastError());
+			return false;
+		}
+		
+		PROFILEINFO pfi;
+		ZeroMemory(&pfi, sizeof(PROFILEINFO));
+		pfi.dwSize = sizeof(PROFILEINFO);
+		pfi.lpUserName = szActiveUserName;
+		if (!::LoadUserProfile(hDuplicateToken, &pfi))
+		{
+			::DestroyEnvironmentBlock(pEnv);
+			TSERROR4CXX("LoadUserProfile fail. Error: " << ::GetLastError());
+			return false;
+		}
 
 		STARTUPINFO startupInfo;
 		std::memset(&startupInfo, 0, sizeof(STARTUPINFO));
@@ -172,11 +208,14 @@ bool LaunchShare4Money(DWORD dwProcessId)
 
 		PROCESS_INFORMATION processInfomation;
 		std::memset(&processInfomation, 0, sizeof(PROCESS_INFORMATION));
-
-		if(!::CreateProcessAsUser(hDuplicateToken, NULL, exeFilePath, NULL, NULL, FALSE, 0, NULL, NULL, &startupInfo, &processInfomation)) {
+		
+		
+		if(!::CreateProcessAsUser(hDuplicateToken, NULL, exeFilePath, NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT, pEnv, NULL, &startupInfo, &processInfomation)) {
+			::DestroyEnvironmentBlock(pEnv);
 			TSERROR4CXX("CreateProcessAsUser fail. Error: " << ::GetLastError());
 			return false;
 		}
+		::DestroyEnvironmentBlock(pEnv);
 		return true;
 	}
 }
