@@ -105,7 +105,7 @@ function ShowContent(objtree)
 		local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
 		strSpeedDesc = string.format("升级后您的赚宝速度可高达%.0f元宝/小时", nMaxSpeed)
 	else
-		local fPrecent = tabClientSpeed["MaxSpeed"]/g_nCurHashRate*100
+		local fPrecent = (tabClientSpeed["MaxSpeed"]-g_nCurHashRate)/g_nCurHashRate*100
 		strSpeedDesc = string.format("升级后您的赚宝速度可提升%.0f%%。", fPrecent)
 	end
 	--local nMinSpeed = nRate*tabClientSpeed["MinSpeed"]
