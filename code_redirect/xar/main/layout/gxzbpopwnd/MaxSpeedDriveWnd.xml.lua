@@ -105,8 +105,12 @@ function ShowContent(objtree)
 		local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
 		strSpeedDesc = string.format("升级后您的赚宝速度可高达%.0f元宝/小时", nMaxSpeed)
 	else
-		local fPrecent = (tabClientSpeed["MaxSpeed"]-g_nCurHashRate)/g_nCurHashRate*100
-		strSpeedDesc = string.format("升级后您的赚宝速度可提升%.0f%%。", fPrecent)
+		local fPrecent = (tabClientSpeed["MaxSpeed"]-g_nCurHashRate)/g_nCurHashRate
+		if fPrecent < 1 then
+			strSpeedDesc = string.format("升级后您的赚宝速度可提升%.0f%%。", fPrecent*100)
+		else
+			strSpeedDesc = string.format("升级后您的赚宝速度可提升%.2f倍。", fPrecent)
+		end
 	end
 	--local nMinSpeed = nRate*tabClientSpeed["MinSpeed"]
 	local strContent = string.format("检测到您的显卡驱动程序不匹配，为了充分发挥显卡本身的高性能，建议您升级显卡驱动至官方推荐版本%s。%s", g_strDriverVer, strSpeedDesc)
