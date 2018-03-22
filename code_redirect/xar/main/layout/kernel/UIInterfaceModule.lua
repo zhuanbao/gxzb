@@ -915,7 +915,6 @@ function UIInterface:ReportAndExit()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "exit"
 	tStatInfo.Exit = true
-	tStatInfo.fnCallBack = ClientWorkModule.SendStopMiningInfoToServer
 	StatisticClient:SendEventReport(tStatInfo)
 end
 

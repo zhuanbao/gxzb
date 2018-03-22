@@ -288,15 +288,11 @@ end
 function StatisticClient:ExitClient(tStat)
 	tFunctionHelper.SaveAllConfig()		
 	ClientWorkModule:NotifyQuit(true)
-	TipLog("************ Exit ************")
 	--tipUtil:CloseSingletonMutex()
-	if type(tStat.fnCallBack) == "function" then
-		tStat.fnCallBack(ClientWorkModule, "exit", function(bRet,tabInfo)
-			tipUtil:Exit("Exit")
-		end)
-	else
+	ClientWorkModule:SendStopMiningInfoToServer("exit", function(bRet,tabInfo)
 		tipUtil:Exit("Exit")
-	end	
+		TipLog("************ Exit ************")
+	end)
 end
 
 function StatisticClient:RestartClient(strRestartCmd)
