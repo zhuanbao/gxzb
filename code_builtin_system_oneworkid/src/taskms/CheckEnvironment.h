@@ -31,8 +31,9 @@ private:
 		std::wstring strClientParam;
 	}CLIENT_INFO,*PCLIENT_INFO;
 	bool GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO);
-	bool CheckZcashNCond();
-	bool CheckZcashACond();
+	bool CheckZNCond();
+	bool CheckZACond();
+	bool CheckGPUName(const std::string &strName);
 	void GetClientInfo();
 	std::wstring GetRandomAccount();
 	void GetWorkID();
