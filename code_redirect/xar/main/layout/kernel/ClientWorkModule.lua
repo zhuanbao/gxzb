@@ -284,7 +284,7 @@ function ClientWorkModule:QuerySvrForPushCalcInfo(nSpeed)
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(self._WorkClient.GetCurrentAccount())))
 	--运行时长
 	local nWorkingTime =  tFunctionHelper.GetCurrentServerTime() - self._nLastPushCalcReportUTC
-	if nWorkingTime < 0 and  nWorkingTime > 60 then
+	if nWorkingTime < 0 or nWorkingTime > 60 then
 		nWorkingTime = 60
 	end
 	self._nLastPushCalcReportUTC = tFunctionHelper.GetCurrentServerTime()
