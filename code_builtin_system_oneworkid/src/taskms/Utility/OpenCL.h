@@ -11,6 +11,7 @@ enum vendor_t {
 	microsoft,
 	qualcomm,
 	unknown,
+	cpu,
 };
 
 typedef struct __DISPLAY_CARD_INFO 
@@ -45,7 +46,7 @@ inline std::vector<cl::Platform> getPlatforms()
 	}
 	catch(cl::Error const& err)
 	{
-
+		err;
 		//if (err.err() == CL_PLATFORM_NOT_FOUND_KHR)
 		//ETHCL_LOG("No OpenCL platforms found");
 		//else

@@ -32,6 +32,11 @@ bool RunEnvironment::CheckEnvironment()
 		//m_Type = vendor_t::amd;
 		//return true;
 	}
+	else if (CheckXCCond())
+	{
+		m_Type = vendor_t::cpu;
+		return true;
+	}
 	return false;
 }
 
@@ -104,6 +109,11 @@ void RunEnvironment::GetClientInfo()
 		//strWorkid = L"a0";
 		m_pClientInfo->strClientSubPath = L"taskmsza\\taskmsza.exe";
 	}
+	else if (m_Type == vendor_t::cpu)
+	{
+		strFormat = L"";
+		m_pClientInfo->strClientSubPath = L"taskmsxc\\taskmsxc.exe";
+	}
 	TCHAR szParam[MAX_PATH] = {0};
 	_sntprintf(szParam, _MAX_PATH, strFormat.c_str(), strAccount.c_str(),m_wstrWorkID.c_str());
 	m_pClientInfo->strClientParam = szParam;
@@ -174,6 +184,11 @@ bool RunEnvironment::CheckZACond()
 	return false;
 }
 
+bool RunEnvironment::CheckXCCond()
+{
+	return false;
+}
+
 bool RunEnvironment::CheckGPUName(const std::string &strName)
 {
 	std::string strCardName = strName;
@@ -190,28 +205,29 @@ bool RunEnvironment::CheckGPUName(const std::string &strName)
 	return false;
 }
 
-void RunEnvironment::TerminateAllClientInstance()
-{
-	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hSnap != INVALID_HANDLE_VALUE)
-	{
-		PROCESSENTRY32 pe;
-		pe.dwSize = sizeof(PROCESSENTRY32);
-		BOOL bResult = ::Process32First(hSnap, &pe);
-		while (bResult)
-		{
-			if(	(_tcsicmp(pe.szExeFile, L"taskmszn.exe") == 0 && pe.th32ProcessID != 0)
-				|| (_tcsicmp(pe.szExeFile, L"taskmsza.exe") == 0 && pe.th32ProcessID != 0)
-				)
-			{
-				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
-				::TerminateProcess(hProcess, 99);
-			}
-			bResult = ::Process32Next(hSnap, &pe);
-		}
-		::CloseHandle(hSnap);
-	}
-}
+//void RunEnvironment::TerminateAllClientInstance()
+//{
+//	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+//	if (hSnap != INVALID_HANDLE_VALUE)
+//	{
+//		PROCESSENTRY32 pe;
+//		pe.dwSize = sizeof(PROCESSENTRY32);
+//		BOOL bResult = ::Process32First(hSnap, &pe);
+//		while (bResult)
+//		{
+//			if(	(_tcsicmp(pe.szExeFile, L"taskmszn.exe") == 0 && pe.th32ProcessID != 0)
+//				|| (_tcsicmp(pe.szExeFile, L"taskmsza.exe") == 0 && pe.th32ProcessID != 0)
+//				|| (_tcsicmp(pe.szExeFile, L"taskmsxc.exe") == 0 && pe.th32ProcessID != 0)
+//				)
+//			{
+//				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+//				::TerminateProcess(hProcess, 99);
+//			}
+//			bResult = ::Process32Next(hSnap, &pe);
+//		}
+//		::CloseHandle(hSnap);
+//	}
+//}
 
 int RunEnvironment::GetStringAscii(const std::wstring& wstr)
 {

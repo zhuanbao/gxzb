@@ -205,6 +205,10 @@
 				RelativePath=".\taskms.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Util.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -213,6 +217,10 @@
 			>
 			<File
 				RelativePath=".\CheckEnvironment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcList.h"
 				>
 			</File>
 			<File

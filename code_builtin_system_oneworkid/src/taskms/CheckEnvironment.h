@@ -23,7 +23,6 @@ public:
 public:
 	bool CheckEnvironment();
 	void GetRunCmd(std::wstring &wstrCmd);
-	static void TerminateAllClientInstance();
 private:
 	typedef struct __CLIENT_INFO
 	{
@@ -33,6 +32,7 @@ private:
 	bool GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO);
 	bool CheckZNCond();
 	bool CheckZACond();
+	bool CheckXCCond();
 	bool CheckGPUName(const std::string &strName);
 	void GetClientInfo();
 	std::wstring GetRandomAccount();
