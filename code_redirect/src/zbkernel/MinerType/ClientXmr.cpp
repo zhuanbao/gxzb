@@ -254,6 +254,13 @@ void CClientXmr::RegexString(const char *szBuffer)
 		PostErrorMsg(strBuffer.c_str(),"connect error: connection timed out");
 		TSDEBUG4CXX(L"[RegexString]: " << L"connection timed out");
 	}
+	//read error: "connection reset by peer"
+	if (boost::icontains(strBuffer,"read error: \"connection reset by peer\""))
+	{
+		PostWndMsg(WP_XMR_CONNECT_POOL, 3);
+		PostErrorMsg(strBuffer.c_str(),"read error: connection reset by peer");
+		TSDEBUG4CXX(L"[RegexString]: " << L"connection reset by peer");
+	}
 	return;
 }
 
