@@ -761,7 +761,8 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 			tUserConfig["tSvrPoolInfo"][strPoolKey] = {}
 		end
 		
-		local tabPool = tabInfo["data"]["p"]
+		local strPoolVerKey = self._WorkClient.GetPoolVerKey() or "p"
+		local tabPool = tabInfo["data"][tostring(strPoolVerKey)] or {}
 		local tabUserPool = {}
 		for index = 1, #tabPool do
 			if type(tabPool[index]) == "table" and tFunctionHelper.CheckPeerIDList(tabPool[index]["pidlist"]) then

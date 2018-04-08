@@ -47,6 +47,7 @@ function XmrHelper:GetCpuCfgTable(nMaxGpuUsage, strPool, strAccount, strWorkID)
 	tabCfg["pools"][1]["pass"] = strWorkID
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
+	tabCfg["pools"][1]["variant"] = -1
 	return tabCfg
 end
 
@@ -65,6 +66,7 @@ function XmrHelper:GetGpuACfgTable(nPlatform, strPool, strAccount, strWorkID)
 	tabCfg["pools"][1]["pass"] = strWorkID
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
+	tabCfg["pools"][1]["variant"] = -1
 	tabCfg["sharehelper"] = {}
 	tabCfg["sharehelper"]["intensity"] = 512
 	tabCfg["sharehelper"]["worksize"] = 8
@@ -89,6 +91,7 @@ function XmrHelper:GetGpuNCfgTable(strSleep, nMaxGpuUsage, strPool, strAccount, 
 	tabCfg["pools"][1]["pass"] = strWorkID
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
+	tabCfg["pools"][1]["variant"] = -1
 	return tabCfg
 end
 

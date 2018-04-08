@@ -5,6 +5,7 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
 --矿池配置文件名字
+local g_PoolVerKey = "p"
 local g_PoolCfgName = "bpcfg.json"
 local g_DefaultPoolType = "x_cb"
 local g_nPlatformId = 0
@@ -661,6 +662,10 @@ function GetDefaultPoolType()
 	return g_DefaultPoolType
 end
 
+function GetPoolVerKey()
+	return g_PoolVerKey
+end
+
 function GetSpeedFormat(nSpeed)
 	local strSpeed = string.format("%0.6f",tostring(nSpeed))
 	--strSpeed = strSpeed .. "SOL/s"
@@ -694,6 +699,7 @@ function RegisterFunctionObject(self)
 	obj.GetDefaultPoolType = GetDefaultPoolType
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
+	obj.GetPoolVerKey = GetPoolVerKey
 	XLSetGlobal("ZcashAClient", obj)
 end
 RegisterFunctionObject()
