@@ -277,20 +277,20 @@ end
 
 function ProfitMax:CheckRecommendDriver()
 	self:ClearRecommendDriver()
-	self:SendRecommendFailStat(0)
+	self:SendRecommendStat(0)
     if SupportClientType:GetCurrentPriorityMode() ~= 1 then
 		TipLog("[CheckRecommendDriver] GetCurrentPriorityMode is not 1")
-		self:SendRecommendFailStat(1)
+		self:SendRecommendStat(1)
 		return
 	end
 	if self:IsExistIgnoreMark() then
 		TipLog("[CheckRecommendDriver] exist ignore mark")
-		self:SendRecommendFailStat(2)
+		self:SendRecommendStat(2)
 		return
 	end
 	if not self:CheckLastRecommendTime() then
 		TipLog("[CheckRecommendDriver] last recommend time return false")
-		self:SendRecommendFailStat(3)
+		self:SendRecommendStat(3)
 		return
 	end
 	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
@@ -298,12 +298,13 @@ function ProfitMax:CheckRecommendDriver()
 		--if true then
 		local bCheck, nHashRate = ProfitMax:CheckShowRecommendCond()
 		if not bCheck then
-			self:SendRecommendFailStat(nHashRate)
+			self:SendRecommendStat(nHashRate)
 		elseif not ClientWorkModule:CheckIsWorking() then
-			self:SendRecommendFailStat(13)
+			self:SendRecommendStat(13)
 		else
 			TipLog("[CheckRecommendDriver] try to show max speed window")
 			UIInterface:ShowMaxSpeedWnd(nHashRate)
+			self:SendRecommendStat(99)
 		end
 	end, 600*1000)
 end
@@ -376,9 +377,9 @@ function ProfitMax:CanShowMaxSpeedWndNow()
 	return true
 end
 
-function ProfitMax:SendRecommendFailStat(nFlag)
+function ProfitMax:SendRecommendStat(nFlag)
     local tStatInfo = {}
-	tStatInfo.fu1 = "recommendfail"
+	tStatInfo.fu1 = "recommenddriver"
 	tStatInfo.fu5 = nFlag
 	StatisticClient:SendEventReport(tStatInfo)
 end
