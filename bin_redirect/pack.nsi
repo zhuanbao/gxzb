@@ -86,6 +86,7 @@ Var IsSilentInst
 Var str_ChannelID
 Var BoolExitMsg
 Var InstallProgressName
+Var Sstartform
 Var BuildNum
 
 Var CheckETHCond
@@ -610,15 +611,18 @@ Function FirstSendStart
 			${SendStat} "installenter" "$Verision_Channel" "" ""
 			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "installenter", t "$Verision_Channel"'
 			StrCpy $InstallProgressName "installprogress"
+			StrCpy $Sstartform "installfinish"
 		${Else}
 			${SendStat} "reinstallenter" "$Verision_Channel" "$Int_InState" ""
 			System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "reinstallenter", t "$Verision_Channel"'
 			StrCpy $InstallProgressName "reinstallprogress"
+			StrCpy $Sstartform "reinstallfinish"
 		${EndIf} 	
 	${Else}
 		${SendStat} "updateenter" "$Verision_Channel" "" ""
 		System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "install", t "updateenter", t "$Verision_Channel"'
 		StrCpy $InstallProgressName "updateprogress"
+		StrCpy $Sstartform "updatefinish"
 	${EndIf} 
 FunctionEnd
 
@@ -847,7 +851,7 @@ Function CmdSilentInstall
         System::Call "kernel32::CloseHandle(i $Handle_SMutex)"
         Sleep $R7
     ${EndIf}   
-	ExecShell open "Share4Money.exe" "/sstartfrom installfinish /installmethod silent $R0" SW_SHOWNORMAL
+	ExecShell open "Share4Money.exe" "/sstartfrom $Sstartform /installmethod silent $R0" SW_SHOWNORMAL
 	ExitInstal:
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	Abort
@@ -1272,7 +1276,7 @@ FunctionEnd
 
 Function lijitiyan
 	SetOutPath "$INSTDIR\program"
-	ExecShell open "Share4Money.exe" "/working /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
+	ExecShell open "Share4Money.exe" "/working /forceshow /sstartfrom $Sstartform" SW_SHOWNORMAL
 	HideWindow
 	System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 	;RMDir /r $PLUGINSDIR
@@ -1369,7 +1373,7 @@ Function NSD_TimerAutoRun
 		GetFunctionAddress $0 NSD_TimerAutoRun
 		nsDialogs::KillTimer $0
 		SetOutPath "$INSTDIR\program"
-		ExecShell open "Share4Money.exe" " /working /forceshow /sstartfrom installfinish" SW_SHOWNORMAL
+		ExecShell open "Share4Money.exe" " /working /forceshow /sstartfrom $Sstartform" SW_SHOWNORMAL
 		HideWindow
 		System::Call "$PLUGINSDIR\zbsetuphelper::WaitForStat()"
 		Call cancel
