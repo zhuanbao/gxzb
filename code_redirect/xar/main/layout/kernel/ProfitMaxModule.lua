@@ -219,16 +219,16 @@ function ProfitMax:CheckShowRecommendCond()
 	end
 	local nClient = ClientWorkModule:GetRealMiningType()
 	if nClient == 7 then
-		return false
+		return false, 4
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) ~= "table" then
-		return false
+		return false, 5
 	end
 	local tabRate = tUserConfig["tProfitMax"]["tRate"]
 	local tabGpuSpeed = tUserConfig["tProfitMax"]["tServerGpuSpeed"]
 	if type(tabRate) ~= "table" or type(tabGpuSpeed) ~= "table" then
-		return false
+		return false, 6
 	end
 	--[[
 	local nRate = 0
@@ -241,16 +241,117 @@ function ProfitMax:CheckShowRecommendCond()
 	end
 	--]]
 	local tabClientSpeed = tabGpuSpeed[tostring(nClient)]
-	if type(tabClientSpeed) ~= "table" and not IsRealString(tabClientSpeed["VerRef"]) then
-		return false
+	if type(tabClientSpeed) ~= "table" or not IsRealString(tabClientSpeed["VerRef"]) then
+		return false, 7
 	end
 	local nMiniSpeed = tabClientSpeed["MinSpeed"]
 	TipLog("[CheckShowRecommendCond] nHashRate = " .. tostring(nHashRate) .. ", nMiniSpeed = " .. tostring(nMiniSpeed))
 	if nHashRate > nMiniSpeed*0.9 then
 		TipLog("[CheckShowRecommendCond] hash rate is enough")
 		self:SetIgnoreMark()
+		return false, 8
+	end
+	local tabUserGpuInfo = SupportClientType:GetCurrentGpuInfo()
+	if type(tabUserGpuInfo) ~= "table" then
+		return false, 9
+	end
+	local strVer = tabUserGpuInfo["version"]
+	if not IsRealString(strVer) then
+		return false, 10
+	end
+	if strVer == tabClientSpeed["VerRef"] then
+		TipLog("[CheckShowRecommendCond] current ver is equal ref ver")
+		self:SetIgnoreMark()
+		return false, 11
+	end
+	local tabExcludeVer = tabClientSpeed["VerList"] or {}
+	for Idx=1, #tabExcludeVer do
+		if strVer == tabExcludeVer[Idx] then
+			TipLog("[CheckShowRecommendCond] current ver is in ver list")
+			self:SetIgnoreMark()
+		    return false, 12
+		end
+	end
+	return true, nHashRate
+end
+
+function ProfitMax:CheckRecommendDriver()
+	self:ClearRecommendDriver()
+	self:SendRecommendFailStat(0)
+    if SupportClientType:GetCurrentPriorityMode() ~= 1 then
+		TipLog("[CheckRecommendDriver] GetCurrentPriorityMode is not 1")
+		self:SendRecommendFailStat(1)
+		return
+	end
+	if self:IsExistIgnoreMark() then
+		TipLog("[CheckRecommendDriver] exist ignore mark")
+		self:SendRecommendFailStat(2)
+		return
+	end
+	if not self:CheckLastRecommendTime() then
+		TipLog("[CheckRecommendDriver] last recommend time return false")
+		self:SendRecommendFailStat(3)
+		return
+	end
+	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
+		self._RecommendTimerID = nil
+		--if true then
+		local bCheck, nHashRate = ProfitMax:CheckShowRecommendCond()
+		if not bCheck then
+			self:SendRecommendFailStat(nHashRate)
+		elseif not ClientWorkModule:CheckIsWorking() then
+			self:SendRecommendFailStat(13)
+		else
+			TipLog("[CheckRecommendDriver] try to show max speed window")
+			UIInterface:ShowMaxSpeedWnd(nHashRate)
+		end
+	end, 600*1000)
+end
+
+function ProfitMax:ClearRecommendDriver()
+    if self._RecommendTimerID ~= nil then
+		timeMgr:KillTimer(self._RecommendTimerID)
+		self._RecommendTimerID = nil
+	end
+end
+
+
+function ProfitMax:CanShowMaxSpeedWndNow()
+    self:ClearRecommendDriver()
+    if SupportClientType:GetCurrentPriorityMode() ~= 1 then
+		TipLog("[CanShowhowMaxSpeedWndNow] GetCurrentPriorityMode is not 1")
 		return false
 	end
+	if self:IsExistIgnoreMark() then
+		TipLog("[CanShowhowMaxSpeedWndNow] exist ignore mark")
+		return false
+	end
+	if not self:CheckLastRecommendTime() then
+		TipLog("[CanShowhowMaxSpeedWndNow] last recommend time return false")
+		return false
+	end
+		local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
+	if nHashRate == 0 then
+		--return false
+	end
+	local nClient = ClientWorkModule:GetRealMiningType()
+	if nClient == 7 then
+		return false
+	end
+	
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tProfitMax"]) ~= "table" then
+		return false
+	end
+	local tabGpuSpeed = tUserConfig["tProfitMax"]["tServerGpuSpeed"]
+	if type(tabGpuSpeed) ~= "table" then
+		return false
+	end
+	local tabClientSpeed = tabGpuSpeed[tostring(nClient)]
+	if type(tabClientSpeed) ~= "table" or not IsRealString(tabClientSpeed["VerRef"]) then
+		return false
+	end
+	
 	local tabUserGpuInfo = SupportClientType:GetCurrentGpuInfo()
 	if type(tabUserGpuInfo) ~= "table" then
 		return false
@@ -272,43 +373,15 @@ function ProfitMax:CheckShowRecommendCond()
 		    return false
 		end
 	end
-	return true, nHashRate
+	return true
 end
 
-function ProfitMax:CheckRecommendDriver()
-	self:ClearRecommendDriver()
-    if SupportClientType:GetCurrentPriorityMode() ~= 1 then
-		TipLog("[CheckRecommendDriver] GetCurrentPriorityMode is not 1")
-		return
-	end
-	if self:IsExistIgnoreMark() then
-		TipLog("[CheckRecommendDriver] exist ignore mark")
-		return
-	end
-	if not self:CheckLastRecommendTime() then
-		TipLog("[CheckRecommendDriver] last recommend time return false")
-		return
-	end
-	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
-		self._RecommendTimerID = nil
-		--if true then
-		local bCheck, nHashRate = ProfitMax:CheckShowRecommendCond()
-		if ClientWorkModule:CheckIsWorking() and bCheck then
-			TipLog("[CheckRecommendDriver] try to show max speed window")
-			UIInterface:ShowMaxSpeedWnd(nHashRate)
-		end
-	end, 600*1000)
+function ProfitMax:SendRecommendFailStat(nFlag)
+    local tStatInfo = {}
+	tStatInfo.fu1 = "recommendfail"
+	tStatInfo.fu5 = nFlag
+	StatisticClient:SendEventReport(tStatInfo)
 end
-
-function ProfitMax:ClearRecommendDriver()
-    if self._RecommendTimerID ~= nil then
-		timeMgr:KillTimer(self._RecommendTimerID)
-		self._RecommendTimerID = nil
-	end
-end
-
-
-
 
 
 

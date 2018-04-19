@@ -1,0 +1,372 @@
+<xlue>
+	<control class="UserIntroduce">
+		<attr_def>
+        </attr_def>
+		<method_def>
+
+		</method_def>
+        <event_def>
+        </event_def>
+		<objtemplate>
+            <children>				
+				<obj id="UserIntroduce.Root" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>				
+					<children>		
+						<obj id="UserIntroduce.Root.Bkg" class="TextureObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<texture>GXZB.UserIntroduce.Bkg</texture>
+							</attr>
+							<children>
+								<obj id="UserIntroduce.Skip" class="TipAddin.Button">
+									<attr>
+										<Text></Text>
+										<TextFont></TextFont>
+										<TextColor></TextColor>
+										<left>father.width-69-23</left>
+										<top>32</top>
+										<width>69</width>
+										<height>30</height>
+										<NormalBkgID>GXZB.UserIntroduce.SkipBtn.normal</NormalBkgID>
+										<DownBkgID>GXZB.UserIntroduce.SkipBtn.hover</DownBkgID>
+										<HoverBkgID>GXZB.UserIntroduce.SkipBtn.hover</HoverBkgID>
+										<DisableBkgID>GXZB.UserIntroduce.SkipBtn.normal</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickSkip" />
+									</eventlist>	
+								</obj>
+								<obj id="UserIntroduce.Page1" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="UserIntroduce.Page1.Title" class="TextObject">
+											<attr>
+												<left>30</left>
+												<top>40</top>
+												<width>father.width-30-69-23</width>
+												<height>20</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>B7673A</textcolor>
+												<font>font.text18</font>
+												<texttype>freetype</texttype>
+												<text>赚宝能给你带来什么？</text>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page1.Img" class="ImageObject">
+											<attr>
+												<left>30</left>
+												<top>father.height-242-221</top>
+												<width>307</width>
+												<height>242</height>
+												<image>GXZB.UserIntroduce.RedPacket</image>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page1.Desc" class="ImageObject">
+											<attr>
+												<left>(father.width-192)/2</left>
+												<top>father.height-221+37</top>
+												<width>192</width>
+												<height>57</height>
+												<image>GXZB.UserIntroduce.Desc1</image>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="UserIntroduce.Page2" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="UserIntroduce.Page2.Title" class="TextObject">
+											<attr>
+												<left>30</left>
+												<top>40</top>
+												<width>father.width-30-69-23</width>
+												<height>20</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>B7673A</textcolor>
+												<font>font.text18</font>
+												<texttype>freetype</texttype>
+												<text>您需要做什么？</text>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page2.Img" class="ImageObject">
+											<attr>
+												<left>30</left>
+												<top>father.height-242-221</top>
+												<width>307</width>
+												<height>243</height>
+												<image>GXZB.UserIntroduce.ComputerHang</image>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page2.Desc" class="ImageObject">
+											<attr>
+												<left>(father.width-191)/2</left>
+												<top>father.height-221+37</top>
+												<width>191</width>
+												<height>57</height>
+												<image>GXZB.UserIntroduce.Desc2</image>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="UserIntroduce.Page3" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="UserIntroduce.Page3.Title" class="TextObject">
+											<attr>
+												<left>30</left>
+												<top>40</top>
+												<width>father.width-30-69-23</width>
+												<height>20</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>B7673A</textcolor>
+												<font>font.text18</font>
+												<texttype>freetype</texttype>
+												<text>真的能提现吗？</text>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page3.Img" class="ImageObject">
+											<attr>
+												<left>30</left>
+												<top>father.height-242-221</top>
+												<width>307</width>
+												<height>243</height>
+												<image>GXZB.UserIntroduce.WXIdentify</image>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page3.Desc" class="ImageObject">
+											<attr>
+												<left>(father.width-191)/2</left>
+												<top>father.height-221+37</top>
+												<width>191</width>
+												<height>57</height>
+												<image>GXZB.UserIntroduce.Desc3</image>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="UserIntroduce.Page4" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="UserIntroduce.Page4.Title" class="TextObject">
+											<attr>
+												<left>30</left>
+												<top>40</top>
+												<width>father.width-30-69-23</width>
+												<height>20</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>B7673A</textcolor>
+												<font>font.text18</font>
+												<texttype>freetype</texttype>
+												<text>立即体验赚宝</text>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page4.Img" class="ImageObject">
+											<attr>
+												<left>62</left>
+												<top>164</top>
+												<width>243</width>
+												<height>178</height>
+												<image>GXZB.UserIntroduce.OpenPacket</image>
+												<cursor>IDC_HAND</cursor>
+											</attr>
+											<eventlist>
+												<event name="OnMouseMove" file="UserIntroduce.xml.lua" func="OnMouseMoveOpenPacket" />
+												<event name="OnMouseLeave" file="UserIntroduce.xml.lua" func="OnMouseLeaveOpenPacket" />
+												<event name="OnLButtonUp" file="UserIntroduce.xml.lua" func="OnLButtonUpOpenPacket" />
+											</eventlist>
+										</obj>
+										<obj id="UserIntroduce.Page4.Desc" class="ImageObject">
+											<attr>
+												<left>(father.width-193)/2</left>
+												<top>father.height-63-48-46-56</top>
+												<width>193</width>
+												<height>56</height>
+												<image>GXZB.UserIntroduce.Desc4</image>
+											</attr>
+										</obj>
+										<obj id="UserIntroduce.Page4.Start" class="TipAddin.Button">
+											<attr>
+												<Text></Text>
+												<TextFont></TextFont>
+												<TextColor></TextColor>
+												<left>(father.width-190)/2</left>
+												<top>father.height-86-48</top>
+												<width>190</width>
+												<height>48</height>
+												<NormalBkgID>GXZB.UserIntroduce.StartBtn.normal</NormalBkgID>
+												<DownBkgID>GXZB.UserIntroduce.StartBtn.hover</DownBkgID>
+												<HoverBkgID>GXZB.UserIntroduce.StartBtn.hover</HoverBkgID>
+												<DisableBkgID>GXZB.UserIntroduce.StartBtn.normal</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickStart" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+								<obj id="UserIntroduce.LeftBtn" class="TipAddin.Button">
+									<attr>
+										<Text></Text>
+										<TextFont></TextFont>
+										<TextColor></TextColor>
+										<left>12</left>
+										<top>(father.height-38)/2</top>
+										<width>18</width>
+										<height>38</height>
+										<NormalBkgID>GXZB.UserIntroduce.LeftBtn.normal</NormalBkgID>
+										<DownBkgID>GXZB.UserIntroduce.LeftBtn.hover</DownBkgID>
+										<HoverBkgID>GXZB.UserIntroduce.LeftBtn.hover</HoverBkgID>
+										<DisableBkgID>GXZB.UserIntroduce.LeftBtn.normal</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickLeftPage" />
+									</eventlist>	
+								</obj>
+								<obj id="UserIntroduce.RightBtn" class="TipAddin.Button">
+									<attr>
+										<Text></Text>
+										<TextFont></TextFont>
+										<TextColor></TextColor>
+										<left>father.width-12-18</left>
+										<top>(father.height-38)/2</top>
+										<width>18</width>
+										<height>38</height>
+										<NormalBkgID>GXZB.UserIntroduce.RightBtn.normal</NormalBkgID>
+										<DownBkgID>GXZB.UserIntroduce.RightBtn.hover</DownBkgID>
+										<HoverBkgID>GXZB.UserIntroduce.RightBtn.hover</HoverBkgID>
+										<DisableBkgID>GXZB.UserIntroduce.RightBtn.normal</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickRightPage" />
+									</eventlist>	
+								</obj>
+								<obj id="UserIntroduce.Position" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="UserIntroduce.Position.Bnt1" class="TipAddin.Button">
+											<attr>
+												<Text></Text>
+												<TextFont></TextFont>
+												<TextColor></TextColor>
+												<left>134</left>
+												<top>father.height-40-10</top>
+												<width>10</width>
+												<height>10</height>
+												<NormalBkgID>GXZB.UserIntroduce.PagePos.unselect</NormalBkgID>
+												<DownBkgID>GXZB.UserIntroduce.PagePos.unselect</DownBkgID>
+												<HoverBkgID>GXZB.UserIntroduce.PagePos.unselect</HoverBkgID>
+												<DisableBkgID>GXZB.UserIntroduce.PagePos.unselect</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickPos" />
+											</eventlist>	
+										</obj>
+										<obj id="UserIntroduce.Position.Bnt2" class="TipAddin.Button">
+											<attr>
+												<Text></Text>
+												<TextFont></TextFont>
+												<TextColor></TextColor>
+												<left>134+10+20</left>
+												<top>father.height-40-10</top>
+												<width>10</width>
+												<height>10</height>
+												<NormalBkgID>GXZB.UserIntroduce.PagePos.unselect</NormalBkgID>
+												<DownBkgID>GXZB.UserIntroduce.PagePos.unselect</DownBkgID>
+												<HoverBkgID>GXZB.UserIntroduce.PagePos.unselect</HoverBkgID>
+												<DisableBkgID>GXZB.UserIntroduce.PagePos.unselect</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickPos" />
+											</eventlist>	
+										</obj>
+										<obj id="UserIntroduce.Position.Bnt3" class="TipAddin.Button">
+											<attr>
+												<Text></Text>
+												<TextFont></TextFont>
+												<TextColor></TextColor>
+												<left>134+10+20+10+20</left>
+												<top>father.height-40-10</top>
+												<width>10</width>
+												<height>10</height>
+												<NormalBkgID>GXZB.UserIntroduce.PagePos.unselect</NormalBkgID>
+												<DownBkgID>GXZB.UserIntroduce.PagePos.unselect</DownBkgID>
+												<HoverBkgID>GXZB.UserIntroduce.PagePos.unselect</HoverBkgID>
+												<DisableBkgID>GXZB.UserIntroduce.PagePos.unselect</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickPos" />
+											</eventlist>	
+										</obj>
+										<obj id="UserIntroduce.Position.Bnt4" class="TipAddin.Button">
+											<attr>
+												<Text></Text>
+												<TextFont></TextFont>
+												<TextColor></TextColor>
+												<left>134+10+20+10+20+10+20</left>
+												<top>father.height-40-10</top>
+												<width>10</width>
+												<height>10</height>
+												<NormalBkgID>GXZB.UserIntroduce.PagePos.unselect</NormalBkgID>
+												<DownBkgID>GXZB.UserIntroduce.PagePos.unselect</DownBkgID>
+												<HoverBkgID>GXZB.UserIntroduce.PagePos.unselect</HoverBkgID>
+												<DisableBkgID>GXZB.UserIntroduce.PagePos.unselect</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="UserIntroduce.xml.lua" func="OnClickPos" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+							</children>
+						</obj>
+					</children>
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnInitControl" file="UserIntroduce.xml.lua" func="OnInitControl" />
+				<event name="OnMouseMove" file="UserIntroduce.xml.lua" func="OnMouseMove" />
+				<event name="OnMouseLeave" file="UserIntroduce.xml.lua" func="OnMouseLeave" />
+			</eventlist>
+        </objtemplate>
+	</control>
+
+</xlue>
+
+

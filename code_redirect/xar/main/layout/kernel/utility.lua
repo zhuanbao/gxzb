@@ -173,6 +173,13 @@ function GetTimeStamp()
 	return strStamp 
 end
 
+function GetMinuteStamp()
+    local nCUtc = GetCurrentServerTime()
+	local nCYear, nCMonth, nCDay, nCHour, nCMin = tipUtil:FormatCrtTime(nCUtc)
+    local strStamp = string.format("%04d%02d%02d%02d%02d", nCYear, nCMonth, nCDay, nCHour, nCMin)
+	return strStamp
+end
+
 function GetFileSaveNameFromUrl(url)
 	local _, _, strFileName = string.find(tostring(url), ".*/(.*)$")
 	local npos = string.find(strFileName, "?", 1, true)
@@ -1099,6 +1106,7 @@ function RegisterFunctionObject(self)
 	obj.GetFileNameFromPath = GetFileNameFromPath
 	obj.GetCommandStrValue = GetCommandStrValue
 	obj.GetTimeStamp = GetTimeStamp
+	obj.GetMinuteStamp = GetMinuteStamp
 	obj.GetFileSaveNameFromUrl = GetFileSaveNameFromUrl
 	obj.GetSystemBits = GetSystemBits
 	obj.IsUserFullScreen = IsUserFullScreen

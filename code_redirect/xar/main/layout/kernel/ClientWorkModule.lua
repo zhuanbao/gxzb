@@ -1199,112 +1199,103 @@ end
 --查询收益接口,strtype = h24 最近24小时，d30 最近1个月
 --不同整点才会去请求，否则使用本地
 --请求失败显示上次， 颜色用灰色
-function ClientWorkModule:GetHistoryToServer(strtype, fnCallBack)
-	local function CheckLastUTC(utc)
-		if type(utc) ~= "number" then
+function ClientWorkModule:CreateIncomeTimeTab(strTabKey,tabValue)
+    if type(tabValue) ~= "table" then
+        tabValue = {}
+    end
+    local tabTypeData = {}
+    local nCurrentUtc = tFunctionHelper.GetCurrentServerTime() or 0
+    local nCYear, nCMonth, nCDay, nCHour = tipUtil:FormatCrtTime(nCurrentUtc)
+    if strTabKey == "hour24" then
+        for IdxHour=1, 24 do
+            tabTypeData[IdxHour] = {}
+            local nUtc = tipUtil:DateTime2Seconds(nCYear,nCMonth,nCDay,nCHour,0,0)
+            local nIdxUtc = nUtc-(24-IdxHour)*3600
+            local nIdxYear, nIdxMonth, nIdxDay, nIdxHour = tipUtil:FormatCrtTime(nIdxUtc) 
+            tabTypeData[IdxHour][1] = string.format("%02d", nIdxHour)..":00"
+            tabTypeData[IdxHour][2] = tonumber(tabValue[IdxHour]) or 0
+        end
+    else
+        for IdxMonth=1,30 do
+            tabTypeData[IdxMonth] = {}
+            local nUtc = tipUtil:DateTime2Seconds(nCYear,nCMonth,nCDay,nCHour,0,0)
+            local nIdxUtc = nUtc-(30-IdxMonth)*86400
+            local nIdxYear, nIdxMonth, nIdxDay, nIdxHour = tipUtil:FormatCrtTime(nIdxUtc) 
+            tabTypeData[IdxMonth][1] = string.format("%02d", nIdxMonth)..".".. string.format("%02d", nIdxDay)
+            tabTypeData[IdxMonth][2] = tonumber(tabValue[IdxMonth]) or 0
+        end
+    end
+    return tabTypeData
+end
+
+function ClientWorkModule:GetLocalHistoryIncome(strType)
+	local strTabKey = "hour24"
+    if strType == "d30" then
+        strTabKey = "day30"
+    end
+	
+    local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
+	if type(tEarnings[strTabKey]) == "table" and #tEarnings[strTabKey] > 0 then
+        return tEarnings[strTabKey]
+    end
+    tEarnings[strTabKey] = self:CreateIncomeTimeTab(strTabKey, nil)
+    tFunctionHelper.SaveConfigToFileByKey("tEarnings")
+    return tEarnings[strTabKey]
+end
+
+function ClientWorkModule:GetServerHistoryIncome(strType, fnCallBack)
+    local strTabKey = "hour24"
+    if strType == "d30" then
+        strTabKey = "day30"
+    end
+	local tabLocal = ClientWorkModule:GetLocalHistoryIncome(strType) 
+	
+    local strReguestUrl = self:QuerySvrForGetHistoryInfo(strType)
+    if not IsRealString(strReguestUrl) then
+        fnCallBack(false, tabLocal)
+        return
+    end
+	local function CheckLastUTC(nLastUtc)
+		if type(nLastUtc) ~= "number" then
 			return true
 		end
-		local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
-		local nLYear, nLMonth, nLDay, nLHour, nLMin = tipUtil:FormatCrtTime(utc)
+		local nCurrentUtc = tFunctionHelper.GetCurrentServerTime() or 0
+		local nLYear, nLMonth, nLDay, nLHour, nLMin = tipUtil:FormatCrtTime(nLastUtc)
 		local nCYear, nCMonth, nCDay, nCHour, nCMin = tipUtil:FormatCrtTime(nCurrentUtc)
 		if nLYear ~= nCYear or nLMonth ~= nCMonth or nLDay ~= nCDay or nLHour ~= nCHour or nLMin ~= nCMin then
 			return true
 		end
 		return false
 	end
-	local function UINeedTable(t)
-		local tmp = {}
-		local nCurrent = tipUtil:GetCurrentUTCTime() or 0
-		--[[
-		if strtype == "h24" then
-			nCurrent = nCurrent - 3600
-		else
-			nCurrent = nCurrent - 86400
-		end
-		--]]
-		for i=#t, 1, -1 do
-			local _, LMonth, LDay, LHour = tipUtil:FormatCrtTime(nCurrent)
-			tmp[i] = {}
-			if strtype == "h24" then
-				tmp[i][1] = string.format("%02d", LHour)..":00"
-				nCurrent = nCurrent - 3600
-			else
-				tmp[i][1] = string.format("%02d", LMonth).."/".. string.format("%02d", LDay)
-				nCurrent = nCurrent - 86400
-			end
-			tmp[i][2] = t[i]
-		end
-		return tmp
-	end
-	local function GetLocal(tLocal)
-		local t = {}
-		local count = 0
-		tLocal = tLocal or {}
-		if strtype == "h24" then
-			if type(tLocal["hour24"]) == "table" and #tLocal["hour24"] == 24 then
-				return tLocal["hour24"]
-			end
-			count = 24
-		else
-			if type(tLocal["day30"]) == "table" and #tLocal["day30"] == 30 then
-				return tLocal["day30"]
-			end
-			count = 30
-		end
-		for i = 1, count do
-			t[i] = 0
-		end
-		return UINeedTable(t)
-	end
-	local function Save2Local(tServer)
-		local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
-		tEarnings[strtype] = tEarnings[strtype] or {}
-		tEarnings[strtype]["lastutc"] = tipUtil:GetCurrentUTCTime() or 0
-		tEarnings[strtype == "h24" and "hour24" or "day30"] = UINeedTable(tServer)
-		tFunctionHelper.SaveConfigToFileByKey("tEarnings")
-	end
-	local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
-	tEarnings[strtype] = tEarnings[strtype] or {}
-	if not CheckLastUTC(tEarnings[strtype]["lastutc"]) then
-		fnCallBack(true, GetLocal(tEarnings))
+    local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
+	if type(tEarnings[strType]) == "table" and not CheckLastUTC(tEarnings[strType]["lastutc"]) then
+		fnCallBack(true, tabLocal)
 		return
 	end
-	local strReguestUrl = self:QuerySvrForGetHistoryInfo(strtype)
-	if not strReguestUrl then
-		local tDefault = GetLocal()
-		fnCallBack(false, tDefault)
-		return
-	end
-	strReguestUrl = strReguestUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+	strReguestUrl = strReguestUrl .. "&rd="..tostring(tFunctionHelper.GetMinuteStamp())
 	TipLog("[GetHistoryToServer] strReguestUrl = " .. strReguestUrl)
 	tFunctionHelper.NewAsynGetHttpContent(strReguestUrl, false
 	, function(nRet, strContent, respHeaders)
 		TipLog("[GetHistoryToServer] nRet:"..tostring(nRet)
 				.." strContent:"..tostring(strContent))
-		--[[forlocal
-		strContent = GetLocalSvrCfgWithName("getHistory"..strtype..".json")
-		local tabInfo = DeCodeJson(strContent)
-		if type(tabInfo) == "table" and type(tabInfo["data"]) == "table" then
-			fnCallBack(true, UINeedTable(tabInfo["data"]))
-			Save2Local(tabInfo["data"])
-		else
-			fnCallBack(false, GetLocal())
-		end
-		if true then return end
-		--]]
-		if 0 == nRet then
-			local tabInfo = tFunctionHelper.DeCodeJson(strContent)	
-			if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" then
-				TipLog("[GetHistoryToServer] parse info error.")
-				fnCallBack(false, GetLocal(tEarnings))
-				return
-			end
-			fnCallBack(true, UINeedTable(tabInfo["data"]))
-			Save2Local(tabInfo["data"])
-		else
-			TipLog("[GetHistoryToServer] get content failed.")
-			fnCallBack(false, GetLocal(tEarnings))
-		end	
+		if 0 ~= nRet then
+            TipLog("[GetHistoryToServer] get content failed.")
+			fnCallBack(false, tabLocal)
+            return
+        end
+        local tabInfo = tFunctionHelper.DeCodeJson(strContent)	
+        if type(tabInfo) ~= "table" or type(tabInfo["data"]) ~= "table" then
+            TipLog("[GetHistoryToServer] parse info error.")
+            fnCallBack(false, tabLocal)
+            return
+        end
+        tEarnings[strTabKey] = self:CreateIncomeTimeTab(strTabKey,tabInfo["data"])
+        if type(tEarnings[strType]) ~= "table" then
+            tEarnings[strType] = {}
+        end
+        tEarnings[strType]["lastutc"] = tFunctionHelper.GetCurrentServerTime()
+        tFunctionHelper.SaveConfigToFileByKey("tEarnings")
+        fnCallBack(true, tEarnings[strTabKey])
 	end)
 end
 --与服务端通信逻辑--End

@@ -12,6 +12,8 @@ local gMinTakeCashBalance = 10000
 local gLastExpireTime = 0
 local gLastQRCodeBitmap = nil
 local gLastTabInfo = {}
+local gMaxBindFailCnt = 10
+
 
 local tabCtrl = {
 	"QRCodePanel.Panel.QRCode.GenFailed",
@@ -130,6 +132,8 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	local bQuerying = false
 	local nTimerCounter = 0
+	
+	local nQueryBindFailCnt = 0
 	local function TimerHandle()
 		if not gBinding then
 			return	
@@ -160,18 +164,22 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 					return
 				end
 				if not bRet then
-					TipLog("Cycle query  sever for bind result return false")
-					bQuerying = false
-					ResetLastQRCodeInfo()
-					ResetGlobalParam()
-					ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
-					local tStatInfo = {}
-					tStatInfo.fu1 = "bindwx"
-					tStatInfo.fu5 = "fail"
-					tStatInfo.fu6 = "svrerror"
-					StatisticClient:SendEventReport(tStatInfo)
-					return 
+					nQueryBindFailCnt = nQueryBindFailCnt+1
+					if nQueryBindFailCnt > gMaxBindFailCnt then
+						TipLog("Cycle query  sever for bind result return false")
+						bQuerying = false
+						ResetLastQRCodeInfo()
+						ResetGlobalParam()
+						ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.BindFailed")
+						local tStatInfo = {}
+						tStatInfo.fu1 = "bindwx"
+						tStatInfo.fu5 = "fail"
+						tStatInfo.fu6 = "svrerror"
+						StatisticClient:SendEventReport(tStatInfo)
+						return 
+					end	
 				end
+				nQueryBindFailCnt = 0
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
 					ResetGlobalParam()
 					UpdateBindSuccessUI(OwnerCtrl)

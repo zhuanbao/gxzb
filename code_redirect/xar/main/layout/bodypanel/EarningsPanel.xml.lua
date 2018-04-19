@@ -30,6 +30,7 @@ end
 
 --相当于强制刷新
 function UpdateClientUnBindState(self)
+	--[[
 	local attr = self:GetAttribute()
 	local reqID = "h24"
 	if attr.currentpanel == 2 then
@@ -41,6 +42,14 @@ function UpdateClientUnBindState(self)
 			attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 			self:Update()
 		end)
+	--]]
+	local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
+    tEarnings["hour24"] = nil
+    tEarnings["h24"] = nil
+    tEarnings["day30"] = nil
+    tEarnings["d30"] = nil
+	tFunctionHelper.SaveConfigToFileByKey("tEarnings")
+	UpdateAddIncome(self, nil)
 end
 
 local xylineFailedBitmap24 = nil
@@ -331,6 +340,7 @@ function ChangeBtnState(self, state)
 end
 
 function OnClickHourBtnBarChart(self)
+	local OwnerCtrl = self:GetOwnerControl()
 	local barobj = self:GetObject("control:EarningsPanel.BarChart")
 	local attr = barobj:GetAttribute()
 	if attr.currentpanel == 1 then
@@ -340,11 +350,13 @@ function OnClickHourBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
-    attr.Data = {}
-    attr.Data["reqFailed"] = true
+    attr.Data = ClientWorkModule:GetLocalHistoryIncome("h24") or {}
+	UpdateAddIncome(OwnerCtrl, attr.Data)
+    attr.Data["reqFailed"] = false
     barobj:Update()
-	ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
-		attr.Data = tabInfo
+	ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
+		attr.Data = tabInfo or ClientWorkModule:GetLocalHistoryIncome("h24")
+		UpdateAddIncome(OwnerCtrl, attr.Data)
 		attr.Data["reqFailed"] = not bRet
 		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 		barobj:Update()
@@ -352,6 +364,7 @@ function OnClickHourBtnBarChart(self)
 end
 
 function OnClickDayBtnBarChart(self)
+	local OwnerCtrl = self:GetOwnerControl()
 	local barobj = self:GetObject("control:EarningsPanel.BarChart")
 	local attr = barobj:GetAttribute()
 	if attr.currentpanel == 2 then
@@ -361,13 +374,51 @@ function OnClickDayBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
-    attr.Data = {}
-    attr.Data["reqFailed"] = true
+    attr.Data = ClientWorkModule:GetLocalHistoryIncome("d30") or {}
+	UpdateAddIncome(OwnerCtrl, attr.Data)
+    attr.Data["reqFailed"] = false
     barobj:Update()
-	ClientWorkModule:GetHistoryToServer("d30", function(bRet, tabInfo)
-		attr.Data = tabInfo
+	ClientWorkModule:GetServerHistoryIncome("d30", function(bRet, tabInfo)
+		attr.Data = tabInfo or ClientWorkModule:GetLocalHistoryIncome("d30")
+		UpdateAddIncome(OwnerCtrl, attr.Data)
 		attr.Data["reqFailed"] = not bRet
 		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
 		barobj:Update()
 	end)
+end
+
+function UpdateAddIncome(self, tabIncome)
+	local ObjAddIncome= self:GetControlObject("EarningsPanel.AddIncome")
+	local ObjStart= self:GetControlObject("EarningsPanel.AddIncome.Start")
+	local ObjNum= self:GetControlObject("EarningsPanel.AddIncome.Num")
+	local ObjEnd= self:GetControlObject("EarningsPanel.AddIncome.End")
+	
+	local nAddIncome = 0
+	if type(tabIncome) == "table" then
+		for Idx=1, #tabIncome do
+			if type(tabIncome[Idx]) == "table" and type(tabIncome[Idx][2]) == "number" then
+				nAddIncome = nAddIncome + tabIncome[Idx][2]
+			end	
+		end
+	end
+	ObjNum:SetText(tFunctionHelper.NumberToFormatMoney(nAddIncome or 0))
+	local nFLeft, nFTop, nFRight, nFButtom = ObjAddIncome:GetObjPos()
+	local nFWidth, nFHeight = nFRight - nFLeft, nFButtom - nFTop
+	--初始给一个较大的宽度
+	w = 200
+	local nLenStart = ObjStart:GetTextExtent()
+	local nLenEnd = ObjEnd:GetTextExtent()
+	local nLenNum = ObjNum:GetTextExtent()
+	local gap = 1
+	local nMax = nFWidth - (nLenStart + gap + nLenEnd + gap) 
+	if nLenNum > nMax then
+		nLenNum = nMax
+	end
+	local nNewLeft = 0
+	ObjStart:SetObjPos(nNewLeft, 0, nNewLeft+nLenStart, nFHeight)
+	ObjNum:SetObjPos(nNewLeft + (nLenStart + gap), 0, nNewLeft + (nLenStart + gap) + nLenNum, nFHeight)
+	ObjEnd:SetObjPos(nNewLeft + (nLenStart + gap) + (nLenNum + gap), 0, nNewLeft + (nLenStart + gap) + (nLenNum + gap) + nLenEnd, nFHeight)
+	
+	local nFatherLen = nNewLeft + (nLenStart + gap) + (nLenNum + gap) + nLenEnd + 4
+	ObjAddIncome:SetObjPos("(father.width-"..nFatherLen..")/2", nFTop, "father.width/2+"..nFatherLen.."/2", nFButtom)
 end

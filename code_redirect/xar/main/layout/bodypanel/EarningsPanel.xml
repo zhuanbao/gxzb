@@ -203,6 +203,56 @@
 								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickDayBtnBarChart" />
 							</eventlist>	
 						</obj>
+						<obj id="EarningsPanel.AddIncome" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>26+16</top>
+								<width>father.width</width>
+								<height>20</height>
+							</attr>
+							<children>
+								<obj id="EarningsPanel.AddIncome.Start" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>66</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>累计赚宝</text>
+									</attr>
+								</obj>
+								<obj id="EarningsPanel.AddIncome.Num" class="TextObject">
+									<attr>
+										<left>66+1</left>
+										<top>0</top>
+										<width>father.width-(66+1)-(41+1)</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>EBB922</textcolor>
+										<font>font.text15</font>
+										<text>0</text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+								<obj id="EarningsPanel.AddIncome.End" class="TextObject">
+									<attr>
+										<left>father.width-(41+1)</left>
+										<top>0</top>
+										<width>41</width>
+										<height>16</height>
+										<valign>center</valign>
+										<halign>right</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>个</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
 						<obj id="EarningsPanel.BarChart" class="BarChart">
 							<attr>
 								<left>60</left>

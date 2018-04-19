@@ -4,6 +4,7 @@ local IPCUtil = XLGetObject("IPC.Util")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 --local ClientWorkModule = nil
 
 ObjectBase = XLGetGlobal("ObjectBase")
@@ -279,13 +280,20 @@ function UIInterface:ShowUpdateDriveWnd()
 		return false
 	end
 	local objHostWnd = self:GetMainHostWnd()
-	local objUpdateCardDriveWnd = hostwndManager:GetHostWnd("GXZB.UpdateCardDriveWnd.ModalInstance")
+	
 	
 	if objHostWnd:GetVisible() then
 		self._tipNotifyIcon:CancleFlashTray() 
-		if objUpdateCardDriveWnd == nil then
-			Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+		if ProfitMax:CanShowMaxSpeedWndNow() then
+			UIInterface:ShowMaxSpeedWnd(0)
+		else
+			local objUpdateCardDriveWnd = hostwndManager:GetHostWnd("GXZB.UpdateCardDriveWnd.ModalInstance")
+			if objUpdateCardDriveWnd == nil then
+				Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+			end	
 		end	
+		
+		
 		--[[
 		if not objUpdateCardDriveWnd:GetVisible() then
 			Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
@@ -374,7 +382,7 @@ function UIInterface:PopTipPre4Hour()
 	if true then return end
 	--]]
 	local function DoPopTip(item, id)
-		ClientWorkModule:GetHistoryToServer("h24", function(bRet, tabInfo)
+		ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
 			if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
 				local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 				local newgetgold = 0
@@ -928,4 +936,44 @@ function UIInterface:ShowRemindRebootWarning()
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
 	objMiningPanel:ShowRemindRebootWarning()
+end
+
+--420*652  369*600
+function UIInterface:CheckCanShowUserIntroduce(tabInfo)
+	if ClientWorkModule:CheckIsBinded() then
+		return
+	end
+	local bRet, strSource = tFunctionHelper.GetCommandStrValue("/sstartfrom")
+	if string.lower(tostring(strSource)) ~= "installfinish" and string.lower(tostring(strSource)) ~= "reinstallfinish" then
+		return
+	end
+	if type(tabInfo) ~= "table" then
+		return
+	end
+	if type(tabInfo["tPID"]) ~= "table" or not tFunctionHelper.CheckPeerIDList(tabInfo["tPID"]) then
+        return
+    end
+	local ObjUserIntroduce = objFactory:CreateUIObject("UserIntroduce.Instance", "UserIntroduce")
+	local wnd = self:GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainWndBkg = objRootCtrl:GetControlObject("WndPanel.MainWnd.Bkg")
+	objMainWndBkg:AddChild(ObjUserIntroduce)
+	ObjUserIntroduce:SetZorder(300000)
+	ObjUserIntroduce:SetObjPos((420-369)/2, 18, (420-369)/2+369, 18+600)
+end
+
+function UIInterface:RemoveUserIntroduce()
+	local wnd = self:GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local ObjUserIntroduce = objRootCtrl:GetControlObject("UserIntroduce.Instance")
+	local objMainWndBkg = objRootCtrl:GetControlObject("WndPanel.MainWnd.Bkg")
+	objMainWndBkg:RemoveChild(ObjUserIntroduce)
 end

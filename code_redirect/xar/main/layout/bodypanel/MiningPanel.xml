@@ -115,7 +115,7 @@
 								<font>font.text22</font>
 								<texttype>freetype</texttype>
 								<text>开始赚宝</text>
-								<zorder>9999999</zorder>
+								<zorder>200000</zorder>
 							</attr>
 						</obj>
 						<obj id="MiningPanel.Panel.MiningSpeed" class="LayoutObject">
