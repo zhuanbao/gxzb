@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\userconfig.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Util.h"
 				>
 			</File>

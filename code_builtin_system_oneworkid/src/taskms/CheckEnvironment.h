@@ -23,6 +23,7 @@ public:
 public:
 	bool CheckEnvironment();
 	void GetRunCmd(std::wstring &wstrCmd);
+	bool CheckIsForceNotMonitor();
 private:
 	typedef struct __CLIENT_INFO
 	{

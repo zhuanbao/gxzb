@@ -1,11 +1,11 @@
 // taskms.cpp : Defines the entry point for the console application.
 //
 #include "stdafx.h"
-
+#include "userconfig.h"
 #include "CheckEnvironment.h"
 #include "Util.h"
-#define  BUILDNUM  L"2"
-#define  CHANNEL  L"0004"
+#define  BUILDNUM  L"5"
+
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
@@ -68,7 +68,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	}
 	HANDLE hThread = SendAnyHttpStat(L"startup", CHANNEL, BUILDNUM, 1);
 
-	if (wstrCmdLine.find(L"/nmp") != std::wstring::npos)
+	if (wstrCmdLine.find(L"/nmp") != std::wstring::npos || run.CheckIsForceNotMonitor())
 	{
 		if (hThread)
 		{
