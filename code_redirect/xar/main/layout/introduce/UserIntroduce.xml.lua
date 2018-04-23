@@ -10,6 +10,14 @@ function IsRealString(AString)
     return type(AString) == "string" and AString ~= ""
 end
 
+function SaveLastShowUTC()
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
+	tUserConfig["tConfig"]["tUserIntroduce"] = tUserConfig["tConfig"]["tUserIntroduce"] or {}
+	tUserConfig["tConfig"]["tUserIntroduce"]["nLastShowTime"] = tFunctionHelper.GetCurrentServerTime()
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
 function FinishUserIntroduce()	
 	StopPosNextPage()
 	if gCookie then
@@ -87,6 +95,7 @@ function OnInitControl(self)
 		    tStatInfo.fu1 = "showuserintroduce"
             StatisticClient:SendEventReport(tStatInfo)
         end)
+		SaveLastShowUTC()
 	end	
 	local wndMain = UIInterface:GetMainHostWnd()
 	gCookie = wndMain:AttachListener("OnShowWindow", false, function(wnd, bShow)
@@ -96,7 +105,8 @@ function OnInitControl(self)
 				local tStatInfo = {}
 				tStatInfo.fu1 = "showuserintroduce"
 				StatisticClient:SendEventReport(tStatInfo)
-        end)
+			end)
+			SaveLastShowUTC()
 		else
 			StopPosNextPage()
 		end

@@ -940,19 +940,33 @@ end
 
 --420*652  369*600
 function UIInterface:CheckCanShowUserIntroduce(tabInfo)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if ClientWorkModule:CheckIsBinded() then
+		tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
+		tUserConfig["tConfig"]["tUserIntroduce"] = tUserConfig["tConfig"]["tUserIntroduce"] or {}
+		tUserConfig["tConfig"]["tUserIntroduce"]["nLastShowTime"] = tFunctionHelper.GetCurrentServerTime()
+		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+		
 		return
 	end
+	local nLastShowTime = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "tUserIntroduce", "nLastShowTime"})
+	if nLastShowTime ~= nil then
+		return
+	end
+	
+	--[[
 	local bRet, strSource = tFunctionHelper.GetCommandStrValue("/sstartfrom")
 	if string.lower(tostring(strSource)) ~= "installfinish" and string.lower(tostring(strSource)) ~= "reinstallfinish" then
 		return
 	end
+	--]]
 	if type(tabInfo) ~= "table" then
 		return
 	end
 	if type(tabInfo["tPID"]) ~= "table" or not tFunctionHelper.CheckPeerIDList(tabInfo["tPID"]) then
         return
     end
+	
 	local ObjUserIntroduce = objFactory:CreateUIObject("UserIntroduce.Instance", "UserIntroduce")
 	local wnd = self:GetMainHostWnd()
 	if not wnd then
