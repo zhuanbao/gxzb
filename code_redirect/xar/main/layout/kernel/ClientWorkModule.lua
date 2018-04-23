@@ -607,6 +607,10 @@ end
 
 function ClientWorkModule:SendStopMiningInfoToServer(strStatus, func)
 	local strUrl = self:QuerySvrForReportStopMiningInfo(strStatus)
+	if not IsRealString(strUrl) then
+		func(false, nil)
+		return
+	end
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	local function fnCallback(bRet, tabInfo)
 		if type(func) == "function" then

@@ -290,8 +290,8 @@ function StatisticClient:ExitClient(tStat)
 	ClientWorkModule:NotifyQuit(true)
 	--tipUtil:CloseSingletonMutex()
 	ClientWorkModule:SendStopMiningInfoToServer("exit", function(bRet,tabInfo)
-		tipUtil:Exit("Exit")
 		TipLog("************ Exit ************")
+		tipUtil:Exit("Exit")
 	end)
 end
 

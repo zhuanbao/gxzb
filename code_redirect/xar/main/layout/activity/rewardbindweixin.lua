@@ -42,6 +42,15 @@ function RewardBindWX:UpdateQrCodePanel()
     if not self._bShouldReward then
         return
     end
+	local wnd = UIInterface:GetMainHostWnd()
+	if not wnd then
+		if self._CycleTimerId then
+			timeMgr:KillTimer(self._CycleTimerId)
+			self._CycleTimerId = nil
+		end
+		return
+	end
+	
     local tBindInfo = self._tabContent["tDescInfo"]["tBindText"][self._nBindIdx]
     local nScanTextIdx = tBindInfo[3]
     local tabScanText = self._tabContent["tDescInfo"]["tScanText"][nScanTextIdx]
@@ -49,6 +58,7 @@ function RewardBindWX:UpdateQrCodePanel()
 	local ObjDescBkg = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Bkg")
     local ObjDescText = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.Reward.Desc.Text")
     local ObjUnbind = self:GetQrCodePanleObjectByID("QRCodePanel.Panel.UnBind")
+	
     local nType = tBindInfo[2]
     if type(nType) == "number" and nType > 0 then
         local strRecvId = "GXZB.Activity.BindReward.Recv" .. tostring(nType)
@@ -350,8 +360,8 @@ function RewardBindWX:GetQrCodePanleObjectByID(strObjID)
 	local Objtree = wnd:GetBindUIObjectTree()
 	local ObjRootCtrl = Objtree:GetUIObject("root.layout:root.ctrl")
 	local ObjMainBodyCtrl = ObjRootCtrl:GetControlObject("WndPanel.MainBody")
-	local ObjMiningPanel = ObjMainBodyCtrl:GetChildObjByCtrlName("QRCodePanel")
-	local ObjCtrl = ObjMiningPanel:GetControlObject(strObjID)
+	local ObjQRCodePanel = ObjMainBodyCtrl:GetChildObjByCtrlName("QRCodePanel")
+	local ObjCtrl = ObjQRCodePanel:GetControlObject(strObjID)
     return ObjCtrl
 end
 
