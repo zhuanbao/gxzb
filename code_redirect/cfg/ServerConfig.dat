@@ -32,6 +32,9 @@ function GetSubTable()
                 ["strUrl"] = "http://conf.eastredm.com/static/activity_v1.2.dat",
             },
         },
+		["tIntroduce"] = {
+				["tPID"] = {"1","2","3","9"},
+		},
 		["tExtraHelper"] = {
 			
 		},
