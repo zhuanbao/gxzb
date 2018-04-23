@@ -401,8 +401,10 @@ function UpdateAddIncome(self, tabIncome)
 			end	
 		end
 	end
-	ObjNum:SetObjPos(0, 0,"father.width", 16)
+	ObjAddIncome:SetObjPos2(0, 26+16, "father.width-(66+1)-(41+1)", 20)
+	ObjNum:SetObjPos2(0, 0, "father.width-(66+1)-(41+1)", 16)
 	ObjNum:SetText(tFunctionHelper.NumberToFormatMoney(nAddIncome or 0))
+	
 	local nFLeft, nFTop, nFRight, nFButtom = ObjAddIncome:GetObjPos()
 	local nFWidth, nFHeight = nFRight - nFLeft, nFButtom - nFTop
 	--初始给一个较大的宽度
