@@ -817,10 +817,25 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 		self:DispatchEvent("OnUpdateCfgFinish", bUpdate)
 	elseif bUpdate and not tabInfo then
+		--[[
 		UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
 		SetOnceTimer(function()
 			self:GetSvrPoolCfg()
 		end, 10*1000)
+		--]]
+		if not self:CheckCanReconnect() then
+			if self:CheckIsWorking() then
+				self:CheckAndReTryConnectServer()
+			else
+				UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+			end	
+		else
+			local nInterval = self:GetReconnectInterval()
+			UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+			SetOnceTimer(function()
+				self:GetSvrPoolCfg()
+			end, 10*1000)
+		end
 	elseif not bUpdate then
 		self:DispatchEvent("OnUpdateCfgFinish", bUpdate)
 	end
