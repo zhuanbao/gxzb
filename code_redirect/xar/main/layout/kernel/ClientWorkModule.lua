@@ -1109,11 +1109,7 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo, bRetry)
 	else
 		if bRetry and self:CheckIsWorking() then
 			if not self:CheckCanReconnect() then
-				if self:CheckIsWorking() then
-					--self:NotifyPause()
-					--UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
-					self:CheckAndReTryConnectServer()
-				end	
+				self:CheckAndReTryConnectServer()
 			else
 				local nInterval = self:GetReconnectInterval()
 				UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
@@ -1589,6 +1585,7 @@ function ClientWorkModule:QuerySvrForReTryConnect()
 		self:QueryWorkerInfo(true)
 	end
 	local strReguestUrl = "http://api.eastredm.com/pc/getClassInfo"
+	strReguestUrl = strReguestUrl .. "?rd="..tostring(tipUtil:GetCurrentUTCTime())
 	self:GetServerJsonData(strReguestUrl, fnCallBack)
 end
 
