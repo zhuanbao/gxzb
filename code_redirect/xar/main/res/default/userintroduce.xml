@@ -1,0 +1,37 @@
+﻿<XLUE>
+	<resource>
+		<texture id="GXZB.UserIntroduce.Bkg" image="userintroduce\GXZB.UserIntroduce.Bkg.png" />
+		
+		<bitmap id="GXZB.UserIntroduce.ComputerHang" path="userintroduce\GXZB.UserIntroduce.ComputerHang.png"/>
+		<bitmap id="GXZB.UserIntroduce.RedPacket" path="userintroduce\GXZB.UserIntroduce.RedPacket.png"/>
+		<bitmap id="GXZB.UserIntroduce.OpenPacket" path="userintroduce\GXZB.UserIntroduce.OpenPacket.png"/>
+		<bitmap id="GXZB.UserIntroduce.WXIdentify" path="userintroduce\GXZB.UserIntroduce.WXIdentify.png"/>
+		
+		<imagelist id="GXZB.UserIntroduce.LeftBtn" vertical="0" varyblock="0" blocksize="18" image="userintroduce\GXZB.UserIntroduce.LeftBtn.png"/>
+			<texture id="GXZB.UserIntroduce.LeftBtn.hover"  imagelist="GXZB.UserIntroduce.LeftBtn" index="1" />
+			<texture id="GXZB.UserIntroduce.LeftBtn.normal"  imagelist="GXZB.UserIntroduce.LeftBtn" index="2" />
+			
+		<imagelist id="GXZB.UserIntroduce.RightBtn" vertical="0" varyblock="0" blocksize="18" image="userintroduce\GXZB.UserIntroduce.RightBtn.png"/>
+			<texture id="GXZB.UserIntroduce.RightBtn.normal"  imagelist="GXZB.UserIntroduce.RightBtn" index="1" />
+			<texture id="GXZB.UserIntroduce.RightBtn.hover"  imagelist="GXZB.UserIntroduce.RightBtn" index="2" />
+			
+		<imagelist id="GXZB.UserIntroduce.SkipBtn" vertical="0" varyblock="0" blocksize="69" image="userintroduce\GXZB.UserIntroduce.SkipBtn.png"/>
+			<texture id="GXZB.UserIntroduce.SkipBtn.normal"  imagelist="GXZB.UserIntroduce.SkipBtn" index="1" />
+			<texture id="GXZB.UserIntroduce.SkipBtn.hover"  imagelist="GXZB.UserIntroduce.SkipBtn" index="2" />
+		
+		<imagelist id="GXZB.UserIntroduce.PagePos" vertical="0" varyblock="0" blocksize="10" image="userintroduce\GXZB.UserIntroduce.PagePos.png"/>
+			<texture id="GXZB.UserIntroduce.PagePos.unselect"  imagelist="GXZB.UserIntroduce.PagePos" index="1" />
+			<texture id="GXZB.UserIntroduce.PagePos.select"  imagelist="GXZB.UserIntroduce.PagePos" index="2" />
+		
+		<imagelist id="GXZB.UserIntroduce.StartBtn" vertical="0" varyblock="0" blocksize="190" image="userintroduce\GXZB.UserIntroduce.StartBtn.png"/>
+			<texture id="GXZB.UserIntroduce.StartBtn.normal"  imagelist="GXZB.UserIntroduce.StartBtn" index="1" />
+			<texture id="GXZB.UserIntroduce.StartBtn.hover"  imagelist="GXZB.UserIntroduce.StartBtn" index="2" />		
+			
+		<bitmap id="GXZB.UserIntroduce.Desc1" path="userintroduce\GXZB.UserIntroduce.Desc1.png"/>
+		<bitmap id="GXZB.UserIntroduce.Desc2" path="userintroduce\GXZB.UserIntroduce.Desc2.png"/>
+		<bitmap id="GXZB.UserIntroduce.Desc3" path="userintroduce\GXZB.UserIntroduce.Desc3.png"/>
+		<bitmap id="GXZB.UserIntroduce.Desc4" path="userintroduce\GXZB.UserIntroduce.Desc4.png"/>
+		
+			
+	</resource>
+</XLUE>
