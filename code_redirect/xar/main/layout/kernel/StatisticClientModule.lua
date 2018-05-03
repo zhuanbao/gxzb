@@ -39,6 +39,7 @@ function TipLog(strLog)
 end
 
 function MakeMaxParamLen(strParam)
+	strParam = tFunctionHelper.StringTrim(strParam)
 	local strEncode = ParamEncode(strParam)
 	while string.len(strEncode) > 256 do
 		local nLen = string.len(strParam)-1
@@ -46,6 +47,7 @@ function MakeMaxParamLen(strParam)
 			nLen = 256
 		end
 		strParam = string.sub(strParam, 1, nLen)
+		strParam = tFunctionHelper.StringTrim(strParam)
 		strEncode = ParamEncode(strParam)
     end
 	return strEncode

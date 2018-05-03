@@ -4,6 +4,7 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
+local g_CoinType = "ca"
 --矿池配置文件名字
 local g_PoolVerKey = "p"
 local g_PoolCfgName = "apcfg.json"
@@ -248,7 +249,7 @@ function GetCurrentMiningCmdLine()
 end
 
 function UpdateSpeed(nHashRate)
-	 g_MiningSpeedPerHour = math.floor(nHashRate * ClientWorkModule:GetSvrAverageMiningSpeed())
+	 g_MiningSpeedPerHour = math.floor(nHashRate * ClientWorkModule:GetSvrAverageMiningSpeed(g_CoinType))
 end
 
 function GetRealTimeIncome(nSpeed,nSpanTime)
@@ -256,7 +257,7 @@ function GetRealTimeIncome(nSpeed,nSpanTime)
 		TipLog("[GetRealTimeIncome] nSpanTime = " .. GTV(nSpanTime) .. ", nSpeed = " .. GTV(nSpeed))
 		return 0
 	end
-	local nIncome = nSpeed*nSpanTime*ClientWorkModule:GetSvrAverageMiningSpeed()/3600
+	local nIncome = nSpeed*nSpanTime*ClientWorkModule:GetSvrAverageMiningSpeed(g_CoinType)/3600
 	
 	local nLastRealTimeIncome = g_LastRealTimeIncome
 	local nNewRealTimeIncome = g_LastRealTimeIncome + nIncome
@@ -343,10 +344,12 @@ function OnGenOilMsg(tParam)
 		if tonumber(nParam) ~= nil and not g_bNoPrepare then
 			UIInterface:UpdateDagProgress(nParam)
 		end
+		--[[
 		if not g_bHasQuerySpeed then
 			g_bHasQuerySpeed = true
 			ClientWorkModule:QueryClientInfo(0)
 		end	
+		--]]
 	elseif nMsgType == WP_GENOIL_SHARE then
 		g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 		g_PreWorkState = CLIENT_STATE_CALCULATE
@@ -356,10 +359,12 @@ function OnGenOilMsg(tParam)
 		if nParam == 0 then
 			g_LastClientOutputRightInfoTime = tipUtil:GetCurrentUTCTime()
 			g_ConnectFailCnt = 0
+			--[[
             if not g_bHasQuerySpeed then
                 g_bHasQuerySpeed = true
                 ClientWorkModule:QueryClientInfo(0)
             end	
+			--]]
 		else
 			g_PreWorkState = CLIENT_STATE_CONNECT_FAILED
 			g_ConnectFailCnt = g_ConnectFailCnt + 1
@@ -626,6 +631,10 @@ function GetPoolVerKey()
 	return g_PoolVerKey
 end
 
+function GetCoinType()
+	return g_CoinType
+end
+
 function GetSpeedFormat(nSpeed)
 	local strSpeed = string.format("%0.2f",nSpeed)
 	--strSpeed = strSpeed .. "MH/s"
@@ -660,6 +669,7 @@ function RegisterFunctionObject(self)
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
 	obj.GetPoolVerKey = GetPoolVerKey
+	obj.GetCoinType = GetCoinType
 	XLSetGlobal("GenOilClient", obj)
 end
 RegisterFunctionObject()

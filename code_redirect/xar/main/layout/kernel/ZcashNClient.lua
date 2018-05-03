@@ -4,6 +4,7 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local IPCUtil = XLGetObject("IPC.Util")
 
+local g_CoinType = "cb"
 --矿池配置文件名字
 local g_PoolVerKey = "p"
 local g_PoolCfgName = "bpcfg.json"
@@ -242,7 +243,7 @@ function GetCurrentMiningCmdLine()
 end
 
 function UpdateSpeed(nHashRate)
-	 g_MiningSpeedPerHour = math.floor(nHashRate * ClientWorkModule:GetSvrAverageMiningSpeed())
+	 g_MiningSpeedPerHour = math.floor(nHashRate * ClientWorkModule:GetSvrAverageMiningSpeed(g_CoinType))
 end
 
 function GetRealTimeIncome(nSpeed,nSpanTime)
@@ -250,7 +251,7 @@ function GetRealTimeIncome(nSpeed,nSpanTime)
 		TipLog("[GetRealTimeIncome] nSpanTime = " .. GTV(nSpanTime) .. ", nSpeed = " .. GTV(nSpeed))
 		return 0
 	end
-	local nIncome = nSpeed*nSpanTime*ClientWorkModule:GetSvrAverageMiningSpeed()/3600
+	local nIncome = nSpeed*nSpanTime*ClientWorkModule:GetSvrAverageMiningSpeed(g_CoinType)/3600
 	
 	local nLastRealTimeIncome = g_LastRealTimeIncome
 	local nNewRealTimeIncome = g_LastRealTimeIncome + nIncome
@@ -393,10 +394,12 @@ function OnZcashNMsg(tParam)
 			g_ConnectFailCnt = 0
 			if g_PreWorkState ~= CLIENT_STATE_CALCULATE then
 				GenerateVirtualDAG()
+				--[[
 				if not g_bHasQuerySpeed then
 					g_bHasQuerySpeed = true
 					ClientWorkModule:QueryClientInfo(0)
 				end	
+				--]]
 			end	
 		else
 			g_PreWorkState = CLIENT_STATE_CONNECT_FAILED 
@@ -672,6 +675,10 @@ function GetPoolVerKey()
 	return g_PoolVerKey
 end
 
+function GetCoinType()
+	return g_CoinType
+end
+
 function GetSpeedFormat(nSpeed)
 	local strSpeed = string.format("%0.6f",tostring(nSpeed))
 	--strSpeed = strSpeed .. "SOL/s"
@@ -706,6 +713,7 @@ function RegisterFunctionObject(self)
 	obj.GetSpeedFormat = GetSpeedFormat
 	obj.OnUpdateBalance = OnUpdateBalance
 	obj.GetPoolVerKey = GetPoolVerKey
+	obj.GetCoinType = GetCoinType
 	XLSetGlobal("ZcashNClient", obj)
 end
 RegisterFunctionObject()

@@ -143,6 +143,7 @@ function LoadDynamicFont()
 end
 
 function ShowMainTipWnd(objMainWnd)
+	UIInterface:AttachFirstShowMainWnd()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local bHideMainPage = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "HideMainPage", "bState"})
 	
@@ -235,6 +236,7 @@ function TipMain()
 		UIInterface:ChangeClientTitle("共享赚宝(未绑定)")
 	end
 	--显示悬浮框
+	UIInterface:CreateSuspendWnd()
 	UIInterface:UpdateSuspendWndVisible()
 	
 	ClientWorkModule:InitMiningClient()
@@ -253,8 +255,6 @@ function PreTipMain()
 	LoadDynamicFont()
 	SendStartUpReport()
 	StatisticClient:StartRunTimeReport("noworking")
-	UIInterface:CreatePopupTipWnd()
-	
 	TipMain()
 end
 

@@ -12,34 +12,8 @@ function OnMouseLeave(self, x, y)
 
 end
 
-local gShowOnce = false
-function TryPopAutoRunTip()
-	if gShowOnce then
-		return
-	end
-	
-	if not tFunctionHelper.CheckCfgSetBoot() or tFunctionHelper.CheckSysSetBoot() then
-		return
-	end
-	local hostWndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
-	local wndUpdate = hostWndManager:GetHostWnd("GXZB.UpdateFrameWnd.Instance")
-	if wndUpdate == nil then
-		return
-	end
-	if wndUpdate:GetVisible() then
-		return
-	end
-	gShowOnce = true
-	UIInterface:ShowPopupWndByName("GXZB.AutoRunTipWnd.Instance", true)
-end
-
 function OnShowWindow(self, bShow)
 	if bShow then
-		if not UIInterface:ShowUpdateDriveWnd() then
-			TryPopAutoRunTip()
-		end	
-		gTipStartTime = tipUtil:GetCurrentUTCTime()
-        
         StatisticClient:SendOnceReport("event", "showmainwnd", function()
             local tStatInfo = {}
 		    tStatInfo.fu1 = "showmainwnd"

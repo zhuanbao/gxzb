@@ -1090,6 +1090,17 @@ function WriteOffLineMonitorNoLaunchCfg(nValue)
 	tipUtil:WriteINI("offline", "nolaunch", nValue, strSvcCfg)
 end
 
+function StringTrim(str)   
+	if not IsRealString(str) then
+		return str
+	end
+	local _,_, strResult = string.find(str, "^%s*(.-)%s*$")
+    if not IsRealString(strResult) then
+		return str
+	end
+	return strResult
+end 
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -1100,6 +1111,7 @@ function RegisterFunctionObject(self)
 	obj.MessageBox = MessageBox
 	obj.LoadTableFromFile = LoadTableFromFile
 	obj.FetchValueByPath = FetchValueByPath
+	obj.StringTrim = StringTrim
 	
 	obj.DeCodeJson = DeCodeJson
 	obj.EnCodeJson = EnCodeJson

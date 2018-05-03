@@ -24,13 +24,12 @@ UIInterface._tHideWnd = {}
 
 
 UIInterface._tPopupWndList = {
-	[1] = {"GXZB.RemindTipWnd", "GXZB.RemindTipWndTree"},
-	[2] = {"GXZB.SuspendWnd", "GXZB.SuspendWndTree"},
-	[3] = {"GXZB.MachineCheckWnd", "GXZB.MachineCheckWndTree"},
-	[4] = {"GXZB.ProfitShareWnd", "GXZB.ProfitShareWndTree"},
-	[5] = {"GXZB.UpdateFrameWnd", "GXZB.UpdateWndTree"},
-	[6] = {"GXZB.AutoRunTipWnd", "GXZB.AutoRunTipWndTree"},
-	[7] = {"GXZB.ZcashAPromptWnd", "GXZB.ZcashAPromptWndTree"},
+	"GXZB.RemindTipWnd",
+	"GXZB.MachineCheckWnd",
+	"GXZB.ProfitShareWnd",
+	"GXZB.UpdateWnd",
+	"GXZB.AutoRunTipWnd",
+	"GXZB.ZcashAPromptWnd"
 }
 
 function IsNilString(AString)
@@ -168,83 +167,60 @@ function UIInterface:SetWndForeGround(objHostWnd)
 	end
 end
 
---弹出窗体
-function UIInterface:CheckIsInitPopupTipWnd()
-	return self._bInitPopWnd
+--悬浮窗
+function UIInterface:CreateSuspendWnd()
+	local wnd = Helper:CreateModelessWnd("GXZB.SuspendWnd", "GXZB.SuspendWndTree")
+	wnd:Show(0)
 end
 
-function UIInterface:CreatePopupTipWnd()
-	for key, tItem in pairs(self._tPopupWndList) do
-		local strHostWndName = tItem[1]
-		local strTreeName = tItem[2]
-		local bSucc = self:CreateWndByName(strHostWndName, strTreeName)
-		
-		if not bSucc then
-			TipLog("[CreatePopupTipWnd] create wnd failed: "..tostring(strHostWndName))
-			StatisticClient:FailExitProcess(5)
-			return false
+function UIInterface:DestroySuspendWnd()
+	Helper:DestoryModelessWnd("GXZB.SuspendWnd")
+end
+
+--弹出窗体
+function UIInterface:CheckIsExistPopupWnd()
+	for key, strID in pairs(self._tPopupWndList) do
+		local strWndInstName = strID .. ".Instance"
+		local wnd = hostwndManager:GetHostWnd(strWndInstName)
+		if wnd then
+			return true
 		end
 	end
-	self._bInitPopWnd = true
+	return false
+end
+
+function UIInterface:CreatePopUpWnd(wndTemplateID)
+	local strWndInstName = wndTemplateID .. ".Instance"
+	local wnd = hostwndManager:GetHostWnd(strWndInstName)
+	if wnd then
+		TipLog("[CreatePopUpWnd] wndTemplateID = " .. tostring(wndTemplateID) .. " is exist")
+		return false
+	end
+	if self:CheckIsExistPopupWnd() then
+		TipLog("[CreatePopUpWnd] exist other popup wnd")
+		return false
+	end
+	
+	local treeTemplateID = wndTemplateID .. "Tree"
+	wnd = Helper:CreateModelessWnd(wndTemplateID, treeTemplateID)
+	self:ShowPopUpWnd(wnd, true)
 	return true
 end
 
-function UIInterface:CreateWndByName(strHostWndName, strTreeName)
-	local bSuccess = false
-	local strInstWndName = strHostWndName..".Instance"
-	local strInstTreeName = strTreeName..".Instance"
-	
-	local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
-	local frameHostWndTemplate = templateMananger:GetTemplate(strHostWndName, "HostWndTemplate" )
-	if frameHostWndTemplate then
-		local frameHostWnd = frameHostWndTemplate:CreateInstance(strInstWndName)
-		if frameHostWnd then
-			local objectTreeTemplate = nil
-			objectTreeTemplate = templateMananger:GetTemplate(strTreeName, "ObjectTreeTemplate")
-			if objectTreeTemplate then
-				local uiObjectTree = objectTreeTemplate:CreateInstance(strInstTreeName)
-				if uiObjectTree then
-					frameHostWnd:BindUIObjectTree(uiObjectTree)
-					local iRet = frameHostWnd:Create()
-					if iRet ~= nil and iRet ~= 0 then
-						bSuccess = true
-						--强制隐藏
-						frameHostWnd:Show(0)
-					end
-				end
-			end
-		end
-	end
-
-	return bSuccess
-end
-
 function UIInterface:DestroyPopupWnd()
-	for key, tItem in pairs(self._tPopupWndList) do
-		local strPopupWndName = tItem[1]
-		local strPopupInst = strPopupWndName..".Instance"
-		
-		local objPopupWnd = hostwndManager:GetHostWnd(strPopupInst)
-		if objPopupWnd then
-			hostwndManager:RemoveHostWnd(strPopupInst)
-		end
+	for key, strID in pairs(self._tPopupWndList) do
+		Helper:DestoryModelessWnd(strID)
 	end
 end
 
-function UIInterface:ShowPopupWndByName(strWndName, bSetTop)
-	local frameHostWnd = hostwndManager:GetHostWnd(tostring(strWndName))
-	if frameHostWnd == nil then
-		TipLog("[ShowPopupWindow] GetHostWnd failed: "..tostring(strWndName))
-		return
-	end
-
+function UIInterface:ShowPopUpWnd(wnd, bSetTop)
 	if not tFunctionHelper.IsUserFullScreen() then
 		if type(tipUtil.SetWndPos) == "function" then
-			local hWnd = frameHostWnd:GetWndHandle()
+			local hWnd = wnd:GetWndHandle()
 			if hWnd ~= nil then
-				TipLog("[ShowPopupWndByName] success")
+				TipLog("[ShowPopUpWnd] success")
 				if bSetTop then
-					frameHostWnd:SetTopMost(true)
+					wnd:SetTopMost(true)
 					tipUtil:SetWndPos(hWnd, 0, 0, 0, 0, 0, 0x0043)
 				else
 					tipUtil:SetWndPos(hWnd, -2, 0, 0, 0, 0, 0x0043)
@@ -252,26 +228,25 @@ function UIInterface:ShowPopupWndByName(strWndName, bSetTop)
 			end
 		end
 	end
-	
-	frameHostWnd:Show(5)
+	wnd:Show(5)
 end
 
-
-function UIInterface:ShowExitRemindWnd()
-	self:ShowPopupWndByName("TipExitRemindWnd.Instance", true)
+function UIInterface:DestroyAllWnd()
+	self:DestroySuspendWnd()
+	self:DestroyPopupWnd()
 end
-
 --
 UIInterface._tabErrorMsg = nil
 UIInterface._bShowUpdateDriveWnd = false
 
+
 --弹出窗体
 
 function UIInterface:ShowMaxSpeedWnd(nHashRate)
-	local objHostWnd = self:GetMainHostWnd()
+	local wndMain = self:GetMainHostWnd()
 	local objMaxSpeedWnd = hostwndManager:GetHostWnd("GXZB.MaxSpeedDriveWnd.ModalInstance")
 	if objMaxSpeedWnd == nil then
-		Helper:CreateModalWnd("GXZB.MaxSpeedDriveWnd", "GXZB.MaxSpeedDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd, ["nCurHashRate"] = nHashRate})
+		Helper:CreateModalWnd("GXZB.MaxSpeedDriveWnd", "GXZB.MaxSpeedDriveWndTree", wndMain:GetWndHandle(), {["parentWnd"] = wndMain, ["nCurHashRate"] = nHashRate})
 	end
 end
 
@@ -279,27 +254,19 @@ function UIInterface:ShowUpdateDriveWnd()
 	if not self._bShowUpdateDriveWnd then
 		return false
 	end
-	local objHostWnd = self:GetMainHostWnd()
+	local wndMain = self:GetMainHostWnd()
 	
 	
-	if objHostWnd:GetVisible() then
+	if wndMain:GetVisible() then
 		self._tipNotifyIcon:CancleFlashTray() 
 		if ProfitMax:CanShowMaxSpeedWndNow() then
 			UIInterface:ShowMaxSpeedWnd(0)
 		else
 			local objUpdateCardDriveWnd = hostwndManager:GetHostWnd("GXZB.UpdateCardDriveWnd.ModalInstance")
 			if objUpdateCardDriveWnd == nil then
-				Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+				Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", wndMain:GetWndHandle(), {["parentWnd"] = wndMain})
 			end	
-		end	
-		
-		
-		--[[
-		if not objUpdateCardDriveWnd:GetVisible() then
-			Helper:CreateModalWnd("GXZB.UpdateCardDriveWnd", "GXZB.UpdateCardDriveWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
-			--self:ShowPopupWndByName("GXZB.UpdateCardDriveWnd.Instance", true)
-		end	
-		--]]
+		end
 	else
 		self._tipNotifyIcon:FlashTray()
 	end	
@@ -319,7 +286,6 @@ function UIInterface:AnalysisClientErrorMsg(tParam)
 		and (string.find(string.lower(strErrorMsg), string.lower("insufficient")) ~= nil 
 		or string.find(string.lower(strErrorMsg), string.lower("Cannot load nvml")) ~= nil  )then
 		self._tabErrorMsg = tParam
-		--self:ShowPopupWndByName("GXZB.UpdateCardDriveWnd.Instance", true)
 		self._bShowUpdateDriveWnd = true
 		self:ShowUpdateDriveWnd(tParam)
 	end
@@ -335,7 +301,7 @@ function UIInterface:PopRemindUpdateWnd()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local nLocalCnt = tFunctionHelper.FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nCnt"}) or 0
 	local nLocaLastUtc = tFunctionHelper.FetchValueByPath(tUserConfig, {"tRemindUpdateCfg", strVersion, "nLastUTC"}) or 0
-	local nCurrentUtc = tipUtil:GetCurrentUTCTime() or 0
+	local nCurrentUtc = tFunctionHelper.GetCurrentServerTime() or 0
 	local strNewVersion = ServerCfg:GetServerCfgData({"tNewVersionInfo", "strVersion"}) or "1.0.0.1"
 	TipLog("PopRemindUpdateWnd strVersion="..tostring(strVersion)
 		.."\n strNewVersion="..tostring(strNewVersion)
@@ -344,14 +310,16 @@ function UIInterface:PopRemindUpdateWnd()
 		.."\n nLocaLastUtc="..tostring(nLocaLastUtc)
 		.."\n nCurrentUtc="..tostring(nCurrentUtc)
 		.."\n nTipPopInterval="..tostring(nTipPopInterval))
-	if tFunctionHelper.CheckIsNewVersion(strNewVersion, strVersion) and nLocalCnt < nTipPopCnt and nCurrentUtc - nLocaLastUtc > nTipPopInterval then
+	if tFunctionHelper.CheckIsNewVersion(strNewVersion, strVersion) and nLocalCnt < nTipPopCnt and math.abs(nCurrentUtc - nLocaLastUtc) > nTipPopInterval then
 		SetOnceTimer(function()
-				self:ShowPopupWndByName("GXZB.UpdateFrameWnd.Instance", true)
-				tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
-				tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
-				tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
-				tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
-				tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+				if UIInterface:CreatePopUpWnd("GXZB.UpdateWnd") then
+					tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
+					tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
+					tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
+					nCurrentUtc = tFunctionHelper.GetCurrentServerTime() or 0
+					tUserConfig["tRemindUpdateCfg"][strVersion]["nLastUTC"] = nCurrentUtc
+					tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+				end	
 			end, 60*1000)
 		return true
 	end
@@ -374,13 +342,6 @@ end
 
 
 function UIInterface:PopTipPre4Hour()
-	--[[
-	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	tUserConfig["nMoneyPer4Hour"] = 8977
-	SaveConfigToFileByKey("tUserConfig")
-	ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
-	if true then return end
-	--]]
 	local function DoPopTip(item, id)
 		ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
 			if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
@@ -392,7 +353,7 @@ function UIInterface:PopTipPre4Hour()
 				if newgetgold > 0 then
 					tUserConfig["nMoneyPer4Hour"] = newgetgold
 					tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-					self:ShowPopupWndByName("GXZB.RemindTipWnd.Instance", true)
+					UIInterface:CreatePopUpWnd("GXZB.RemindTipWnd")
 				end	
 			end
 		end)
@@ -630,8 +591,9 @@ function UIInterface:UpdateSuspendWndVisible(nScene)
 	if not bVisibale then
 		if nState == 0 
 			or nState == 2 and ClientWorkModule:CheckIsWorking() then
-			self:ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
+			--self:ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
 			--Statistic:SendUIReport("showsuspendwnd",1)
+			self:ShowPopUpWnd(ObjSuspendWnd, true)
 			local tStatInfo = {}
 			tStatInfo.fu1 = "showball"
 			tStatInfo.fu5 = 1
@@ -648,29 +610,6 @@ function UIInterface:UpdateSuspendWndVisible(nScene)
 			StatisticClient:SendEventReport(tStatInfo)
 		end	
 	end
-	--[[
-	if nState == 0 then
-		self:ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
-		SendUIReport("showsuspendwnd",1)
-	elseif nState == 1 then
-		local ObjSuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
-		if ObjSuspendWnd then
-			ObjSuspendWnd:Show(0)
-			SendUIReport("showsuspendwnd",0)
-		end
-	elseif nScene == 1 and nState == 2 then
-		if not ClientWorkModule:CheckIsWorking() then
-			local ObjSuspendWnd = hostwndManager:GetHostWnd("GXZB.SuspendWnd.Instance")
-			if ObjSuspendWnd then
-				ObjSuspendWnd:Show(0)
-				SendUIReport("showsuspendwnd",0)
-			end
-		else
-			self:ShowPopupWndByName("GXZB.SuspendWnd.Instance",  true)
-			SendUIReport("showsuspendwnd",1)
-		end
-	end
-	--]]
 end
 
 function UIInterface:OnUserChangePanel()
@@ -915,7 +854,7 @@ function UIInterface:ReportAndExit()
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 	end
 	self:DestroyMainWnd()
-	self:DestroyPopupWnd()
+	self:DestroyAllWnd()
 	self:HideTray()
 	
 	
@@ -990,4 +929,19 @@ function UIInterface:RemoveUserIntroduce()
 	local ObjUserIntroduce = objRootCtrl:GetControlObject("UserIntroduce.Instance")
 	local objMainWndBkg = objRootCtrl:GetControlObject("WndPanel.MainWnd.Bkg")
 	objMainWndBkg:RemoveChild(ObjUserIntroduce)
+end
+
+function UIInterface:AttachFirstShowMainWnd()	
+	local wnd = self:GetMainHostWnd()
+	self._nShowWindowCookie = wnd:AttachListener("OnShowWindow", false, function(wnd, bShow)
+		if bShow then
+			if not UIInterface:ShowUpdateDriveWnd() then
+				if tFunctionHelper.CheckCfgSetBoot() and not tFunctionHelper.CheckSysSetBoot() then
+					UIInterface:CreatePopUpWnd("GXZB.AutoRunTipWnd")
+				end
+			end	
+			wnd:RemoveListener("OnShowWindow", self._nShowWindowCookie)
+			self._nShowWindowCookie = nil
+		end
+	end)
 end

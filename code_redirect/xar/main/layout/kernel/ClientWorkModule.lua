@@ -16,7 +16,6 @@ ClientWorkModule._WorkClient = nil
 
 --心跳接口
 ClientWorkModule._WorkingTimerId = nil
-ClientWorkModule._SvrAverageMiningSpeed = 0
 ClientWorkModule._Balance = 0
 ClientWorkModule._LastQueryBalanceTime = 0
 
@@ -39,12 +38,16 @@ ClientWorkModule.CLIENT_STATE.EEEOR = 2
 ClientWorkModule.CLIENT_STATE.AUTO_EXIT = 3
 
 --重试
-ClientWorkModule.CONNECT_MAX_COUNT = 10
+ClientWorkModule.CONNECT_MAX_COUNT = 3
 ClientWorkModule.CONNECT_RETRY_COUNT = 0
 
 ClientWorkModule._ReConnectSvrTimerId = nil
 
 --
+ClientWorkModule._tabGetWorkerInfo = nil
+ClientWorkModule._nLastGetWorkerTime = 0
+ClientWorkModule._strLastPoolType = ""
+	
 ClientWorkModule._nLastPushCalcReportUTC = 0
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -84,7 +87,9 @@ end
 function ClientWorkModule:MakeInterfaceMd5(strInterface,strInterfaceParam)
 	local strParam = "/" .. strInterface .. "?" .. tostring(strInterfaceParam)
 	local strMd5 = tipUtil:GetStringMD5(strParam)
-	strParam = strParam .. "&md5=" .. strMd5
+	if string.lower(tostring(strParam)) ~= string.lower(tostring(strMd5)) then
+		strParam = strParam .. "&md5=" .. strMd5
+	end	
 	return strParam
 end
 
@@ -160,11 +165,15 @@ function ClientWorkModule:ResetReconnectCnt()
 end
 
 function ClientWorkModule:GetReconnectInterval()
-	local nInterval = (self.CONNECT_RETRY_COUNT + 1 )*15*1000
-	if nInterval > 60*1000 then
-		nInterval = 60*1000
+	local nMaxInterval = self:GetHeartbeatInterval()
+	if nMaxInterval < 3*60 then
+		nMaxInterval = 3*60
 	end
 	self.CONNECT_RETRY_COUNT = self.CONNECT_RETRY_COUNT + 1
+	local nInterval = (self.CONNECT_RETRY_COUNT)*30*1000
+	if nInterval > nMaxInterval*1000 then
+		nInterval = nMaxInterval*1000
+	end
 	return nInterval
 end
 
@@ -284,8 +293,9 @@ function ClientWorkModule:QuerySvrForPushCalcInfo(nSpeed)
 	--strInterfaceParam = strInterfaceParam .. "&account=" .. Helper:UrlEncode((tostring(self._WorkClient.GetCurrentAccount())))
 	--运行时长
 	local nWorkingTime =  tFunctionHelper.GetCurrentServerTime() - self._nLastPushCalcReportUTC
-	if nWorkingTime < 0 or nWorkingTime > 60 then
-		nWorkingTime = 60
+	local nInterval = self:GetHeartbeatInterval()
+	if nWorkingTime < 0 or nWorkingTime > nInterval then
+		nWorkingTime = nInterval
 	end
 	self._nLastPushCalcReportUTC = tFunctionHelper.GetCurrentServerTime()
 	strInterfaceParam = strInterfaceParam .. "&workTime=" .. Helper:UrlEncode((tostring(nWorkingTime)))
@@ -315,7 +325,11 @@ function ClientWorkModule:QuerySvrForWorkerInfo()
 	local tUserConfig = self:GetUserConfig()
 	local strInterfaceName = "getWorkerInfo"
 	local strInterfaceParam = "peerid=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetPeerID()))
-	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
+	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
+	if not IsRealString(strWorkID) then
+		return nil
+	end
+	strInterfaceParam = strInterfaceParam .. "&workerID=" .. Helper:UrlEncode(tostring(strWorkID))
 	if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
@@ -387,10 +401,13 @@ function ClientWorkModule:QuerySvrForGetHistoryInfo(strtype)
 	return strReguestUrl
 end
 
-function ClientWorkModule:ReportClientInfoToServer()
-	local strUrl = self:QuerySvrForReportClientInfo()
-	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
-	self:SendMinerInfoToServer(strUrl,3)
+function ClientWorkModule:ReportClientInfoToServer(bForce)
+	if bForce or not self._bHasReportClientConf then
+		local strUrl = self:QuerySvrForReportClientInfo()
+		strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+		self:SendMinerInfoToServer(strUrl,3)
+		self._bHasReportClientConf = true
+	end	
 end
 
 function ClientWorkModule:ReportMiningPoolInfoToServer()
@@ -400,7 +417,7 @@ function ClientWorkModule:ReportMiningPoolInfoToServer()
 end
 
 function ClientWorkModule:SetMachineNameChangeInfo()
-	self:ReportClientInfoToServer()
+	self:ReportClientInfoToServer(true)
 end
 
 --获取当前余额
@@ -478,8 +495,23 @@ function ClientWorkModule:GetWorkClient()
 end
 
 --返回当前挖矿速度的比例系数
-function ClientWorkModule:GetSvrAverageMiningSpeed()
-	return self._SvrAverageMiningSpeed
+function ClientWorkModule:GetSvrAverageMiningSpeed(strCoinType)
+	local tUserConfig = self:GetUserConfig()
+	if type(tUserConfig["tSpeedRate"]) ~= "table" then
+		tUserConfig["tSpeedRate"] = {}
+	end
+	return tUserConfig["tSpeedRate"][strCoinType] or 0
+end
+
+function ClientWorkModule:UpdateAverageMiningSpeed(strCoinType, nSpeedRate)
+	local tUserConfig = self:GetUserConfig()
+	if type(tUserConfig["tSpeedRate"]) ~= "table" then
+		tUserConfig["tSpeedRate"] = {}
+	end
+	if type(nSpeedRate) == "number" then
+		tUserConfig["tSpeedRate"][strCoinType] = nSpeedRate
+	end
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
 function ClientWorkModule:CheckIsGettedWorkID()
@@ -524,7 +556,7 @@ function ClientWorkModule:SetUserBindInfo(tabBindInfo)
 	tUserConfig["tUserInfo"]["strOpenID"] = tabBindInfo["data"]["wxOpenID"]
 	tUserConfig["tUserInfo"]["bBind"] = true
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-	self:ReportClientInfoToServer()
+	--self:ReportClientInfoToServer()
 	-----------------------UI相关
 	UIInterface:ChangeClientTitle("共享赚宝")
 	self:QueryWorkerInfo()
@@ -532,6 +564,10 @@ end
 
 --
 function ClientWorkModule:ReportInterfaceErrorInfo(strUrl, strFu6, strFu8)
+	local bReport = ServerCfg:GetServerCfgData({"tReportCfg", "bInterfaceError"})
+	if not bReport then
+		return
+	end
 	local _,_,strInterfaceName = string.find(tostring(strUrl), ".+/([%w]+)?")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "interfaceerror"
@@ -784,7 +820,7 @@ function ClientWorkModule:OnSvrPoolCfgUpdate(event, bUpdate, tabInfo)
 		UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
 		SetOnceTimer(function()
 			self:GetSvrPoolCfg()
-		end, 5*1000)
+		end, 10*1000)
 	elseif not bUpdate then
 		self:DispatchEvent("OnUpdateCfgFinish", bUpdate)
 	end
@@ -1029,12 +1065,17 @@ end
 
 --查询客户端信息
 function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo, bRetry)
-	if bSuccess then
+	if bSuccess then 
+		self._tabGetWorkerInfo = tabInfo
+		self._nLastGetWorkerTime = tFunctionHelper.GetCurrentServerTime()
+		self._strLastPoolType = self._WorkClient.GetDefaultPoolType()
 		self:UpdateSvrPoolCfg(tabInfo)
 		if tabInfo["data"]["status"] ~= 1 then
 			if self:CheckIsBinded() then
 				self:UnBindingClientFromServer()
-				--return
+				self._tabGetWorkerInfo = nil
+				self._nLastGetWorkerTime = 0
+				self._strLastPoolType = ""
 			end	
 		end
 		if tonumber(tabInfo["data"]["balance"]) ~= nil then
@@ -1044,23 +1085,44 @@ function ClientWorkModule:OnQueryWorkerInfo(event, bSuccess, tabInfo, bRetry)
 				UIInterface:UpdateUserBalance()
 			end	
 		end
+		if type(tabInfo["data"]["rate"]) == "table" then
+			for strCoinType, nSpeedRate in pairs(tabInfo["data"]["rate"]) do
+				self:UpdateAverageMiningSpeed(strCoinType, nSpeedRate)
+			end
+		end
 		self:ResetReconnectCnt()
 	else
 		if bRetry and self:CheckIsWorking() then
-			--[[
-			local nInterval = self:GetReconnectInterval()
-			UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
-			SetOnceTimer(function()
-				self:QueryWorkerInfo(true)
-			end, nInterval)
-			--]]
-			self:CheckAndReTryConnectServer()
+			if not self:CheckCanReconnect() then
+				if self:CheckIsWorking() then
+					--self:NotifyPause()
+					--UIInterface:SetStateInfoToUser("连接赚宝服务器失败")
+					self:CheckAndReTryConnectServer()
+				end	
+			else
+				local nInterval = self:GetReconnectInterval()
+				UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
+				SetOnceTimer(function()
+					self:QueryWorkerInfo(true)
+				end, 10*1000)
+			end
 		end	
 	end
 end
 
+--该接口间隔一定时间调一次 默认5分钟
 function ClientWorkModule:QueryWorkerInfo(bRetry)
+	local nInterval = tonumber(ServerCfg:GetServerCfgData({"tServerInterfaceCfg", "nGetWorkInfoInterval"})) or 5*60
+	local nCurrentTime = tFunctionHelper.GetCurrentServerTime()
+	if math.abs(nCurrentTime - self._nLastGetWorkerTime) < nInterval and type(self._tabGetWorkerInfo) == "table" 
+		and self._strLastPoolType == self._WorkClient.GetDefaultPoolType() then
+		self:UpdateSvrPoolCfg(self._tabGetWorkerInfo)
+		return
+	end
 	local strUrl = self:QuerySvrForWorkerInfo()
+	if not IsRealString(strUrl) then
+		return
+	end
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[QueryWorkerInfo] strUrl = " .. strUrl)
 	
@@ -1091,7 +1153,8 @@ function ClientWorkModule:OnQueryClientInfo(event, bSuccess, tabInfo)
 			end	
 		end
 		if tonumber(tabInfo["data"]["rate"]) ~= nil then
-			self._SvrAverageMiningSpeed = tabInfo["data"]["rate"]
+			strCoinType = self._WorkClient.GetCoinType()
+			self:UpdateAverageMiningSpeed(strCoinType, tabInfo["data"]["rate"])
 		end
 	else
 		self:CheckAndReTryConnectServer()
@@ -1108,56 +1171,6 @@ function ClientWorkModule:QueryClientInfo(nMiningSpeed)
 	end
 	
 	self:GetServerJsonData(strUrl, fnClientInfoCallBack)
-	--[[
-	NewAsynGetHttpContent(strReguestUrl, false
-	, function(nRet, strContent, respHeaders)
-		TipLog("[QueryClientInfo] nRet:"..tostring(nRet)
-				.." strContent:"..tostring(strContent))
-				
-		if 0 == nRet then
-			-- forlocal
-			strContent = GetLocalSvrCfgWithName("pushCalc.json")
-			--
-			local tabInfo = DeCodeJson(strContent)
-			if type(tabInfo) ~= "table" 
-				or tabInfo["rtn"] ~= 0 
-				or type(tabInfo["data"]) ~= "table" then
-				TipLog("[QueryClientInfo] parse info error.")
-				if fnCallBack ~= nil then
-					fnCallBack(false)
-				end
-				return 
-			end
-			UpdateSvrPoolCfg(tabInfo)
-			if fnCallBack ~= nil then
-				fnCallBack(true)
-			end
-			-- 绑定 未绑定 解绑 是否 status 不一样
-			if tabInfo["data"]["status"] ~= 1 then
-				if CheckIsBinded() then
-					UnBindingClientFromServer()
-					--return
-				end	
-			end
-			if tonumber(tabInfo["data"]["balance"]) ~= nil then
-				--g_Balance = tabInfo["data"]["balance"]
-				if g_Balance ~= tonumber(tabInfo["data"]["balance"]) then
-					SetUserCurrentBalance(tabInfo["data"]["balance"])
-					UpdateUserBalance()
-				end	
-			end
-			if tonumber(tabInfo["data"]["rate"]) ~= nil then
-				--g_PerSpeed = tabInfo["data"]["rate"]
-				g_SvrAverageMiningSpeed = tabInfo["data"]["rate"]
-			end
-		else
-			if fnCallBack ~= nil then
-				fnCallBack(false)
-			end
-			TipLog("[QueryClientInfo] query sever failed.")
-		end
-	end)
-	--]]
 end
 
 --提现接口
@@ -1318,12 +1331,25 @@ function ClientWorkModule:ResetGlobalParam()
 end
 
 function ClientWorkModule:WorkingTimerHandle()
+	if self._WorkingTimerId then
+		timeMgr:KillTimer(self._WorkingTimerId)
+		self._WorkingTimerId = nil
+	end
 	local nReportCalcInterval = self:GetHeartbeatInterval()
+	
 	self._WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
 		local nAverageHashRate = self._WorkClient.GetAverageHashRate()
-		self:QueryClientInfo(nAverageHashRate)
-		self._LastQueryBalanceTime = tipUtil:GetCurrentUTCTime()
-	end, nReportCalcInterval*1000)
+		if nAverageHashRate > 0 then
+			timeMgr:KillTimer(self._WorkingTimerId)
+			self._WorkingTimerId = nil
+			self:QueryClientInfo(nAverageHashRate)
+			self._WorkingTimerId = timeMgr:SetTimer(function(Itm, id)
+				local nAverageHashRate = self._WorkClient.GetAverageHashRate()
+				self:QueryClientInfo(nAverageHashRate)
+				self._LastQueryBalanceTime = tipUtil:GetCurrentUTCTime()
+			end, nReportCalcInterval*1000)
+		end	
+	end, 60*1000)	
 end
 
 function ClientWorkModule:StartMinerSuccess()
@@ -1538,6 +1564,19 @@ function ClientWorkModule:CheckCanStartNow()
 	return true
 end
 
+function ClientWorkModule:QuerySvrForReTryConnect()
+	local function fnCallBack(bRet, tabRate)
+		if not bRet then
+			self:CheckAndReTryConnectServer()
+			return
+		end
+		self:ResetReconnectCnt()
+		self:QueryWorkerInfo(true)
+	end
+	local strReguestUrl = "http://api.eastredm.com/pc/getClassInfo"
+	self:GetServerJsonData(strReguestUrl, fnCallBack)
+end
+
 function ClientWorkModule:CheckAndReTryConnectServer()
 	if self._ReConnectSvrTimerId then
 		timeMgr:KillTimer(self._ReConnectSvrTimerId)
@@ -1558,7 +1597,7 @@ function ClientWorkModule:CheckAndReTryConnectServer()
 	UIInterface:SetStateInfoToUser("连接服务器失败，重试中...")
 	self._ReConnectSvrTimerId = SetOnceTimer(function()
 		self._ReConnectSvrTimerId = nil
-		self:QueryWorkerInfo(true)
+		self:QuerySvrForReTryConnect()
 	end, nInterval)	
 	return true	
 end

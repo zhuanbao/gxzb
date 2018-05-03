@@ -28,7 +28,7 @@ end
 function menuFunTable.OnSelect_checkupdate(self)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:Show(1)
-	Helper:CreateModalWnd("GXZB.UpdateWnd", "GXZB.UpdateWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+	Helper:CreateModalWnd("GXZB.UpdateModalWnd", "GXZB.UpdateWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
 end
 
 function menuFunTable.OnSelect_about(self)

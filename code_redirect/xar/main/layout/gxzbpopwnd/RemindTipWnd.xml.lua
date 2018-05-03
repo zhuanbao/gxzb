@@ -28,9 +28,7 @@ end
 
 function OnClickClose(self)
 	DoWorkOnHideWnd()
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	objHostWnd:Show(0)
+	Helper:DestoryModelessWnd("GXZB.RemindTipWnd")
 end
 
 function PopupInDeskRight(self)
@@ -48,9 +46,7 @@ function PopupInDeskRight(self)
 end
 
 function OnClickBind(self)
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	objHostWnd:Show(0)
+	Helper:DestoryModelessWnd("GXZB.RemindTipWnd")
 	local mainwnd = UIInterface:GetMainHostWnd()
 	if mainwnd then
 		mainwnd:BringWindowToTop(true)
@@ -75,9 +71,6 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		if not UIInterface:CheckIsInitPopupTipWnd() then
-			return
-		end
 		local objtree = self:GetBindUIObjectTree()
 		PopupInDeskRight(self)
 		
@@ -88,7 +81,8 @@ function OnShowWindow(self, bShow)
 		local objCheckAutoRun = objtree:GetUIObject("RemindTipWnd.CheckAutoRun")
 		local nMoneyCount = tUserConfig["nMoneyPer4Hour"] or 0
 		if tonumber(nMoneyCount) == nil or nMoneyCount <= 0 then 
-			self:Show(0)
+			--self:Show(0)
+			Helper:DestoryModelessWnd("GXZB.RemindTipWnd")
 			return
 		end
 		
@@ -120,7 +114,8 @@ function OnShowWindow(self, bShow)
 		local nTipHolds = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg","nHolds"})) or 15
 		SetOnceTimer(function(item, id)
 			DoWorkOnHideWnd()
-			self:Show(0)
+			--self:Show(0)
+			Helper:DestoryModelessWnd("GXZB.RemindTipWnd")
 		end, nTipHolds*1000)
 	end
 end

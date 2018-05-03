@@ -54,7 +54,7 @@ function OnClickClose(self)
 	if type(objHostWnd.EndDialog) == "function" then
 		objHostWnd:EndDialog(0)
 	else
-		objHostWnd:Show(0)
+		Helper:DestoryModelessWnd("GXZB.UpdateWnd")
 	end
 end
 
@@ -195,15 +195,10 @@ function PopupInDeskRight(self)
 	return true
 end
 
-local isAutoPopFirstEntry = true
 function OnShowWindow(self, isShow)
 	if not isShow then return end
 	--是否是自动弹出提醒
 	local isAutoPop = type(self.EndDialog) ~= "function"
-	if isAutoPopFirstEntry and isAutoPop then
-		isAutoPopFirstEntry = false
-		return
-	end
 	local objtree = self:GetBindUIObjectTree()
 	local objRootLayout = objtree:GetUIObject("root")
 	if isAutoPop then
@@ -221,7 +216,6 @@ function OnShowWindow(self, isShow)
 			self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
 		end
 	end
-	
 	local TextBig = objtree:GetUIObject("UpdateWnd.Content.TextBig")
 	local TextMain = objtree:GetUIObject("UpdateWnd.Content.TextMain")
 	local TextVersion = objtree:GetUIObject("UpdateWnd.Content.TextVersion")
@@ -239,7 +233,8 @@ function OnShowWindow(self, isShow)
 			TextMain:SetObjPos(159, 107, 159+260, 107+25)
 			TextMain:SetText("您的共享赚宝已经是最新版本。")
 		else
-			self:Show(0)
+			--self:Show(0)
+			Helper:DestoryModelessWnd("GXZB.UpdateWnd")
 		end
 	end
 	
@@ -264,13 +259,14 @@ function OnShowWindow(self, isShow)
 			local nHolds  = tonumber(ServerCfg:GetServerCfgData({"tNewVersionInfo", "tRemindUpdate", "nHolds"})) or 30
 			SetOnceTimer(
 				function(item, id)
-					self:Show(0)
+					--self:Show(0)
+					Helper:DestoryModelessWnd("GXZB.UpdateWnd")
 				end, 
 				nHolds*1000)
 		end
 	end
 	
-	local function InitMainWnd(nRet, strCfgPath)			
+	local function InitMainWnd(nRet, strCfgPath)
 		--[[local tNewVersionInfo = {
 			strVersion = "1.0.0.2",
 			strContent = "1、修改了XX\n2、优化了xx\n3、see more",

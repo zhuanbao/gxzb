@@ -189,7 +189,7 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.UpdateWnd" class="ModalHostWnd">
+    <hostwndtemplate id="GXZB.UpdateModalWnd" class="ModalHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
@@ -214,7 +214,7 @@
         </eventlist>
     </hostwndtemplate>
 	
-	<hostwndtemplate id="GXZB.UpdateFrameWnd" class="FrameHostWnd">
+	<hostwndtemplate id="GXZB.UpdateWnd" class="FrameHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>

@@ -26,10 +26,13 @@ function OnClickUpdateDrive(self)
 end
 
 function OnClickRestart(self)
+	--[[
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
 	UIInterface:DestroyPopupWnd()
+	--]]
+	UIInterface:DestroyAllWnd()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "restart"
 	tStatInfo.fu5 = "updatedrive"

@@ -27,9 +27,12 @@ function DoWorkOnHideWnd()
 end
 
 function OnClickClose(self)
+	--[[
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
+	--]]
+	Helper:DestoryModelessWnd("GXZB.AutoRunTipWnd")
 	DoWorkOnHideWnd()
 end
 
@@ -48,9 +51,12 @@ function PopupInDeskRight(self)
 end
 
 function OnClickBind(self)
+	--[[
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:Show(0)
+	--]]
+	Helper:DestoryModelessWnd("GXZB.AutoRunTipWnd")
 	local mainwnd = UIInterface:GetMainHostWnd()
 	if mainwnd then
 		mainwnd:BringWindowToTop(true)
@@ -80,9 +86,6 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		if not UIInterface:CheckIsInitPopupTipWnd() then
-			return
-		end
 		local objtree = self:GetBindUIObjectTree()
 		PopupInDeskRight(self)
 		
@@ -116,7 +119,8 @@ function OnShowWindow(self, bShow)
 		end
 		local nTipHolds = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg","nHolds"})) or 10
 		SetOnceTimer(function(item, id)
-			self:Show(0)
+			--self:Show(0)
+			Helper:DestoryModelessWnd("GXZB.AutoRunTipWnd")
 			DoWorkOnHideWnd()
 		end, nTipHolds*1000)
 	end

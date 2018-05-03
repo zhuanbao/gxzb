@@ -2,10 +2,7 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 
 function ExitAndReport(self)
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	objHostWnd:Show(0)
-	UIInterface:DestroyPopupWnd()
+	UIInterface:DestroyAllWnd()
 	StatisticClient:FailExitProcess(1)
 end
 
@@ -18,10 +15,8 @@ function OnClickExit(self)
 end
 
 function OnClickShare(self)
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	objHostWnd:Show(0)
-	UIInterface:ShowPopupWndByName("GXZB.ProfitShareWnd.Instance", true)
+	Helper:DestoryModelessWnd("GXZB.MachineCheckWnd")
+	UIInterface:CreatePopUpWnd("GXZB.ProfitShareWnd")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "opensharewnd"
 	StatisticClient:SendClickReport(tStatInfo)
