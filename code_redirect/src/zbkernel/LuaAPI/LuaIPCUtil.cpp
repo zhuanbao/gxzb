@@ -276,19 +276,24 @@ int LuaIPCUtil::Start(lua_State* pLuaState)
 
 int LuaIPCUtil::Quit(lua_State* pLuaState)
 {
-	if ((m_hPipeThread !=NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hPipeThread, 0)))
-	{
-		TerminateThread(m_hPipeThread,-2);
-	}
+	TSAUTO();
+	
 	if (g_pClient)
 	{
+		TSDEBUG4CXX(L"Terminate all client"); 
 		g_pClient->TerminateAllClientInstance();
 	}
 	if (m_hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hWorkProcess, 0))
 	{
-		
-		TerminateThread(m_hWorkProcess,-2);
+		TSDEBUG4CXX(L"Terminate work process"); 
+		TerminateProcess(m_hWorkProcess,-2);
 	}
+	if ((m_hPipeThread !=NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hPipeThread, 0)))
+	{
+		TSDEBUG4CXX(L"Terminate pipe thread"); 
+		TerminateThread(m_hPipeThread,-2);
+	}
+	TSDEBUG4CXX(L"Terminate finish");
 	Clear();
 	return 0;
 }
