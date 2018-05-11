@@ -1,0 +1,101 @@
+<xlue>	
+	<objtreetemplate id="GXZB.OpenBoxWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>180</width>
+			<height>60</height>
+		</attr>
+		<obj id="OpenBoxWnd.Bkg" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>180</width>
+				<height>60</height>
+				<texture>GXZB.OpenBoxWnd.Bkg</texture>
+			</attr>	
+			<children>
+				<obj id="OpenBoxWnd.CloseBtn" class="TipAddin.Button">
+					<attr>
+						<left>father.width-13-3</left>
+						<top>3</top>
+						<width>13</width>
+						<height>13</height>
+						<NormalBkgID>GXZB.OpenBoxWnd.Close.Btn.normal</NormalBkgID>
+						<DownBkgID>GXZB.OpenBoxWnd.Close.Btn.down</DownBkgID>
+						<HoverBkgID>GXZB.OpenBoxWnd.Close.Btn.down</HoverBkgID>
+						<DisableBkgID>GXZB.OpenBoxWnd.Close.Btn.down</DisableBkgID>
+					</attr>
+					<eventlist>
+						<event name="OnClick" file="OpenBoxWnd.xml.lua" func="OnClickClose" />
+						<event name="OnMouseMove" file="OpenBoxWnd.xml.lua" func="OnMouseMoveClose" />
+						<event name="OnMouseLeave" file="OpenBoxWnd.xml.lua" func="OnMouseLeaveClose" />
+					</eventlist>	
+				</obj>
+				<obj id="OpenBoxWnd.Text" class="TextObject">
+					<attr>
+						<left>father.width-30-88</left>
+						<top>10</top>
+						<width>88</width>
+						<height>12</height>
+						<valign>center</valign>
+						<halign>right</halign>
+						<textcolor>EFC455</textcolor>
+						<font>font.text12</font>
+						<text>赚越久中越多</text>
+					</attr>
+				</obj>
+				<obj id="RemindOpenBoxWnd.Btn" class="TipAddin.Button">
+					<attr>
+						<Text>我的宝箱</Text>
+						<TextFont>font.text12</TextFont>
+						<TextColor>101010</TextColor>
+						<left>66</left>
+						<top>father.height-(8+22)</top>
+						<width>92</width>
+						<height>22</height>
+						<NormalBkgID>GXZB.OpenBoxWnd.Btn.normal</NormalBkgID>
+						<HoverBkgID>GXZB.OpenBoxWnd.Btn.down</HoverBkgID>
+						<DownBkgID>GXZB.OpenBoxWnd.Btn.down</DownBkgID>
+						<DisableBkgID>GXZB.OpenBoxWnd.Btn.down</DisableBkgID>
+					</attr>
+					<eventlist>
+						<event name="OnClick" file="OpenBoxWnd.xml.lua" func="OnClickLookBox" />
+						<event name="OnMouseMove" file="OpenBoxWnd.xml.lua" func="OnMouseMoveBtn" />
+						<event name="OnMouseLeave" file="OpenBoxWnd.xml.lua" func="OnMouseLeaveBtn" />
+					</eventlist>	
+				</obj>
+			</children>
+			<eventlist>
+				<event name="OnMouseMove" file="OpenBoxWnd.xml.lua" func="OnMouseMove" />
+				<event name="OnMouseLeave" file="OpenBoxWnd.xml.lua" func="OnMouseLeave" />
+			</eventlist>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.OpenBoxWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>180</width>
+            <height>60</height>
+            
+            <topmost>1</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+             <event name="OnCreate" file="OpenBoxWnd.xml.lua" func="OnCreate"/>
+			 <event name="OnShowWindow" file="OpenBoxWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

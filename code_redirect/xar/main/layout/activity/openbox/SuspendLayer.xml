@@ -1,0 +1,48 @@
+<xlue>
+	<control class="OpenBox.SuspendLayer">
+		<method_def>
+
+		</method_def>
+		<objtemplate>
+			<children>
+				<obj id="SuspendLayer.Bkg" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<image>suspend-work-hoveroff</image>
+						<valign>top</valign>
+						<halign>center</halign>
+					</attr>
+					<children>
+						<obj id="SuspendLayer.Box" class="ImageObject">
+							<attr>
+								<left>(father.width-31)/2</left>
+								<top>father.height-30-22-16</top>
+								<width>31</width>
+								<height>30</height>
+								<image>GXZB.OpenBox.Suspend.Layer</image>
+								<valign>center</valign>
+								<halign>center</halign>
+							</attr>
+						</obj>
+						<obj id="SuspendLayer.Text" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>father.height-20-16</top>
+								<width>father.width</width>
+								<height>11</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>system.black</textcolor>
+								<font>font.text11</font>
+								<text>激活宝箱</text>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+</xlue>

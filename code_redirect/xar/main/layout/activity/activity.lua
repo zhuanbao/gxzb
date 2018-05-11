@@ -11,6 +11,7 @@ XLSetGlobal("Activity", Activity)
 
 Activity._tabLuaFile = {
 "rewardbindweixin.lua",
+"openbox\\openbox.lua",
 }
 
 Activity._tabCfg = {}
@@ -76,6 +77,7 @@ function Activity:OnGetServerActivity(event, strPath)
         return
     end
     RewardBindWX:CheckCanShowRewardEnter(tActivityCfg)
+	OpenBox:PrepareActivity(tActivityCfg["tOpenBoxCfg"])
 end
 
 function Activity:TryToGetServerActivity(tabActivity)

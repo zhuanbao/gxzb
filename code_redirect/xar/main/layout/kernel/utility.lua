@@ -538,6 +538,10 @@ function GetTimeCalibration()
 end
 
 function GetCurrentServerTime()
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "DebugLocalTime")
+	if nValue == 1 then
+		return  tipUtil:GetCurrentUTCTime()
+	end
 	local nCurLocalUTCInSec = tipUtil:GetCurrentUTCTime() or 0
 	local nLocalUTCInSec, nSvrUTCInSec = GetTimeCalibration()
 	local nCurSvrUTCInSec = nCurLocalUTCInSec + (nSvrUTCInSec - nLocalUTCInSec)

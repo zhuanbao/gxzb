@@ -189,7 +189,7 @@ function UIInterface:CheckIsExistPopupWnd()
 	return false
 end
 
-function UIInterface:CreatePopUpWnd(wndTemplateID)
+function UIInterface:CreatePopUpWnd(wndTemplateID, userData)
 	local strWndInstName = wndTemplateID .. ".Instance"
 	local wnd = hostwndManager:GetHostWnd(strWndInstName)
 	if wnd then
@@ -202,7 +202,7 @@ function UIInterface:CreatePopUpWnd(wndTemplateID)
 	end
 	
 	local treeTemplateID = wndTemplateID .. "Tree"
-	wnd = Helper:CreateModelessWnd(wndTemplateID, treeTemplateID)
+	wnd = Helper:CreateModelessWnd(wndTemplateID, treeTemplateID, nil, userData)
 	self:ShowPopUpWnd(wnd, true)
 	return true
 end
