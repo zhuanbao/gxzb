@@ -1,0 +1,23 @@
+﻿<XLUE>
+	<resource>
+		<bitmap id="GXZB.OpenBox.Suspend.Layer" path="openbox\GXZB.OpenBox.Suspend.Layer.png" /> 
+		<bitmap id="GXZB.OpenBox.PopWnd.Img" path="openbox\GXZB.OpenBox.PopWnd.Img.png" /> 
+		<imagelist id="GXZB.OpenBox.PopWnd.Btn" vertical="0" varyblock="0" blocksize="150" image="openbox\GXZB.OpenBox.PopWnd.Btn.png"/>
+			<texture id="GXZB.OpenBox.PopWnd.Btn.normal"  imagelist="GXZB.OpenBox.PopWnd.Btn" index="1" />
+			<texture id="GXZB.OpenBox.PopWnd.Btn.down"  imagelist="GXZB.OpenBox.PopWnd.Btn" index="2" />
+		<imagelist id="GXZB.OpenBox.CloseAni.Btn" vertical="0" varyblock="0" blocksize="16" image="openbox\GXZB.OpenBox.CloseAni.Btn.png"/>
+			<texture id="GXZB.OpenBox.CloseAni.Btn.normal"  imagelist="GXZB.OpenBox.CloseAni.Btn" index="1" />
+			<texture id="GXZB.OpenBox.CloseAni.Btn.down"  imagelist="GXZB.OpenBox.CloseAni.Btn" index="2" />
+		
+		<imageseq id="GXZB.OpenBox.MainWndAni" folder="openbox\openboxani"/>
+		
+		<texture id="GXZB.OpenBoxWnd.Bkg" image="openbox\GXZB.OpenBoxWnd.Bkg.png" />
+		<imagelist id="GXZB.OpenBoxWnd.Btn" vertical="0" varyblock="0" blocksize="92" image="openbox\GXZB.OpenBoxWnd.Btn.png"/>
+			<texture id="GXZB.OpenBoxWnd.Btn.normal"  imagelist="GXZB.OpenBoxWnd.Btn" index="1" />
+			<texture id="GXZB.OpenBoxWnd.Btn.down"  imagelist="GXZB.OpenBoxWnd.Btn" index="2" />
+		<imagelist id="GXZB.OpenBoxWnd.Close.Btn" vertical="0" varyblock="0" blocksize="13" image="openbox\GXZB.OpenBoxWnd.Close.Btn.png"/>
+			<texture id="GXZB.OpenBoxWnd.Close.Btn.normal"  imagelist="GXZB.OpenBoxWnd.Close.Btn" index="1" />
+			<texture id="GXZB.OpenBoxWnd.Close.Btn.down"  imagelist="GXZB.OpenBoxWnd.Close.Btn" index="2" />
+			
+	</resource>
+</XLUE>
