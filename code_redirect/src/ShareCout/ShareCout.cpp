@@ -34,9 +34,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	sa.lpSecurityDescriptor = NULL;
 	sa.bInheritHandle = TRUE;
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,&sa,CONSOLE_TEXTMODE_BUFFER,NULL);
-	FillConsoleOutputCharacter(hConsole, '\0', MAXLONG, origin, &dwDummy); // fill screen buffer with zeroes
-	SetStdHandle(STD_OUTPUT_HANDLE, hConsole); // to be inherited by child process
-
+	if(INVALID_HANDLE_VALUE == hConsole)
+	{
+		TSDEBUG4CXX(L"CreateConsoleScreenBuffer failed, dwLastError = "<< ::GetLastError()); 
+	}
+	BOOL bFill = FillConsoleOutputCharacter(hConsole, '\0', MAXLONG, origin, &dwDummy); // fill screen buffer with zeroes
+	if(!bFill)
+	{
+		TSDEBUG4CXX(L"FillConsoleOutputCharacter failed, dwLastError = "<< ::GetLastError()); 
+	}
+	BOOL bSet = SetStdHandle(STD_OUTPUT_HANDLE, hConsole); // to be inherited by child process
+	if(!bSet)
+	{
+		TSDEBUG4CXX(L"SetStdHandle failed, dwLastError = "<< ::GetLastError()); 
+	}
+	bSet = SetConsoleActiveScreenBuffer(hConsole);
+	if(!bSet)
+	{
+		TSDEBUG4CXX(L"SetConsoleActiveScreenBuffer failed, dwLastError = "<< ::GetLastError()); 
+	}
 	// start the subprocess
 	PROCESS_INFORMATION pi;
 	STARTUPINFO si;
@@ -45,7 +61,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	si.dwFlags = STARTF_FORCEOFFFEEDBACK; // we don't want the "app starting" cursor
 	// all other default options are already good : we want subprocess to share the same console and to inherit our STD handles
 	TSDEBUG4CXX(L"pszCommandLine = "<< pszCommandLine); 
-	::SetErrorMode(::SetErrorMode(0)|SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX|SEM_NOGPFAULTERRORBOX|SEM_NOALIGNMENTFAULTEXCEPT);
+	//::SetErrorMode(::SetErrorMode(0)|SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX|SEM_NOGPFAULTERRORBOX|SEM_NOALIGNMENTFAULTEXCEPT);
 	if (!CreateProcess(	NULL, pszCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 	{
 		TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
@@ -63,9 +79,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			bExitNow = true; // exit after this last iteration
 
 		// get screen buffer state
-		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		BOOL bGet = GetConsoleScreenBufferInfo(hConsole, &csbi);
+		if(!bGet)
+		{
+			TSDEBUG4CXX(L"GetConsoleScreenBufferInfo failed, dwLastError = "<< ::GetLastError()); 
+		}
 		int iLineWidth = csbi.dwSize.X;
-
+		
+		//TSDEBUG4CXX(L"dwCursorPosition.X = "<< csbi.dwCursorPosition.X <<", dwCursorPosition.Y = " << csbi.dwCursorPosition.Y); 
+		//TSDEBUG4CXX(L" lastpos.X = "<<  lastpos.X <<", lastpos.Y = " << lastpos.Y); 
 		if ((csbi.dwCursorPosition.X == lastpos.X) && (csbi.dwCursorPosition.Y == lastpos.Y))
 			Sleep(SLEEP_TIME); // text cursor did not move, sleep a while
 		else
@@ -89,6 +111,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			// scan screen buffer and transmit character to real output handle
 			LPTSTR szScan = szBuffer;
+			//TSDEBUG4CXX(L"szScan = "<< szBuffer); 
 			do
 			{
 				if (*szScan)
@@ -112,12 +135,13 @@ int _tmain(int argc, _TCHAR* argv[])
 						WriteFile(hOutput, "\r\n", 2, &dwDummy, NULL);
 				}
 			} while (dwCnt);
-			//FlushFileBuffers(hOutput); // seems unnecessary
+			FlushFileBuffers(hOutput); // seems unnecessary
 			LocalFree(szBuffer);
 		}
 		// loop until end of subprocess
 	} while (!bExitNow);
 
+	SetConsoleActiveScreenBuffer(hOutput);
 	CloseHandle(hConsole);
 	FlushFileBuffers(hOutput);
 	// release subprocess handle
