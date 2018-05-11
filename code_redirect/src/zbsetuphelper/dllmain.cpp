@@ -1254,3 +1254,15 @@ extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *
 	CloseHandle(hThread);
 	//SendHttpStatThread((LPVOID)szURL);
 }
+
+extern "C" __declspec(dllexport) int GetRandomNum(int nMax)
+{
+	if (nMax < 1)
+	{
+		nMax = 10;
+	}
+	srand( (unsigned)time( NULL ) );
+	int Num = rand()%nMax;
+	TSDEBUG4CXX(L"GetRandomNum Num = "<<Num);
+	return Num;
+}
