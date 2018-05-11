@@ -841,6 +841,10 @@ Function CmdSilentInstall
 	;ÑÓ³ÙÀ­Æðexe
     StrCpy $R6 0
     StrCpy $R7 0
+	${GetOptions} $R4 "/rdelay"  $R6
+	IfErrors +3 0
+	System::Call "$PLUGINSDIR\zbsetuphelper::GetRandomNum(i $R6) i.r0"
+	IntOp $R7 $0 * 1000
     ${GetOptions} $R4 "/timer"  $R6
 	IfErrors +2 0
     IntOp $R7 $R6 * 1000
