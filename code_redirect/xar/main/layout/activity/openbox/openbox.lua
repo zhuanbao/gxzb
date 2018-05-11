@@ -431,16 +431,22 @@ function OpenBox:CalcWorkingTime()
 end
 
 function OpenBox:OnGetWhiteListInfo(event, bSuccess, tabInfo)
-	---[[
-	if not bSuccess or type(tabInfo["data"]) ~= "table" then
-		self:PrepareNextDay()
-		return
+	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "nOpenBoxInWhiteList")
+	if nValue ~= 1 then
+		---[[
+		if not bSuccess or type(tabInfo["data"]) ~= "table" then
+			self:PrepareNextDay()
+			return
+		end
+		if tabInfo["data"]["in_white_list"] ~= 1 then
+			self:PrepareNextDay()
+			return
+		end
+		--]]
+	else
+		TipLog("[OnGetWhiteListInfo] debug workid")
 	end
-	if tabInfo["data"]["in_white_list"] ~= 1 then
-		self:PrepareNextDay()
-		return
-	end
-	--]]
+	
 	local tStatInfo = {}
 	tStatInfo.fu1 = "openbox"
 	tStatInfo.fu5 = "showactivity"
