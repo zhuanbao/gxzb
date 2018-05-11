@@ -18,7 +18,11 @@ function GetSubTable()
 		},
 		["tServerInterfaceCfg"] = {
 			["nQueryBindInterval"] = 5,
-			["nReportCalcInterval"] = 60,
+			["nReportCalcInterval"] = 60*5,
+			["nGetWorkInfoInterval"] = 30,
+		},
+		["tReportCfg"] = {
+			["bInterfaceError"] = true,
 		},
 		["tRemindCfg"] = {
 			["nPopIntervals"] = 4*60*60,
