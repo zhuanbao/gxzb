@@ -16,8 +16,8 @@
 	g_uMinMemorySize：显存大小 根据需求修改
 */
 bool g_bCheckName = CHECKCARD;
-char g_szCardName[][MAX_PATH] = {"950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"};
-cl_ulong g_uMinMemorySize = 2900000000;
+char g_szCardName[][MAX_PATH] = GPU_N_NAME;
+cl_ulong g_uMinMemorySize = GPU_MEMORYSIZE;
 
 
 
