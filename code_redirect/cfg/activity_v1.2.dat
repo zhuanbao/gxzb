@@ -1,5 +1,10 @@
 function GetSubTable()
 	local t = {
+		["tOpenBoxCfg"] = {
+			["nBeginTime"] = 1526832000,
+			["nEndTime"] = 1528646399,
+			["strText"] = "5月21日-6月10日，每天免费开宝箱送元宝，赚越久中越多，开完还有送！仅限部分用户参与~",
+		},
         ["tRBindCfg"] = {
             ["tCondition"] = {
                 [1] = {
