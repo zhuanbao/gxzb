@@ -28,6 +28,22 @@ function FinishUserIntroduce()
 	UIInterface:RemoveUserIntroduce()
 end
 
+function ChangeQrCodePanleInfo()
+    local wnd = UIInterface:GetMainHostWnd()
+	local Objtree = wnd:GetBindUIObjectTree()
+	local ObjRootCtrl = Objtree:GetUIObject("root.layout:root.ctrl")
+	local ObjMainBodyCtrl = ObjRootCtrl:GetControlObject("WndPanel.MainBody")
+	local ObjQRCodePanel = ObjMainBodyCtrl:GetChildObjByCtrlName("QRCodePanel")
+	local ObjTitle = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Title")
+	local nLeft, nTop, nRight, nButtom = ObjTitle:GetObjPos()
+	ObjTitle:SetObjPos2("(father.width-330)/2", nTop, 330, 24)	
+	local ObjTitle = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Title")
+	ObjTitle:SetText("恭喜，999元宝送给您")
+	local ObjDescription = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Description")
+	ObjDescription:SetText("元宝变现微信领取")
+	
+end
+
 function OnClickSkip(self)
 	FinishUserIntroduce()
 end
@@ -43,6 +59,17 @@ function OnClickStart(self)
 	StatisticClient:SendClickReport(tStatInfo)
 end
 
+function OnClickOpenTree(self)
+	FinishUserIntroduce()
+	ChangeQrCodePanleInfo()
+	UIInterface:ChangeMainBodyPanel("QRCodePanel")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "qrcode"
+	tStatInfo.fu6 = "userintroduce"
+	StatisticClient:SendClickReport(tStatInfo)
+end
+
 function OnClickLeftPage(self)
 	local OwnerAttr = gOwnerCtrl:GetAttribute()
 	local nIdx = OwnerAttr.nCurPage
@@ -54,7 +81,7 @@ end
 function OnClickRightPage(self)
 	local OwnerAttr = gOwnerCtrl:GetAttribute()
 	local nIdx = OwnerAttr.nCurPage
-	if nIdx < 4 then
+	if nIdx < 3 then
 		ShowPage(nIdx+1)
 	end
 end
@@ -65,23 +92,6 @@ function OnClickPos(self)
 	ShowPage(tonumber(strIdx))
 end
 
-function OnLButtonUpOpenPacket(self, x, y)
-	FinishUserIntroduce()
-	UIInterface:ChangeMainBodyPanel("QRCodePanel")
-	local tStatInfo = {}
-	tStatInfo.fu1 = "showpanel"
-	tStatInfo.fu5 = "qrcode"
-	tStatInfo.fu6 = "userintroduce"
-	StatisticClient:SendClickReport(tStatInfo)
-end
-
-function OnMouseMoveOpenPacket(self, x, y)
-
-end
-
-function OnMouseLeaveOpenPacket(self)
-
-end
 
 function OnInitControl(self)
 	gOwnerCtrl = self
@@ -127,7 +137,7 @@ end
 
 function ShowPage(nIdx)
 	local strID = "UserIntroduce.Page"
-	for i=1, 4 do
+	for i=1, 3 do
 		local ObjPage = gOwnerCtrl:GetControlObject(strID .. tostring(i))
 		local bShow = false
 		local strBtnBkgID = "GXZB.UserIntroduce.PagePos.unselect"
@@ -157,7 +167,7 @@ function ShowPage(nIdx)
 	end
 	
 	local ObjRightBtn = gOwnerCtrl:GetControlObject("UserIntroduce.RightBtn")
-	if nIdx == 4 then
+	if nIdx == 3 then
 		ObjRightBtn:Show(false)
 		OwnerAttr.bFinishAutoPosPage = true
 	else
@@ -174,7 +184,7 @@ function StartPosNextPage()
 	end
 	gAutoPosTimerId = timerManager:SetOnceTimer(function () 
 		local nIdx = OwnerAttr.nCurPage
-		if nIdx < 4 then
+		if nIdx < 3 then
 			ShowPage(nIdx+1)
 		end 
 	end, 3000)

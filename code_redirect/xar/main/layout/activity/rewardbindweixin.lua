@@ -197,7 +197,7 @@ function RewardBindWX:CheckCondition(tabInfo)
 end
 
 function RewardBindWX:CheckCanShowRewardEnter(tabInfo)
-    local tabReward = tabInfo["tRBindCfg"]
+    local tabReward = tabInfo["tRBindCfg_v2"]
     if type(tabReward) ~= "table" 
         or type(tabReward["tCondition"]) ~= "table" 
         or type(tabReward["tDescInfo"]) ~= "table" 
@@ -323,12 +323,13 @@ function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
         end    
         if type(tabScanText) == "table" 
             and IsRealString(tabScanText[3]) then
-            ObjResultText:SetCursorID("IDC_HAND")
-            ObjResultText:SetTextFontResID("font.text13.underline")
+            --ObjResultText:SetCursorID("IDC_HAND")
+            ObjResultText:SetTextFontResID("font.text13")
             ObjResultText:SetText(tabScanText[3])
             ObjResultText:SetVisible(true)
             ObjResultBkg:SetResID("GXZB.Activity.BindReward.Result")
             ObjResultBkg:SetVisible(true)
+			--[[
             if self._dwCookie_ResultText_OnLButtonUp then
                 ObjResultText:RemoveListener("OnLButtonUp", self._dwCookie_ResultText_OnLButtonUp)
             end
@@ -340,6 +341,7 @@ function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
                                             tStatInfo.fu6 = self._nBindIdx
                                             StatisticClient:SendClickReport(tStatInfo)
                                         end)
+			--]]
         end
         
 	else
