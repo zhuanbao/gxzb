@@ -3,8 +3,7 @@
 		<texture id="GXZB.UserIntroduce.Bkg" image="userintroduce\GXZB.UserIntroduce.Bkg.png" />
 		
 		<bitmap id="GXZB.UserIntroduce.ComputerHang" path="userintroduce\GXZB.UserIntroduce.ComputerHang.png"/>
-		<bitmap id="GXZB.UserIntroduce.RedPacket" path="userintroduce\GXZB.UserIntroduce.RedPacket.png"/>
-		<bitmap id="GXZB.UserIntroduce.OpenPacket" path="userintroduce\GXZB.UserIntroduce.OpenPacket.png"/>
+		<bitmap id="GXZB.UserIntroduce.MoneyTree" path="userintroduce\GXZB.UserIntroduce.MoneyTree.png"/>
 		<bitmap id="GXZB.UserIntroduce.WXIdentify" path="userintroduce\GXZB.UserIntroduce.WXIdentify.png"/>
 		
 		<imagelist id="GXZB.UserIntroduce.LeftBtn" vertical="0" varyblock="0" blocksize="18" image="userintroduce\GXZB.UserIntroduce.LeftBtn.png"/>
@@ -23,9 +22,9 @@
 			<texture id="GXZB.UserIntroduce.PagePos.unselect"  imagelist="GXZB.UserIntroduce.PagePos" index="1" />
 			<texture id="GXZB.UserIntroduce.PagePos.select"  imagelist="GXZB.UserIntroduce.PagePos" index="2" />
 		
-		<imagelist id="GXZB.UserIntroduce.StartBtn" vertical="0" varyblock="0" blocksize="190" image="userintroduce\GXZB.UserIntroduce.StartBtn.png"/>
-			<texture id="GXZB.UserIntroduce.StartBtn.normal"  imagelist="GXZB.UserIntroduce.StartBtn" index="1" />
-			<texture id="GXZB.UserIntroduce.StartBtn.hover"  imagelist="GXZB.UserIntroduce.StartBtn" index="2" />		
+		<imagelist id="GXZB.UserIntroduce.OpenTree" vertical="0" varyblock="0" blocksize="140" image="userintroduce\GXZB.UserIntroduce.OpenTree.png"/>
+			<texture id="GXZB.UserIntroduce.OpenTree.normal"  imagelist="GXZB.UserIntroduce.OpenTree" index="1" />
+			<texture id="GXZB.UserIntroduce.OpenTree.hover"  imagelist="GXZB.UserIntroduce.OpenTree" index="2" />		
 			
 		<bitmap id="GXZB.UserIntroduce.Desc1" path="userintroduce\GXZB.UserIntroduce.Desc1.png"/>
 		<bitmap id="GXZB.UserIntroduce.Desc2" path="userintroduce\GXZB.UserIntroduce.Desc2.png"/>
