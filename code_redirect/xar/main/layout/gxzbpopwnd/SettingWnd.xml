@@ -4,14 +4,14 @@
 			<left>0</left>
 			<top>0</top>
 			<width>610</width>
-			<height>398</height>
+			<height>398+34+5</height>
 		</attr>
 		<obj id="root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
 				<width>610</width>
-				<height>398</height>
+				<height>398+34+5</height>
 				<texture>setting-bkg</texture>
 			</attr>	
 			<children>
@@ -367,10 +367,52 @@
 										</obj>
 									</children>
 								</obj>
-								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
+								<obj id="SettingWnd.Content.EarningRemind" class="LayoutObject">
 									<attr>
 										<left>1</left>
 										<top>28+34+5+34+5+5+34+5+34+5+34+5</top>
+										<width>father.width-2</width>
+										<height>34</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.EarningRemind.SettingName" class="TextObject">
+											<attr>
+												<left>70</left>
+												<top>0</top>
+												<width>120</width>
+												<height>34</height>
+												<valign>center</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13</font>
+												<text>收益提醒</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.EarningRemind.CheckRemind" class="CheckBox">
+											<attr>
+												<left>70+120+5</left>
+												<top>5</top>
+												<width>150</width>
+												<height>25</height>
+												<ImgWidth>13</ImgWidth>
+												<ImgHeight>13</ImgHeight>
+												<CheckNormal>setting_checkbox.check</CheckNormal>
+												<CheckHover>setting_checkbox.check</CheckHover>
+												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
+												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<Select>false</Select>
+												<Text>订阅"收益提醒"，了解每日收益状况</Text>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
+									<attr>
+										<left>1</left>
+										<top>28+34+5+34+5+5+34+5+34+5+34+5+34+5</top>
 										<width>father.width-2</width>
 										<height>34+20</height>
 									</attr>

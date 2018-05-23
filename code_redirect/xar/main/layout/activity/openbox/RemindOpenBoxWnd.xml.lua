@@ -63,6 +63,10 @@ function OnShowWindow(self, bShow)
 		tStatInfo.fu1 = "openbox"
 		tStatInfo.fu5 = "showpopupwnd"
 		StatisticClient:SendEventReport(tStatInfo)
+		local nTipHolds = tonumber(ServerCfg:GetServerCfgData({"tRemindCfg","nHolds"})) or 15
+		SetOnceTimer(function(item, id)
+			ClosePopWnd(self)
+		end, nTipHolds*1000)
 	end
 end
 

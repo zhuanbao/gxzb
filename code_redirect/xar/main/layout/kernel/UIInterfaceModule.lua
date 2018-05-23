@@ -190,6 +190,10 @@ function UIInterface:CheckIsExistPopupWnd()
 end
 
 function UIInterface:CreatePopUpWnd(wndTemplateID, userData)
+	if self._bBossKeyHide then
+		TipLog("[CreatePopUpWnd] BossKey is Hide, so not popup")
+		return false
+	end
 	local strWndInstName = wndTemplateID .. ".Instance"
 	local wnd = hostwndManager:GetHostWnd(strWndInstName)
 	if wnd then
@@ -346,6 +350,13 @@ function UIInterface:PopTipPre4Hour()
 		ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
 			if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
 				local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+				local bRemind = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "EarningRemind", "bCheck"})
+				if bRemind == nil then
+					bRemind = true
+				end
+				if not bRemind then
+					return
+				end
 				local newgetgold = 0
 				for i = 1, 4 do
 					newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]

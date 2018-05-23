@@ -117,6 +117,15 @@ function SaveSettingConfig(objTree)
 	else
 		tFunctionHelper.WriteOffLineMonitorNoLaunchCfg(1)
 	end
+	
+	--收益提醒
+	local ObjCheckRemind = objTree:GetUIObject("SettingWnd.Content.EarningRemind.CheckRemind")
+	local ObjRemindAttr = ObjCheckRemind:GetAttribute()
+	if type(tUserConfig["tConfig"]["EarningRemind"]) ~= "table" then
+		tUserConfig["tConfig"]["EarningRemind"] = {}
+	end
+	tUserConfig["tConfig"]["EarningRemind"]["bCheck"] = ObjRemindAttr.Select
+	
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
@@ -417,6 +426,21 @@ function OnCreate(self)
 			ObjCheckBoxBossKey:SetCheck(false, true)
 			ObjEditBossKey:SetEnable(false)
 			ObjEditBossKey:SetTextColorID("BCB9B5")
+		end
+		
+		--收益提醒
+		local ObjCheckRemind = objTree:GetUIObject("SettingWnd.Content.EarningRemind.CheckRemind")
+		if type(tUserConfig["tConfig"]["EarningRemind"]) ~= "table" then
+			tUserConfig["tConfig"]["EarningRemind"] = {}
+		end
+		local bRemind = tUserConfig["tConfig"]["EarningRemind"]["bCheck"]
+		if bRemind == nil then
+			bRemind = true
+		end
+		if bRemind then
+			ObjCheckRemind:SetCheck(true, true)
+		else
+			ObjCheckRemind:SetCheck(false, true)
 		end
 		
 		--掉线监控
