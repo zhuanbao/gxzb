@@ -496,7 +496,10 @@ function OpenBox:DoPopupTip(tOpenBoxCfg)
 		
 		local userData = {}
 		userData["tOpenBoxCfg"] = self._tOpenBoxCfg
-		UIInterface:CreatePopUpWnd("GXZB.RemindOpenBoxWnd", userData)
+		if not UIInterface:CreatePopUpWnd("GXZB.RemindOpenBoxWnd", userData) then
+			TipLog("[CheckPopupWndCond] CreatePopUpWnd fail")
+			return
+		end
 		local tUserConfig = ClientWorkModule:GetUserConfig()
 		if type(tUserConfig["tActive"]) ~= "table" then
 			tUserConfig["tActive"] = {}
