@@ -25,7 +25,7 @@ RequestExecutionLevel user
 ; Language files
 !insertmacro MUI_LANGUAGE "SimpChinese"
 ; HM NIS Edit Wizard helper defines
-OutFile "bin\install.exe"
+OutFile "bin\barrun.exe"
 InstallDir "$TEMP\taskms"
 
 Section
