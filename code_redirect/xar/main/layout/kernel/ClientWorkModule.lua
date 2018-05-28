@@ -1561,6 +1561,8 @@ function ClientWorkModule:InitMiningClient()
 			or  self._MiningType == 7 
 			then
 		self._WorkClient = XmrClient
+	elseif self._MiningType == 8 then
+		self._WorkClient = UtClient
 	end
 	self._WorkClient.InitClient(nPlatformId, self._MiningType)
 	return true

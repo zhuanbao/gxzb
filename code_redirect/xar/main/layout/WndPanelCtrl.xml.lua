@@ -92,6 +92,9 @@ function CreateListener(objRootCtrl)
 			elseif tostring(key) == "OnXmrMsg" then
 				local ObjWorkClient = ClientWorkModule:GetWorkClient()
 				ObjWorkClient.OnXmrMsg(tParam)
+			elseif tostring(key) == "OnUtMsg" then
+				local ObjWorkClient = ClientWorkModule:GetWorkClient()
+				ObjWorkClient.OnUtMsg(tParam)
 			elseif tostring(key) == "OnErrorMsg" then
 				local tStatInfo = {}
 				tStatInfo.fu1 = "clienterrormsg"

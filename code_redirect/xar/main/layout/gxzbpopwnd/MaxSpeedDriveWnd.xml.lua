@@ -75,7 +75,7 @@ end
 
 function ShowContent(objtree)
 	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 or nClient == nil then
+	if nClient == 7 or nClient == 8 or nClient == nil then
 		return
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}

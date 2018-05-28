@@ -125,6 +125,7 @@ function ProfitMax:CalculateProfitPriority(bRet, tabGpuSpeed)
 	for Idx=1, #tabMaxSpeed do
 		tabSort[Idx] = tabMaxSpeed[Idx]["ClientType"]
 	end
+	tabSort[#tabSort+1] = 8
 	tabSort[#tabSort+1] = 7
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) ~= "table" then
@@ -218,7 +219,7 @@ function ProfitMax:CheckShowRecommendCond()
 		--return false
 	end
 	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 then
+	if nClient == 7 or nClient == 8 then
 		return false, 4
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -336,7 +337,7 @@ function ProfitMax:CanShowMaxSpeedWndNow()
 		--return false
 	end
 	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 then
+	if nClient == 7 or nClient == 8 then
 		return false
 	end
 	

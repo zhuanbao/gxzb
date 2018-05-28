@@ -11,6 +11,7 @@
 --6: A卡      显存>=1*1024*1024*1024 Share4PeerXA.exe  XMR
 --32+64位系统
 --7: CPU      Share4PeerXC.exe  XMR
+--8: CPU      Share4PeerUC.exe  UT
 
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
@@ -28,14 +29,14 @@ SupportClientType.ClientType.XMR_N64 = 4
 SupportClientType.ClientType.XMR_A64 = 5
 SupportClientType.ClientType.XMR_A32 = 6
 SupportClientType.ClientType.XMR_C32 = 7
-
+SupportClientType.ClientType.UT_C64 = 8
 
 SupportClientType._tabSupportClientInfo = nil
 SupportClientType._nCoinCnt = 0
 SupportClientType._nClientCnt = 0
 SupportClientType._tabGpuInfo = nil
 
-SupportClientType._tabCoinType = {"etc","zcash","xmr"}
+SupportClientType._tabCoinType = {"etc","zcash","xmr", "ut"}
 SupportClientType._VENDOR = {}
 SupportClientType._VENDOR.AMD = 1
 SupportClientType._VENDOR.NVIDIA = 2
@@ -253,15 +254,18 @@ function SupportClientType:GetMachineSupportClient()
 		end
 	end
 	--全部加入CPU的客户端
+	--8: CPU      Share4PeerUC.exe  UT
+	self:InsertClientInfoToTab("ut", self.ClientType.UT_C64)
 	--7: CPU      Share4PeerXC.exe  XMR
 	self:InsertClientInfoToTab("xmr", self.ClientType.XMR_C32)
+	
 	self:SortClientTable()
 	tFunctionHelper.DumpObj(self._tabSupportClientInfo, "DisplayCardInfo")
 end
 
 function SupportClientType:GetLocalPriorityTable()
 	local tForcePlist = nil
-    local tPriority = {1,2,3,4,5,6,7}
+    local tPriority = {2,1,3,4,5,6,8,7}
     local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tPriority"]) == "table" then
 		tPriority = tUserConfig["tPriority"]

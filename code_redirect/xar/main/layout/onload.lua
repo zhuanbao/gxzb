@@ -49,6 +49,7 @@ local tabLuaFile = {
 "kernel\\ZcashAClient.lua",
 "kernel\\XmrClient.lua",
 "kernel\\XmrClientHelper.lua",
+"kernel\\UtClient.lua",
 
 "activity\\activity.lua",
 }
