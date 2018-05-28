@@ -258,7 +258,6 @@ function SupportClientType:GetMachineSupportClient()
 	self:InsertClientInfoToTab("ut", self.ClientType.UT_C64)
 	--7: CPU      Share4PeerXC.exe  XMR
 	self:InsertClientInfoToTab("xmr", self.ClientType.XMR_C32)
-	
 	self:SortClientTable()
 	tFunctionHelper.DumpObj(self._tabSupportClientInfo, "DisplayCardInfo")
 end
@@ -276,11 +275,25 @@ function SupportClientType:GetLocalPriorityTable()
 	return tPriority, tForcePlist
 end
 
+function SupportClientType:InsertNewPriority(tabProfitMax, nNewItem, nBeforeItem)
+	local nFind = 0
+	for Idx=1, #tabProfitMax do
+		if tabProfitMax[Idx] == nBeforeItem then
+			nFind = Idx
+		elseif tabProfitMax[Idx] == nNewItem then
+			return
+		end
+	end
+	tabProfitMax[nFind] == nNewItem
+	tabProfitMax[#tabProfitMax+1] = nBeforeItem
+end
+
 function SupportClientType:GetLocalProfitMaxTable()
 	local tabProfitMax = nil
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) == "table" and type(tUserConfig["tProfitMax"]["tPriority"]) == "table" then
 		tabProfitMax = tUserConfig["tProfitMax"]["tPriority"]
+		self:InsertNewPriority(tabProfitMax, 8, 7)
 	end
 	return tabProfitMax
 end
