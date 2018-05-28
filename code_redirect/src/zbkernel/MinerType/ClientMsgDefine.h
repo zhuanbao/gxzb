@@ -92,6 +92,27 @@
 
 
 
+/***************************************************/
+//Xmr 客户端的消息定义
+#define WM_UT_MSG           WM_USER+600
+
+//WPARAM定义
+//上报速度
+#define WP_UT_SPEED		 1
+
+//share提交结果
+#define WP_UT_SHARE         2
+//连接矿次结果
+#define WP_UT_CONNECT_POOL	 3
+
+
+//错误
+//进程自动退出
+#define WP_UT_AUTOEXIT	    5
+//解析到错误信息
+#define WP_UT_ERROR_INFO    9
+/***************************************************/
+
 //错误信息
 #define WM_ERROR_INFO      WM_USER+100
 #define MAX_ERROR_LEN      200

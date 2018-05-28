@@ -7,6 +7,7 @@
 #include "../MinerType/ClientZcashN.h"
 #include "../MinerType/ClientZcashA.h"
 #include "../MinerType/ClientXmr.h"
+#include "../MinerType/ClientUt.h"
 
 CMinerClient *g_pClient = NULL;
 
@@ -125,6 +126,10 @@ int LuaIPCUtil::Init(lua_State* pLuaState)
 	else if(uMinerType >= MINER_XMR_B && uMinerType <= MINER_XMR_E)
 	{
 		g_pClient = new CClientXmr(uMinerType);
+	}
+	else if(uMinerType == MINER_UT_C)
+	{
+		g_pClient = new CClientUt(uMinerType);
 	}
 	return 0;
 }

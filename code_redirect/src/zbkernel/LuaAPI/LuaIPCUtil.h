@@ -12,6 +12,7 @@ typedef enum
 	MINER_ZCASH_A = 3,
 	MINER_XMR_B = 4,
 	MINER_XMR_E = 7,
+	MINER_UT_C= 8,
 }MinerType;
 
 
