@@ -362,6 +362,7 @@ Function CloseExe
 	${FKillProc} "Share4PeerXA"
 	${FKillProc} "Share4PeerXA64"
 	${FKillProc} "SharePlugin"
+	${FKillProc} "Share4PeerUC"
 FunctionEnd
 
 Function un.CloseExe
@@ -377,6 +378,7 @@ Function un.CloseExe
 	${FKillProc} "Share4PeerXA"
 	${FKillProc} "Share4PeerXA64"
 	${FKillProc} "SharePlugin"
+	${FKillProc} "Share4PeerUC"
 FunctionEnd
 
 Function CheckHasInstall
