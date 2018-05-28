@@ -287,7 +287,7 @@ function SupportClientType:InsertNewPriority(tabProfitMax, nNewItem, nBeforeItem
 	if nFind == 0 then
 		tabProfitMax[#tabProfitMax+1] = nNewItem
 	else
-		tabProfitMax[nFind] == nNewItem
+		tabProfitMax[nFind] = nNewItem
 		tabProfitMax[#tabProfitMax+1] = nBeforeItem
 	end
 	
