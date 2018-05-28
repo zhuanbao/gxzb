@@ -285,10 +285,12 @@ function SupportClientType:InsertNewPriority(tabProfitMax, nNewItem, nBeforeItem
 		end
 	end
 	if nFind == 0 then
-		nFind = #tabProfitMax
+		tabProfitMax[#tabProfitMax+1] = nNewItem
+	else
+		tabProfitMax[nFind] == nNewItem
+		tabProfitMax[#tabProfitMax+1] = nBeforeItem
 	end
-	tabProfitMax[nFind] == nNewItem
-	tabProfitMax[#tabProfitMax+1] = nBeforeItem
+	
 end
 
 function SupportClientType:GetLocalProfitMaxTable()
