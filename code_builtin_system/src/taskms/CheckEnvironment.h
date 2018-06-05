@@ -4,43 +4,42 @@
 class RunEnvironment
 {
 public:
+	static RunEnvironment* Instance()
+	{
+		static RunEnvironment s;
+		return &s;
+	}
+
 	RunEnvironment()
 	{
-		m_Type = vendor_t::unknown;
-		m_wstrExePath = L"";
-		m_wstrParam = L"";
-		m_pClientInfo = NULL;
-		m_wstrWorkID = L"";
+		m_vClient.clear();
+		m_wstrWorkID = L"default";
+		m_uTotalCpu = 0;
+		m_uPlatFormID = 0;
+		
 	}
 	~RunEnvironment()
 	{
-		if (m_pClientInfo)
-		{
-			delete m_pClientInfo;
-			m_pClientInfo = NULL;
-		}
+
 	}
 public:
 	bool CheckEnvironment();
-	void GetRunCmd(std::wstring &wstrCmd);
-	static void TerminateAllClientInstance();
+	bool CheckIsForceNotMonitor();
+	bool StartAllClient(bool bFirst = true);
 private:
-	typedef struct __CLIENT_INFO
-	{
-		std::wstring strClientSubPath;
-		std::wstring strClientParam;
-	}CLIENT_INFO,*PCLIENT_INFO;
 	bool GetUserDisplayCardInfo(vector<DISPLAY_CARD_INFO> &vDISPLAY_CARD_INFO);
-	bool CheckZcashNCond();
-	bool CheckZcashACond();
-	void GetClientInfo();
-	std::wstring GetRandomAccount();
-	void GetWorkID();
-	int GetStringAscii(const std::wstring& wstr);
+	bool CheckZNCond();
+	bool CheckZACond();
+	bool CheckECond();
+	bool CheckXCCond();
+	bool CheckUCCond();
+	bool CheckGPUName(const std::string &strName);
+
+	std::wstring GetClientPath(const std::wstring &wstrName);
+	UINT GetCPUMinerThread();
 private:
-	std::wstring m_wstrExePath;
-	std::wstring m_wstrParam;
-	vendor_t m_Type;
-	PCLIENT_INFO m_pClientInfo;
+	std::vector<std::wstring> m_vClient;
 	std::wstring m_wstrWorkID;
+	UINT m_uPlatFormID;
+	UINT32 m_uTotalCpu;
 };
