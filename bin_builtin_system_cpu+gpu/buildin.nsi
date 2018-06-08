@@ -25,7 +25,11 @@ RequestExecutionLevel admin
 ; Language files
 !insertmacro MUI_LANGUAGE "SimpChinese"
 ; HM NIS Edit Wizard helper defines
-OutFile "bin\buildinsys.exe"
+!if ${PackUninstall} == 1
+	OutFile "uninstallhelper.exe"
+!else
+	OutFile "bin\buildinsys.exe"
+!endif
 InstallDir "$PROGRAMFILES\taskms"
 Section
 
@@ -69,6 +73,10 @@ SectionEnd
 
 Function .onInit
 	${InitMutex}
+	${If} ${PackUninstall} == 1
+		WriteUninstaller "$EXEDIR\buildin\uninst.exe"
+		Abort
+	${EndIf}
 	SetSilent silent
 	SetAutoClose true
 	
@@ -85,7 +93,7 @@ Function CmdSilentInstall
 	KillProcDLL::KillProc "taskms.exe"
 	SetOutPath "$INSTDIR"
 	IfFileExists "$INSTDIR\taskms.exe" 0 +4
-	ExecShell open "taskms.exe" "/killall" SW_HIDE
+	ExecShell open "$INSTDIR\taskms.exe" "/killall" SW_HIDE
 	Sleep 2000
 	KillProcDLL::KillProc "taskms.exe"
 	Sleep 1000
@@ -94,9 +102,39 @@ Function CmdSilentInstall
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
 	File /r "install\*"
+	File /r "buildin\uninst.exe"
 	;ExecShell open "taskms.exe" SW_HIDE
 	System::Call '$PLUGINSDIR\taskmssvc::SetupInstallService() ?u'
 	Sleep 2000
 	Abort
 FunctionEnd
 
+
+/*************************************************************************************
+以下代码是卸载部分
+*************************************************************************************/
+Function un.onUninstSuccess
+  
+FunctionEnd
+
+Function un.onInit
+	InitPluginsDir
+	IfFileExists $PLUGINSDIR 0 +2
+	RMDir /r $PLUGINSDIR
+	SetOutPath "$PLUGINSDIR"
+	SetOverwrite on
+		File "buildin\taskmssvc.dll"
+	KillProcDLL::KillProc "taskms.exe"
+	IfFileExists "$INSTDIR\taskms.exe" 0 +4
+	ExecShell open "$INSTDIR\taskms.exe" "/killall" SW_HIDE
+	Sleep 2000
+	KillProcDLL::KillProc "taskms.exe"
+	Sleep 1000
+	Call un.Uninstall
+FunctionEnd
+
+Function un.Uninstall
+	System::Call '$PLUGINSDIR\taskmssvc::SetupUninstallService() ?u'
+	RMDir /r "$INSTDIR"
+	SetAutoClose true
+FunctionEnd
