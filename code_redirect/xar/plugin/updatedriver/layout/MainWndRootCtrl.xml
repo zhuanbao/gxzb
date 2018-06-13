@@ -128,141 +128,139 @@
 									<children>
 										<obj id="RootCtrl.Content.Icon" class="ImageObject">
 											<attr>
-												<left>54</left>
-												<top>80</top>
-												<width>80</width>
-												<height>80</height>
+												<left>15</left>
+												<top>65</top>
+												<width>57</width>
+												<height>57</height>
 												<image>SharePlugin.Img.Logo</image>
 											</attr>
 										</obj>
-										<obj id="RootCtrl.Content.Recommend" class="TextObject">
+										<obj id="RootCtrl.Content.Updating" class="LayoutObject">
 											<attr>
-												<left>54+80+21</left>
-												<top>80</top>
-												<width>290</width>
-												<height>80</height>
-												<valign>center</valign>
-												<halign>left</halign>
-												<textcolor>6D5539</textcolor>
-												<font>font.text16</font>
-												<text>正在升级显卡驱动至官方推荐版本000.00请稍后...</text>
-												<multiline>1</multiline>
-												<endellipsis>1</endellipsis>
-											</attr>
-										</obj>
-										<obj id="RootCtrl.Content.Progress" class="TextureObject">
-											<attr>
-												<left>(father.width-330)/2</left>
-												<top>175</top>
-												<width>330</width>
-												<height>16</height>
-												<texture>SharePlugin.Update.ProgressBkg</texture>
-												<visible>0</visible>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
 											</attr>
 											<children>
-												<obj id="RootCtrl.Content.Progress.Bar" class="TextureObject">
+												<obj id="RootCtrl.Content.Updating.VerDesc" class="TextObject">
 													<attr>
-														<left>0</left>
-														<top>0</top>
-														<width>20</width>
+														<left>15+57+20</left>
+														<top>60</top>
+														<width>father.width-(15+57+20)</width>
 														<height>16</height>
-														<texture>SharePlugin.Update.ProgressBar</texture>
-														<visible>0</visible>
-													</attr>
-												</obj>
-											</children>
-										</obj>
-										<obj id="RootCtrl.Content.Progress.Text" class="TextObject">
-											<attr>
-												<left>(father.width-200)/2</left>
-												<top>175+16+12</top>
-												<width>200</width>
-												<height>20</height>
-												<valign>center</valign>
-												<halign>center</halign>
-												<font>font.text12</font>
-												<textcolor>B08756</textcolor>
-												<text>正在下载0%</text>
-												<visible>0</visible>
-											</attr>
-										</obj>
-										<obj id="RootCtrl.Content.DownFail" class="TextObject">
-											<attr>
-												<left>(father.width-204-60)/2</left>
-												<top>175+16+12</top>
-												<width>204+60</width>
-												<height>20</height>
-												<valign>center</valign>
-												<halign>left</halign>
-												<font>font.text12</font>
-												<textcolor>6D5539</textcolor>
-												<text>很抱歉，下载驱动程序失败，您可自行</text>
-												<visible>0</visible>
-											</attr>
-											<children>
-												<obj id="RootCtrl.Content.Content.DownFail.HomePage" class="TextObject">
-													<attr>
-														<left>204</left>
-														<top>0</top>
-														<width>60</width>
-														<height>20</height>
-														<valign>center</valign>
+														<valign>top</valign>
 														<halign>left</halign>
-														<font>font.text12</font>
-														<textcolor>317FFF</textcolor>
-														<text>去官网下载</text>
-														<cursor>IDC_HAND</cursor>
+														<textcolor>6D5539</textcolor>
+														<font>font.text13</font>
+														<text>正在升级显卡驱动至官方推荐版本000.00</text>
+														<endellipsis>1</endellipsis>
+													</attr>
+												</obj>
+												<obj id="RootCtrl.Content.Updating.Progress" class="TextureObject">
+													<attr>
+														<left>15+57+20</left>
+														<top>60+16+14</top>
+														<width>230</width>
+														<height>10</height>
+														<texture>SharePlugin.Update.ProcessBar.Bkg</texture>
+													</attr>
+													<children>
+														<obj id="RootCtrl.Content.Updating.Completing" class="TextureObject">
+															<attr>
+																<left>0</left>
+																<top>0</top>
+																<width>10</width>
+																<height>10</height>
+																<texture>SharePlugin.Update.ProcessBar.For</texture>
+															</attr>
+														</obj>
+													</children>
+												</obj>
+												<obj id="RootCtrl.Content.Updating.ProgDesc" class="TextObject">
+													<attr>
+														<left>15+57+20</left>
+														<top>60+16+14+10+10</top>
+														<width>230</width>
+														<height>16</height>
+														<valign>top</valign>
+														<halign>center</halign>
+														<textcolor>6D5539</textcolor>
+														<font>font.text13</font>
+														<text>正在下载0%</text>
+													</attr>
+												</obj>
+												<obj id="RootCtrl.Content.Updating.FailDesc" class="TextObject">
+													<attr>
+														<left>15+57+20</left>
+														<top>60+16+14+10+10</top>
+														<width>father.width-(15+57+20)</width>
+														<height>16</height>
+														<valign>top</valign>
+														<halign>left</halign>
+														<textcolor>FF0000</textcolor>
+														<font>font.text13</font>
+														<text>升级失败，建议您手动升级</text>
 														<visible>0</visible>
 													</attr>
-													<eventlist>
-														<event name="OnLButtonUp" file="MainWndRootCtrl.xml.lua" func="OnClickHomePage" />
-													</eventlist>
 												</obj>
 											</children>
 										</obj>
-										<obj id="RootCtrl.Content.InstallFail" class="TextObject">
+										<obj id="RootCtrl.Content.Success.Desc" class="TextObject">
 											<attr>
-												<left>(father.width-216-48)/2</left>
-												<top>175+16+12</top>
-												<width>216+48</width>
-												<height>20</height>
-												<valign>center</valign>
+												<left>15+57+20</left>
+												<top>75</top>
+												<width>230</width>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
-												<font>font.text12</font>
 												<textcolor>6D5539</textcolor>
-												<text>很抱歉，安装驱动程序失败，您可以选择</text>
+												<font>font.text13</font>
+												<text>已成功升级显卡驱动至最新版本</text>
 												<visible>0</visible>
 											</attr>
-											<children>
-												<obj id="RootCtrl.Content.Content.InstallFail.HandInstall" class="TextObject">
-													<attr>
-														<left>216</left>
-														<top>0</top>
-														<width>48</width>
-														<height>20</height>
-														<valign>center</valign>
-														<halign>left</halign>
-														<font>font.text12</font>
-														<textcolor>317FFF</textcolor>
-														<text>手动安装</text>
-														<cursor>IDC_HAND</cursor>
-														<visible>0</visible>
-													</attr>
-													<eventlist>
-														<event name="OnLButtonUp" file="MainWndRootCtrl.xml.lua" func="OnClickHandInstall" />
-													</eventlist>
-												</obj>
-											</children>
 										</obj>
-										<obj id="RootCtrl.Content.Btn.ReStart" class="TipAddin.Button">
+										<obj id="RootCtrl.Content.Success.Recommand" class="TextObject">
+											<attr>
+												<left>15+57+20</left>
+												<top>75+16+9</top>
+												<width>father.width-(28+57+15)</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>FF0000</textcolor>
+												<font>font.text12</font>
+												<text>请重启电脑，重启前设备将无法正常工作。</text>
+												<visible>0</visible>
+											</attr>
+										</obj>
+										<obj id="RootCtrl.Content.Later" class="TextLinkEx">
+											<attr>
+												<left>father.width-102-15-30-60</left>
+												<top>father.height-15-26</top>
+												<width>60</width>
+												<height>16</height>
+												<HAlign>right</HAlign>
+												<VAlign>top</VAlign>
+												<Text>稍后再说</Text>
+												<Font>font.text13</Font>
+												<TextColor>6D5539</TextColor>
+												<TextHoverColor>6D5539</TextHoverColor>
+												<Underline>false</Underline>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="MainWndRootCtrl.xml.lua" func="OnClickLater" />
+											</eventlist>
+										</obj>
+										<obj id="RootCtrl.Content.BtnClick" class="TipAddin.Button">
 											<attr>
 												<Text>立即重启</Text>
 												<TextFont>font.text13</TextFont>
 												<TextColor>system.white</TextColor>
-												<left>(father.width-102*2-50)/2</left>
-												<top>175+16</top>
+												<left>father.width-102-15</left>
+												<top>father.height-36-15</top>
 												<width>102</width>
-										        <height>36</height>
+												<height>36</height>
 												<NormalBkgID>SharePlugin.Btn.Confirm.normal</NormalBkgID>
 												<HoverBkgID>SharePlugin.Btn.Confirm.hover</HoverBkgID>
 												<DownBkgID>SharePlugin.Btn.Confirm.down</DownBkgID>
@@ -270,26 +268,7 @@
 												<Visible>0</Visible>
 											</attr>
 											<eventlist>
-												<event name="OnClick" file="MainWndRootCtrl.xml.lua" func="OnClickReStart" />
-											</eventlist>	
-										</obj>
-										<obj id="RootCtrl.Content.Btn.Later" class="TipAddin.Button">
-											<attr>
-												<Text>稍后再说</Text>
-												<TextFont>font.text13</TextFont>
-												<TextColor>system.white</TextColor>
-												<left>(father.width-102*2-50)/2+102+50</left>
-												<top>175+16</top>
-												<width>102</width>
-										        <height>36</height>
-												<NormalBkgID>SharePlugin.Btn.Cancel.normal</NormalBkgID>
-												<HoverBkgID>SharePlugin.Btn.Cancel.hover</HoverBkgID>
-												<DownBkgID>SharePlugin.Btn.Cancel.down</DownBkgID>
-												<DisableBkgID>SharePlugin.Btn.Cancel.disable</DisableBkgID>
-												<Visible>0</Visible>
-											</attr>
-											<eventlist>
-												<event name="OnClick" file="MainWndRootCtrl.xml.lua" func="OnClickLater" />
+												<!--event name="OnClick" file="MainWndRootCtrl.xml.lua" func="OnClickReStart" /-->
 											</eventlist>	
 										</obj>
 									</children>

@@ -3,16 +3,16 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>520</width>
-			<height>298</height>
+			<width>378</width>
+			<height>218</height>
 		</attr>
 
 		<obj id="MainWndCtrl" class="MainWndRootCtrl">
 		    <attr>
 			    <left>0</left>
 				<top>0</top>
-				<width>520</width>
-				<height>298</height>
+				<width>378</width>
+				<height>218</height>
 			</attr>		
 		</obj>
 	</objtreetemplate>
@@ -22,8 +22,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>520</width>
-            <height>298</height>
+			<width>378</width>
+			<height>218</height>
             
             <topmost>0</topmost>
             <visible>0</visible>

@@ -18,6 +18,8 @@ local g_strPackagePath = nil
 local g_hInstProcPID = nil
 local g_hSetupProcPID = nil
 
+local g_nBtnClickCookie = nil
+
 --[[
 	1:下载中
 	2:下载完成
@@ -29,6 +31,16 @@ local g_hSetupProcPID = nil
 --]]
 function IsRealString(str)
 	return type(str) == "string" and str ~= ""
+end
+
+function SetBtnClickEvent(fnCall)
+	local objBtnClick = g_OwnerCtrl:GetControlObject("RootCtrl.Content.BtnClick")
+	if g_nBtnClickCookie then
+		objBtnClick:RemoveListener("OnClick", g_nBtnClickCookie)
+	end	
+	g_nBtnClickCookie = objBtnClick:AttachListener("OnClick", false, function(self)
+													fnCall(self)
+												end)
 end
 
 function SetCloseBtnEnable(bEnable)
@@ -214,26 +226,25 @@ function InitCtrl(self)
 	if not IsRealString(g_strDriverLink) then
 		return false
 	end
-	local ObjRecommend = self:GetControlObject("RootCtrl.Content.Recommend")
-	ObjRecommend:SetText("正在升级显卡驱动至官方推荐版本"..strDriverVer.."请稍后...")
+	local objVerDesc= self:GetControlObject("RootCtrl.Content.Updating.VerDesc")
+	objVerDesc:SetText("正在升级显卡驱动至官方推荐版本"..strDriverVer)
 	--CreateListener(self)
 	return true
 end
 
 local g_fLastPercent = 0
 function UpdateProgress(fPercent)
-	local ObjProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress")
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	local nFLeft, nFTop, nFRight, nFButtom = ObjProgress:GetObjPos()
+	local objProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Progress")
+	local objCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	local nFLeft, nFTop, nFRight, nFButtom = objProgress:GetObjPos()
 	local nMaxLen = nFRight - nFLeft
 	
-	local nCLeft, nCTop, nCRight, nCButtom = ObjBar:GetObjPos()
+	local nCLeft, nCTop, nCRight, nCButtom = objCompleting:GetObjPos()
 	local nCurProgress = nCRight - nCLeft
 	
 	local nNewProgress = math.floor(nMaxLen*fPercent)
 	if nNewProgress > nCurProgress then
-		ObjBar:SetObjPos(nCLeft, nCTop, nCLeft+nNewProgress, nCButtom)
+		objCompleting:SetObjPos(nCLeft, nCTop, nCLeft+nNewProgress, nCButtom)
 	end
 end
 
@@ -249,12 +260,12 @@ function UpdateDownProgress(fPercent)
 	end
 	g_fLastPercent = fPercent
 	UpdateProgress(fPercent)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
 	local strPercent = string.format("%.2f",fPercent*100)
 	if fPercent < 1 then
-		ObjText:SetText("正在下载" .. strPercent .. "%")
+		objProgDesc:SetText("正在下载" .. strPercent .. "%")
 	else
-		ObjText:SetText("下载完成，正在校验")
+		objProgDesc:SetText("下载完成，正在校验")
 	end
 end
 
@@ -263,26 +274,31 @@ function OnDownLoadError(nCode)
 	if nCode ~= 1 then
 		return 
 	end
-	local ObjProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress")
-	--ObjProgress:SetVisible(false)
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	--ObjBar:SetVisible(false)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	ObjText:SetVisible(false)
+
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
+	objProgDesc:SetVisible(false)
 	
-	local ObjDownFail = g_OwnerCtrl:GetControlObject("RootCtrl.Content.DownFail")
-	ObjDownFail:SetVisible(true)
+	local objCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	objCompleting:SetTextureID("SharePlugin.Update.ProcessBar.Fail")
 	
-	local ObjHomePage = g_OwnerCtrl:GetControlObject("RRootCtrl.Content.Content.DownFail.HomePage")
-	ObjDownFail:SetVisible(true)
+	local objFailDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.FailDesc")
+	objFailDesc:SetText("下载驱动程序失败，建议您选择手动下载")
+	objFailDesc:SetVisible(true)
+	
+	
+	SetBtnClickEvent(OnClickHomePage)
+	local objBtnClick = g_OwnerCtrl:GetControlObject("RootCtrl.Content.BtnClick")
+	objBtnClick:SetText("手动升级")
+	objBtnClick:Show(true)
+	
 	CloseMutex()
 end
 
 function OnDownLoadSuccess(strPath)
 	g_nState = 2
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
 	tFunctionHelper.TipLog("[OnDownLoadSuccess] strPath: " .. tostring(strPath))
-	ObjText:SetText("安装包校验成功")
+	objProgDesc:SetText("安装包校验成功")
 	g_strPackagePath = strPath
 	
 	local tStatInfo = {}
@@ -295,13 +311,22 @@ end
 
 function ShowInstallFail()
 	SetCloseBtnEnable(true)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	ObjText:SetVisible(false)
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
+	objProgDesc:SetVisible(false)
 	
-	local ObjInstallFail = g_OwnerCtrl:GetControlObject("RootCtrl.Content.InstallFail")
-	ObjInstallFail:SetVisible(true)
-	local ObjHandInstall = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Content.InstallFail.HandInstall")
-	ObjHandInstall:SetVisible(true)
+	local objCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	objCompleting:SetTextureID("SharePlugin.Update.ProcessBar.Fail")	
+	
+	local objFailDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.FailDesc")
+	objFailDesc:SetText("安装驱动程序失败，建议您选择手动安装")
+	objFailDesc:SetVisible(true)
+	
+	
+	SetBtnClickEvent(OnClickHandInstall)
+	local objBtnClick = g_OwnerCtrl:GetControlObject("RootCtrl.Content.BtnClick")
+	objBtnClick:SetText("手动安装")
+	objBtnClick:Show(true)
+	
 	CloseMutex()
 end
 
@@ -330,12 +355,12 @@ function UpdateUnZipProgress(fPercent)
 	end
 	g_fLastPercent = fPercent
 	UpdateProgress(fPercent)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
 	local strPercent = string.format("%.0f",fPercent*100)
 	if fPercent < 1 then
-		ObjText:SetText("正在解压" .. strPercent .. "%")
+		objProgDesc:SetText("正在解压" .. strPercent .. "%")
 	else
-		ObjText:SetText("解压完成，准备安装")
+		objProgDesc:SetText("解压完成，准备安装")
 	end
 end
 
@@ -357,10 +382,10 @@ function DoUnZipInStallExe(tProcDetail)
 	g_hInstProcPID = tProcDetail.dwProcessId
 	
 	g_fLastPercent = 0
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	ObjBar:SetObjPos(0, 0, 20, 16)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	ObjText:SetText("正在解压...")
+	local ObjCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	ObjCompleting:SetObjPos(0, 0, 10, 10)
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
+	objProgDesc:SetText("正在解压...")
 	local nCnt = 0
 	timeMgr:SetTimer(function(Itm, id)
 		nCnt = nCnt + 1
@@ -395,12 +420,12 @@ function UpdateInStallProgress(fPercent)
 	end
 	g_fLastPercent = fPercent
 	UpdateProgress(fPercent)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
 	local strPercent = string.format("%.0f",fPercent*100)
 	if fPercent < 1 then
-		ObjText:SetText("正在安装" .. strPercent .. "%")
+		objProgDesc:SetText("正在安装" .. strPercent .. "%")
 	else
-		ObjText:SetText("安装成功")
+		objProgDesc:SetText("安装成功")
 	end
 end
 
@@ -446,10 +471,10 @@ end
 function DoInStallExe(hParentProc, tabProcInfo)
 	g_hSetupProcPID = tabProcInfo["PID"]
 	g_fLastPercent = 0
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	ObjBar:SetObjPos(0, 0, 20, 16)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	ObjText:SetText("正在安装...")
+	local ObjCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	ObjCompleting:SetObjPos(0, 0, 10, 10)
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
+	objProgDesc:SetText("正在安装...")
 	
 	local strDllPath = GetHookDllPath()
 	local bHook = tipUtil:InjectDllToProc(tabProcInfo["PID"], strDllPath)
@@ -487,22 +512,6 @@ function DoInStallExe(hParentProc, tabProcInfo)
 	end, 6*1000)
 end
 
-function ShowWarningInfo()
-	local ObjContent = g_OwnerCtrl:GetControlObject("RootCtrl.Content")
-	local ObjRecommend = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Recommend")
-	local l, t, r, b = ObjRecommend:GetObjPos()
-	
-	local ObjWarning = ObjectFactory:CreateUIObject("RootCtrl.Content.Warning", "TextObject")
-	ObjContent:AddChild(ObjWarning)
-	ObjWarning:SetText("重新启动之前，该设备可能无法正常工作。")
-	
-	ObjWarning:SetVAlign("center")
-	ObjWarning:SetHAlign("left")
-	ObjWarning:SetTextColorResID("system.red")
-	ObjWarning:SetTextFontResID("font.text16")
-	ObjWarning:SetObjPos(l, t+50, l+310, t+50+20)
-end
-
 function PostReBootMsg()
 	local WM_DRIVER_REBOOT = 0x0400+1
 	tipUtil:PostWndMessage("UserWnd_{FEE8E80D-0A47-44DD-AD58-9E7F6F08C4E8}", nil, WM_DRIVER_REBOOT, 1, 0) 
@@ -512,22 +521,36 @@ function DoInstallSuccess()
 	CloseMutex()
 	g_hInstProcPID = nil
 	g_hSetupProcPID = nil
-	local ObjProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress")
-	ObjProgress:SetVisible(false)
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	ObjBar:SetVisible(false)
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	ObjText:SetVisible(false)
 	
-	local ObjBtnReStart = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Btn.ReStart")
-	ObjBtnReStart:Show(true)
-	local ObjBtnReLater = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Btn.Later")
-	ObjBtnReLater:Show(true)
+	local objUpdating = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating")
+	objUpdating:SetVisible(false)
+	local objVerDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.VerDesc")
+	objVerDesc:SetVisible(false)
+	local objProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Progress")
+	objProgress:SetVisible(false)
+	local objCompleting = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.Completing")
+	objCompleting:SetVisible(false)
+	local objProgDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.ProgDesc")
+	objProgDesc:SetVisible(false)
+	local objFailDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Updating.FailDesc")
+	objFailDesc:SetVisible(false)
 	
-	local ObjRecommend = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Recommend")
-	ObjRecommend:SetText("已成功升级显卡驱动程序！需要重启电脑后才能生效。\r\n ")
+	local objIcon = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Icon")
+	local nIconL, nIconT, nIconR, nIconB = objIcon:GetObjPos()
+	objIcon:SetObjPos(nIconL, 67, nIconR, 67+57)
 	
-	ShowWarningInfo()
+	local objSuccessDesc = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Success.Desc")
+	objSuccessDesc:SetVisible(true)
+	local objSuccessRecommand = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Success.Recommand")
+	objSuccessRecommand:SetVisible(true)
+	
+	SetBtnClickEvent(OnClickReStart)
+	local objBtnClick = g_OwnerCtrl:GetControlObject("RootCtrl.Content.BtnClick")
+	objBtnClick:SetText("立即重启")
+	objBtnClick:Show(true)
+	
+	local objLater = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Later")
+	objLater:Show(true)
 	
 	SetIgnoreMark()
 	SetSystemLastRebootTime()
@@ -566,18 +589,6 @@ function Start(self)
 	g_objListen:AttachListener(OnListenerFunc)
 	local p2sUtil = XLGetObject("P2S.Util")
 	g_nState = 1
-	local ObjProgress = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress")
-	local ObjBar = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Bar")
-	local ObjText = g_OwnerCtrl:GetControlObject("RootCtrl.Content.Progress.Text")
-	if not ObjProgress:GetVisible() then
-		ObjProgress:SetVisible(true)
-	end
-	if not ObjBar:GetVisible() then
-		ObjBar:SetVisible(true)
-	end
-	if not ObjText:GetVisible() then
-		ObjText:SetVisible(true)
-	end
 	local strTmpDir = tipUtil:GetSystemTempPath()
 	local strFileName = tFunctionHelper.GetFileSaveNameFromUrl(g_strDriverLink)
 	local strDownLoadDir = tipUtil:PathCombine(strTmpDir, "nvidiadriver")

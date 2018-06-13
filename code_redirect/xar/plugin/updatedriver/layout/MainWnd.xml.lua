@@ -14,14 +14,17 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
-		
+		local objTree = self:GetBindUIObjectTree()
+		local objRootLayout = objTree:GetUIObject("MainWndCtrl")
+		local objLater = objRootLayout:GetControlObject("RootCtrl.Content.Later")
+		objLater:Show(false)
     end   
 end
 
 
 function PopupInDeskMiddle(self)
-	local objtree = self:GetBindUIObjectTree()
-	local objRootLayout = objtree:GetUIObject("MainWndCtrl")
+	local objTree = self:GetBindUIObjectTree()
+	local objRootLayout = objTree:GetUIObject("MainWndCtrl")
     local templateMananger = XLGetObject("Xunlei.UIEngine.TemplateManager")
 	
 	local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
@@ -40,11 +43,11 @@ end
 
 
 function OnDestroy( self )
-	local objtree = self:GetBindUIObjectTree()
-	if objtree ~= nil then
+	local objTree = self:GetBindUIObjectTree()
+	if objTree ~= nil then
 		self:UnbindUIObjectTree()
 		local objtreeManager = XLGetObject("Xunlei.UIEngine.TreeManager")
-		objtreeManager:DestroyTree(objtree)
+		objtreeManager:DestroyTree(objTree)
 	end
 	local wndId = self:GetID()
 	if wndId ~= nil then

@@ -11,9 +11,10 @@
 			<texture id="SharePlugin.Btn.Confirm.normal" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="1" />
 			<texture id="SharePlugin.Btn.Confirm.hover" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="2" />
 			<texture id="SharePlugin.Btn.Confirm.down" type="ThreeInOneH" imagelist="SharePlugin.Btn.Confirm" index="3" />
-		
-		<texture id="SharePlugin.Update.ProgressBar" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProgressBar.png" />
-		<texture id="SharePlugin.Update.ProgressBkg" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProgressBkg.png" />	
+			
+		<texture id="SharePlugin.Update.ProcessBar.Bkg" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProcessBar.Bkg.png" />
+		<texture id="SharePlugin.Update.ProcessBar.Fail" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProcessBar.Fail.png" />
+		<texture id="SharePlugin.Update.ProcessBar.For" type="ThreeInOneH" image="bitmap\SharePlugin.Update.ProcessBar.For.png" />
 		
 		<texture id="SharePlugin.Caption.Close" image="bitmap\SharePlugin.Caption.Close.png" />
 		<texture id="SharePlugin.Caption.Min" image="bitmap\SharePlugin.Caption.Min.png" />
