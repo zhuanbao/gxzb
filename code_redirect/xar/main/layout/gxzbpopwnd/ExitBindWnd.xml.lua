@@ -28,19 +28,20 @@ end
 
 function OnClickClose(self)
 	DestoryDialog(self)
+	local wndMain = UIInterface:GetMainHostWnd()
+	UIInterface:ReportAndExit()
 end
 
-function OnClickUnBind(self)
-	ClientWorkModule:UnBindingClientFromClient()
-	local tStatInfo = {}
-	tStatInfo.fu1 = "unbindwx"
-	--tStatInfo.fu5 = "client"
-	StatisticClient:SendClickReport(tStatInfo)
+function OnClickBind(self)
+	local wndMain = UIInterface:GetMainHostWnd()
+	wndMain:BringWindowToTop(true)
+	UIInterface:ChangeMainBodyPanel("QRCodePanel")
 	DestoryDialog(self)
 end
 
 function OnClickCancel(self)
-	DestoryDialog(self)
+	local wndMain = UIInterface:GetMainHostWnd()
+	UIInterface:ReportAndExit()
 end
 
 function OnCreate(self)
@@ -48,7 +49,7 @@ function OnCreate(self)
 	local userData = self:GetUserData()
 	if userData and userData.parentWnd then
 		local objTree = self:GetBindUIObjectTree()
-		local objRootLayout = objTree:GetUIObject("UnBindWnd.Content")
+		local objRootLayout = objTree:GetUIObject("ExitBindWnd.Content")
 		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
 		local nLayoutWidth  = nLayoutR - nLayoutL
 		local nLayoutHeight = nLayoutB - nLayoutT
@@ -58,7 +59,7 @@ function OnCreate(self)
 		local parentHeight = parentBottom - parentTop
 		self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
 		
-		local ObjText = objTree:GetUIObject("UnBindWnd.Desc")
+		local ObjText = objTree:GetUIObject("ExitBindWnd.Desc")
 		
 		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 		if type(tUserConfig["tUserInfo"]) ~= "table" then
@@ -70,9 +71,9 @@ function OnCreate(self)
 		else
 			strNickName = "*"
 		end
-		
-		local strText = "当前绑定微信账号是（*" .. tostring(strNickName) .. "）,\r\n"
-		strText = strText .. "解除绑定赚宝收益无法提现，确定解绑吗?"
+		local nCurBalance = ClientWorkModule:GetUserCurrentBalance()
+		local strText = "您已赚了" .. tostring(tFunctionHelper.NumberToFormatMoney(nCurBalance)) .. "元宝，\r\n"
+		strText = strText .. "不绑定微信，元宝可能会被人领走哦"
 		ObjText:SetText(strText)
 	end
 end

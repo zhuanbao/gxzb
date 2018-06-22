@@ -36,7 +36,7 @@
 								<top>0</top>
 								<width>father.width</width>
 								<height>father.height-30</height>
-								<image>xyLineBkg24</image>
+								<image>GXZB.EarningPanel.CoordinateHour</image>
 								<halign>center</halign>
 								<zorder>99999</zorder>
 							</attr>
@@ -111,7 +111,7 @@
 						<top>0</top>
 						<width>father.width</width>
 						<height>father.height</height>
-						<image>charttips-bkg</image>
+						<image>GXZB.EarningPanel.TipHour</image>
 					</attr>
 					<children>
 						<obj id="texttop" class="TextObject">
@@ -176,10 +176,10 @@
 								<top>0</top>
 								<width>102</width>
 								<height>26</height>
-								<NormalBkgID>earnings.btnunsel</NormalBkgID>
-								<DownBkgID>earnings.btnunsel</DownBkgID>
-								<HoverBkgID>earnings.btnunsel</HoverBkgID>
-								<DisableBkgID>earnings.btnunsel</DisableBkgID>
+								<NormalBkgID>GXZB.EarningPanel.BtnUnSelect</NormalBkgID>
+								<DownBkgID>GXZB.EarningPanel.BtnUnSelect</DownBkgID>
+								<HoverBkgID>GXZB.EarningPanel.BtnUnSelect</HoverBkgID>
+								<DisableBkgID>GXZB.EarningPanel.BtnUnSelect</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickHourBtnBarChart" />
@@ -194,10 +194,10 @@
 								<top>0</top>
 								<width>102</width>
 								<height>26</height>
-								<NormalBkgID>earnings.btnunsel</NormalBkgID>
-								<DownBkgID>earnings.btnunsel</DownBkgID>
-								<HoverBkgID>earnings.btnunsel</HoverBkgID>
-								<DisableBkgID>earnings.btnunsel</DisableBkgID>
+								<NormalBkgID>GXZB.EarningPanel.BtnUnSelect</NormalBkgID>
+								<DownBkgID>GXZB.EarningPanel.BtnUnSelect</DownBkgID>
+								<HoverBkgID>GXZB.EarningPanel.BtnUnSelect</HoverBkgID>
+								<DisableBkgID>GXZB.EarningPanel.BtnUnSelect</DisableBkgID>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="EarningsPanel.xml.lua" func="OnClickDayBtnBarChart" />

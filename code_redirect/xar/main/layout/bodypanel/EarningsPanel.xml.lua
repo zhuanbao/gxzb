@@ -105,12 +105,12 @@ function BarChartUpdate(self)
 		attr.ColumnColorSrc = "FFDD92"
 		attr.ColumnColorSrcHover = "EEB93B"
 		attr.LineColor = "CDA140"
-		attr.TipRes = "charttips-bkg"
+		attr.TipRes = "GXZB.EarningPanel.TipHour"
 	else
 		attr.ColumnColorSrc = "FFC08D"
 		attr.ColumnColorSrcHover = "FF7B39"
 		attr.LineColor = "C57046"
-		attr.TipRes = "charttips-bkg-day"
+		attr.TipRes = "GXZB.EarningPanel.TipDay"
 	end
 	--坐标轴变色
 	if attr.Data["reqFailed"] then
@@ -321,14 +321,14 @@ function ChangeBtnState(self, state)
 	end
 	local selfattr = self:GetAttribute()
 	local otherattr = otherbtn:GetAttribute()
-	selfattr.NormalBkgID = "earnings.btnsel"
-	selfattr.DownBkgID = "earnings.btnsel"
-	selfattr.HoverBkgID = "earnings.btnsel"
-	selfattr.DisableBkgID = "earnings.btnsel"
-	otherattr.NormalBkgID = "earnings.btnunsel"
-	otherattr.DownBkgID = "earnings.btnunsel"
-	otherattr.HoverBkgID = "earnings.btnunsel"
-	otherattr.DisableBkgID = "earnings.btnunsel"
+	selfattr.NormalBkgID = "GXZB.EarningPanel.BtnSelect"
+	selfattr.DownBkgID = "GXZB.EarningPanel.BtnSelect"
+	selfattr.HoverBkgID = "GXZB.EarningPanel.BtnSelect"
+	selfattr.DisableBkgID = "GXZB.EarningPanel.BtnSelect"
+	otherattr.NormalBkgID = "GXZB.EarningPanel.BtnUnSelect"
+	otherattr.DownBkgID = "GXZB.EarningPanel.BtnUnSelect"
+	otherattr.HoverBkgID = "GXZB.EarningPanel.BtnUnSelect"
+	otherattr.DisableBkgID = "GXZB.EarningPanel.BtnUnSelect"
 	self:Updata()
 	otherbtn:Updata()
 	self:SetTextColor("system.white")
@@ -347,7 +347,7 @@ function OnClickHourBtnBarChart(self)
 		return
 	end
 	ChangeBtnState(self, 1)
-	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg24")
+	barobj:GetObject("xyLineBkg"):SetResID("GXZB.EarningPanel.CoordinateHour")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
     attr.Data = ClientWorkModule:GetLocalHistoryIncome("h24") or {}
@@ -371,7 +371,7 @@ function OnClickDayBtnBarChart(self)
 		return
 	end
 	ChangeBtnState(self, 2)
-	barobj:GetObject("xyLineBkg"):SetResID("xyLineBkg30")
+	barobj:GetObject("xyLineBkg"):SetResID("GXZB.EarningPanel.CoordinateDay")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
     attr.Data = ClientWorkModule:GetLocalHistoryIncome("d30") or {}

@@ -146,10 +146,10 @@
 								<TextFont>font.text20</TextFont>
 								<TextColor>system.white</TextColor>
 								<DisableTextColor>system.white</DisableTextColor>
-								<NormalBkgID>texture.Update.OneKeyUpdate.normal</NormalBkgID>
-								<DownBkgID>texture.Update.OneKeyUpdate.down</DownBkgID>
-								<HoverBkgID>texture.Update.OneKeyUpdate.hover</HoverBkgID>
-								<DisableBkgID>texture.Update.OneKeyUpdate.disable</DisableBkgID>
+								<NormalBkgID>GXZB.TakeCashPanel.BtnTake.normal</NormalBkgID>
+								<DownBkgID>GXZB.TakeCashPanel.BtnTake.down</DownBkgID>
+								<HoverBkgID>GXZB.TakeCashPanel.BtnTake.hover</HoverBkgID>
+								<DisableBkgID>GXZB.TakeCashPanel.BtnTake.disable</DisableBkgID>
 								<Visible>true</Visible>
 								<Text>提现</Text>
 								<Enable>false</Enable>

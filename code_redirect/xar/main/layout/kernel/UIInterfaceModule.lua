@@ -24,12 +24,11 @@ UIInterface._tHideWnd = {}
 
 
 UIInterface._tPopupWndList = {
-	"GXZB.RemindTipWnd",
+	"GXZB.IncomeRemindTipWnd",
 	"GXZB.MachineCheckWnd",
 	"GXZB.ProfitShareWnd",
-	"GXZB.UpdateWnd",
+	"GXZB.RecommandUpdateWnd",
 	"GXZB.AutoRunTipWnd",
-	"GXZB.ZcashAPromptWnd"
 }
 
 function IsNilString(AString)
@@ -316,7 +315,10 @@ function UIInterface:PopRemindUpdateWnd()
 		.."\n nTipPopInterval="..tostring(nTipPopInterval))
 	if tFunctionHelper.CheckIsNewVersion(strNewVersion, strVersion) and nLocalCnt < nTipPopCnt and math.abs(nCurrentUtc - nLocaLastUtc) > nTipPopInterval then
 		SetOnceTimer(function()
-				if UIInterface:CreatePopUpWnd("GXZB.UpdateWnd") then
+				local objCheckUpdateWnd = hostwndManager:GetHostWnd("GXZB.UpdateCardDriveWnd.ModalInstance")
+				if objCheckUpdateWnd then return end
+				
+				if UIInterface:CreatePopUpWnd("GXZB.RecommandUpdateWnd") then
 					tUserConfig["tRemindUpdateCfg"] = tUserConfig["tRemindUpdateCfg"] or {}
 					tUserConfig["tRemindUpdateCfg"][strVersion] = tUserConfig["tRemindUpdateCfg"][strVersion] or {}
 					tUserConfig["tRemindUpdateCfg"][strVersion]["nCnt"] = nLocalCnt + 1
@@ -357,14 +359,13 @@ function UIInterface:PopTipPre4Hour()
 				if not bRemind then
 					return
 				end
-				local newgetgold = 0
 				for i = 1, 4 do
-					newgetgold = newgetgold + tabInfo[#tabInfo-i+1][2]
+					nNewGet = nNewGet + tabInfo[#tabInfo-i+1][2]
 				end
-				if newgetgold > 0 then
-					tUserConfig["nMoneyPer4Hour"] = newgetgold
+				if nNewGet > 0 then
+					tUserConfig["nMoneyPer4Hour"] = nNewGet
 					tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-					UIInterface:CreatePopUpWnd("GXZB.RemindTipWnd")
+					UIInterface:CreatePopUpWnd("GXZB.IncomeRemindTipWnd")
 				end	
 			end
 		end)
@@ -886,6 +887,18 @@ function UIInterface:ShowRemindRebootWarning()
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
 	objMiningPanel:ShowRemindRebootWarning()
+end
+
+function UIInterface:ShowNoticeTip(tabCfg)
+	local wnd = self:GetMainHostWnd()
+	if not wnd then
+		return
+	end
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	objMiningPanel:ShowNoticeTip(tabCfg)
 end
 
 --420*652  369*600

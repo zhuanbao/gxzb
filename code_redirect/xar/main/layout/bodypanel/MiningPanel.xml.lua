@@ -494,6 +494,61 @@ function ChangeMiningFailVisible(self)
 	ObjMiningFail:SetVisible(false)
 end
 
+local gCookieTipClick = nil
+function ShowNoticeTip(self, tabNotice)
+	
+	local objFAQ = self:GetControlObject("MiningPanel.Panel.FAQ")
+	local objNotice = self:GetControlObject("MiningPanel.Panel.Notice")
+	local objIcon = self:GetControlObject("MiningPanel.Panel.Notice.Icon")
+	local objTipText = self:GetControlObject("MiningPanel.Panel.Notice.Tip")
+	local objFather = self:GetControlObject("MiningPanel.Panel")
 
-
-
+	if gCookieTipClick then
+		objTipText:RemoveListener("OnLButtonUp", gCookieTipClick)
+		gCookieTipClick = nil
+	end	
+	
+	if type(tabNotice) ~= "table" or not Helper:IsRealString(tabNotice["strTip"]) then
+		objFAQ:Show(true)
+		objNotice:SetChildrenVisible(false)
+		objNotice:SetVisible(false)
+	else
+		objFAQ:Show(false)
+		local nTextMaxLen = 246-(24+10+12)
+		local nTextMinLen = 160-(24+10+12)
+		local nFLeft, nFTop, nFRight, nFBottom = objFather:GetObjPos()
+		local nFWidth = nFRight - nFLeft
+		
+		local nTipLeft,	nTipTop, nTipRight,	nTipBottom = objTipText:GetObjPos()
+		objTipText:SetObjPos(nTipLeft, nTipTop, nTipLeft+nTextMaxLen, nTipBottom)
+		objTipText:SetText(tabNotice["strTip"])
+		local nLenDesc = objTipText:GetTextExtent()
+		nLenDesc = nLenDesc
+		if nLenDesc > nTextMaxLen then
+			nLenDesc = nTextMaxLen
+		end
+		if nLenDesc < nTextMinLen then
+			nLenDesc = nTextMinLen
+		end
+		local nBkgWidth = nLenDesc+(24+10+12)
+		local nBkgLeft,	nBkgTop, nBkgRight,	nBkgBottom = objNotice:GetObjPos()
+		objNotice:SetObjPos((nFWidth-nBkgWidth)/2, nBkgTop, (nFWidth+nBkgWidth)/2, nBkgBottom)
+		
+		objIcon:SetObjPos2(0, 0, 24, 24)
+		objTipText:SetObjPos2(24+10, 0, "father.width-(24+10+12)", 24)
+		if Helper:IsRealString(tabNotice["strLink"]) then
+			objTipText:SetCursorID("IDC_HAND")
+			gCookieTipClick = objTipText:AttachListener("OnLButtonUp", false, function()
+				Helper.tipUtil:OpenURL(tabNotice["strLink"])
+				local tStatInfo = {}
+				tStatInfo.fu1 = "noticetip"
+				tStatInfo.fu5 = tabNotice["strLink"]
+				StatisticClient:SendClickReport(tStatInfo)
+			end)
+		else
+			objTipText:SetCursorID("IDC_ARROW")
+		end
+		objNotice:SetChildrenVisible(true)
+		objNotice:SetVisible(true)
+	end
+end

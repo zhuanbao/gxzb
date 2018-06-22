@@ -1,0 +1,234 @@
+<xlue>
+	<objtreetemplate id="GXZB.RecommandUpdateWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>296+18</width>
+			<height>164+18</height>
+		</attr>
+		<obj id="RecommandUpdateWnd.Content" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>296+18</width>
+				<height>164+18</height>
+				<texture>GXZB.PopUpWnd.Bkg</texture>
+			</attr>	
+			<children>
+				<obj id="RecommandUpdateWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
+					</attr>
+					<children>
+						<obj id="RecommandUpdateWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
+						<obj id="RecommandUpdateWnd.Title" class="TextObject">
+							<attr>
+								<left>26+6</left>
+								<top>9</top>
+								<width>70</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text12</font>
+								<text>共享赚宝</text>
+							</attr>
+						</obj>
+						<obj id="RecommandUpdateWnd.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close.normal</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close.normal</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close.normal</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="RecommandUpdateWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="RecommandUpdateWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="RecommandUpdateWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
+						</obj>
+						<obj id="RecommandUpdateWnd.Icon" class="ImageObject">
+							<attr>
+								<left>28</left>
+								<top>45</top>
+								<width>46</width>
+								<height>46</height>
+								<image>GXZB.PopUpWnd.Icon.SmallLogo</image>
+							</attr>
+						</obj>
+						<obj id="RecommandUpdateWnd.NoNeedUpadte" class="TextObject">
+							<attr>
+								<left>28+57+15</left>
+								<top>51</top>
+								<width>father.width-(28+57+15)</width>
+								<height>15+10+15</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text12</font>
+								<multiline>1</multiline>
+								<linegap>4</linegap>
+								<text>您的共享赚宝已是最新版本
+								版本号：v1.0.0.1</text>
+								<visible>0</visible>
+							</attr>
+						</obj>
+						<obj id="RecommandUpdateWnd.FindNewVersion" class="TextObject">
+							<attr>
+								<left>28+57+15</left>
+								<top>10</top>
+								<width>father.width-(28+57+15)</width>
+								<height>father.height-15-36-28</height>
+								<valign>center</valign>
+								<halign>left</halign>
+								<multiline>1</multiline>
+								<textcolor>6D5539</textcolor>
+								<font>font.text12</font>
+								<text>发现共享赚宝新版本v1.0.0.1
+								1、修改了XX
+								2、优化了xx
+								3、see more
+								</text>
+								<visible>0</visible>
+							</attr>
+						</obj>
+						<obj id="RecommandUpdateWnd.Updating" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="RecommandUpdateWnd.Updating.VerDesc" class="TextObject">
+									<attr>
+										<left>28+57+15</left>
+										<top>50</top>
+										<width>father.width-(28+57+15)</width>
+										<height>14</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text12</font>
+										<text>正在升级至最新版本v1.0.0.1</text>
+										<visible>0</visible>
+									</attr>
+								</obj>
+								<obj id="RecommandUpdateWnd.Updating.Progress" class="TextureObject">
+									<attr>
+										<left>28+57+15</left>
+										<top>50+14+11</top>
+										<width>170</width>
+										<height>10</height>
+										<texture>GXZB.PopUpWnd.ProcessBar.Bkg</texture>
+										<visible>0</visible>
+									</attr>
+									<children>
+										<obj id="RecommandUpdateWnd.Updating.Progress.Completing" class="TextureObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>10</width>
+												<height>10</height>
+												<texture>GXZB.PopUpWnd.ProcessBar.For</texture>
+												<visible>0</visible>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="RecommandUpdateWnd.Updating.ProgDesc" class="TextObject">
+									<attr>
+										<left>28+57+15</left>
+										<top>50+14+11+10+7</top>
+										<width>170</width>
+										<height>15</height>
+										<valign>top</valign>
+										<halign>center</halign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text12</font>
+										<text>正在下载0%</text>
+										<visible>0</visible>
+									</attr>
+								</obj>
+								<obj id="RecommandUpdateWnd.Updating.FaillDesc" class="TextObject">
+									<attr>
+										<left>28+57+15</left>
+										<top>50+14+11+10+7</top>
+										<width>father.width-(28+57+15)</width>
+										<height>15</height>
+										<valign>top</valign>
+										<halign>left</halign>
+										<textcolor>FF0000</textcolor>
+										<font>font.text12</font>
+										<text>升级失败，建议您手动升级</text>
+										<visible>0</visible>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="RecommandUpdateWnd.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>确定</Text>
+								<TextFont>font.text13</TextFont>
+								<TextColor>system.white</TextColor>
+								<left>father.width-102-15</left>
+								<top>father.height-32-15</top>
+								<width>102</width>
+								<height>32</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Update.normal</NormalBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Update.hover</HoverBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Update.down</DownBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Update.down</DisableBkgID>
+								<Visible>false</Visible>
+							</attr>
+							<eventlist>
+								<!--event name="OnClick" file="RecommandUpdateWnd.xml.lua" func="OnClickBtn" /-->
+							</eventlist>	
+						</obj>		
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.RecommandUpdateWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+			<width>296+18</width>
+			<height>164+18</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnShowWindow" file="RecommandUpdateWnd.xml.lua" func="OnShowWindow" />
+			<event name="OnCreate" file="RecommandUpdateWnd.xml.lua" func="OnCreate"/>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

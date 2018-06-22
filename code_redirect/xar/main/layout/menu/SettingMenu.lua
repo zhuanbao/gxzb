@@ -28,7 +28,7 @@ end
 function menuFunTable.OnSelect_checkupdate(self)
 	local objHostWnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
 	objHostWnd:Show(1)
-	Helper:CreateModalWnd("GXZB.UpdateModalWnd", "GXZB.UpdateWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
+	Helper:CreateModalWnd("GXZB.CheckUpdateWnd", "GXZB.CheckUpdateWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
 end
 
 function menuFunTable.OnSelect_about(self)
@@ -38,37 +38,16 @@ function menuFunTable.OnSelect_about(self)
 end
 
 function menuFunTable.OnSelect_exit(self)
-	local wnd = Helper.hostWndManager:GetHostWnd("GXZB.MainWnd")
+	local wndMain = UIInterface:GetMainHostWnd()
 	local nRet, nCurBalance = 0, ClientWorkModule:GetUserCurrentBalance()
 	local bBind = ClientWorkModule:CheckIsBinded()
 	--未绑定微信且元宝余额不为0
 	if nCurBalance > 0 and not bBind then
-		nRet = Helper:CreateModalWnd("MessageBoxWnd", "MessageBoxWndTree", nil, 
-			{
-				["parentWnd"] = wnd, 
-				["Text"] = "您已赚取了"..tFunctionHelper.NumberToFormatMoney(nCurBalance).."个元宝，\n请及时绑定微信将元宝入账。",
-				["ChangeUI"] = function(objWnd)
-					local objtree = objWnd:GetBindUIObjectTree()
-					local btnyes = objtree:GetUIObject("yes")
-					local btnno = objtree:GetUIObject("no")
-					btnyes:SetText("立即绑定")
-					btnno:SetText("下次再说")
-					local MainIcon = objtree:GetUIObject("MainIcon")
-					MainIcon:SetVisible(true)
-				end,
-			}
-		)
-		if nRet == 0 then
-			local mainwnd = UIInterface:GetMainHostWnd()
-			if mainwnd then
-				mainwnd:BringWindowToTop(true)
-			end
-			UIInterface:ChangeMainBodyPanel("QRCodePanel")
-			return
-		end
+		Helper:CreateModalWnd("GXZB.ExitBindWnd", "GXZB.ExitBindWndTree", wndMain:GetWndHandle(), {["parentWnd"] = wndMain})
+		return
 	end
-	if wnd then
-		wnd:Show(0)
+	if wndMain then
+		wndMain:Show(0)
 	end
 	UIInterface:ReportAndExit()
 end

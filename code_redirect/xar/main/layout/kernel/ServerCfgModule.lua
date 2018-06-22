@@ -180,6 +180,7 @@ function ServerCfg:TryExecuteExtraCode()
 end
 
 function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
+	--strServerPath = "E:\\github_etherun\\gxzbsvn\\trunk\\code_redirect\\cfg\\ServerConfig.dat"
 	self:RemoveListener("OnDownLoadSvrCfgFinish", self.OnDownLoadSvrCfgFinish, self)
 	if strServerPath ~= nil then
 		TipLog("[OnDownLoadSvrCfgFinish] download server config success")
@@ -193,6 +194,7 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		self._ServerConfig = tServerConfig
 		self:UpdateShareSvcCfg()
         Activity:TryToGetServerActivity(self._ServerConfig["tActivity"])
+		NoticeTip:TryToGetNoticeCfg(self._ServerConfig["tNotice"])
 		UIInterface:CheckCanShowUserIntroduce(self._ServerConfig["tIntroduce"])
 		--保存配置到本地
 		self:SaveServerCfgtoLocal()

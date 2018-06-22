@@ -50,10 +50,49 @@
 		<!--各面板-->		
 		<bitmap id="GXZB.TakeCashPanel.RMB" image="bitmap\GXZB.TakeCashPanel.RMB.png" />
 		
+		<imagelist id="GXZB.TakeCashPanel.BtnTake" vertical="0" varyblock="1" splitter="1" image="bitmap\GXZB.TakeCashPanel.BtnTake.png"/>
+			<texture id="GXZB.TakeCashPanel.BtnTake.normal" type="ThreeInOneH" imagelist="GXZB.TakeCashPanel.BtnTake" index="1" />
+			<texture id="GXZB.TakeCashPanel.BtnTake.hover" type="ThreeInOneH" imagelist="GXZB.TakeCashPanel.BtnTake" index="2" />
+			<texture id="GXZB.TakeCashPanel.BtnTake.down" type="ThreeInOneH" imagelist="GXZB.TakeCashPanel.BtnTake" index="3" />
+			<texture id="GXZB.TakeCashPanel.BtnTake.disable" type="ThreeInOneH" imagelist="GXZB.TakeCashPanel.BtnTake" index="4" />
+			
 		<texture id="GXZB.QRCodePanel.QRCodeBkg" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCodeBkg.png" />
 		<texture id="GXZB.QRCodePanel.QRCode.FailedBKG" type="NineInOne" image="bitmap\GXZB.QRCodePanel.QRCode.FailedBKG.png" />
 		<texture id="texture.general.tip.bkg" type="NineInOne" image="bitmap\texture.general.tip.bkg.png" />
 		
-		<bitmap id="GXZB.SmallWarning" path="bitmap\smallwarning.png"/>
+		<bitmap id="GXZB.SmallWarning" path="bitmap\GXZB.SmallWarning.png"/>
+		
+		
+		<bitmap id="GXZB.EarningPanel.TipDay" path="bitmap\GXZB.EarningPanel.TipDay.png"/>
+		<bitmap id="GXZB.EarningPanel.TipHour" path="bitmap\GXZB.EarningPanel.TipHour.png"/>
+		<bitmap id="GXZB.EarningPanel.CoordinateHour" path="bitmap\GXZB.EarningPanel.CoordinateHour.png" />
+		<bitmap id="GXZB.EarningPanel.CoordinateDay" path="bitmap\GXZB.EarningPanel.CoordinateDay.png" />
+		<texture id="GXZB.EarningPanel.BtnUnSelect" type="ThreeInOneH" image="bitmap\GXZB.EarningPanel.BtnUnSelect.png" />
+		<texture id="GXZB.EarningPanel.BtnSelect" type="ThreeInOneH" image="bitmap\GXZB.EarningPanel.BtnSelect.png" />
+		
+		<texture id="GXZB.MiningPanel.Notice.Bkg" type="ThreeInOneH" image="bitmap\GXZB.MiningPanel.Notice.Bkg.png" />
+		<bitmap id="GXZB.MiningPanel.Notice.Icon" path="bitmap\GXZB.MiningPanel.Notice.Icon.png"/>
+		
+		
+		<imagelist id="GXZB.Btn.Cancel" vertical="0" varyblock="1" splitter="1" image="bitmap\GXZB.Btn.Cancel.png"/>
+			<texture id="GXZB.Btn.Cancel.normal" type="ThreeInOneH" imagelist="GXZB.Btn.Cancel" index="1" />
+			<texture id="GXZB.Btn.Cancel.hover" type="ThreeInOneH" imagelist="GXZB.Btn.Cancel" index="2" />
+			<texture id="GXZB.Btn.Cancel.down" type="ThreeInOneH" imagelist="GXZB.Btn.Cancel" index="3" />
+		<imagelist id="GXZB.Btn.Confirm" vertical="0" varyblock="1" splitter="1" image="bitmap\GXZB.Btn.Confirm.png"/>
+			<texture id="GXZB.Btn.Confirm.normal" type="ThreeInOneH" imagelist="GXZB.Btn.Confirm" index="1" />
+			<texture id="GXZB.Btn.Confirm.hover" type="ThreeInOneH" imagelist="GXZB.Btn.Confirm" index="2" />
+			<texture id="GXZB.Btn.Confirm.down" type="ThreeInOneH" imagelist="GXZB.Btn.Confirm" index="3" />
+			
+		<imagelist id="GXZB.Btn.CheckBox" vertical="0" varyblock="1" splitter="1" image="bitmap\GXZB.Btn.CheckBox.png"/>
+			<texture id="GXZB.Btn.CheckBox.normal"  imagelist="GXZB.Btn.CheckBox" index="1" />
+			<texture id="GXZB.Btn.CheckBox.hover"  imagelist="GXZB.Btn.CheckBox" index="2" />
+			<texture id="GXZB.Btn.CheckBox.check"  imagelist="GXZB.Btn.CheckBox" index="3" />
+		
+		<imagelist id="GXZB.Btn.Radio" vertical="0" varyblock="1" splitter="1" image="bitmap\GXZB.Btn.Radio.png"/>
+			<texture id="GXZB.Btn.Radio.normal"  imagelist="GXZB.Btn.Radio" index="1" />
+			<texture id="GXZB.Btn.Radio.hover"  imagelist="GXZB.Btn.Radio" index="2" />
+			<texture id="GXZB.Btn.Radio.check"  imagelist="GXZB.Btn.Radio" index="3" />		
+			
+			
 	</resource>
 </XLUE>

@@ -3,16 +3,16 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>520</width>
-			<height>298</height>
+			<width>378</width>
+			<height>218</height>
 		</attr>
-		<obj id="root" class="TextureObject">
+		<obj id="UpdateCardDriveWndTree.Content" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>520</width>
-				<height>298</height>
-				<texture>msgbox.bkg</texture>
+				<width>378</width>
+				<height>218</height>
+				<texture>GXZB.PopUpWnd.Bkg</texture>
 			</attr>	
 			<children>
 				<obj id="UpdateCardDriveWnd.Caption" class="CaptionObject">
@@ -23,40 +23,6 @@
 						<height>father.height-18</height>
 					</attr>
 					<children>
-						<obj id="UpdateCardDriveWnd.Caption.CloseBtn" class="TipAddin.Button">
-							<attr>
-								<left>father.width-27</left>
-								<top>10</top>
-								<width>15</width>
-								<height>15</height>
-								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickClose" />
-								<event name="OnMouseEnter">
-									local self = ...
-									local hoverimage = self:GetObject("hoverimage")
-									if not hoverimage then
-										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
-										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
-										self:AddChild(hoverimage)
-										hoverimage:SetObjPos(-5, -9, 20, -6)
-										hoverimage:SetResID("GXZB.Title.Hoverimage")
-									end
-									hoverimage:SetVisible(true)
-								</event>
-								<event name="OnMouseLeave">
-									local self = ...
-									local hoverimage = self:GetObject("hoverimage")
-									if hoverimage then
-										hoverimage:SetVisible(false)
-									end
-								</event>
-							</eventlist>	
-						</obj>
 						<obj id="UpdateCardDriveWnd.Logo" class="ImageObject">
 							<attr>
 								<left>12</left>
@@ -68,9 +34,9 @@
 						</obj>
 						<obj id="UpdateCardDriveWnd.Title" class="TextObject">
 							<attr>
-								<left>32</left>
+								<left>26+6</left>
 								<top>8</top>
-								<width>100</width>
+								<width>80</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
@@ -79,75 +45,78 @@
 								<text>共享赚宝提示</text>
 							</attr>
 						</obj>
+						<obj id="UpdateCardDriveWnd.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="UpdateCardDriveWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="UpdateCardDriveWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
+						</obj>
 						<obj id="UpdateCardDriveWnd.Icon" class="ImageObject">
 							<attr>
-								<left>54</left>
-								<top>92</top>
-								<width>80</width>
-								<height>80</height>
-								<image>logo-mid</image>
+								<left>15</left>
+								<top>55</top>
+								<width>57</width>
+								<height>57</height>
+								<image>GXZB.PopUpWnd.Icon.Logo</image>
 							</attr>
 						</obj>
-						<obj id="UpdateCardDriveWnd.Content.UpdateDrive" class="LayoutObject">
+						<obj id="UpdateCardDriveWnd.UpdateDesc" class="LayoutObject">
 							<attr>
-								<left>160</left>
-								<top>87</top>
-								<width>330</width>
-								<height>20+3+20+3+20+3</height>
+								<left>15+57+20</left>
+								<top>50</top>
+								<width>father.width-(15+57+20)-34</width>
+								<height>16+9+16+9+16</height>
 							</attr>	
 							<children>
-								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc1" class="TextObject">
+								<obj id="UpdateCardDriveWnd.UpdateDesc.Text1" class="TextObject">
 									<attr>
 										<left>0</left>
 										<top>0</top>
-										<width>330</width>
-										<height>20</height>
+										<width>father.width</width>
+										<height>16</height>
 										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
+										<font>font.text13</font>
 										<endellipsis>1</endellipsis>
-										<text>检测到您的显卡驱动程序版本过低，为了充</text>
+										<text>检测到您的显卡驱动程序版本过低，为了</text>
 									</attr>
 								</obj>
-								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc2" class="TextObject">
+								<obj id="UpdateCardDriveWnd.UpdateDesc.Text2" class="TextObject">
 									<attr>
 										<left>0</left>
-										<top>20+3</top>
-										<width>330</width>
-										<height>20</height>
+										<top>16+9</top>
+										<width>father.width</width>
+										<height>16</height>
 										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
+										<font>font.text13</font>
 										<endellipsis>1</endellipsis>
-										<text>分发挥显卡本身的高性能，我们建议您立即</text>
+										<text>充分发挥显卡本身的高性能，建议您前往</text>
 									</attr>
 								</obj>
-								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc3" class="TextObject">
+								<obj id="UpdateCardDriveWnd.UpdateDesc.Text3" class="TextLinkEx">
 									<attr>
 										<left>0</left>
-										<top>20+3+20+3</top>
-										<width>15</width>
-										<height>20</height>
-										<valign>top</valign>
-										<halign>left</halign>
-										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
-										<endellipsis>1</endellipsis>
-										<text>去</text>
-									</attr>
-								</obj>
-								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc4" class="TextLinkEx">
-									<attr>
-										<left>15+1</left>
-										<top>20+3+20+3</top>
-										<width>64</width>
-										<height>20</height>
+										<top>16+9+16+9</top>
+										<width>father.width</width>
+										<height>16</height>
 										<HAlign>left</HAlign>
 										<VAlign>top</VAlign>
 										<Text>显卡官网</Text>
-										<Font>font.text16</Font>
+										<Font>font.text13</Font>
 										<TextColor>317FFF</TextColor>
 										<TextHoverColor>317FFF</TextHoverColor>
 										<Underline>false</Underline>
@@ -156,53 +125,53 @@
 										<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickUpdateDrive" />
 									</eventlist>
 								</obj>
-								<obj id="UpdateCardDriveWnd.Content.UpdateDrive.Desc5" class="TextObject">
+								<obj id="UpdateCardDriveWnd.UpdateDesc.Text4" class="TextObject">
 									<attr>
-										<left>15+1+64+1</left>
-										<top>20+3+20+3</top>
-										<width>102</width>
-										<height>20</height>
+										<left>53</left>
+										<top>16+9+16+9</top>
+										<width>father.width</width>
+										<height>16</height>
 										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
+										<font>font.text13</font>
 										<text>更新驱动程序。</text>
 									</attr>
 								</obj>
 							</children>
 						</obj>
-						<obj id="UpdateCardDriveWnd.Content.Restart" class="LayoutObject">
+						<obj id="UpdateCardDriveWnd.RestartDesc" class="LayoutObject">
 							<attr>
-								<left>160</left>
-								<top>87+20+3+20+3+20+3</top>
-								<width>310</width>
+								<left>15+57+20</left>
+								<top>50+16+9+16+9+16+20</top>
+								<width>father.width-(15+57+20)-34</width>
 								<height>20</height>
 							</attr>	
 							<children>
-								<obj id="UpdateCardDriveWnd.Content.Restart.Desc1" class="TextObject">
+								<obj id="UpdateCardDriveWnd.RestartDesc.Text1" class="TextObject">
 									<attr>
 										<left>0</left>
 										<top>0</top>
-										<width>208</width>
-										<height>20</height>
+										<width>130</width>
+										<height>16</height>
 										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
+										<font>font.text13</font>
 										<endellipsis>1</endellipsis>
-										<text>显卡驱动程序更新完之后，请</text>
+										<text>显卡驱动更新完后，请</text>
 									</attr>
 								</obj>
-								<obj id="UpdateCardDriveWnd.Content.Restart.Desc2" class="TextLinkEx">
+								<obj id="UpdateCardDriveWnd.RestartDesc.Text2" class="TextLinkEx">
 									<attr>
-										<left>208</left>
+										<left>130</left>
 										<top>0</top>
-										<width>96</width>
-										<height>20</height>
+										<width>80</width>
+										<height>16</height>
 										<HAlign>left</HAlign>
 										<VAlign>top</VAlign>
 										<Text>重新启动赚宝</Text>
-										<Font>font.text16</Font>
+										<Font>font.text13</Font>
 										<TextColor>317FFF</TextColor>
 										<TextHoverColor>317FFF</TextHoverColor>
 										<Underline>false</Underline>
@@ -211,17 +180,17 @@
 										<event name="OnClick" file="UpdateCardDriveWnd.xml.lua" func="OnClickRestart" />
 									</eventlist>
 								</obj>
-								<obj id="UpdateCardDriveWnd.Content.Restart.Desc3" class="TextObject">
+								<obj id="UpdateCardDriveWnd.RestartDesc.Text3" class="TextObject">
 									<attr>
-										<left>208+92</left>
+										<left>130+80</left>
 										<top>0</top>
 										<width>10</width>
-										<height>20</height>
+										<height>16</height>
 										<valign>top</valign>
 										<halign>left</halign>
 										<textcolor>6D5539</textcolor>
-										<font>font.text16</font>
-										<text>！</text>
+										<font>font.text13</font>
+										<text>。</text>
 									</attr>
 								</obj>
 							</children>
@@ -237,8 +206,8 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>520</width>
-			<height>298</height>
+            <width>378</width>
+			<height>218</height>
             
             <topmost>0</topmost>
             <visible>1</visible>

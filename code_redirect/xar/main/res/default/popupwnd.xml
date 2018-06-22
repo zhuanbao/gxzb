@@ -1,0 +1,27 @@
+<XLUE>
+	<resource>
+		<texture id="GXZB.PopUpWnd.Bkg" type="NineInOne" image="popupwnd\GXZB.PopUpWnd.Bkg.png" />
+		<texture id="GXZB.PopUpWnd.Btn.Close" image="popupwnd\GXZB.PopUpWnd.Btn.Close.png" />
+		<texture id="GXZB.PopUpWnd.Btn.Min" image="popupwnd\GXZB.PopUpWnd.Btn.Min.png" />
+		<bitmap id="GXZB.PopUpWnd.Btn.Hover" image="popupwnd\GXZB.PopUpWnd.Btn.Hover.png" />
+		<bitmap id="GXZB.PopUpWnd.Icon.Logo" image="popupwnd\GXZB.PopUpWnd.Icon.Logo.png" />
+		<bitmap id="GXZB.PopUpWnd.Icon.SmallLogo" image="popupwnd\GXZB.PopUpWnd.Icon.SmallLogo.png" />
+		<bitmap id="GXZB.PopUpWnd.Icon.Smile" image="popupwnd\GXZB.PopUpWnd.Icon.Smile.png" />
+		<bitmap id="GXZB.PopUpWnd.Icon.Tip" path="popupwnd\GXZB.PopUpWnd.Icon.Tip.png"/>
+		<bitmap id="GXZB.PopUpWnd.Icon.Warning" image="popupwnd\GXZB.PopUpWnd.Icon.Warning.png" />
+		
+		
+		<texture id="GXZB.PopUpWnd.ProcessBar.Bkg" type="ThreeInOneH" image="popupwnd\GXZB.PopUpWnd.ProcessBar.Bkg.png" />
+		<texture id="GXZB.PopUpWnd.ProcessBar.Fail" type="ThreeInOneH" image="popupwnd\GXZB.PopUpWnd.ProcessBar.Fail.png" />
+		<texture id="GXZB.PopUpWnd.ProcessBar.For" type="ThreeInOneH" image="popupwnd\GXZB.PopUpWnd.ProcessBar.For.png" />
+		
+		<imagelist id="GXZB.PopUpWnd.Btn.Close" vertical="0" varyblock="0" blocksize="15" image="popupwnd\GXZB.PopUpWnd.Btn.Close.png"/>
+			<texture id="GXZB.PopUpWnd.Btn.Close.normal"  imagelist="GXZB.PopUpWnd.Btn.Close" index="1" />
+			<texture id="GXZB.PopUpWnd.Btn.Close.disable"  imagelist="GXZB.PopUpWnd.Btn.Close" index="2" />
+		
+		<imagelist id="GXZB.PopUpWnd.Btn.Update" vertical="0" varyblock="1" splitter="1" image="popupwnd\GXZB.PopUpWnd.Btn.Update.png"/>
+			<texture id="GXZB.PopUpWnd.Btn.Update.normal" type="ThreeInOneH" imagelist="GXZB.PopUpWnd.Btn.Update" index="1" />
+			<texture id="GXZB.PopUpWnd.Btn.Update.hover" type="ThreeInOneH" imagelist="GXZB.PopUpWnd.Btn.Update" index="2" />
+			<texture id="GXZB.PopUpWnd.Btn.Update.down" type="ThreeInOneH" imagelist="GXZB.PopUpWnd.Btn.Update" index="3" />	
+	</resource>
+</XLUE>

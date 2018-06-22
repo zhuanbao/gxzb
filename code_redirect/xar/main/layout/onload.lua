@@ -37,6 +37,7 @@ local tabLuaFile = {
 "kernel\\utility.lua",
 "kernel\\CheckSupportClient.lua",
 "kernel\\ProfitMaxModule.lua",
+"kernel\\notice.lua",
 
 "menu\\SuspendMenu.lua",
 "menu\\SettingMenu.lua",
@@ -226,6 +227,7 @@ end
 --整个UI完成之后，需要处理的地方
 function OnFinishCreateUI()
     Activity:Init()
+	UIInterface:ShowNoticeTip(nil)
 end
 
 function TipMain()	

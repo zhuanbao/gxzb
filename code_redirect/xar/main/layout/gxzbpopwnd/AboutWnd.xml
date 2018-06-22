@@ -3,16 +3,16 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>520</width>
-			<height>298</height>
+			<width>378</width>
+			<height>218</height>
 		</attr>
-		<obj id="root" class="TextureObject">
+		<obj id="AboutWnd.Content" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>520</width>
-				<height>298</height>
-				<texture>msgbox.bkg</texture>
+				<width>378</width>
+				<height>218</height>
+				<texture>GXZB.PopUpWnd.Bkg</texture>
 			</attr>	
 			<children>
 				<obj id="AboutWnd.Caption" class="CaptionObject">
@@ -23,40 +23,6 @@
 						<height>father.height-18</height>
 					</attr>
 					<children>
-						<obj id="AboutWnd.Caption.CloseBtn" class="TipAddin.Button">
-							<attr>
-								<left>father.width-27</left>
-								<top>10</top>
-								<width>15</width>
-								<height>15</height>
-								<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-								<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-								<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-								<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-							</attr>
-							<eventlist>
-								<event name="OnClick" file="AboutWnd.xml.lua" func="OnClickClose" />
-								<event name="OnMouseEnter">
-									local self = ...
-									local hoverimage = self:GetObject("hoverimage")
-									if not hoverimage then
-										local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
-										hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
-										self:AddChild(hoverimage)
-										hoverimage:SetObjPos(-5, -9, 20, -6)
-										hoverimage:SetResID("GXZB.Title.Hoverimage")
-									end
-									hoverimage:SetVisible(true)
-								</event>
-								<event name="OnMouseLeave">
-									local self = ...
-									local hoverimage = self:GetObject("hoverimage")
-									if hoverimage then
-										hoverimage:SetVisible(false)
-									end
-								</event>
-							</eventlist>
-						</obj>
 						<obj id="AboutWnd.Logo" class="ImageObject">
 							<attr>
 								<left>12</left>
@@ -75,77 +41,94 @@
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.default13</font>
-								<text>关于</text>
+								<font>font.text13</font>
+								<text>共享赚宝</text>
 							</attr>
+						</obj>
+						<obj id="AboutWnd.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close.normal</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close.normal</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close.normal</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="AboutWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="AboutWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="AboutWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
 						</obj>
 						<obj id="AboutWnd.Icon" class="ImageObject">
 							<attr>
-								<left>94</left>
-								<top>96</top>
-								<width>80</width>
-								<height>80</height>
-								<image>logo-mid</image>
+								<left>60</left>
+								<top>70</top>
+								<width>57</width>
+								<height>57</height>
+								<image>GXZB.PopUpWnd.Icon.Logo</image>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.Version" class="TextObject">
+						<obj id="AboutWnd.Version" class="TextObject">
 							<attr>
-								<left>204</left>
-								<top>95</top>
+								<left>60+57+20</left>
+								<top>67</top>
 								<width>80</width>
-								<height>20</height>
+								<height>16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.text16</font>
+								<font>font.text13</font>
 								<text>程序版本：</text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.VersionValue" class="TextObject">
+						<obj id="AboutWnd.Version.Value" class="TextObject">
 							<attr>
-								<left>284</left>
-								<top>95</top>
+								<left>60+57+20+80</left>
+								<top>67</top>
 								<width>120</width>
-								<height>20</height>
+								<height>16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.text16</font>
+								<font>font.text13</font>
 								<text></text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.Date" class="TextObject">
+						<obj id="AboutWnd.Date" class="TextObject">
 							<attr>
-								<left>204</left>
-								<top>123</top>
+								<left>60+57+20</left>
+								<top>67+13+10</top>
 								<width>80</width>
-								<height>20</height>
+								<height>16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.text16</font>
+								<font>font.text13</font>
 								<text>更新日期：</text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.DateValue" class="TextObject">
+						<obj id="AboutWnd.Date.Value" class="TextObject">
 							<attr>
-								<left>284</left>
-								<top>123</top>
+								<left>60+57+20+80</left>
+								<top>67+13+10</top>
 								<width>120</width>
-								<height>20</height>
+								<height>16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
-								<font>font.text16</font>
+								<font>font.text13</font>
 								<text></text>
 							</attr>
 						</obj>
-						<obj id="AboutWnd.Content.Url" class="TextLinkEx">
+						<obj id="AboutWnd.Url" class="TextLinkEx">
 							<attr>
-								<left>204</left>
-								<top>150</top>
+								<left>60+57+20</left>
+								<top>67+13+10+13+15</top>
 								<width>200</width>
-								<height>20</height>
+								<height>16</height>
 								<HAlign>left</HAlign>
 								<VAlign>center</VAlign>
 								<Text>http://www.share4money.cn/</Text>
@@ -164,13 +147,13 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.AboutWnd" class="ModalHostWnd">
+	<hostwndtemplate id="GXZB.AboutWnd" class="ModalHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>545</width>
-            <height>338</height>
+            <width>378</width>
+			<height>218</height>
             
             <topmost>0</topmost>
             <visible>1</visible>
@@ -185,7 +168,7 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-			<event name="OnCreate" file="AboutWnd.xml.lua" func="OnCreate" />
+			<event name="OnCreate" file="AboutWnd.xml.lua" func="OnCreate"/>
         </eventlist>
     </hostwndtemplate>
 </xlue>

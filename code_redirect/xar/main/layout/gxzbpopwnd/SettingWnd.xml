@@ -3,133 +3,123 @@
 		<attr>
 			<left>0</left>
 			<top>0</top>
-			<width>610</width>
-			<height>398+34+5</height>
+			<width>578</width>
+			<height>398</height>
 		</attr>
-		<obj id="root" class="TextureObject">
+		<obj id="SettingWnd.Root" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
-				<width>610</width>
-				<height>398+34+5</height>
-				<texture>setting-bkg</texture>
+				<width>578</width>
+				<height>398</height>
+				<texture>GXZB.Setting.Bkg</texture>
 			</attr>	
 			<children>
 				<obj id="SettingWnd.Caption" class="CaptionObject">
 					<attr>
 						<left>9</left>
-						<top>9</top>
+						<top>7</top>
 						<width>father.width-18</width>
 						<height>father.height-18</height>
 					</attr>
 					<children>
-						<obj id="SettingWnd.TitleBar" class="LayoutObject">
+						<obj id="SettingWnd.Title.Logo" class="ImageObject">
 							<attr>
-								<left>0</left>
-								<top>0</top>
-								<width>father.width</width>
-								<height>30</height>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
 							</attr>
-							<children>
-								<obj id="SettingWnd.TitleBar.Logo" class="ImageObject">
-									<attr>
-										<left>12</left>
-										<top>11</top>
-										<width>14</width>
-										<height>13</height>
-										<image>GXZB.Caption.Logo</image>
-									</attr>
-								</obj>
-								<obj id="SettingWnd.TitleBar.Title" class="TextObject">
-									<attr>
-										<left>26+6</left>
-										<top>8</top>
-										<width>200</width>
-										<height>father.height</height>
-										<text>共享赚宝</text>
-										<textcolor>6D5539</textcolor>
-										<font>font.default13</font>
-										<valign>top</valign>
-									</attr>
-								</obj>
-								<obj id="SettingWnd.TitleBar.CloseBtn" class="TipAddin.Button">
-									<attr>
-										<left>father.width-27</left>
-										<top>10</top>
-										<width>15</width>
-										<height>15</height>
-										<NormalBkgID>GXZB.Caption.BtnClose.Normal</NormalBkgID>
-										<DownBkgID>GXZB.Caption.BtnClose.Down</DownBkgID>
-										<HoverBkgID>GXZB.Caption.BtnClose.Hover</HoverBkgID>
-										<DisableBkgID>GXZB.Caption.BtnClose.Normal</DisableBkgID>
-									</attr>
-									<eventlist>
-										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCloseDialog" />
-										<event name="OnMouseEnter">
-											local self = ...
-											local hoverimage = self:GetObject("hoverimage")
-											if not hoverimage then
-												local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
-												hoverimage = objFactory:CreateUIObject("hoverimage", "ImageObject")
-												self:AddChild(hoverimage)
-												hoverimage:SetObjPos(-5, -9, 20, -6)
-												hoverimage:SetResID("GXZB.Title.Hoverimage")
-											end
-											hoverimage:SetVisible(true)
-										</event>
-										<event name="OnMouseLeave">
-											local self = ...
-											local hoverimage = self:GetObject("hoverimage")
-											if hoverimage then
-												hoverimage:SetVisible(false)
-											end
-										</event>
-									</eventlist>	
-								</obj>
-								
-							</children>
+						</obj>
+						<obj id="SettingWnd.Title.Title" class="TextObject">
+							<attr>
+								<left>26+6</left>
+								<top>8</top>
+								<width>200</width>
+								<height>father.height</height>
+								<text>共享赚宝</text>
+								<textcolor>6D5539</textcolor>
+								<font>font.default13</font>
+								<valign>top</valign>
+							</attr>
+						</obj>
+						<obj id="SettingWnd.Title.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close.normal</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close.normal</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close.normal</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="SettingWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
 						</obj>
 						<obj id="SettingWnd.Content" class="LayoutObject">
 							<attr>
 								<left>0</left>
-								<top>30</top>
+								<top>0</top>
 								<width>father.width</width>
-								<height>father.height-30-70</height>
+								<height>father.height</height>
 							</attr>
 							<children>
-								<obj id="SettingWnd.Content.AutoRunArea" class="LayoutObject">
+								<obj id="SettingWnd.Content.Item.Base" class="TextLinkEx">
 									<attr>
-										<left>1</left>
-										<top>28</top>
-										<width>father.width-2</width>
-										<height>34</height>
+										<left>40</left>
+										<top>48</top>
+										<width>53</width>
+										<height>16</height>
+										<HAlign>left</HAlign>
+										<VAlign>top</VAlign>
+										<Text>基础设置</Text>
+										<Font>font.text13</Font>
+										<TextColor>6D5539</TextColor>
+										<TextHoverColor>DEAF37</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickBaseSetting" />
+									</eventlist>
+								</obj>
+								<obj id="SettingWnd.Content.Base" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
 									</attr>
 									<children>
-										<obj id="SettingWnd.Content.AutoRunArea.SettingName" class="TextObject">
+										<obj id="SettingWnd.Content.Base.AutoRun" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>开机启动</text>
+												<text>开机启动：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.AutoRunArea.CheckAutoRun" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.CheckAutoRun" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>5</top>
+												<left>40+53+75</left>
+												<top>48+(16+8)</top>
 												<width>150</width>
-												<height>25</height>
+												<height>17</height>
 												<ImgWidth>13</ImgWidth>
 												<ImgHeight>13</ImgHeight>
-												<CheckNormal>setting_checkbox.check</CheckNormal>
-												<CheckHover>setting_checkbox.check</CheckHover>
-												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
-												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+												<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+												<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
 												<Select>false</Select>
 												<Text>开机启动赚宝</Text>
 											</attr>
@@ -137,39 +127,30 @@
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
 											</eventlist>
 										</obj>
-									</children>
-								</obj>
-								<obj id="SettingWnd.Content.MachineIDArea" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5</top>
-										<width>father.width-2</width>
-										<height>34</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.MachineIDArea.SettingName" class="TextObject">
+										
+										<obj id="SettingWnd.Content.Base.MachineID" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>设备标识ID</text>
+												<text>设备标识ID：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.MachineIDArea.EditBkg" class="TextureObject">
+										<obj id="SettingWnd.Content.Base.MachineIDEdit" class="TextureObject">
 											<attr>
-												<left>70+120+5</left>
-												<top>5</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+7)</top>
 												<width>230</width>
 												<height>24</height>
-												<texture>setting-edit-bkg</texture>
+												<texture>GXZB.Setting.Edit</texture>
 											</attr>	
 											<children>
-												<obj id="SettingWnd.Content.MachineIDArea.Edit" class="EditObject">
+												<obj id="SettingWnd.Content.Base.MachineIDEdit.Input" class="EditObject">
 													<attr>
 														<left>0</left>
 														<top>0</top>
@@ -187,261 +168,244 @@
 												</obj>
 											</children>
 										</obj>
-									</children>
-								</obj>
-								<obj id="SettingWnd.Content.SuspendedWnd" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5+5</top>
-										<width>father.width-2</width>
-										<height>34</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.SuspendedWnd.SettingName" class="TextObject">
+										
+										<obj id="SettingWnd.Content.Base.SuspendedWnd" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>悬浮窗显示设置</text>
+												<text>悬浮窗显示设置：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.SuspendedWnd.Show" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.SuspendedWnd.Show" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>7</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8)</top>
 												<width>90</width>
-												<height>20</height>
+												<height>17</height>
 												<Type>radio</Type>
 												<Select>false</Select>
 												<Text>始终显示</Text>
-												<CheckHover>setting_radio.check</CheckHover>
-												<CheckNormal>setting_radio.check</CheckNormal>
-												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-												<UnCheckHover>setting_radio.hover</UnCheckHover>
+												<CheckHover>GXZB.Btn.Radio.check</CheckHover>
+												<CheckNormal>GXZB.Btn.Radio.check</CheckNormal>
+												<UnCheckNormal>GXZB.Btn.Radio.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.Radio.hover</UnCheckHover>
 											</attr>
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
 											</eventlist>
 										</obj>
-										<obj id="SettingWnd.Content.SuspendedWnd.Hide" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.SuspendedWnd.Hide" class="CheckBox">
 											<attr>
-												<left>70+120+5+90+5</left>
-												<top>7</top>
+												<left>40+53+75+90+5</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8)</top>
 												<width>90</width>
-												<height>20</height>
+												<height>17</height>
 												<Type>radio</Type>
 												<Select>false</Select>
 												<Text>始终隐藏</Text>
-												<CheckHover>setting_radio.check</CheckHover>
-												<CheckNormal>setting_radio.check</CheckNormal>
-												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-												<UnCheckHover>setting_radio.hover</UnCheckHover>
+												<CheckHover>GXZB.Btn.Radio.check</CheckHover>
+												<CheckNormal>GXZB.Btn.Radio.check</CheckNormal>
+												<UnCheckNormal>GXZB.Btn.Radio.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.Radio.hover</UnCheckHover>
 											</attr>
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
 											</eventlist>
 										</obj>
-										<obj id="SettingWnd.Content.SuspendedWnd.ShowAtMining" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.SuspendedWnd.ShowAtMining" class="CheckBox">
 											<attr>
-												<left>70+120+5+90+5+90+5</left>
-												<top>7</top>
+												<left>40+53+75+90+5+90+5</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8)</top>
 												<width>110</width>
-												<height>20</height>
+												<height>17</height>
 												<Type>radio</Type>
 												<Select>false</Select>
 												<Text>仅赚宝时显示</Text>
-												<CheckHover>setting_radio.check</CheckHover>
-												<CheckNormal>setting_radio.check</CheckNormal>
-												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-												<UnCheckHover>setting_radio.hover</UnCheckHover>
+												<CheckHover>GXZB.Btn.Radio.check</CheckHover>
+												<CheckNormal>GXZB.Btn.Radio.check</CheckNormal>
+												<UnCheckNormal>GXZB.Btn.Radio.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.Radio.hover</UnCheckHover>
 											</attr>
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectSWndRadio" />
 											</eventlist>
 										</obj>
-									</children>
-								</obj>
-								<obj id="SettingWnd.Content.WorkModel" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5+5+34+5</top>
-										<width>father.width-2</width>
-										<height>34</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.WorkModel.SettingName" class="TextObject">
+										
+										<obj id="SettingWnd.Content.Base.WorkModel" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8+17)+16</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>赚宝模式</text>
+												<text>赚宝模式：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.WorkModel.Full" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.WorkModel.Full" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>7</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8+17)+16+(16+8)</top>
 												<width>90</width>
 												<height>20</height>
 												<Type>radio</Type>
 												<Select>false</Select>
 												<Text>全速赚宝</Text>
-												<CheckHover>setting_radio.check</CheckHover>
-												<CheckNormal>setting_radio.check</CheckNormal>
-												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-												<UnCheckHover>setting_radio.hover</UnCheckHover>
+												<CheckHover>GXZB.Btn.Radio.check</CheckHover>
+												<CheckNormal>GXZB.Btn.Radio.check</CheckNormal>
+												<UnCheckNormal>GXZB.Btn.Radio.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.Radio.hover</UnCheckHover>
 											</attr>
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectWorkModelRadio" />
 											</eventlist>
 										</obj>
-										<obj id="SettingWnd.Content.SuspendedWnd.Intelligent" class="CheckBox">
+										<obj id="SettingWnd.Content.Base.WorkModel.Intelligent" class="CheckBox">
 											<attr>
-												<left>70+120+5+90+5</left>
-												<top>7</top>
+												<left>40+53+75+90+5</left>
+												<top>48+(16+8+17)+16+(16+7+24)+18+(16+8+17)+16+(16+8)</top>
 												<width>90</width>
 												<height>20</height>
 												<Type>radio</Type>
 												<Select>false</Select>
 												<Text>智能赚宝</Text>
-												<CheckHover>setting_radio.check</CheckHover>
-												<CheckNormal>setting_radio.check</CheckNormal>
-												<UnCheckNormal>setting_radio.normal</UnCheckNormal>
-												<UnCheckHover>setting_radio.hover</UnCheckHover>
+												<CheckHover>GXZB.Btn.Radio.check</CheckHover>
+												<CheckNormal>GXZB.Btn.Radio.check</CheckNormal>
+												<UnCheckNormal>GXZB.Btn.Radio.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.Radio.hover</UnCheckHover>
 											</attr>
 											<eventlist>
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectWorkModelRadio" />
 											</eventlist>
 										</obj>
+										
 									</children>
 								</obj>
-								<obj id="SettingWnd.Content.OffLineMonitor" class="LayoutObject">
+								<obj id="SettingWnd.Content.Item.Advance" class="TextLinkEx">
 									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5+5+34+5+34+5</top>
-										<width>father.width-2</width>
-										<height>34</height>
+										<left>40</left>
+										<top>48+16+25</top>
+										<width>53</width>
+										<height>16</height>
+										<HAlign>left</HAlign>
+										<VAlign>top</VAlign>
+										<Text>高级设置</Text>
+										<Font>font.text13</Font>
+										<TextColor>6D5539</TextColor>
+										<TextHoverColor>DEAF37</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickAdvanceSetting" />
+									</eventlist>
+								</obj>
+								<obj id="SettingWnd.Content.Advance" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
 									</attr>
 									<children>
-										<obj id="SettingWnd.Content.OffLineMonitor.SettingName" class="TextObject">
+										<obj id="SettingWnd.Content.Advance.OffLineMonitor" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>掉线监控</text>
+												<text>掉线监控：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.OffLineMonitor.CheckMonitor" class="CheckBox">
+										<obj id="SettingWnd.Content.Advance.CheckOffLineMonitor" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>5</top>
+												<left>40+53+75</left>
+												<top>48+(16+8)</top>
 												<width>150</width>
-												<height>25</height>
+												<height>17</height>
 												<ImgWidth>13</ImgWidth>
 												<ImgHeight>13</ImgHeight>
-												<CheckNormal>setting_checkbox.check</CheckNormal>
-												<CheckHover>setting_checkbox.check</CheckHover>
-												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
-												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+												<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+												<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
 												<Select>false</Select>
 												<Text>开启客户端掉线监控，掉线10分钟后自动上线</Text>
 											</attr>
 											<eventlist>
-												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectOffLineMonitor" />
 											</eventlist>
 										</obj>
-									</children>
-								</obj>
-								<obj id="SettingWnd.Content.EarningRemind" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5+5+34+5+34+5+34+5</top>
-										<width>father.width-2</width>
-										<height>34</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.EarningRemind.SettingName" class="TextObject">
+										
+										<obj id="SettingWnd.Content.Advance.EarningRemind" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>收益提醒</text>
+												<text>收益提醒：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.EarningRemind.CheckRemind" class="CheckBox">
+										<obj id="SettingWnd.Content.Advance.CheckEarningRemind" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>5</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+8)</top>
 												<width>150</width>
-												<height>25</height>
+												<height>17</height>
 												<ImgWidth>13</ImgWidth>
 												<ImgHeight>13</ImgHeight>
-												<CheckNormal>setting_checkbox.check</CheckNormal>
-												<CheckHover>setting_checkbox.check</CheckHover>
-												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
-												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+												<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+												<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
 												<Select>false</Select>
 												<Text>订阅"收益提醒"，了解每日收益状况</Text>
 											</attr>
 											<eventlist>
-												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectAutoRun" />
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectEarningRemind" />
 											</eventlist>
 										</obj>
-									</children>
-								</obj>
-								<obj id="SettingWnd.Content.BossKeyArea" class="LayoutObject">
-									<attr>
-										<left>1</left>
-										<top>28+34+5+34+5+5+34+5+34+5+34+5+34+5</top>
-										<width>father.width-2</width>
-										<height>34+20</height>
-									</attr>
-									<children>
-										<obj id="SettingWnd.Content.BossKeyArea.SettingName" class="TextObject">
+										
+										<obj id="SettingWnd.Content.Advance.BossKeyArea" class="TextObject">
 											<attr>
-												<left>70</left>
-												<top>0</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+8+17)+16</top>
 												<width>120</width>
-												<height>34</height>
-												<valign>center</valign>
+												<height>16</height>
+												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
 												<font>font.text13</font>
-												<text>老板键</text>
+												<text>老板键：</text>
 											</attr>
 										</obj>
-										<obj id="SettingWnd.Content.BossKeyArea.Check" class="CheckBox">
+										<obj id="SettingWnd.Content.Advance.CheckBossKeyArea" class="CheckBox">
 											<attr>
-												<left>70+120+5</left>
-												<top>5</top>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(16+8+17)+16+(16+8)</top>
 												<width>85</width>
-												<height>25</height>
+												<height>17</height>
 												<ImgWidth>13</ImgWidth>
 												<ImgHeight>13</ImgHeight>
-												<CheckNormal>setting_checkbox.check</CheckNormal>
-												<CheckHover>setting_checkbox.check</CheckHover>
-												<UnCheckNormal>setting_checkbox.normal</UnCheckNormal>
-												<UnCheckHover>setting_checkbox.hover</UnCheckHover>
+												<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+												<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+												<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
 												<Select>false</Select>
 												<Text>启用老板键</Text>
 											</attr>
@@ -449,16 +413,16 @@
 												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectBossKey" />
 											</eventlist>
 										</obj>
-										<obj id="SettingWnd.Content.BossKeyArea.EditBkg" class="TextureObject">
+										<obj id="SettingWnd.Content.Advance.BossKeyEdit" class="TextureObject">
 											<attr>
-												<left>70+120+5+85+5</left>
-												<top>5</top>
+												<left>40+53+75+85+5</left>
+												<top>48+(16+8+17)+16+(16+8+17)+16+(16+4)</top>
 												<width>140</width>
 												<height>24</height>
-												<texture>setting-edit-bkg</texture>
+												<texture>GXZB.Setting.Edit</texture>
 											</attr>	
 											<children>
-												<obj id="SettingWnd.Content.BossKeyArea.Edit" class="EditObject">
+												<obj id="SettingWnd.Content.BossKeyEdit.Input" class="EditObject">
 													<attr>
 														<left>0</left>
 														<top>0</top>
@@ -479,24 +443,24 @@
 												</obj>
 											</children>
 										</obj>
-										<obj id="SettingWnd.Content.BossKeyArea.About" class="ImageObject">
+										<obj id="SettingWnd.Content.Advance.BossKeyAbout" class="ImageObject">
 											<attr>
-												<left>70+120+5+85+5+140+5</left>
-												<top>9</top>
+												<left>40+53+75+85+5+140+5</left>
+												<top>48+(16+8+17)+16+(16+8+17)+16+(16+8)</top>
 												<width>16</width>
 												<height>16</height>
 												<cursor>IDC_HAND</cursor>
-												<image>settingwndtip</image>
+												<image>GXZB.Setting.Tip</image>
 											</attr>
 											<eventlist>
 												<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnterAbout" />
 												<event name="OnMouseLeave" file="SettingWnd.xml.lua" func="OnMouseLeaveAbout" />
 											</eventlist>
 										</obj>
-										<obj id="SettingWnd.Content.BossKeyArea.Tip" class="TextureObject">
+										<obj id="SettingWnd.Content.Advance.BossKeyError" class="TextureObject">
 											<attr>
-												<left>70+120+5+85+5</left>
-												<top>24+8</top>
+												<left>40+53+75+85+5</left>
+												<top>48+(16+8+17)+16+(16+8+17)+16+(16+8)+23</top>
 												<width>260</width>
 												<height>20</height>
 												<texture>texture.general.tip.bkg</texture>
@@ -504,7 +468,7 @@
 												<visible>0</visible>
 											</attr>
 											<children>
-												<obj id="SettingWnd.Content.BossKeyArea.TipText" class="TextObject">
+												<obj id="SettingWnd.Content.Advance.BossKeyError.TipText" class="TextObject">
 													<attr>
 														<left>0</left>
 														<top>0</top>
@@ -519,7 +483,7 @@
 													</attr>
 												</obj>
 											</children>
-										</obj>
+										</obj>	
 									</children>
 								</obj>
 							</children>
@@ -534,17 +498,17 @@
 							<children>
 								<obj id="SettingWnd.Buttom.Confirm" class="TipAddin.Button">
 									<attr>
-										<left>362</left>
+										<left>father.width-102-10-102-15</left>
 										<top>17</top>
 										<width>102</width>
 										<height>36</height>
 										<Text>确定</Text>
 										<TextFont>font.text13</TextFont>
 										<TextColor>system.white</TextColor>
-										<NormalBkgID>setting-surebtn-normal</NormalBkgID>
-										<DownBkgID>setting-surebtn-normal</DownBkgID>
-										<HoverBkgID>setting-surebtn-hover</HoverBkgID>
-										<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+										<NormalBkgID>GXZB.Btn.Confirm.normal</NormalBkgID>
+										<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
+										<DownBkgID>GXZB.Btn.Confirm.down</DownBkgID>
+										<DisableBkgID>GXZB.Btn.Confirm.down</DisableBkgID>
 									</attr>
 									<eventlist>
 										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickConfirm" />
@@ -552,17 +516,17 @@
 								</obj>
 								<obj id="SettingWnd.Buttom.Cancel" class="TipAddin.Button">
 									<attr>
-										<left>362+102+10</left>
+										<left>father.width-102-10</left>
 										<top>17</top>
 										<width>102</width>
 										<height>36</height>
 										<Text>取消</Text>
 										<TextFont>font.text13</TextFont>
 										<TextColor>system.white</TextColor>
-										<NormalBkgID>setting-cacelbtn-normal</NormalBkgID>
-										<DownBkgID>setting-cacelbtn-normal</DownBkgID>
-										<HoverBkgID>setting-cacelbtn-hover</HoverBkgID>
-										<DisableBkgID>setting-cacelbtn-hover</DisableBkgID>
+										<NormalBkgID>GXZB.Btn.Cancel.normal</NormalBkgID>
+										<HoverBkgID>GXZB.Btn.Cancel.hover</HoverBkgID>
+										<DownBkgID>GXZB.Btn.Cancel.down</DownBkgID>
+										<DisableBkgID>GXZB.Btn.Cancel.down</DisableBkgID>
 									</attr>
 									<eventlist>
 										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickCancel" />
@@ -571,9 +535,6 @@
 							</children>
 						</obj>
 					</children>
-					<eventlist>
-						<event name="OnLButtonDown" file="SettingWnd.xml.lua" func="OnLButtonDownCaption" />
-					</eventlist>
 				</obj>
 			</children>
 		</obj>
@@ -584,7 +545,7 @@
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-            <width>610</width>
+            <width>578</width>
             <height>398</height>
             
             <topmost>0</topmost>

@@ -12,6 +12,24 @@ function IsRealString(str)
 	return type(str) == "string" and str ~= ""
 end
 
+function OnMouseEnter(self)
+	local objBtnHover = self:GetObject("BtnHover")
+	if not objBtnHover then
+		objBtnHover = objFactory:CreateUIObject("BtnHover", "ImageObject")
+		self:AddChild(objBtnHover)
+		objBtnHover:SetObjPos(-5, -9, 20, -6)
+		objBtnHover:SetResID("GXZB.PopUpWnd.Btn.Hover")
+	end
+	objBtnHover:SetVisible(true)
+end
+
+function OnMouseLeave(self)
+	local objBtnHover = self:GetObject("BtnHover")
+	if objBtnHover then
+		objBtnHover:SetVisible(false)
+	end
+end
+
 function UpadteRecommendTime(bClear)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) ~= "table" then
@@ -75,7 +93,7 @@ end
 
 function ShowContent(objtree)
 	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 or nClient == 8 or nClient == nil then
+	if nClient == 7 or nClient == nil then
 		return
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -103,19 +121,17 @@ function ShowContent(objtree)
 	local strSpeedDesc = ""
 	if g_nCurHashRate <= 0 then
 		local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
-		strSpeedDesc = string.format("升级后您的赚宝速度可高达%.0f元宝/小时", nMaxSpeed)
+		strSpeedDesc = string.format("可高达%.0f元宝/小时", nMaxSpeed)
 	else
 		local fPrecent = (tabClientSpeed["MaxSpeed"]-g_nCurHashRate)/g_nCurHashRate
 		if fPrecent < 1 then
-			strSpeedDesc = string.format("升级后您的赚宝速度可提升%.0f%%。", fPrecent*100)
+			strSpeedDesc = string.format("可提升%.0f%%", fPrecent*100)
 		else
-			strSpeedDesc = string.format("升级后您的赚宝速度可提升%.2f倍。", fPrecent)
+			strSpeedDesc = string.format("可提升%.2f倍", fPrecent)
 		end
 	end
-	--local nMinSpeed = nRate*tabClientSpeed["MinSpeed"]
-	local strContent = string.format("检测到您的显卡驱动程序不匹配，为了充分发挥显卡本身的高性能，建议您升级显卡驱动至官方推荐版本%s。%s", g_strDriverVer, strSpeedDesc)
-	local objContent = objtree:GetUIObject("MaxSpeedDriveWnd.Content")
-	objContent:SetText(strContent)
+	local objContent = objtree:GetUIObject("MaxSpeedDriveWnd.Text.Improve")
+	objContent:SetText(strSpeedDesc)
 end
 
 function SetCurrentHashRate(nCurHashRate)
@@ -127,7 +143,7 @@ function OnCreate(self)
 	if userData and userData.parentWnd then
 		SetCurrentHashRate(userData.nCurHashRate or 0)
 		local objtree = self:GetBindUIObjectTree()
-		local objRootLayout = objtree:GetUIObject("root")
+		local objRootLayout = objtree:GetUIObject("MaxSpeedDriveWnd.Content")
 		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
 		local nLayoutWidth  = nLayoutR - nLayoutL
 		local nLayoutHeight = nLayoutB - nLayoutT

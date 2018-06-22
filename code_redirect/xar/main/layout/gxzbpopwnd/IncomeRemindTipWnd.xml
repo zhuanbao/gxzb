@@ -1,12 +1,12 @@
 <xlue>
-	<objtreetemplate id="GXZB.UnBindWndTree" class="ObjectTreeTemplate">
+	<objtreetemplate id="GXZB.IncomeRemindTipWndTree" class="ObjectTreeTemplate">
 		<attr>
 			<left>0</left>
 			<top>0</top>
 			<width>378</width>
 			<height>218</height>
 		</attr>
-		<obj id="UnBindWnd.Content" class="TextureObject">
+		<obj id="IncomeRemindTipWnd.Content" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
@@ -15,7 +15,7 @@
 				<texture>GXZB.PopUpWnd.Bkg</texture>
 			</attr>	
 			<children>
-				<obj id="UnBindWnd.Caption" class="CaptionObject">
+				<obj id="IncomeRemindTipWnd.Caption" class="CaptionObject">
 					<attr>
 						<left>9</left>
 						<top>9</top>
@@ -23,7 +23,7 @@
 						<height>father.height-18</height>
 					</attr>
 					<children>
-						<obj id="UnBindWnd.Logo" class="ImageObject">
+						<obj id="AboutWnd.Logo" class="ImageObject">
 							<attr>
 								<left>12</left>
 								<top>11</top>
@@ -32,7 +32,7 @@
 								<image>GXZB.Caption.Logo</image>
 							</attr>
 						</obj>
-						<obj id="UnBindWnd.Title" class="TextObject">
+						<obj id="AboutWnd.Title" class="TextObject">
 							<attr>
 								<left>26+6</left>
 								<top>8</top>
@@ -45,7 +45,7 @@
 								<text>共享赚宝</text>
 							</attr>
 						</obj>
-						<obj id="UnBindWnd.CloseBtn" class="TipAddin.Button">
+						<obj id="AboutWnd.CloseBtn" class="TipAddin.Button">
 							<attr>
 								<left>father.width-27</left>
 								<top>10</top>
@@ -57,57 +57,78 @@
 								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickClose" />
-								<event name="OnMouseEnter" file="UnBindWnd.xml.lua" func="OnMouseEnter" />
-								<event name="OnMouseLeave" file="UnBindWnd.xml.lua" func="OnMouseLeave" />
+								<event name="OnClick" file="IncomeRemindTipWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="IncomeRemindTipWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="IncomeRemindTipWnd.xml.lua" func="OnMouseLeave" />
 							</eventlist>	
-						</obj>		
-						<obj id="UnBindWnd.Warning" class="ImageObject">
+						</obj>
+						<obj id="AboutWnd.Icon" class="ImageObject">
 							<attr>
-								<left>35</left>
-								<top>55</top>
+								<left>60</left>
+								<top>60</top>
 								<width>56</width>
 								<height>56</height>
-								<image>GXZB.PopUpWnd.Icon.Warning</image>
+								<image>GXZB.PopUpWnd.Icon.Smile</image>
 							</attr>
 						</obj>
-						<obj id="UnBindWnd.Desc" class="TextObject">
+						<obj id="IncomeRemindTipWnd.Desc" class="TextObject">
 							<attr>
-								<left>35+56+15</left>
-								<top>60</top>
-								<width>father.width-(35+56+15)</width>
+								<left>60+56+20</left>
+								<top>65</top>
+								<width>father.width-(60+56+20)</width>
 								<height>16+11+16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text13</font>
-								<linegap>8</linegap>
 								<multiline>1</multiline>
-								<text>当前绑定微信账号是（**）,
-								解除绑定赚宝收益无法提现，确定解绑吗？</text>
+								<linegap>5</linegap>
+								<endellipsis>1</endellipsis>
+								<text>哇~您已赚取了0个元宝，
+								绑定微信一秒提现到账。</text>
 							</attr>
 						</obj>
-						<obj id="UnBindWnd.UnBind" class="TextLinkEx">
+						<obj id="IncomeRemindTipWnd.CheckAutoRun" class="CheckBox">
 							<attr>
-								<left>father.width-102-15-30-30</left>
+								<left>12</left>
+								<top>father.height-21-20</top>
+								<width>150</width>
+								<height>20</height>
+								<ImgWidth>13</ImgWidth>
+								<ImgHeight>13</ImgHeight>
+								<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+								<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+								<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+								<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
+								<Select>true</Select>
+								<Text>开机启动赚宝</Text>
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="IncomeRemindTipWnd.xml.lua" func="OnSelectAutoRun" />
+							</eventlist>
+						</obj>
+						<obj id="IncomeRemindTipWnd.Cancel" class="TextLinkEx">
+							<attr>
+								<left>father.width-102-15-25-60</left>
 								<top>father.height-15-26</top>
-								<width>30</width>
+								<width>60</width>
 								<height>16</height>
 								<HAlign>right</HAlign>
 								<VAlign>top</VAlign>
-								<Text>解绑</Text>
+								<Text>下次再说</Text>
 								<Font>font.text13</Font>
 								<TextColor>6D5539</TextColor>
 								<TextHoverColor>6D5539</TextHoverColor>
 								<Underline>false</Underline>
+								<Show>false</Show>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickUnBind" />
+								<event name="OnClick" file="IncomeRemindTipWnd.xml.lua" func="OnClickCancel" />
 							</eventlist>
 						</obj>
-						<obj id="UnBindWnd.Content.Cancel" class="TipAddin.Button">
+						<obj id="IncomeRemindTipWnd.Bind" class="TipAddin.Button">
 							<attr>
-								<Text>取消</Text>
+								<Text>立即绑定</Text>
 								<TextFont>font.text13</TextFont>
 								<TextColor>FFFFFF</TextColor>
 								<left>father.width-102-15</left>
@@ -118,9 +139,10 @@
 								<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
 								<DownBkgID>GXZB.Btn.Confirm.down</DownBkgID>
 								<DisableBkgID>GXZB.Btn.Confirm.down</DisableBkgID>
+								<Visible>false</Visible>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="UnBindWnd.xml.lua" func="OnClickCancel" />
+								<event name="OnClick" file="IncomeRemindTipWnd.xml.lua" func="OnClickBind" />
 							</eventlist>	
 						</obj>
 					</children>
@@ -129,7 +151,7 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.UnBindWnd" class="ModalHostWnd">
+    <hostwndtemplate id="GXZB.IncomeRemindTipWnd" class="FrameHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
@@ -145,12 +167,12 @@
             <minwidth>50</minwidth>
             <minheight>50</minheight>
 			<sysmenu>0</sysmenu>
-			<appwindow>1</appwindow>
+			<appwindow>0</appwindow>
             <fps>30</fps>
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-			<event name="OnCreate" file="UnBindWnd.xml.lua" func="OnCreate" />
+			<event name="OnShowWindow" file="IncomeRemindTipWnd.xml.lua" func="OnShowWindow" />
         </eventlist>
     </hostwndtemplate>
 </xlue>

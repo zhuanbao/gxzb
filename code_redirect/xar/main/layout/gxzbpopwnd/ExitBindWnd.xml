@@ -1,12 +1,12 @@
 <xlue>
-	<objtreetemplate id="GXZB.MaxSpeedDriveWndTree" class="ObjectTreeTemplate">
+	<objtreetemplate id="GXZB.ExitBindWndTree" class="ObjectTreeTemplate">
 		<attr>
 			<left>0</left>
 			<top>0</top>
 			<width>378</width>
 			<height>218</height>
 		</attr>
-		<obj id="MaxSpeedDriveWnd.Content" class="TextureObject">
+		<obj id="ExitBindWnd.Content" class="TextureObject">
 			<attr>
 				<left>0</left>
 				<top>0</top>
@@ -15,7 +15,7 @@
 				<texture>GXZB.PopUpWnd.Bkg</texture>
 			</attr>	
 			<children>
-				<obj id="MaxSpeedDriveWnd.Caption" class="CaptionObject">
+				<obj id="ExitBindWnd.Caption" class="CaptionObject">
 					<attr>
 						<left>9</left>
 						<top>9</top>
@@ -23,7 +23,7 @@
 						<height>father.height-18</height>
 					</attr>
 					<children>
-						<obj id="MaxSpeedDriveWnd.Logo" class="ImageObject">
+						<obj id="ExitBindWnd.Logo" class="ImageObject">
 							<attr>
 								<left>12</left>
 								<top>11</top>
@@ -32,20 +32,20 @@
 								<image>GXZB.Caption.Logo</image>
 							</attr>
 						</obj>
-						<obj id="MaxSpeedDriveWnd.Title" class="TextObject">
+						<obj id="ExitBindWnd.Title" class="TextObject">
 							<attr>
 								<left>26+6</left>
 								<top>8</top>
-								<width>80</width>
+								<width>70</width>
 								<height>20</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text13</font>
-								<text>共享赚宝提示</text>
+								<text>共享赚宝</text>
 							</attr>
 						</obj>
-						<obj id="MaxSpeedDriveWnd.CloseBtn" class="TipAddin.Button">
+						<obj id="ExitBindWnd.CloseBtn" class="TipAddin.Button">
 							<attr>
 								<left>father.width-27</left>
 								<top>10</top>
@@ -57,55 +57,59 @@
 								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="MaxSpeedDriveWnd.xml.lua" func="OnClickClose" />
-								<event name="OnMouseEnter" file="MaxSpeedDriveWnd.xml.lua" func="OnMouseEnter" />
-								<event name="OnMouseLeave" file="MaxSpeedDriveWnd.xml.lua" func="OnMouseLeave" />
+								<event name="OnClick" file="ExitBindWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="ExitBindWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="ExitBindWnd.xml.lua" func="OnMouseLeave" />
 							</eventlist>	
-						</obj>
-						<obj id="MaxSpeedDriveWnd.Icon" class="ImageObject">
+						</obj>		
+						<obj id="ExitBindWnd.Warning" class="ImageObject">
 							<attr>
-								<left>15</left>
-								<top>60</top>
-								<width>57</width>
-								<height>57</height>
-								<image>GXZB.PopUpWnd.Icon.Logo</image>
+								<left>35</left>
+								<top>55</top>
+								<width>56</width>
+								<height>56</height>
+								<image>GXZB.PopUpWnd.Icon.Warning</image>
 							</attr>
 						</obj>
-						<obj id="MaxSpeedDriveWnd.Text.Desc" class="TextObject">
+						<obj id="ExitBindWnd.Desc" class="TextObject">
 							<attr>
-								<left>15+57+20</left>
-								<top>50</top>
-								<width>father.width-(15+57+20)-34</width>
-								<height>100</height>
+								<left>35+56+15</left>
+								<top>60</top>
+								<width>father.width-(35+56+15)</width>
+								<height>16+11+16</height>
 								<valign>top</valign>
 								<halign>left</halign>
 								<textcolor>6D5539</textcolor>
 								<font>font.text13</font>
-								<text>检测到您的显卡驱动程序不匹配，为了充分发挥显卡的高性能，建议您升级至官方推荐版本000.00，升级后您的赚宝速度最高</text>
+								<linegap>8</linegap>
 								<multiline>1</multiline>
-								<endellipsis>1</endellipsis>
+								<text>您已赚了0元宝,
+								不绑定微信,元宝可能会被人领走哦</text>
 							</attr>
 						</obj>
-						<obj id="MaxSpeedDriveWnd.Text.Improve" class="TextObject">
+						<obj id="ExitBindWnd.Cancel" class="TextLinkEx">
 							<attr>
-								<left>15+57+20+15</left>
-								<top>107</top>
-								<width>father.width-(15+57+20)-34</width>
+								<left>father.width-102-15-30-60</left>
+								<top>father.height-15-26</top>
+								<width>60</width>
 								<height>16</height>
-								<valign>top</valign>
-								<halign>left</halign>
-								<textcolor>FF0000</textcolor>
-								<font>font.text13</font>
-								<text>可提升</text>
-								<multiline>1</multiline>
-								<endellipsis>1</endellipsis>
+								<HAlign>right</HAlign>
+								<VAlign>top</VAlign>
+								<Text>下次再说</Text>
+								<Font>font.text13</Font>
+								<TextColor>6D5539</TextColor>
+								<TextHoverColor>6D5539</TextHoverColor>
+								<Underline>false</Underline>
 							</attr>
+							<eventlist>
+								<event name="OnClick" file="ExitBindWnd.xml.lua" func="OnClickCancel" />
+							</eventlist>
 						</obj>
-						<obj id="MaxSpeedDriveWnd.Btn.Update" class="TipAddin.Button">
+						<obj id="ExitBindWnd.Bind" class="TipAddin.Button">
 							<attr>
-								<Text>立即升级</Text>
+								<Text>立即绑定</Text>
 								<TextFont>font.text13</TextFont>
-								<TextColor>system.white</TextColor>
+								<TextColor>FFFFFF</TextColor>
 								<left>father.width-102-15</left>
 								<top>father.height-36-15</top>
 								<width>102</width>
@@ -116,7 +120,7 @@
 								<DisableBkgID>GXZB.Btn.Confirm.down</DisableBkgID>
 							</attr>
 							<eventlist>
-								<event name="OnClick" file="MaxSpeedDriveWnd.xml.lua" func="OnClickUpdate" />
+								<event name="OnClick" file="ExitBindWnd.xml.lua" func="OnClickBind" />
 							</eventlist>	
 						</obj>
 					</children>
@@ -125,12 +129,12 @@
 		</obj>
 	</objtreetemplate>
 
-    <hostwndtemplate id="GXZB.MaxSpeedDriveWnd" class="ModalHostWnd">
+    <hostwndtemplate id="GXZB.ExitBindWnd" class="ModalHostWnd">
         <attr>
             <layered>1</layered>
             <left>0</left>
             <top>0</top>
-			<width>378</width>
+            <width>378</width>
 			<height>218</height>
             
             <topmost>0</topmost>
@@ -146,8 +150,7 @@
 			<blur>1</blur>
         </attr>
 		 <eventlist>
-			<event name="OnCreate" file="MaxSpeedDriveWnd.xml.lua" func="OnCreate" />
-			<event name="OnShowWindow" file="MaxSpeedDriveWnd.xml.lua" func="OnShowWindow" />
+			<event name="OnCreate" file="ExitBindWnd.xml.lua" func="OnCreate" />
         </eventlist>
     </hostwndtemplate>
 </xlue>

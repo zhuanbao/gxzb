@@ -19,6 +19,7 @@
 			<SetStateInfoToUser file="MiningPanel.xml.lua" func="SetStateInfoToUser"/>
             <ShowBindWeiXin file="MiningPanel.xml.lua" func="ShowBindWeiXin"/>
 			<ShowRemindRebootWarning file="MiningPanel.xml.lua" func="ShowRemindRebootWarning"/>
+			<ShowNoticeTip file="MiningPanel.xml.lua" func="ShowNoticeTip"/>
 		</method_def>
 		<event_def>
 			
@@ -60,11 +61,47 @@
 								<TextColor>AF8656</TextColor>
 								<TextHoverColor>AF8656</TextHoverColor>
 								<Underline>false</Underline>
-								<Show>true</Show>
+								<Show>false</Show>
 							</attr>
 							<eventlist>
 								<event name="OnClick" file="MiningPanel.xml.lua" func="OnClickFAQ" />
 							</eventlist>
+						</obj>
+						<obj id="MiningPanel.Panel.Notice" class="TextureObject">
+							<attr>
+								<left>(father.width-246)/2</left>
+								<top>10+20+5+6</top>
+								<width>246</width>
+								<height>24</height>
+								<texture>GXZB.MiningPanel.Notice.Bkg</texture>
+							</attr>
+							<children>
+								<obj id="MiningPanel.Panel.Notice.Icon" class="ImageObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>24</width>
+										<height>24</height>
+										<image>GXZB.MiningPanel.Notice.Icon</image>
+										<valign>center</valign>
+										<halign>center</halign>
+									</attr>
+								</obj>
+								<obj id="MiningPanel.Panel.Notice.Tip" class="TextObject">
+									<attr>
+										<left>24+10</left>
+										<top>0</top>
+										<width>father.width-(24+10+12)</width>
+										<height>24</height>
+										<valign>center</valign>
+										<halign>center</halign>
+										<textcolor>B08858</textcolor>
+										<font>font.text14</font>
+										<text></text>
+										<endellipsis>1</endellipsis>
+									</attr>
+								</obj>
+							</children>
 						</obj>
 						<obj id="MiningPanel.Panel.StopBtn" class="TipAddin.Button">
 							<attr>

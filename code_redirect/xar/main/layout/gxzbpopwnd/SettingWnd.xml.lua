@@ -1,5 +1,7 @@
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tipUtil = XLGetObject("API.Util")
+local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+
 --local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 --local strAutoRunRegPath = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Share4Money"
 
@@ -13,30 +15,6 @@ local g_SuspendedWndState = 0
 
 local g_strBossKey = "Alt+Z"
 local g_nBossKeyValue = 0x5A0001
---[[
-function CheckIsSysAutoRun()
-	local strValue = Helper:QueryRegValue(strAutoRunRegPath)
-	if Helper:IsRealString(strValue) then
-		return true
-	end
-	return false
-end
-
-function CheckIsCfgAutoRun()
-	return tFunctionHelper.CheckLastSetBoot()
-end
-
-function SetAutoRun()
-	if not CheckIsCfgAutoRun() then
-		tFunctionHelper.WriteLastSetBootTime()
-	end
-	if not CheckIsSysAutoRun() then
-		local strExePath = tFunctionHelper.GetExePath()
-		local strValue = "\""..strExePath.."\" /sstartfrom sysboot /embedding /mining"
-		Helper:SetRegValue(strAutoRunRegPath, strValue)
-	end
-end
---]]
 
 local g_tKey2String = 
 {
@@ -52,6 +30,64 @@ local g_tKey2String =
 	[222] = "\'", [16] = "Shift", [17] = "Ctrl", [18] = "Alt"
 }
 
+function OnMouseEnter(self)
+	local objBtnHover = self:GetObject("BtnHover")
+	if not objBtnHover then
+		objBtnHover = objFactory:CreateUIObject("BtnHover", "ImageObject")
+		self:AddChild(objBtnHover)
+		objBtnHover:SetObjPos(-5, -9, 20, -6)
+		objBtnHover:SetResID("GXZB.PopUpWnd.Btn.Hover")
+	end
+	objBtnHover:SetVisible(true)
+end
+
+function OnMouseLeave(self)
+	local objBtnHover = self:GetObject("BtnHover")
+	if objBtnHover then
+		objBtnHover:SetVisible(false)
+	end
+end
+
+function DestoryDialog(self)
+	local objTree = self:GetOwner()
+	local objHostWnd = objTree:GetBindHostWnd()
+	objHostWnd:EndDialog(0)
+end
+
+function OnClickClose(self)
+	DestoryDialog(self)
+end
+
+function OnClickBaseSetting(self)
+	local objTree = self:GetOwner()
+	local objBase = objTree:GetUIObject("SettingWnd.Content.Base")
+	objBase:SetVisible(true)
+	objBase:SetChildrenVisible(true)
+	self:SetTextColorID("DEAF37")
+	
+	local objAdvance = objTree:GetUIObject("SettingWnd.Content.Advance")
+	objAdvance:SetVisible(false)
+	objAdvance:SetChildrenVisible(false)
+	
+	local objItemAdvance = objTree:GetUIObject("SettingWnd.Content.Item.Advance")
+	objItemAdvance:SetTextColorID("6D5539")
+end
+
+function OnClickAdvanceSetting(self)
+	local objTree = self:GetOwner()
+	local objAdvance = objTree:GetUIObject("SettingWnd.Content.Advance")
+	objAdvance:SetVisible(true)
+	objAdvance:SetChildrenVisible(true)
+	self:SetTextColorID("DEAF37")
+	
+	local objBase = objTree:GetUIObject("SettingWnd.Content.Base")
+	objBase:SetVisible(false)
+	objBase:SetChildrenVisible(false)
+	
+	local objItemBase = objTree:GetUIObject("SettingWnd.Content.Item.Base")
+	objItemBase:SetTextColorID("6D5539")
+end
+
 function SaveSettingConfig(objTree)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if g_AutoRunState then
@@ -62,7 +98,7 @@ function SaveSettingConfig(objTree)
 		tFunctionHelper.DeleteSysSetBoot()
 	end
 	
-	local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
+	local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.Base.MachineIDEdit.Input")
 	local strMachineName = ObjEditMachineID:GetText()
 	if not Helper:IsRealString(strMachineName) then
 		strMachineName = tFunctionHelper.GetMachineName()
@@ -94,7 +130,7 @@ function SaveSettingConfig(objTree)
 	UIInterface:UpdateSuspendWndVisible()
 	
 	--老板键
-	local ObjCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Check")
+	local ObjCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.Advance.CheckBossKeyArea")
 	if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
 		tUserConfig["tConfig"]["BossKey"] = {}
 	end
@@ -109,7 +145,7 @@ function SaveSettingConfig(objTree)
 	end
 	
 	--掉线监控
-	local ObjCheckMonitor = objTree:GetUIObject("SettingWnd.Content.OffLineMonitor.CheckMonitor")
+	local ObjCheckMonitor = objTree:GetUIObject("SettingWnd.Content.Advance.CheckOffLineMonitor")
 	local ObjMonitorAttr = ObjCheckMonitor:GetAttribute()
 	local strSvcCfg = tFunctionHelper.GetCfgPathWithName("svccfg.ini")
 	if ObjMonitorAttr.Select then
@@ -119,7 +155,7 @@ function SaveSettingConfig(objTree)
 	end
 	
 	--收益提醒
-	local ObjCheckRemind = objTree:GetUIObject("SettingWnd.Content.EarningRemind.CheckRemind")
+	local ObjCheckRemind = objTree:GetUIObject("SettingWnd.Content.Advance.CheckEarningRemind")
 	local ObjRemindAttr = ObjCheckRemind:GetAttribute()
 	if type(tUserConfig["tConfig"]["EarningRemind"]) ~= "table" then
 		tUserConfig["tConfig"]["EarningRemind"] = {}
@@ -144,15 +180,7 @@ function GetOffLineMonitorNoLaunchCfg()
 	return nNoLaunch
 end
 
-function DestoryDialog(self)
-	local objTree = self:GetOwner()
-	local objHostWnd = objTree:GetBindHostWnd()
-	objHostWnd:EndDialog(0)
-end
 
-function OnClickCloseDialog(self)
-	DestoryDialog(self)
-end
 
 function OnSelectAutoRun(self, event, bSelect)
 	local tStatInfo = {}
@@ -170,15 +198,23 @@ end
 
 function OnSelectBossKey(self, event, bSelect)
 	local objTree = self:GetOwner()
-	local ObjEditBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Edit")
+	local objBossKeyInput = objTree:GetUIObject("SettingWnd.Content.BossKeyEdit.Input")
 	
 	if bSelect then
-		ObjEditBossKey:SetEnable(true)
-		ObjEditBossKey:SetTextColorID("555555")
+		objBossKeyInput:SetEnable(true)
+		objBossKeyInput:SetTextColorID("555555")
 	else
-		ObjEditBossKey:SetEnable(false)
-		ObjEditBossKey:SetTextColorID("BCB9B5")
+		objBossKeyInput:SetEnable(false)
+		objBossKeyInput:SetTextColorID("BCB9B5")
 	end
+end
+
+function OnSelectOffLineMonitor(self, event, bSelect)
+	
+end
+
+function OnSelectEarningRemind(self, event, bSelect)
+	
 end
 
 function SetEditTextState(self, bFocus)
@@ -206,15 +242,15 @@ function OnClickCancel(self)
 end
 
 function OnSelectSWndRadio(self, event, bCheck)
-	local ObjRadioShow = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Show")
-	local ObjRadioHide = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Hide")
-	local ObjRadioShowAtMining = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.ShowAtMining")
+	local ObjRadioShow = self:GetObject("tree:SettingWnd.Content.Base.SuspendedWnd.Show")
+	local ObjRadioHide = self:GetObject("tree:SettingWnd.Content.Base.SuspendedWnd.Hide")
+	local ObjRadioShowAtMining = self:GetObject("tree:SettingWnd.Content.Base.SuspendedWnd.ShowAtMining")
 	local strCurrentID = self:GetID()
-	if strCurrentID == "SettingWnd.Content.SuspendedWnd.Show" then
+	if strCurrentID == "SettingWnd.Content.Base.SuspendedWnd.Show" then
 		ObjRadioHide:SetCheck(false, true)
 		ObjRadioShowAtMining:SetCheck(false, true)
 		g_SuspendedWndState = 0
-	elseif strCurrentID == "SettingWnd.Content.SuspendedWnd.Hide" then
+	elseif strCurrentID == "SettingWnd.Content.Base.SuspendedWnd.Hide" then
 		ObjRadioShow:SetCheck(false, true)
 		ObjRadioShowAtMining:SetCheck(false, true)
 		g_SuspendedWndState = 1
@@ -226,10 +262,10 @@ function OnSelectSWndRadio(self, event, bCheck)
 end
 
 function OnSelectWorkModelRadio(self, event, bCheck)
-	local ObjRadioFull = self:GetObject("tree:SettingWnd.Content.WorkModel.Full")
-	local ObjRadioIntelligent = self:GetObject("tree:SettingWnd.Content.SuspendedWnd.Intelligent")
+	local ObjRadioFull = self:GetObject("tree:SettingWnd.Content.Base.WorkModel.Full")
+	local ObjRadioIntelligent = self:GetObject("tree:SettingWnd.Content.Base.WorkModel.Intelligent")
 	local strCurrentID = self:GetID()
-	if strCurrentID == "SettingWnd.Content.WorkModel.Full" then
+	if strCurrentID == "SettingWnd.Content.Base.WorkModel.Full" then
 		ObjRadioIntelligent:SetCheck(false, true)
 		g_nWorkModel = 0
 	else
@@ -250,8 +286,8 @@ end
 
 
 function OnLButtonDownCaption(self, x, y)
-	local editMachineID = self:GetObject("tree:SettingWnd.Content.MachineIDArea.Edit")
-	SetSettingWndEditFocus(editMachineID, x, y)
+	--local editMachineID = self:GetObject("tree:SettingWnd.Content.MachineIDArea.Edit")
+	--SetSettingWndEditFocus(editMachineID, x, y)
 end
 
 function OnBossKeyFocusChange(self, bFocus)
@@ -273,8 +309,8 @@ function OnBossKeyChange(self)
 end
 
 function ShowRegHotKeyErrorInfo(ObjTree, bShow)
-	local ObjTip = ObjTree:GetUIObject("SettingWnd.Content.BossKeyArea.Tip")
-	local ObjTipText = ObjTree:GetUIObject("SettingWnd.Content.BossKeyArea.TipText")
+	local ObjTip = ObjTree:GetUIObject("SettingWnd.Content.Advance.BossKeyError")
+	local ObjTipText = ObjTree:GetUIObject("SettingWnd.Content.Advance.BossKeyError.TipText")
 	ObjTip:SetVisible(bShow)
     ObjTipText:SetVisible(bShow)
 end
@@ -342,7 +378,7 @@ function OnCreate(self)
 	local userData = self:GetUserData()
 	if userData and userData.parentWnd then
 		local objTree = self:GetBindUIObjectTree()
-		local objRootLayout = objTree:GetUIObject("root")
+		local objRootLayout = objTree:GetUIObject("SettingWnd.Root")
 		local nLayoutL, nLayoutT, nLayoutR, nLayoutB = objRootLayout:GetObjPos()
 		local nLayoutWidth  = nLayoutR - nLayoutL
 		local nLayoutHeight = nLayoutB - nLayoutT
@@ -352,22 +388,31 @@ function OnCreate(self)
 		local parentHeight = parentBottom - parentTop
 		self:Move( parentLeft + (parentWidth - nLayoutWidth)/2, parentTop + (parentHeight - nLayoutHeight)/2, nLayoutWidth, nLayoutHeight)
 		
-		local ObjCheckBoxAutoRun = objTree:GetUIObject("SettingWnd.Content.AutoRunArea.CheckAutoRun")
+		--[[
+		local objAdvance = objTree:GetUIObject("SettingWnd.Content.Advance")
+		objAdvance:SetVisible(false)
+		objAdvance:SetChildrenVisible(false)
+		--]]
 		
-		local ObjEditMachineID = objTree:GetUIObject("SettingWnd.Content.MachineIDArea.Edit")
+		local objItemBase = objTree:GetUIObject("SettingWnd.Content.Item.Base")
+		objItemBase:FireExtEvent("OnClick")
 		
-		local ObjRadioShow = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Show")
-		local ObjRadioHide = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Hide")
-		local ObjRadioShowAtMining = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.ShowAtMining")
+		local objCheckBoxAutoRun = objTree:GetUIObject("SettingWnd.Content.Base.CheckAutoRun")
 		
-		local ObjRadioFull = objTree:GetUIObject("SettingWnd.Content.WorkModel.Full")
-		local ObjRadioIntelligent = objTree:GetUIObject("SettingWnd.Content.SuspendedWnd.Intelligent")
+		local objMachineIDInput = objTree:GetUIObject("SettingWnd.Content.Base.MachineIDEdit.Input")
+		
+		local objRadioShow = objTree:GetUIObject("SettingWnd.Content.Base.SuspendedWnd.Show")
+		local objRadioHide = objTree:GetUIObject("SettingWnd.Content.Base.SuspendedWnd.Hide")
+		local objRadioShowAtMining = objTree:GetUIObject("SettingWnd.Content.Base.SuspendedWnd.ShowAtMining")
+		
+		local objRadioFull = objTree:GetUIObject("SettingWnd.Content.Base.WorkModel.Full")
+		local objRadioIntelligent = objTree:GetUIObject("SettingWnd.Content.Base.WorkModel.Intelligent")
 
 		g_AutoRunState = tFunctionHelper.CheckCfgSetBoot()
 		if g_AutoRunState then
-			ObjCheckBoxAutoRun:SetCheck(true, true)
+			objCheckBoxAutoRun:SetCheck(true, true)
 		else
-			ObjCheckBoxAutoRun:SetCheck(false, true)
+			objCheckBoxAutoRun:SetCheck(false, true)
 		end
 		if type(tUserConfig["tUserInfo"]) ~= "table" then
 			tUserConfig["tUserInfo"] = {}
@@ -376,7 +421,7 @@ function OnCreate(self)
 		if not Helper:IsRealString(strMachineName) then 
 			strMachineName = tFunctionHelper.GetMachineName()
 		end 
-		ObjEditMachineID:SetText(strMachineName)
+		objMachineIDInput:SetText(strMachineName)
 		if type(tUserConfig["tConfig"]) ~= "table" then
 			tUserConfig["tConfig"] = {}
 		end
@@ -385,11 +430,11 @@ function OnCreate(self)
 		end
 		g_SuspendedWndState = tUserConfig["tConfig"]["ShowBall"]["nState"] or 0
 		if g_SuspendedWndState == 0 then
-			ObjRadioShow:SetCheck(true, true)
+			objRadioShow:SetCheck(true, true)
 		elseif g_SuspendedWndState == 1 then
-			ObjRadioHide:SetCheck(true, true)
+			objRadioHide:SetCheck(true, true)
 		else
-			ObjRadioShowAtMining:SetCheck(true, true)
+			objRadioShowAtMining:SetCheck(true, true)
 		end
 		
 		
@@ -398,13 +443,13 @@ function OnCreate(self)
 		end
 		g_nWorkModel = tUserConfig["tConfig"]["WorkModel"]["nState"] or UIInterface:GetDefaultWorkModel()
 		if g_nWorkModel == 0 then
-			ObjRadioFull:SetCheck(true, true)
+			objRadioFull:SetCheck(true, true)
 		else
-			ObjRadioIntelligent:SetCheck(true, true)
+			objRadioIntelligent:SetCheck(true, true)
 		end
 		
 		--老板键
-		local ObjCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Check")
+		local objCheckBoxBossKey = objTree:GetUIObject("SettingWnd.Content.Advance.CheckBossKeyArea")
 		if type(tUserConfig["tConfig"]["BossKey"]) ~= "table" then
 			tUserConfig["tConfig"]["BossKey"] = {}
 		end
@@ -414,22 +459,22 @@ function OnCreate(self)
 			g_strBossKey = strBossKey
 			g_nBossKeyValue = nBossKeyValue
 		end
-		local ObjEditBossKey = objTree:GetUIObject("SettingWnd.Content.BossKeyArea.Edit")
-		ObjEditBossKey:SetText(g_strBossKey)
+		local ObjBossKeyInput = objTree:GetUIObject("SettingWnd.Content.BossKeyEdit.Input")
+		ObjBossKeyInput:SetText(g_strBossKey)
 		local bBossKeyCheck = tUserConfig["tConfig"]["BossKey"]["bCheck"]
 		
 		if bBossKeyCheck then
-			ObjCheckBoxBossKey:SetCheck(true, true)
-			ObjEditBossKey:SetEnable(true)
-			ObjEditBossKey:SetTextColorID("555555")
+			objCheckBoxBossKey:SetCheck(true, true)
+			ObjBossKeyInput:SetEnable(true)
+			ObjBossKeyInput:SetTextColorID("555555")
 		else
-			ObjCheckBoxBossKey:SetCheck(false, true)
-			ObjEditBossKey:SetEnable(false)
-			ObjEditBossKey:SetTextColorID("BCB9B5")
+			objCheckBoxBossKey:SetCheck(false, true)
+			ObjBossKeyInput:SetEnable(false)
+			ObjBossKeyInput:SetTextColorID("BCB9B5")
 		end
 		
 		--收益提醒
-		local ObjCheckRemind = objTree:GetUIObject("SettingWnd.Content.EarningRemind.CheckRemind")
+		local objCheckRemind = objTree:GetUIObject("SettingWnd.Content.Advance.CheckEarningRemind")
 		if type(tUserConfig["tConfig"]["EarningRemind"]) ~= "table" then
 			tUserConfig["tConfig"]["EarningRemind"] = {}
 		end
@@ -438,18 +483,18 @@ function OnCreate(self)
 			bRemind = true
 		end
 		if bRemind then
-			ObjCheckRemind:SetCheck(true, true)
+			objCheckRemind:SetCheck(true, true)
 		else
-			ObjCheckRemind:SetCheck(false, true)
+			objCheckRemind:SetCheck(false, true)
 		end
 		
 		--掉线监控
-		local ObjCheckMonitor = objTree:GetUIObject("SettingWnd.Content.OffLineMonitor.CheckMonitor")
+		local objCheckMonitor = objTree:GetUIObject("SettingWnd.Content.Advance.CheckOffLineMonitor")
 		local nNoLaunch = GetOffLineMonitorNoLaunchCfg()
 		if nNoLaunch == 0 then
-			ObjCheckMonitor:SetCheck(true, true)
+			objCheckMonitor:SetCheck(true, true)
 		else
-			ObjCheckMonitor:SetCheck(false, true)
+			objCheckMonitor:SetCheck(false, true)
 		end
 	end
 end
