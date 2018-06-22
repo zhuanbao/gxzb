@@ -26,6 +26,7 @@
 #include "StringOperation.h"
 #include "OpenCL.h"
 #include "base64standard.h"
+#include <sys/timeb.h>
 
 using namespace std;
 
@@ -1255,13 +1256,32 @@ extern "C" __declspec(dllexport) void SendHttpStatEx(CHAR *fu2, CHAR *fu6,CHAR *
 	//SendHttpStatThread((LPVOID)szURL);
 }
 
+unsigned Reverse(unsigned uInput) 
+{
+	unsigned uOutput = 0;
+	while(uInput != 0) {
+		uOutput = uOutput*10+uInput%10;
+		uInput=uInput/10;
+	}
+	return uOutput;
+}
+
 extern "C" __declspec(dllexport) int GetRandomNum(int nMax)
 {
 	if (nMax < 1)
 	{
 		nMax = 10;
 	}
-	srand( (unsigned)time( NULL ) );
+	//unsigned uInput =  (unsigned)time( NULL ) ;
+	//unsigned uOutput = Reverse(uInput);
+	//srand(uOutput);
+	struct timeb timeSeed;
+	ftime(&timeSeed);
+	unsigned int uValue = Reverse(timeSeed.time * 1000 + timeSeed.millitm);
+	char* address = new char;
+	int iSeed = (int) address + uValue;
+	delete address;
+	srand(iSeed);
 	int Num = rand()%nMax;
 	TSDEBUG4CXX(L"GetRandomNum Num = "<<Num);
 	return Num;
