@@ -110,10 +110,10 @@
 												<Text>刷新</Text>
 												<TextFont>font.text14</TextFont>
 												<TextColor>system.white</TextColor>
-												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
-												<DownBkgID>setting-surebtn-normal</DownBkgID>
-												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
-												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+												<NormalBkgID>GXZB.Btn.Confirm.normal</NormalBkgID>
+												<DownBkgID>GXZB.Btn.Confirm.normal</DownBkgID>
+												<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
+												<DisableBkgID>GXZB.Btn.Confirm.hover</DisableBkgID>
 											</attr>
 											<eventlist>
 												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
@@ -166,10 +166,10 @@
 												<Text>刷新</Text>
 												<TextFont>font.text14</TextFont>
 												<TextColor>system.white</TextColor>
-												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
-												<DownBkgID>setting-surebtn-normal</DownBkgID>
-												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
-												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+												<NormalBkgID>GXZB.Btn.Confirm.normal</NormalBkgID>
+												<DownBkgID>GXZB.Btn.Confirm.normal</DownBkgID>
+												<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
+												<DisableBkgID>GXZB.Btn.Confirm.hover</DisableBkgID>
 											</attr>
 											<eventlist>
 												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />

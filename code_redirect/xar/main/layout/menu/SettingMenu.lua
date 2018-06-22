@@ -43,6 +43,7 @@ function menuFunTable.OnSelect_exit(self)
 	local bBind = ClientWorkModule:CheckIsBinded()
 	--未绑定微信且元宝余额不为0
 	if nCurBalance > 0 and not bBind then
+		wndMain:Show(1)
 		Helper:CreateModalWnd("GXZB.ExitBindWnd", "GXZB.ExitBindWndTree", wndMain:GetWndHandle(), {["parentWnd"] = wndMain})
 		return
 	end
