@@ -359,6 +359,7 @@ function UIInterface:PopTipPre4Hour()
 				if not bRemind then
 					return
 				end
+				local nNewGet = 0
 				for i = 1, 4 do
 					nNewGet = nNewGet + tabInfo[#tabInfo-i+1][2]
 				end
