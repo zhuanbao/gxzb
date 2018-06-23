@@ -1,6 +1,7 @@
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tipUtil = XLGetObject("API.Util")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
 local g_strDriverVer = nil
 local g_nCurHashRate = 0
 
@@ -93,6 +94,7 @@ end
 
 function ShowContent(objtree)
 	local nClient = ClientWorkModule:GetRealMiningType()
+	nClient = 2
 	if nClient == 7 or nClient == nil then
 		return
 	end
@@ -118,6 +120,10 @@ function ShowContent(objtree)
 		return
 	end
 	g_strDriverVer = tabClientSpeed["VerRef"]
+	local strVerDesc = string.format("检测到您的显卡驱动程序不匹配，为了充分发挥显卡的高性能，建议您升级至官方推荐版本%s，升级后您的赚宝速度最高", g_strDriverVer)
+	local objVerDesc = objtree:GetUIObject("MaxSpeedDriveWnd.Text.Desc")
+	objVerDesc:SetText(strVerDesc)
+	
 	local strSpeedDesc = ""
 	if g_nCurHashRate <= 0 then
 		local nMaxSpeed = nRate*tabClientSpeed["MaxSpeed"]
@@ -132,6 +138,8 @@ function ShowContent(objtree)
 	end
 	local objContent = objtree:GetUIObject("MaxSpeedDriveWnd.Text.Improve")
 	objContent:SetText(strSpeedDesc)
+	
+	
 end
 
 function SetCurrentHashRate(nCurHashRate)
