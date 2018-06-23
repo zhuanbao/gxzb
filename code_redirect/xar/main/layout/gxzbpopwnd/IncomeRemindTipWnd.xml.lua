@@ -103,7 +103,7 @@ function OnShowWindow(self, bShow)
 		local objBind = objTree:GetUIObject("IncomeRemindTipWnd.Bind")
 		local strText = ""
 		if ClientWorkModule:CheckIsBinded() then
-			strText = "哇~又赚了" .. tostring(nMoneyCount) .. "个元宝，\r\n继续加油保存哟~"
+			strText = "哇~又赚了" .. tostring(nMoneyCount) .. "个元宝，\r\n继续加油保持哟~"
 			objCancel:Show(false)
 			objBind:Show(false)
 		else
