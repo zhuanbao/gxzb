@@ -76,7 +76,9 @@ function Activity:OnGetServerActivity(event, strPath)
     if type(tActivityCfg) ~= "table" then
         return
     end
-    RewardBindWX:CheckCanShowRewardEnter(tActivityCfg)
+	if UIInterface:CheckCanShowRewardInfo() then
+		RewardBindWX:CheckCanShowRewardEnter(tActivityCfg)
+	end	
 	OpenBox:PrepareActivity(tActivityCfg["tOpenBoxCfg"])
 end
 

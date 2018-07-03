@@ -132,6 +132,46 @@
 								</obj>
 							</children>
 						</obj>
+						<obj id="TitleCtrl.Caption.SupperPC" class="TipAddin.Button">
+							<attr>
+								<left>father.width-93-10</left>
+								<top>12</top>
+								<width>12</width>
+								<height>12</height>
+								<NormalBkgID>GXZB.Caption.SuperPC.Menu</NormalBkgID>
+								<DownBkgID>GXZB.Caption.SuperPC.Menu</DownBkgID>
+								<HoverBkgID>GXZB.Caption.SuperPC.Menu</HoverBkgID>
+								<DisableBkgID>GXZB.Caption.SuperPC.Menu</DisableBkgID>
+								<Visible>false</Visible>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="TitleCtrl.xml.lua" func="OnClickSupperPCBtn" />
+								<event name="OnMouseEnter" file="TitleCtrl.xml.lua" func="OnMouseEnterSupperPCBtn" />
+								<event name="OnMouseLeave" file="TitleCtrl.xml.lua" func="OnMouseLeave" />
+							</eventlist>
+							<children>
+								<obj id="TitleCtrl.Caption.SupperPC.Hoverimage" class="ImageObject">
+									<attr>
+										<left>-5</left>
+										<top>-11</top>
+										<width>25</width>
+										<height>3</height>
+										<visible>0</visible>
+										<image>GXZB.Title.Hoverimage</image>
+									</attr>
+								</obj>
+								<obj id="TitleCtrl.Caption.SupperPC.Remind" class="ImageObject">
+									<attr>
+										<left>12</left>
+										<top>-5</top>
+										<width>6</width>
+										<height>6</height>
+										<visible>0</visible>
+										<image>GXZB.Caption.SuperPC.Remind</image>
+									</attr>
+								</obj>
+							</children>
+						</obj>
 					</children>				
 				</obj>			
 			</children>

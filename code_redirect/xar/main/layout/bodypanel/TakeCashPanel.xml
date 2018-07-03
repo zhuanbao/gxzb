@@ -207,6 +207,43 @@
 								<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickUnBindWeiXin" />
 							</eventlist>
 						</obj>
+						<obj id="TakeCashPanel.Panel.SupperPC" class="TextObject">
+							<attr>
+								<left>25+13</left>
+								<top>325+33+50+1+16+1</top>
+								<width>father.width - 25*2</width>
+								<height>80</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>B0A69C</textcolor>
+								<font>font.text12</font>
+								<multiline>0</multiline>
+								<text>4.如果您有多台电脑可申请</text>
+								<visible>0</visible>
+							</attr>
+							<children>
+								<obj id="TakeCashPanel.Panel.SupperPC.Link" class="TextLinkEx">
+								<attr>
+									<left>140</left>
+									<top>-1</top>
+									<width>79</width>
+									<height>16</height>
+									<HAlign>center</HAlign>
+									<VAlign>center</VAlign>
+									<Text>超级电脑特权</Text>
+									<Font>font.yahei12.underline</Font>
+									<TextColor>317FFF</TextColor>
+									<TextHoverColor>317FFF</TextHoverColor>
+									<Underline>false</Underline>
+									<Show>false</Show>
+								</attr>
+								<eventlist>
+									<event name="OnClick" file="TakeCashPanel.xml.lua" func="OnClickSupperPCLink" />
+								</eventlist>
+							</obj>	
+							</children>
+						</obj>
+						
 					</children>
 				</obj>
 			</children>

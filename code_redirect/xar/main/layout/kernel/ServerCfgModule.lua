@@ -193,9 +193,10 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		
 		self._ServerConfig = tServerConfig
 		self:UpdateShareSvcCfg()
+		UIInterface:CheckCanShowUserIntroduce(self._ServerConfig["tIntroduce_v2"])
         Activity:TryToGetServerActivity(self._ServerConfig["tActivity"])
 		NoticeTip:TryToGetNoticeCfg(self._ServerConfig["tNotice"])
-		UIInterface:CheckCanShowUserIntroduce(self._ServerConfig["tIntroduce"])
+		UIInterface:ShowSupperPC(self._ServerConfig["tSupperPC"])
 		--保存配置到本地
 		self:SaveServerCfgtoLocal()
 		--4小时1次提醒

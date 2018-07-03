@@ -459,7 +459,11 @@ function UIInterface:SetNotifyIconState(strText)
 	local nBalance = ClientWorkModule:GetUserCurrentBalance()
 	strShowText = strShowText .. "\r\n金库余额：" .. tFunctionHelper.NumberToFormatMoney(nBalance) .. "元宝"
 	if bShowSpeed then
-		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(ClientWorkModule:GetClientMiningSpeed()) .. "元宝/小时"
+		local nSpeed = 0
+		if strState == "运行中" then
+			nSpeed = ClientWorkModule:GetClientMiningSpeed()
+		end
+		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(nSpeed) .. "元宝/小时"
 	end
 
 	self._tipNotifyIcon:SetIcon(nil, strShowText)
@@ -927,15 +931,20 @@ function UIInterface:CheckCanShowUserIntroduce(tabInfo)
 	if type(tabInfo) ~= "table" then
 		return
 	end
-	if type(tabInfo["tPID"]) ~= "table" or not tFunctionHelper.CheckPeerIDList(tabInfo["tPID"]) then
-        return
+	local strTest = nil
+	if type(tabInfo["tPIDA"]) ~= "table" or not tFunctionHelper.CheckPeerIDList(tabInfo["tPIDA"]) then
+        strTest = "A" 
+		self._bCanShowRewardInfo = false
+	elseif type(tabInfo["tPIDB"]) ~= "table" or not tFunctionHelper.CheckPeerIDList(tabInfo["tPIDB"]) then
+		strTest = "B" 
     end
-	
-	local ObjUserIntroduce = objFactory:CreateUIObject("UserIntroduce.Instance", "UserIntroduce")
-	local wnd = self:GetMainHostWnd()
-	if not wnd then
+	if strTest == nil then
 		return
 	end
+	
+	local ObjUserIntroduce = objFactory:CreateUIObject("UserIntroduce.Instance", "UserIntroduce")
+	ObjUserIntroduce:SetTestType(strTest)
+	local wnd = self:GetMainHostWnd()
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainWndBkg = objRootCtrl:GetControlObject("WndPanel.MainWnd.Bkg")
@@ -969,4 +978,39 @@ function UIInterface:AttachFirstShowMainWnd()
 			self._nShowWindowCookie = nil
 		end
 	end)
+end
+
+function UIInterface:ShowSupperPC(tabInfo)	
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local wnd = self:GetMainHostWnd()
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	if type(tabInfo) ~= "table" then
+		return
+	end
+	if type(tabInfo["tMPID"]) == "table" and tFunctionHelper.CheckPeerIDList(tabInfo["tMPID"]) then
+		local nLastClickTime = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "tMenuSupperPC", "nLastClickTime"})
+		local objTitle = objRootCtrl:GetControlObject("WndPanel.Title")
+		local objSupperPC = objTitle:GetControlObject("TitleCtrl.Caption.SupperPC")
+		local objSupperPCRemind = objSupperPC:GetControlObject("TitleCtrl.Caption.SupperPC.Remind")
+		objSupperPC:Show(true)
+		if nLastClickTime == nil then
+			objSupperPCRemind:SetVisible(true)
+		else
+			objSupperPCRemind:SetVisible(false)
+		end
+    elseif type(tabInfo["tTCPID"]) == "table" and tFunctionHelper.CheckPeerIDList(tabInfo["tTCPID"]) then
+		local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+		local objTakeCashPanel = objMainBodyCtrl:GetChildObjByCtrlName("TakeCashPanel")
+		local objSupperPC = objTakeCashPanel:GetControlObject("TakeCashPanel.Panel.SupperPC")
+		objSupperPC:SetVisible(true)
+		
+		local objSupperPCLink = objTakeCashPanel:GetControlObject("TakeCashPanel.Panel.SupperPC.Link")
+		objSupperPCLink:Show(true)
+    end	
+end
+
+UIInterface._bCanShowRewardInfo = true
+function UIInterface:CheckCanShowRewardInfo()	
+	return self._bCanShowRewardInfo
 end

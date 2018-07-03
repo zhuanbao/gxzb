@@ -167,6 +167,15 @@ function OnClickUnBindWeiXin(self)
 	Helper:CreateModalWnd("GXZB.UnBindWnd", "GXZB.UnBindWndTree", objHostWnd:GetWndHandle(), {["parentWnd"] = objHostWnd})
 end
 
+function OnClickSupperPCLink(self)
+	local strLink = "http://www.eastredm.com/supercomputer"
+	Helper.tipUtil:OpenURL(strLink)
+	local tStatInfo = {}
+	tStatInfo.fu1 = "opensupperpc"
+	tStatInfo.fu5 = "takecash"
+	StatisticClient:SendClickReport(tStatInfo)
+end
+
 function OnInitControl(self)
 	gOwnerCtrl = self
 end

@@ -5,6 +5,21 @@ local timerManager = XLGetObject("Xunlei.UIEngine.TimerManager")
 local gOwnerCtrl = nil
 local gCookie = nil
 local gAutoPosTimerId = nil
+local gTestType = nil
+function SetTestType(self, strTestType)
+	gTestType = strTestType
+	
+	
+	if strTestType ~= "A" then
+		local objFrameA = self:GetControlObject("UserIntroduce.FrameA")
+		objFrameA:SetVisible(false)
+	else
+		local objFrameB = self:GetControlObject("UserIntroduce.FrameB")
+		objFrameB:SetVisible(false)
+		local objFrameB = self:GetControlObject("UserIntroduce.FrameB.Open")
+		objFrameB:Show(false)
+	end
+end
 
 function IsRealString(AString)
     return type(AString) == "string" and AString ~= ""
@@ -28,24 +43,37 @@ function FinishUserIntroduce()
 	UIInterface:RemoveUserIntroduce()
 end
 
-function ChangeQrCodePanleInfo()
-    local wnd = UIInterface:GetMainHostWnd()
-	local Objtree = wnd:GetBindUIObjectTree()
-	local ObjRootCtrl = Objtree:GetUIObject("root.layout:root.ctrl")
-	local ObjMainBodyCtrl = ObjRootCtrl:GetControlObject("WndPanel.MainBody")
-	local ObjQRCodePanel = ObjMainBodyCtrl:GetChildObjByCtrlName("QRCodePanel")
-	local ObjTitle = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Title")
-	local nLeft, nTop, nRight, nButtom = ObjTitle:GetObjPos()
-	ObjTitle:SetObjPos2("(father.width-330)/2", nTop, 330, 24)	
-	local ObjTitle = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Title")
-	ObjTitle:SetText("恭喜，999元宝送给您")
-	local ObjDescription = ObjQRCodePanel:GetControlObject("QRCodePanel.Panel.Description")
-	ObjDescription:SetText("元宝变现微信领取")
-	
+function ShowQrCodePanle(strReportKey)
+	local wnd = UIInterface:GetMainHostWnd()
+	local objtree = wnd:GetBindUIObjectTree()
+	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local objQRCodePanel = objMainBodyCtrl:GetChildObjByCtrlName("QRCodePanel")
+	local objTitle = objQRCodePanel:GetControlObject("QRCodePanel.Panel.Title")
+	if gTestType == "A" then
+		objTitle:SetObjPos2("(father.width-192)/2", 49, 192, 52)	
+		objTitle:SetResID("GXZB.QRCodePanel.Title.IntroduceA")
+	else
+		objTitle:SetObjPos2("(father.width-267)/2", 49, 267, 51)	
+		objTitle:SetResID("GXZB.QRCodePanel.Title.IntroduceB")
+	end
+    UIInterface:ChangeMainBodyPanel("QRCodePanel")
+	local tStatInfo = {}
+	tStatInfo.fu1 = "showpanel"
+	tStatInfo.fu5 = "qrcode"
+	tStatInfo.fu6 = "userintroduce"
+	tStatInfo.fu7 = strReportKey
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnClickSkip(self)
 	FinishUserIntroduce()
+	if gTestType == "A" then
+		ShowQrCodePanle("skipbtn")
+	end
+	local tStatInfo = {}
+	tStatInfo.fu1 = "skipintroduce"
+	StatisticClient:SendClickReport(tStatInfo)
 end
 
 function OnClickStart(self)
@@ -59,15 +87,10 @@ function OnClickStart(self)
 	StatisticClient:SendClickReport(tStatInfo)
 end
 
-function OnClickOpenTree(self)
+function OnClickOpen(self)
 	FinishUserIntroduce()
-	ChangeQrCodePanleInfo()
-	UIInterface:ChangeMainBodyPanel("QRCodePanel")
-	local tStatInfo = {}
-	tStatInfo.fu1 = "showpanel"
-	tStatInfo.fu5 = "qrcode"
-	tStatInfo.fu6 = "userintroduce"
-	StatisticClient:SendClickReport(tStatInfo)
+	--ChangeQrCodePanleInfo()
+	ShowQrCodePanle("openbtn")
 end
 
 function OnClickLeftPage(self)
@@ -83,6 +106,9 @@ function OnClickRightPage(self)
 	local nIdx = OwnerAttr.nCurPage
 	if nIdx < 3 then
 		ShowPage(nIdx+1)
+	elseif gTestType == "A" then
+		FinishUserIntroduce()
+		ShowQrCodePanle("rightbtn")
 	end
 end
 
@@ -136,7 +162,7 @@ function OnMouseHover( self, x, y )
 end
 
 function ShowPage(nIdx)
-	local strID = "UserIntroduce.Page"
+	local strID = "UserIntroduce.Frame"
 	for i=1, 3 do
 		local ObjPage = gOwnerCtrl:GetControlObject(strID .. tostring(i))
 		local bShow = false
@@ -167,7 +193,7 @@ function ShowPage(nIdx)
 	end
 	
 	local ObjRightBtn = gOwnerCtrl:GetControlObject("UserIntroduce.RightBtn")
-	if nIdx == 3 then
+	if nIdx == 3 and gTestType ~= "A" then
 		ObjRightBtn:Show(false)
 		OwnerAttr.bFinishAutoPosPage = true
 	else
@@ -186,6 +212,9 @@ function StartPosNextPage()
 		local nIdx = OwnerAttr.nCurPage
 		if nIdx < 3 then
 			ShowPage(nIdx+1)
+		elseif gTestType == "A" then
+			FinishUserIntroduce()
+			ShowQrCodePanle("autopos")
 		end 
 	end, 3000)
 end

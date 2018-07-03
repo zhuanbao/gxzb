@@ -33,10 +33,25 @@ function OnClickConfigBtn(self)
 	Helper:CreateMenu(curX-50, curY+20, wnd:GetWndHandle(), menuTable, menuFunTable, userData)
 end
 
-function OnClickHomePage(self)
-	local url = "http://www.lvdun123.com"
-	tipUtil:ShellExecute(0, "open", url, 0, 0, "SW_SHOWNORMAL")
+function OnClickSupperPCBtn(self)
+	local strLink = "http://www.eastredm.com/supercomputer"
+	Helper.tipUtil:OpenURL(strLink)
+	local tStatInfo = {}
+	tStatInfo.fu1 = "opensupperpc"
+	tStatInfo.fu5 = "menu"
+	StatisticClient:SendClickReport(tStatInfo)
+	
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
+	tUserConfig["tConfig"]["tMenuSupperPC"] = tUserConfig["tConfig"]["tUserIntroduce"] or {}
+	tUserConfig["tConfig"]["tMenuSupperPC"]["nLastClickTime"] = tFunctionHelper.GetCurrentServerTime()
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+	
+	local objTree = self:GetOwner()
+	local objSupperPCRemind = self:GetControlObject("TitleCtrl.Caption.SupperPC.Remind")
+	objSupperPCRemind:SetVisible(false)
 end
+
 
 function OnClickShare(self)
 	local wndTree = self:GetOwner()
@@ -92,6 +107,12 @@ end
 function OnMouseEnterCloseBtn(self)
 	Helper.Tip:SetTips("关闭")
 	local hoverimage = self:GetObject("TitleCtrl.Caption.CloseBtn.Hoverimage")
+	hoverimage:SetVisible(true)
+end
+
+function OnMouseEnterSupperPCBtn(self)
+	Helper.Tip:SetTips("超级电脑")
+	local hoverimage = self:GetObject("TitleCtrl.Caption.SupperPC.Hoverimage")
 	hoverimage:SetVisible(true)
 end
 

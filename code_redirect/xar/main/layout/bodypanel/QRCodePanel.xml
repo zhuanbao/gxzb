@@ -19,32 +19,17 @@
 						<height>father.height</height>
 					</attr>
 					<children>
-						<obj id="QRCodePanel.Panel.Title" class="TextObject">
+						<obj id="QRCodePanel.Panel.Title" class="ImageObject">
 							<attr>
-								<left>(father.width-130)/2</left>
+								<left>(father.width-293)/2</left>
 								<top>49</top>
-								<width>130</width>
-								<height>24</height>
+								<width>293</width>
+								<height>51</height>
+								<image>GXZB.QRCodePanel.Title.Default</image>
 								<valign>center</valign>
 								<halign>center</halign>
-								<textcolor>6D5539</textcolor>
-								<font>font.text20</font>
-								<texttype>freetype</texttype>
-								<text>绑定微信账号</text>
-							</attr>
-						</obj>
-						<obj id="QRCodePanel.Panel.Description" class="TextObject">
-							<attr>
-								<left>(father.width-230)/2</left>
-								<top>85</top>
-								<width>230</width>
-								<height>24</height>
-								<valign>center</valign>
-								<halign>center</halign>
-								<textcolor>6D5539</textcolor>
-								<font>font.text20</font>
-								<texttype>freetype</texttype>
-								<text>实时查询收益与元宝提现</text>
+								<drawmode>1</drawmode>
+								<antialias>2</antialias>
 							</attr>
 						</obj>
 						<obj id="QRCodePanel.Panel.QRCode.Bkg" class="TextureObject">
