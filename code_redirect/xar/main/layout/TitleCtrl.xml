@@ -152,7 +152,7 @@
 							<children>
 								<obj id="TitleCtrl.Caption.SupperPC.Hoverimage" class="ImageObject">
 									<attr>
-										<left>-5</left>
+										<left>-7</left>
 										<top>-11</top>
 										<width>25</width>
 										<height>3</height>
