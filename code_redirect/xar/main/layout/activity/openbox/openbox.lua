@@ -539,9 +539,15 @@ function OpenBox:PrepareActivity(tOpenBoxCfg)
 		TipLog("[PrepareActivity] no config")
         return
     end
+	
 	if type(tOpenBoxCfg) == "table" then
 		self._tOpenBoxCfg = tOpenBoxCfg
 	end
+	local tabVer = self._tOpenBoxCfg["tVersion"]
+	if type(tabVer) == "table" and not tFunctionHelper.CheckForceVersion(tabVer) then
+		TipLog("[PrepareActivity] not pass version check")
+        return
+	end 
 	local nCurrentTime = tFunctionHelper.GetCurrentServerTime()
     local nBeginTime = tonumber(tOpenBoxCfg["nBeginTime"]) or 0
     local nEndTime = tonumber(tOpenBoxCfg["nEndTime"]) or 9999999999

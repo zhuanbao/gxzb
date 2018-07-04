@@ -79,7 +79,7 @@ function Activity:OnGetServerActivity(event, strPath)
 	if UIInterface:CheckCanShowRewardInfo() then
 		RewardBindWX:CheckCanShowRewardEnter(tActivityCfg)
 	end	
-	OpenBox:PrepareActivity(tActivityCfg["tOpenBoxCfg"])
+	OpenBox:PrepareActivity(tActivityCfg["tOpenBoxCfg_v2"])
 end
 
 function Activity:TryToGetServerActivity(tabActivity)
