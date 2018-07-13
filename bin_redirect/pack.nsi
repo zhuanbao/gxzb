@@ -1475,6 +1475,8 @@ Section Uninstall
 	${WordFind} "${PRODUCT_VERSION}" "." -1 $R2
 	${SendStat} "uninstall" "${PRODUCT_VERSION}_$str_ChannelID" "" ""
 	
+	System::Call '$PLUGINSDIR\zbsetuphelper::SendHttpStatEx(t "uninstall", t "uninstall", t "${PRODUCT_VERSION}_$str_ChannelID"'
+	
 	ReadRegStr $0 HKLM "software\Share4Money" "InstDir"
 	${If} $0 == "$INSTDIR"
 		DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
