@@ -71,6 +71,7 @@ function OpenBox:QuerySvrForUserInWhiteList()
     if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
+	strInterfaceParam = strInterfaceParam .. "&peerid=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetPeerID()))
 	
 	local strParam = ClientWorkModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self._strOpenBoxInterfacePrefix .. strParam

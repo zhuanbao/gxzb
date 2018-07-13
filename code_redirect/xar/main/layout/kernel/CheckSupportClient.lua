@@ -264,7 +264,7 @@ end
 
 function SupportClientType:GetLocalPriorityTable()
 	local tForcePlist = nil
-    local tPriority = {2,1,3,4,5,6,8,7}
+    local tPriority = {2,1,3,4,5,6,7,8}
     local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tPriority"]) == "table" then
 		tPriority = tUserConfig["tPriority"]

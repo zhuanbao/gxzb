@@ -125,8 +125,8 @@ function ProfitMax:CalculateProfitPriority(bRet, tabGpuSpeed)
 	for Idx=1, #tabMaxSpeed do
 		tabSort[Idx] = tabMaxSpeed[Idx]["ClientType"]
 	end
-	tabSort[#tabSort+1] = 8
 	tabSort[#tabSort+1] = 7
+	tabSort[#tabSort+1] = 8
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) ~= "table" then
 		tUserConfig["tProfitMax"] = {}
