@@ -135,7 +135,7 @@ function RewardBindWX:UpdateBindWeixinEntry()
     else
         ObjBindIcon:SetResID("")
     end
-    if not ClientWorkModule:CheckIsBinded() then
+    if not WorkModuleHelper:CheckIsBinded() then
         ObjBindIcon:SetVisible(true)
         ObjMiningPanel:ShowBindWeiXin(true)
         if self._dwCookie_BindEntry_OnClick then
@@ -243,7 +243,7 @@ function RewardBindWX:CycleShowBindEnter()
         return
     end
     self._CycleTimerId = timeMgr:SetTimer(function(Itm, id)
-        if ClientWorkModule:CheckIsBinded() then
+        if WorkModuleHelper:CheckIsBinded() then
             if self._CycleTimerId then
                 timeMgr:KillTimer(self._CycleTimerId)
                 self._CycleTimerId = nil
@@ -264,7 +264,7 @@ function RewardBindWX:HasShowedRewardEnter()
 end
 
 function RewardBindWX:QuerySvrForRewardInfo()
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local strInterfaceName = "eventBind"
     local strInterfaceParam = "workerID=" .. Helper:UrlEncode(tostring(tUserConfig["tUserInfo"]["strWorkID"]))
     if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
@@ -276,8 +276,8 @@ function RewardBindWX:QuerySvrForRewardInfo()
 		strInterfaceParam = strInterfaceParam .. "&param1=" .. Helper:UrlEncode(strGUID)
 	end
     
-	local strParam = ClientWorkModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
-	local strReguestUrl =  ClientWorkModule:FormatRequestUrl(strParam)
+	local strParam = ApiInterfaceModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strReguestUrl =  ApiInterfaceModule:FormatRequestUrl(strParam)
 	TipLog("[QuerySvrForRewardInfo] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
 end
@@ -290,7 +290,7 @@ function RewardBindWX:GetBindWeiXinRewardInfo()
 	local function fnRewardInfoCallBack(bRet, tabInfo)
 		self:DispatchEvent("OnRewardInfo", bRet, tabInfo)
 	end
-	ClientWorkModule:GetServerJsonData(strUrl, fnRewardInfoCallBack)
+	ApiInterfaceModule:GetServerJsonData(strUrl, fnRewardInfoCallBack)
 end
 
 function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
@@ -318,7 +318,7 @@ function RewardBindWX:OnRewardInfo(event, bSuccess, tabInfo)
         end
         local nBalance = tabInfo["data"]["balance"]
         if type(nBalance) == "number" then
-            ClientWorkModule:SetUserCurrentBalance(nBalance)
+            MainWorkModule:SetUserCurrentBalance(nBalance)
             UIInterface:UpdateUserBalance()
         end    
         if type(tabScanText) == "table" 

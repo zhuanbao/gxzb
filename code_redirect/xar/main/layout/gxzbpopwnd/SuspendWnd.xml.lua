@@ -133,20 +133,20 @@ end
 function SpeedoMeter_Click(self)
 	--0未开始正常态，1未开始停右边，2未开始停左边，3开始正常态 4开始停右边， 5开始停左边
 	local attr = self:GetAttribute()
-	TipLog("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(ClientWorkModule:CheckIsWorking()))
+	TipLog("SuspendWnd SuspendRightDisk_Click can call click, attr.currentstate="..tostring(attr.currentstate)..", tFunctionHelper.CheckIsWorking()="..tostring(MainWorkModule:CheckIsWorking()))
 	if attr.currentstate == 2 or attr.currentstate == 1 then
-		if not ClientWorkModule:CheckIsWorking() then
+		if not MainWorkModule:CheckIsWorking() then
 			UIInterface:SetStateInfoToUser(nil)
-			ClientWorkModule:NotifyStart()
+			MainWorkModule:NotifyStart()
 			local tStatInfo = {}
 			tStatInfo.fu1 = "startworking"
 			tStatInfo.fu5 = "ball"
 			StatisticClient:SendClickReport(tStatInfo)
 		end
 	elseif attr.currentstate == 5 or attr.currentstate == 4 then
-		if ClientWorkModule:CheckIsWorking() then
+		if MainWorkModule:CheckIsWorking() then
 			UIInterface:SetStateInfoToUser(nil)
-			ClientWorkModule:NotifyQuit()
+			MainWorkModule:NotifyQuit()
 			local tStatInfo = {}
 			tStatInfo.fu1 = "stopworking"
 			tStatInfo.fu5 = "ball"
@@ -285,7 +285,7 @@ function SuspendCtrl_OnWorkStateChange(self)
 	attr.currentstate = attr.currentstate or 0
 	local SpeedoMeter = self:GetObject("SpeedoMeter")
 	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)
@@ -304,9 +304,9 @@ function SuspendCtrl_UpdateMiningState(self, nMiningState)
 	attr.currentstate = attr.currentstate or 0
 	local SpeedoMeter = self:GetObject("SpeedoMeter")
 	local speedtext = SpeedoMeter:GetObject("SpeedoMeterLight.SpeedText")
-	if ClientWorkModule:CheckIsCalculate() then
+	if MainWorkModule:CheckIsCalculate() then
 		speedtext:SetText("0¥฿/h")
-	elseif ClientWorkModule:CheckIsPrepare() then
+	elseif MainWorkModule:CheckIsPrepare() then
 		if attr.currentstate  <= 2 then
 			local newState = attr.currentstate + 3
 			self:SetState(newState)

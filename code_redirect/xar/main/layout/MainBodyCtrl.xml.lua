@@ -329,7 +329,7 @@ function OnClickTakeCashPanel(self)
 	local tStatInfo = {}
 	tStatInfo.fu1 = "showpanel"
 	tStatInfo.fu5 = "takecash"
-	if not ClientWorkModule:CheckIsBinded() then
+	if not WorkModuleHelper:CheckIsBinded() then
 		strPanel = "QRCodePanel"
 		tStatInfo.fu5 = "qrcode"
 		tStatInfo.fu6 = "takecashbtn"

@@ -31,7 +31,7 @@ function OnClickClose(self)
 end
 
 function OnClickUnBind(self)
-	ClientWorkModule:UnBindingClientFromClient()
+	WorkModuleHelper:UnBindingClientFromClient()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "unbindwx"
 	--tStatInfo.fu5 = "client"

@@ -44,7 +44,7 @@ function OpenBox:Init()
 end
 
 function OpenBox:OpenWeb()
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local strWorkID = tFunctionHelper.FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
 	local strWebUrl = "http://www.eastredm.com/activity/treasure-box?workerID=" .. tostring(strWorkID)
 	Helper.tipUtil:OpenURL(strWebUrl)
@@ -60,20 +60,18 @@ function OpenBox:OpenWeb()
 end
 
 function OpenBox:QuerySvrForUserInWhiteList()
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local strWorkID = tFunctionHelper.FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
 	if not IsRealString(strWorkID) then
 		return
 	end
-	
 	local strInterfaceName = "p/v1/treasure-box/in-white-list"
     local strInterfaceParam = "workerID=" .. Helper:UrlEncode(strWorkID)
     if IsRealString(tUserConfig["tUserInfo"]["strOpenID"]) then
 		strInterfaceParam = strInterfaceParam .. "&openID=" .. Helper:UrlEncode((tostring(tUserConfig["tUserInfo"]["strOpenID"])))
 	end
 	strInterfaceParam = strInterfaceParam .. "&peerid=" .. Helper:UrlEncode(tostring(tFunctionHelper.GetPeerID()))
-	
-	local strParam = ClientWorkModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
+	local strParam = ApiInterfaceModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self._strOpenBoxInterfacePrefix .. strParam
 	TipLog("[QuerySvrForUserInWhiteList] strReguestUrl = " .. strReguestUrl)
 	return strReguestUrl
@@ -89,7 +87,7 @@ function OpenBox:GetUserWhiteListInfo()
 		TipLog("[GetUserWhiteListInfo] Make reguest url fail")
 		return 
 	end
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	if type(tUserConfig["tActive"]) ~= "table" then
 		tUserConfig["tActive"] = {}
 	end
@@ -119,7 +117,7 @@ function OpenBox:GetUserWhiteListInfo()
 	local function fnCallBack(bRet, tabInfo)
 		self:DispatchEvent("OnGetWhiteListInfo", bRet, tabInfo)
 	end
-	ClientWorkModule:GetServerJsonData(strUrl, fnCallBack)
+	ApiInterfaceModule:GetServerJsonData(strUrl, fnCallBack)
 end
 
 function OpenBox:RemoveMainWndAni()
@@ -391,7 +389,7 @@ end
 
 function OpenBox:CalcWorkingTime()
 	local nLeastWorKingTime = self._tOpenBoxCfg["nLeastWorKingTime"] or 30*60
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	if type(tUserConfig["tActive"]) ~= "table" then
 		tUserConfig["tActive"] = {}
 	end
@@ -415,7 +413,7 @@ function OpenBox:CalcWorkingTime()
 			--打开宝箱
 			OpenBox:UpdateSuspendWndOpenBoxState(2)
 		else
-			if ClientWorkModule:CheckIsWorking() then
+			if MainWorkModule:CheckIsWorking() then
 				--宝箱倒计时
 				tUserConfig["tActive"]["tOpenBox"]["nLastWorkingDayTime"] = nCurrentTime
 				tUserConfig["tActive"]["tOpenBox"]["nLastWorkingSecond"] = nLastWorkingSecond + 1
@@ -461,7 +459,7 @@ function OpenBox:OnGetWhiteListInfo(event, bSuccess, tabInfo)
 end
 
 function OpenBox:CheckPopupWndCond()
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local nLastPopupTipTime =  tFunctionHelper.FetchValueByPath(tUserConfig, {"tActive", "tOpenBox", "nLastPopupTipTime"}) or 0
 	local nCurrentTime = tFunctionHelper.GetCurrentServerTime()
 	if not tFunctionHelper.CheckIsAnotherDay(nLastPopupTipTime, nCurrentTime) then
@@ -501,7 +499,7 @@ function OpenBox:DoPopupTip(tOpenBoxCfg)
 			TipLog("[CheckPopupWndCond] CreatePopUpWnd fail")
 			return
 		end
-		local tUserConfig = ClientWorkModule:GetUserConfig()
+		local tUserConfig = WorkModuleHelper:GetUserConfig()
 		if type(tUserConfig["tActive"]) ~= "table" then
 			tUserConfig["tActive"] = {}
 		end

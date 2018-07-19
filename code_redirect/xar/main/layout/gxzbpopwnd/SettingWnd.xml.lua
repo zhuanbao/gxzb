@@ -108,7 +108,7 @@ function SaveSettingConfig(objTree)
 	end
 	if not Helper:IsRealString(tUserConfig["tUserInfo"]["strMachineName"]) or tUserConfig["tUserInfo"]["strMachineName"] ~= strMachineName then
 		tUserConfig["tUserInfo"]["strMachineName"] = strMachineName
-		ClientWorkModule:SetMachineNameChangeInfo()
+		ApiInterfaceModule:ReportClientInfoToServer(true)
 	end
 	
 	if type(tUserConfig["tConfig"]) ~= "table" then
@@ -126,7 +126,7 @@ function SaveSettingConfig(objTree)
 	
 	
 	--更新球的状态
-	local isWorking = ClientWorkModule:CheckIsWorking()
+	local isWorking = MainWorkModule:CheckIsWorking()
 	UIInterface:UpdateSuspendWndVisible()
 	
 	--老板键

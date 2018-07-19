@@ -2,6 +2,10 @@ local tipUtil = XLGetObject("API.Util")
 local tipAsynUtil = XLGetObject("API.AsynUtil")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local tClientProc = XLGetGlobal("ClientProc")
+local IPCUtil = XLGetObject("IPC.Util")
+
+
 ObjectBase = XLGetGlobal("ObjectBase")
 StatisticClient = ObjectBase:New()
 XLSetGlobal("StatisticClient", StatisticClient)
@@ -58,7 +62,7 @@ function ParamEncode(strParam)
 		strParam = tostring(strParam)
 	end
 	if type(strParam) ~= "string" or "" == strParam then
-		TipLog("The parameter is not a real string")
+		--TipLog("The parameter is not a real string")
 		return ""
 	end
 	
@@ -107,7 +111,6 @@ function StatisticClient:GetAverageResourceUsage()
 end
 
 function StatisticClient:Init()
-	--ClientWorkModule = XLGetGlobal("ClientWorkModule")
 	timeMgr:SetTimer(function(Itm, id)
 			self:CalculateResourceUsage()
 		end, 1*1000)
@@ -142,7 +145,7 @@ fu10:workid
 
 function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 	local rdRandom = tipUtil:GetCurrentUTCTime()
-	local tUserConfig = ClientWorkModule:GetUserConfig()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local strWorkID = tUserConfig["tUserInfo"]["strWorkID"]
 	local strVersion = tFunctionHelper.GetGXZBVersion() or ""
 	local strChannel = tFunctionHelper.GetInstallSrc() or ""
@@ -159,7 +162,7 @@ function StatisticClient:SendServerStatistic(strApiInterface, tStat)
 					 .. "&fu10=" .. ParamEncode(strWorkID or "")
                      .. "&fu11=" .. (MakeMaxParamLen(tStat.fu11) or "")
 					 .. "&fu12=" .. (MakeMaxParamLen(tStat.fu12) or "")
-	local strParam = ClientWorkModule:MakeInterfaceMd5(strApiInterface, strInterfaceParam)
+	local strParam = ApiInterfaceModule:MakeInterfaceMd5(strApiInterface, strInterfaceParam)
 	local strStatisticUrl = self:FormatRequestUrl(strParam)
 	strStatisticUrl = strStatisticUrl.."&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("SendServerStatistic: " .. tostring(strStatisticUrl))
@@ -225,12 +228,14 @@ function StatisticClient:SendRunTimeReport(strState, nTimeSpanInSec)
 		nSpanTime = nTimeSpanInSec
 	end
 	local tStatInfo = {}
-	tStatInfo.fu1 = "runtime"
+	tStatInfo.fu1 = "runtimemp"
 	tStatInfo.fu5 = self._strLastReportRunTimeState
 	if tStatInfo.fu5 == "working" then
-		tStatInfo.fu6 = ClientWorkModule:GetClientMiningSpeed()
-		tStatInfo.fu7 = ClientWorkModule:GetRealMiningType()
-		local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
+		local nGpuHashRate, nCpuHashRate = tClientProc.GetModeWrokingHashSpeed()
+		local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
+		tStatInfo.fu6 = tClientProc:GetMiningSpeed()
+		tStatInfo.fu7 = nGPUClient .. "|" .. nCPUClient
+		local nHashRate = nGpuHashRate .. "|" .. nCpuHashRate
         tStatInfo.fu11 = nHashRate .. "_" .. tostring(UIInterface:GetCurrentWorkModel() or 1)
 		tStatInfo.fu12 = nHashRate
 	end
@@ -289,9 +294,10 @@ end
 
 function StatisticClient:ExitClient(tStat)
 	tFunctionHelper.SaveAllConfig()		
-	ClientWorkModule:NotifyQuit(true)
+	MainWorkModule:SlientQuit()
 	--tipUtil:CloseSingletonMutex()
-	ClientWorkModule:SendStopMiningInfoToServer("exit", function(bRet,tabInfo)
+	ApiInterfaceModule:SendStopMiningInfoToServer("exit", function(bRet,tabInfo)
+		IPCUtil:ForceQuit()
 		TipLog("************ Exit ************")
 		tipUtil:Exit("Exit")
 	end)
@@ -300,12 +306,13 @@ end
 function StatisticClient:RestartClient(strRestartCmd)
 	TipLog("************ RestartExit ************")
 	tFunctionHelper.SaveAllConfig()		
-	ClientWorkModule:NotifyQuit(true)
+	MainWorkModule:SlientQuit()
 	tipUtil:CloseSingletonMutex()
 	local strExePath = tFunctionHelper.GetExePath()
 	if not IsRealString(strRestartCmd) then
 		strRestartCmd = "/working /forceshow /sstartfrom restart"
 	end
+	IPCUtil:ForceQuit()
 	tipUtil:ShellExecute(0, "open", strExePath, strRestartCmd, 0, "SW_SHOWNORMAL")
 	tipUtil:Exit("Exit")
 end

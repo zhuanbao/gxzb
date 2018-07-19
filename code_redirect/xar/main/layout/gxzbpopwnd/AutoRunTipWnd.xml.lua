@@ -96,7 +96,7 @@ function OnShowWindow(self, bShow)
 		local objCancel = objTree:GetUIObject("AutoRunTipWnd.Cancel")
 		local objBind = objTree:GetUIObject("AutoRunTipWnd.Bind")
 		local strText = ""
-		if ClientWorkModule:CheckIsBinded() then
+		if WorkModuleHelper:CheckIsBinded() then
 			strText = "闲置网络资源利用起来\r\n拒绝浪费，有赚宝就有收益~"
 			objCancel:Show(false)
 			objBind:Show(false)

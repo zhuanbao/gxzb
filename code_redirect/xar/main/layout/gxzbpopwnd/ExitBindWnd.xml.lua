@@ -71,7 +71,7 @@ function OnCreate(self)
 		else
 			strNickName = "*"
 		end
-		local nCurBalance = ClientWorkModule:GetUserCurrentBalance()
+		local nCurBalance = MainWorkModule:GetUserCurrentBalance()
 		local strText = "您已赚了" .. tostring(tFunctionHelper.NumberToFormatMoney(nCurBalance)) .. "元宝，\r\n"
 		strText = strText .. "不绑定微信，元宝可能会被人领走哦"
 		ObjText:SetText(strText)

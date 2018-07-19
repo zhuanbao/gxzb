@@ -996,7 +996,7 @@ end
 
 function DownLoadServerConfig(fnCallBack, nTimeInMs)
 	local tUserConfig = ReadConfigFromMemByKey("tUserConfig") or {}
-	local strConfigURL = tUserConfig["strServerConfigURL"] or ClientWorkModule._strSeverConfigPrefix .. "/static/ServerConfig.dat"
+	local strConfigURL = tUserConfig["strServerConfigURL"] or ApiInterfaceModule._strSeverConfigPrefix .. "/static/ServerConfig.dat"
 	local strSavePath = GetCfgPathWithName("ServerConfig.dat")
 	local strStamp = GetTimeStamp()
 	local strURLFix = strConfigURL..strStamp

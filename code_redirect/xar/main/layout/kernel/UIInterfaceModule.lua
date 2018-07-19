@@ -5,7 +5,7 @@ local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
 local hostwndManager = XLGetObject("Xunlei.UIEngine.HostWndManager")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
---local ClientWorkModule = nil
+local tClientProc = XLGetGlobal("ClientProc")
 
 ObjectBase = XLGetGlobal("ObjectBase")
 UIInterface = ObjectBase:New()
@@ -44,10 +44,6 @@ end
 
 function TipLog(strLog)
 	tipUtil:Log("UIInterfaceModule: " .. tostring(strLog))
-end
-
-function UIInterface:Init()
-	ClientWorkModule = XLGetGlobal("ClientWorkModule")
 end
 
 function UIInterface:GetDefaultWorkModel()
@@ -119,7 +115,7 @@ function UIInterface:SaveCommonUpdateUTC()
 end
 
 function UIInterface:CheckShouldRemindBind()
-	if ClientWorkModule:CheckIsBinded() then
+	if WorkModuleHelper:CheckIsBinded() then
 		return false
 	end
 	local strCmdline = tipUtil:GetCommandLine()
@@ -349,7 +345,7 @@ end
 
 function UIInterface:PopTipPre4Hour()
 	local function DoPopTip(item, id)
-		ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
+		WorkModuleHelper:GetServerHistoryIncome("h24", function(bRet, tabInfo)
 			if bRet and type(tabInfo) == "table" and #tabInfo >= 4 then
 				local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 				local bRemind = tFunctionHelper.FetchValueByPath(tUserConfig, {"tConfig", "EarningRemind", "bCheck"})
@@ -417,16 +413,16 @@ end
 function UIInterface:GetToolTipInfo()
 	local bShowSpeed = false
 	local strText = ""
-	if ClientWorkModule:CheckIsPrepare() then
+	if MainWorkModule:CheckIsPrepare() then
 		strText = "准备中"
 		bShowSpeed = true
-	elseif ClientWorkModule:CheckIsCalculate() then
+	elseif MainWorkModule:CheckIsCalculate() then
 		strText = "运行中"
 		bShowSpeed = true
 	else
 		strText = "未开启"
 	end	
-	TipLog("[GetToolTipInfo]: nPreWorkState = " .. tostring(nPreWorkState) .. ", strText = " .. tostring(strText))
+	--TipLog("[GetToolTipInfo]: nPreWorkState = " .. tostring(nPreWorkState) .. ", strText = " .. tostring(strText))
 	return strText,bShowSpeed
 end
 
@@ -456,12 +452,12 @@ function UIInterface:SetNotifyIconState(strText)
 	
 	local strShowText = "共享赚宝  状态："..strState
 	
-	local nBalance = ClientWorkModule:GetUserCurrentBalance()
+	local nBalance = MainWorkModule:GetUserCurrentBalance()
 	strShowText = strShowText .. "\r\n金库余额：" .. tFunctionHelper.NumberToFormatMoney(nBalance) .. "元宝"
 	if bShowSpeed then
 		local nSpeed = 0
 		if strState == "运行中" then
-			nSpeed = ClientWorkModule:GetClientMiningSpeed()
+			nSpeed = tClientProc.GetMiningSpeed()
 		end
 		strShowText = strShowText .. "\r\n当前赚宝速度：" .. tostring(nSpeed) .. "元宝/小时"
 	end
@@ -607,7 +603,7 @@ function UIInterface:UpdateSuspendWndVisible(nScene)
 	local bVisibale = ObjSuspendWnd:GetVisible()
 	if not bVisibale then
 		if nState == 0 
-			or nState == 2 and ClientWorkModule:CheckIsWorking() then
+			or nState == 2 and MainWorkModule:CheckIsWorking() then
 			--self:ShowPopupWndByName("GXZB.SuspendWnd.Instance", true)
 			--Statistic:SendUIReport("showsuspendwnd",1)
 			self:ShowPopUpWnd(ObjSuspendWnd, true)
@@ -618,7 +614,7 @@ function UIInterface:UpdateSuspendWndVisible(nScene)
 		end	
 	else 
 		if nState == 1 
-			or nState == 2 and not ClientWorkModule:CheckIsWorking() then
+			or nState == 2 and not MainWorkModule:CheckIsWorking() then
 			ObjSuspendWnd:Show(0)
 			--Statistic:SendUIReport("showsuspendwnd",0)
 			local tStatInfo = {}
@@ -630,10 +626,10 @@ function UIInterface:UpdateSuspendWndVisible(nScene)
 end
 
 function UIInterface:OnUserChangePanel()
-	if not ClientWorkModule:CheckIsBinded() then
+	if not WorkModuleHelper:CheckIsBinded() then
 		--return
 	end
-	ClientWorkModule:QueryWorkerInfo()
+	WorkModuleHelper:GetWorkerInfo()
 end
 
 function UIInterface:ChangeMainBodyPanel(strPanelName)
@@ -680,7 +676,7 @@ function UIInterface:UpdateRealTimeIncome(nRealTimeIncome)
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	local nBalance = ClientWorkModule:GetUserCurrentBalance()
+	local nBalance = MainWorkModule:GetUserCurrentBalance()
 	objMainBodyCtrl:UpdateRealTimeIncome(nBalance, nRealTimeIncome)
 end
 
@@ -696,7 +692,7 @@ end
 --所有要更新账户余额的地方在这里处理
 function UIInterface:UpdateUserBalance()
 	--在注册记录一下， 方便卸载时判断余额
-	local nBalance = ClientWorkModule:GetUserCurrentBalance()
+	local nBalance = MainWorkModule:GetUserCurrentBalance()
 	if tonumber(nBalance) >= 0 then
 		tFunctionHelper.RegSetValue("HKEY_CURRENT_USER\\Software\\Share4Money\\balance", tFunctionHelper.NumberToFormatMoney(nBalance))
 	end
@@ -713,7 +709,7 @@ function UIInterface:UpdateUserBalance()
 	if root and type(root.UpdateUserBalance) == "function" then
 		root:UpdateUserBalance(nBalance)
 	end
-	ClientWorkModule._WorkClient.OnUpdateBalance()
+	MainWorkModule:ClearRealTimeIncome()
 end
 
 --所有要处理绑定后信息的地方在这里处理
@@ -737,7 +733,7 @@ function UIInterface:UpdateClientUnBindState()
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
-	ClientWorkModule:SetUserCurrentBalance(0)
+	MainWorkModule:SetUserCurrentBalance(0)
 	self:UpdateUserBalance()
 	objMainBodyCtrl:UpdateClientUnBindState()
 	--更新球
@@ -909,7 +905,7 @@ end
 --420*652  369*600
 function UIInterface:CheckCanShowUserIntroduce(tabInfo)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
-	if ClientWorkModule:CheckIsBinded() then
+	if WorkModuleHelper:CheckIsBinded() then
 		tUserConfig["tConfig"] = tUserConfig["tConfig"] or {}
 		tUserConfig["tConfig"]["tUserIntroduce"] = tUserConfig["tConfig"]["tUserIntroduce"] or {}
 		tUserConfig["tConfig"]["tUserIntroduce"]["nLastShowTime"] = tFunctionHelper.GetCurrentServerTime()

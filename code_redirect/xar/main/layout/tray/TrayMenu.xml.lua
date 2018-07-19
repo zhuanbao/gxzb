@@ -15,7 +15,7 @@ end
 
 function OnInit_Pause(self)
 	local attr = self:GetAttribute()
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		attr.Text = "暂停"
 		attr.Icon = "bitmap.menu.pause.normal"
 	else
@@ -26,14 +26,14 @@ end
 
 function OnSelect_Pause(self)
 	UIInterface:SetStateInfoToUser(nil)
-	if ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyQuit()
+	if MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyQuit()
 		local tStatInfo = {}
 		tStatInfo.fu1 = "stopworking"
 		tStatInfo.fu5 = "tray"
 		StatisticClient:SendClickReport(tStatInfo)
 	else
-		ClientWorkModule:NotifyStart()
+		MainWorkModule:NotifyStart()
 		local tStatInfo = {}
 		tStatInfo.fu1 = "startworking"
 		tStatInfo.fu5 = "tray"

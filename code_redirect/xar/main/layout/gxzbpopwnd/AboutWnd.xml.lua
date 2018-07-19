@@ -1,5 +1,6 @@
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+local tipUtil = XLGetObject("API.Util")
 
 function OnMouseEnter(self)
 	local objBtnHover = self:GetObject("BtnHover")
@@ -42,13 +43,18 @@ function OnCreate(self)
 		local objVerValue = objTree:GetUIObject("AboutWnd.Version.Value")
 		local objDateValue = objTree:GetUIObject("AboutWnd.Date.Value")
 		local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+		--[[
 		local strLastUTC =  Helper.tipUtil:QueryRegValue("HKEY_LOCAL_MACHINE", "Software\\Share4Money", "InstallTimes")
 		if not tonumber(strLastUTC) then
 			strLastUTC = tUserConfig["nLastCommonUpdateUTC"]
 		end
 		local nLastUTC = tonumber(strLastUTC)
+		--]]
+		local strExePath = tFunctionHelper.GetExePath()
+		local nYear, nMonth, nDay, nHour, nMinute, nSecond = tipUtil:GetFileWriteTime(strExePath)
+		local nLastUTC = tipUtil:DateTime2Seconds(nYear, nMonth, nDay, nHour, nMinute, nSecond)
 		if nLastUTC then
-			objDateValue:SetText(os.date("%Y-%m-%d"), nLastUTC)
+			objDateValue:SetText(os.date("%Y-%m-%d", nLastUTC))
 		end
 		local strVersion = tFunctionHelper.GetGXZBVersion()
 		if strVersion then

@@ -35,22 +35,32 @@ local tabLuaFile = {
 "luacode\\helper.lua",
 "luacode\\helper_token.lua",
 "kernel\\utility.lua",
-"kernel\\CheckSupportClient.lua",
-"kernel\\ProfitMaxModule.lua",
-"kernel\\notice.lua",
 
 "menu\\SuspendMenu.lua",
 "menu\\SettingMenu.lua",
-"kernel\\ServerCfgModule.lua",
-"kernel\\StatisticClientModule.lua",
+
+"kernel\\clientcfg\\UtCfg.lua",
+"kernel\\clientcfg\\EtcCfg.lua",
+"kernel\\clientcfg\\ZcashNCfg.lua",
+"kernel\\clientcfg\\ZcashACfg.lua",
+"kernel\\clientcfg\\XmrCCfg.lua",
+"kernel\\clientcfg\\XmrNCfg.lua",
+"kernel\\clientcfg\\XmrACfg.lua",
+
+"kernel\\ClientProc.lua",
+
+
 "kernel\\UIInterfaceModule.lua",
-"kernel\\ClientWorkModule.lua",
-"kernel\\GenOilClient.lua",
-"kernel\\ZcashNClient.lua",
-"kernel\\ZcashAClient.lua",
-"kernel\\XmrClient.lua",
-"kernel\\XmrClientHelper.lua",
-"kernel\\UtClient.lua",
+"kernel\\notice.lua",
+"kernel\\StatisticClientModule.lua",
+"kernel\\ProfitMaxModule.lua",
+"kernel\\CheckSupportClient.lua",
+
+"kernel\\ApiInterfaceModule.lua",
+"kernel\\WorkModuleHelper.lua",
+"kernel\\MainWorkModule.lua",
+"kernel\\ServerCfgModule.lua",
+
 
 "activity\\activity.lua",
 }
@@ -64,18 +74,15 @@ local ProfitMax = XLGetGlobal("ProfitMax")
 local ServerCfg = XLGetGlobal("ServerCfg")
 local StatisticClient = XLGetGlobal("StatisticClient")
 local UIInterface = XLGetGlobal("UIInterface")
-local ClientWorkModule = XLGetGlobal("ClientWorkModule")
-local GenOilClient = XLGetGlobal("GenOilClient")
-local ZcashNClient = XLGetGlobal("ZcashNClient")
-local ZcashAClient = XLGetGlobal("ZcashAClient")
-local XmrClient = XLGetGlobal("XmrClient")
-local XmrHelper = XLGetGlobal("XmrHelper")
+
+local MainWorkModule = XLGetGlobal("MainWorkModule")
+local WorkModuleHelper = XLGetGlobal("WorkModuleHelper")
+local ApiInterfaceModule = XLGetGlobal("ApiInterfaceModule")
 
 function InitGlobalObj()
 	local bSuccess = tFunctionHelper.ReadAllConfigInfo()
 	StatisticClient:Init()
 	--UIInterface:Init()
-	ClientWorkModule:Init()
 	SupportClientType:Init()
 	ProfitMax:Init()
 end
@@ -235,20 +242,20 @@ function TipMain()
 	CreateMainTipWnd()
 	tFunctionHelper.InitMachineName()
 	tFunctionHelper.SaveConfigInTimer()
-	if not ClientWorkModule:CheckIsBinded() then
+	if not WorkModuleHelper:CheckIsBinded() then
 		UIInterface:ChangeClientTitle("共享赚宝(未绑定)")
 	end
 	--显示悬浮框
 	UIInterface:CreateSuspendWnd()
 	UIInterface:UpdateSuspendWndVisible()
 	
-	ClientWorkModule:InitMiningClient()
+	WorkModuleHelper:InitMiningClient()
     OnFinishCreateUI()
 	ServerCfg:TryToConnectServer()
-	ClientWorkModule:CheckMachineBindState()
-	if ClientWorkModule:CheckShoudAutoMining() then
+	WorkModuleHelper:CheckMachineBindState()
+	if WorkModuleHelper:CheckShoudAutoMining() then
 		TipLog("[TipMain] try to auto mining")
-		ClientWorkModule:DoAutoMining()
+		WorkModuleHelper:DoAutoMining()
 	end
 end
 

@@ -1,5 +1,6 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
+local tClientProc = XLGetGlobal("ClientProc")
 
 local g_tPanelCtrlList = {
 	"EarningsPanel",
@@ -62,7 +63,7 @@ function CreateListener(objRootCtrl)
 	local objListen = objFactory:CreateInstance()	
 	objListen:AttachListener(
 		function(key,...)	
-			tFunctionHelper.TipLog("[CreateListener] key: " .. tostring(key))
+			--tFunctionHelper.TipLog("[CreateListener] key: " .. tostring(key))
 			local tParam = {...}	
 			if tostring(key) == "OnCommandLine" then
 				--OnCommandLine(tParam)
@@ -80,21 +81,8 @@ function CreateListener(objRootCtrl)
 				end
 			elseif tostring(key) == "OnHotKey" then
 				OnHotKey(tParam)
-			elseif tostring(key) == "OnGenOilMsg" then
-				local ObjWorkClient = ClientWorkModule:GetWorkClient()
-				ObjWorkClient.OnGenOilMsg(tParam)
-			elseif tostring(key) == "OnZcashNMsg" then
-				local ObjWorkClient = ClientWorkModule:GetWorkClient()
-				ObjWorkClient.OnZcashNMsg(tParam)
-			elseif tostring(key) == "OnZcashAMsg" then
-				local ObjWorkClient = ClientWorkModule:GetWorkClient()
-				ObjWorkClient.OnZcashAMsg(tParam)
-			elseif tostring(key) == "OnXmrMsg" then
-				local ObjWorkClient = ClientWorkModule:GetWorkClient()
-				ObjWorkClient.OnXmrMsg(tParam)
-			elseif tostring(key) == "OnUtMsg" then
-				local ObjWorkClient = ClientWorkModule:GetWorkClient()
-				ObjWorkClient.OnUtMsg(tParam)
+			elseif tostring(key) == "OnClientMsg" then
+				tClientProc.OnClientMsg(tParam)
 			elseif tostring(key) == "OnErrorMsg" then
 				local tStatInfo = {}
 				tStatInfo.fu1 = "clienterrormsg"

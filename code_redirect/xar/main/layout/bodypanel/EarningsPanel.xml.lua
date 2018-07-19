@@ -30,19 +30,6 @@ end
 
 --相当于强制刷新
 function UpdateClientUnBindState(self)
-	--[[
-	local attr = self:GetAttribute()
-	local reqID = "h24"
-	if attr.currentpanel == 2 then
-		reqID = "d30"
-	end
-	ClientWorkModule:GetHistoryToServer(reqID, function(bRet, tabInfo)
-			attr.Data = tabInfo
-			attr.Data["reqFailed"] = not bRet
-			attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
-			self:Update()
-		end)
-	--]]
 	local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
     tEarnings["hour24"] = nil
     tEarnings["h24"] = nil
@@ -350,15 +337,15 @@ function OnClickHourBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("GXZB.EarningPanel.CoordinateHour")
 	barobj:SetObjPos("(father.width-197)/2 + 5", 89, "(father.width-197)/2 + 5 + 197", 89+246+30)
 	attr.currentpanel = 1
-    attr.Data = ClientWorkModule:GetLocalHistoryIncome("h24") or {}
+    attr.Data = WorkModuleHelper:GetLocalHistoryIncome("h24") or {}
 	UpdateAddIncome(OwnerCtrl, attr.Data)
     attr.Data["reqFailed"] = false
     barobj:Update()
-	ClientWorkModule:GetServerHistoryIncome("h24", function(bRet, tabInfo)
-		attr.Data = tabInfo or ClientWorkModule:GetLocalHistoryIncome("h24")
+	WorkModuleHelper:GetServerHistoryIncome("h24", function(bRet, tabInfo)
+		attr.Data = tabInfo or WorkModuleHelper:GetLocalHistoryIncome("h24")
 		UpdateAddIncome(OwnerCtrl, attr.Data)
 		attr.Data["reqFailed"] = not bRet
-		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
+		attr.Data["balance"] = MainWorkModule:GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end
@@ -374,15 +361,15 @@ function OnClickDayBtnBarChart(self)
 	barobj:GetObject("xyLineBkg"):SetResID("GXZB.EarningPanel.CoordinateDay")
 	barobj:SetObjPos("(father.width-246)/2+4", 89, "(father.width-246)/2 + 4 + 246", 89+246+30)
 	attr.currentpanel = 2
-    attr.Data = ClientWorkModule:GetLocalHistoryIncome("d30") or {}
+    attr.Data = WorkModuleHelper:GetLocalHistoryIncome("d30") or {}
 	UpdateAddIncome(OwnerCtrl, attr.Data)
     attr.Data["reqFailed"] = false
     barobj:Update()
-	ClientWorkModule:GetServerHistoryIncome("d30", function(bRet, tabInfo)
-		attr.Data = tabInfo or ClientWorkModule:GetLocalHistoryIncome("d30")
+	WorkModuleHelper:GetServerHistoryIncome("d30", function(bRet, tabInfo)
+		attr.Data = tabInfo or WorkModuleHelper:GetLocalHistoryIncome("d30")
 		UpdateAddIncome(OwnerCtrl, attr.Data)
 		attr.Data["reqFailed"] = not bRet
-		attr.Data["balance"] = ClientWorkModule:GetUserCurrentBalance()
+		attr.Data["balance"] = MainWorkModule:GetUserCurrentBalance()
 		barobj:Update()
 	end)
 end

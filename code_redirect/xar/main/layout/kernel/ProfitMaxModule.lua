@@ -1,6 +1,7 @@
 local tipUtil = XLGetObject("API.Util")
 local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local timeMgr = XLGetObject("Xunlei.UIEngine.TimerManager")
+local tClientProc = XLGetGlobal("ClientProc")
 
 ObjectBase = XLGetGlobal("ObjectBase")
 ProfitMax = ObjectBase:New()
@@ -82,10 +83,11 @@ function ProfitMax:GetServerGpuMiningInfo()
 			or not IsRealString(tabGpuInfo["name"]) then
 			return
 		end
-		
 		local strServerGpuInfo = self._strGpuInfoPrefix .. Helper:UrlEncode((tostring(tabGpuInfo["name"]))) .. ".json"
 		self:GetServerJsonData(strServerGpuInfo, function(bRet, tabGpuSpeed)
-			self:CalculateProfitPriority(bRet, tabGpuSpeed) 
+			if bRet then
+				self:CalculateProfitPriority(bRet, tabGpuSpeed) 
+			end	
 		end)
 	end
 	self:GetServerJsonData(self._strCoinRateUrl, fnCallBack)
@@ -97,36 +99,37 @@ function ProfitMax:CalculateProfitPriority(bRet, tabGpuSpeed)
 	local nZCahsRate = tFunctionHelper.FetchValueByPath(self._tabCoinRate, {"data", "cb", "rate"}) or 0
 	local nXmrRate = tFunctionHelper.FetchValueByPath(self._tabCoinRate, {"data", "cc", "rate"}) or 0
 	
-	local tabMaxSpeed = {}
+	local tabClientSpeed = {}
 	for strKey, tabValue in pairs(tabGpuSpeed) do
-		if strKey ~= "7" then
-			local nLen = #tabMaxSpeed+1
-			tabMaxSpeed[nLen] = {}
-			tabMaxSpeed[nLen]["ClientType"] = tonumber(strKey) or 0
+		local nClient = tonumber(strKey)
+		if SupportClientType:CheckIsGpuClient(nClient) then
+			local nLen = #tabClientSpeed+1
+			tabClientSpeed[nLen] = {}
+			tabClientSpeed[nLen]["nClient"] = nClient or 0
 			local nRate = 0
-			if strKey == "1" then
+			if nClient == 1 then
 				nRate = nEtcRate
-			elseif strKey == "2" or strKey == "3" then
+			elseif nClient == 2 or nClient == 3 then
 				nRate = nZCahsRate
-			elseif strKey == "4" or strKey == "5" or strKey == "6" then
+			elseif nClient == 4 or nClient == 5 or nClient == 6 then
 				nRate = nXmrRate
 			end
-			tabMaxSpeed[nLen]["Speed"] = tabValue["MaxSpeed"] * nRate
+			tabClientSpeed[nLen]["nSpeed"] = tabValue["MaxSpeed"] * nRate
 		end	
 	end
-	tFunctionHelper.DumpObj(tabMaxSpeed, "before tabMaxSpeed")
-	table.sort(tabMaxSpeed,function(first,second)
-		return first.Speed > second.Speed
-	end)
-	
-	tFunctionHelper.DumpObj(tabMaxSpeed, "tabMaxSpeed")
-	
-	local tabSort = {}
-	for Idx=1, #tabMaxSpeed do
-		tabSort[Idx] = tabMaxSpeed[Idx]["ClientType"]
+	if #tabClientSpeed <= 0 then
+		TipLog("[CalculateProfitPriority] no speed info")
+		return
 	end
-	tabSort[#tabSort+1] = 7
-	tabSort[#tabSort+1] = 8
+	table.sort(tabClientSpeed,function(first,second)
+		return first.nSpeed > second.nSpeed
+	end)
+	tFunctionHelper.DumpObj(tabClientSpeed, "tabClientSpeed")
+	
+	local tNewProfitMax = {}
+	for Idx=1, #tabClientSpeed do
+		tNewProfitMax[Idx] = tabClientSpeed[Idx]["nClient"]
+	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tProfitMax"]) ~= "table" then
 		tUserConfig["tProfitMax"] = {}
@@ -134,19 +137,20 @@ function ProfitMax:CalculateProfitPriority(bRet, tabGpuSpeed)
 	tUserConfig["tProfitMax"]["nLastQueryServer"] = tipUtil:GetCurrentUTCTime()
 	tUserConfig["tProfitMax"]["tRate"] = self._tabCoinRate
 	tUserConfig["tProfitMax"]["tServerGpuSpeed"] = tabGpuSpeed
-	--tUserConfig["tProfitMax"]["tUserGpuInfo"] = SupportClientType:GetCurrentGpuInfo()
-	if self:CheckIsPriorityChange(tabSort) then
-		tUserConfig["tProfitMax"]["tPriority"] = tabSort
-		if SupportClientType:GetCurrentPriorityMode() == 1 then
-			if ClientWorkModule:CheckIsWorking() then
-				ClientWorkModule:DispatchEvent("OnPriorityChange")
-			else
-				SupportClientType:SortClientTable()
-				ClientWorkModule:InitMiningClient()
+	if self:CheckIsPriorityChange(tNewProfitMax) then
+		tUserConfig["tProfitMax"]["tPriority"] = tNewProfitMax
+		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+		SupportClientType:SortGpuClientTable()
+		---[[
+		if SupportClientType:CheckIsProfitMaxMode() then
+			if MainWorkModule:CheckIsWorking() then
+				MainWorkModule:UpdatePriority()
 			end
 		end
+		--]]
+	else
+		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 	end
-	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
 function ProfitMax:CheckIsPriorityChange(tabNew)
@@ -214,12 +218,12 @@ function ProfitMax:RecommendDriver()
 end
 
 function ProfitMax:CheckShowRecommendCond()
-	local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
-	if nHashRate == 0 then
+	local nGpuHashRate, nCpuHashRate = tClientProc.GetModeWrokingHashSpeed()
+	if nGpuHashRate == 0 then
 		--return false
 	end
-	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 or nClient == 8 then
+	local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
+	if nGPUClient == 0 then
 		return false, 4
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -231,23 +235,13 @@ function ProfitMax:CheckShowRecommendCond()
 	if type(tabRate) ~= "table" or type(tabGpuSpeed) ~= "table" then
 		return false, 6
 	end
-	--[[
-	local nRate = 0
-	if nClient == 1 then
-		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "ca", "rate"}) or 0
-	elseif nClient == 2 or nClient == 3 then
-		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "cb", "rate"}) or 0
-	elseif nClient == 4 or nClient == 5 or nClient == 6 then
-		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "cc", "rate"}) or 0
-	end
-	--]]
-	local tabClientSpeed = tabGpuSpeed[tostring(nClient)]
+	local tabClientSpeed = tabGpuSpeed[tostring(nGPUClient)]
 	if type(tabClientSpeed) ~= "table" or not IsRealString(tabClientSpeed["VerRef"]) then
 		return false, 7
 	end
 	local nMiniSpeed = tabClientSpeed["MinSpeed"]
-	TipLog("[CheckShowRecommendCond] nHashRate = " .. tostring(nHashRate) .. ", nMiniSpeed = " .. tostring(nMiniSpeed))
-	if nHashRate > nMiniSpeed*0.9 then
+	TipLog("[CheckShowRecommendCond] nGpuHashRate = " .. tostring(nGpuHashRate) .. ", nMiniSpeed = " .. tostring(nMiniSpeed))
+	if nGpuHashRate > nMiniSpeed*0.9 then
 		TipLog("[CheckShowRecommendCond] hash rate is enough")
 		self:SetIgnoreMark()
 		return false, 8
@@ -273,14 +267,14 @@ function ProfitMax:CheckShowRecommendCond()
 		    return false, 12
 		end
 	end
-	return true, nHashRate
+	return true, nGpuHashRate
 end
 
 function ProfitMax:CheckRecommendDriver()
 	self:ClearRecommendDriver()
 	self:SendRecommendStat(0)
-    if SupportClientType:GetCurrentPriorityMode() ~= 1 then
-		TipLog("[CheckRecommendDriver] GetCurrentPriorityMode is not 1")
+    if not SupportClientType:CheckIsProfitMaxMode() then
+		TipLog("[CheckRecommendDriver] current is not profit max mode")
 		self:SendRecommendStat(1)
 		return
 	end
@@ -297,14 +291,14 @@ function ProfitMax:CheckRecommendDriver()
 	self._RecommendTimerID = timeMgr:SetOnceTimer(function () 
 		self._RecommendTimerID = nil
 		--if true then
-		local bCheck, nHashRate = ProfitMax:CheckShowRecommendCond()
+		local bCheck, nGpuHashRate = ProfitMax:CheckShowRecommendCond()
 		if not bCheck then
-			self:SendRecommendStat(nHashRate)
-		elseif not ClientWorkModule:CheckIsWorking() then
+			self:SendRecommendStat(nGpuHashRate)
+		elseif not MainWorkModule:CheckIsWorking() then
 			self:SendRecommendStat(13)
 		else
 			TipLog("[CheckRecommendDriver] try to show max speed window")
-			UIInterface:ShowMaxSpeedWnd(nHashRate)
+			UIInterface:ShowMaxSpeedWnd(nGpuHashRate)
 			self:SendRecommendStat(99)
 		end
 	end, 600*1000)
@@ -320,8 +314,8 @@ end
 
 function ProfitMax:CanShowMaxSpeedWndNow()
     self:ClearRecommendDriver()
-    if SupportClientType:GetCurrentPriorityMode() ~= 1 then
-		TipLog("[CanShowhowMaxSpeedWndNow] GetCurrentPriorityMode is not 1")
+    if not SupportClientType:CheckIsProfitMaxMode() then
+		TipLog("[CanShowhowMaxSpeedWndNow] current is not profit max mode")
 		return false
 	end
 	if self:IsExistIgnoreMark() then
@@ -332,12 +326,12 @@ function ProfitMax:CanShowMaxSpeedWndNow()
 		TipLog("[CanShowhowMaxSpeedWndNow] last recommend time return false")
 		return false
 	end
-		local nHashRate = ClientWorkModule:GetClientLastAverageHashRate()
-	if nHashRate == 0 then
+	local nGpuHashRate, nCpuHashRate = tClientProc.GetModeWrokingHashSpeed()
+	if nGpuHashRate == 0 then
 		--return false
 	end
-	local nClient = ClientWorkModule:GetRealMiningType()
-	if nClient == 7 or nClient == 8 then
+	local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
+	if nGPUClient == 0 then
 		return false
 	end
 	
@@ -349,7 +343,7 @@ function ProfitMax:CanShowMaxSpeedWndNow()
 	if type(tabGpuSpeed) ~= "table" then
 		return false
 	end
-	local tabClientSpeed = tabGpuSpeed[tostring(nClient)]
+	local tabClientSpeed = tabGpuSpeed[tostring(nGPUClient)]
 	if type(tabClientSpeed) ~= "table" or not IsRealString(tabClientSpeed["VerRef"]) then
 		return false
 	end

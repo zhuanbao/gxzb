@@ -12,7 +12,7 @@ function TipLog(strLog)
 end
 
 function ChangeBindEntryVisible(OwnerCtrl)
-	if not ClientWorkModule:CheckIsBinded() then
+	if not WorkModuleHelper:CheckIsBinded() then
 		--ObjBindWeiXinEntry:Show(true)
         ShowBindWeiXin(OwnerCtrl, true)
 	else
@@ -79,7 +79,7 @@ function UpdateMiningSpeed(self, nSpeed)
 end
 
 function UpdateMiningState(self,nMiningState)
-	if ClientWorkModule:CheckIsCalculate() then
+	if MainWorkModule:CheckIsCalculate() then
 		local ObjMiningSpeed = self:GetControlObject("MiningPanel.Panel.MiningSpeed")
 		if not ObjMiningSpeed:GetVisible() then
 			ObjMiningSpeed:SetChildrenVisible(true)
@@ -92,7 +92,7 @@ function UpdateMiningState(self,nMiningState)
 				ObjReboot:SetVisible(false)
 			end
 		end
-	elseif ClientWorkModule:CheckIsPrepare() then
+	elseif MainWorkModule:CheckIsPrepare() then
 		ResetUIVisible(self, true)
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		--ObjStopBtn:Show(true)
@@ -110,7 +110,7 @@ function UpdateDagProgress(self,nProgress)
 end
 --1:正在运行,2:不在运行
 function OnWorkStateChange(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local ObjStopBtn = self:GetControlObject("MiningPanel.Panel.StopBtn")
 		--ObjStopBtn:Show(true)
 		local ObjStartBtn = self:GetControlObject("MiningPanel.Panel.StartBtn")
@@ -161,8 +161,8 @@ end
 function OnClickStopMining(self)
 	local OwnerCtrl = self:GetOwnerControl()
 	SetStateInfoToUser(OwnerCtrl,nil)
-	if ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyQuit()
+	if MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyQuit()
 	end
 	local tStatInfo = {}
 	tStatInfo.fu1 = "stopworking"
@@ -185,8 +185,8 @@ end
 function OnClickStartMining(self)
 	local OwnerCtrl = self:GetOwnerControl()
 	SetStateInfoToUser(OwnerCtrl,nil)
-	if not ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyStart()
+	if not MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyStart()
 	end
 	local tStatInfo = {}
 	tStatInfo.fu1 = "startworking"
@@ -195,7 +195,7 @@ function OnClickStartMining(self)
 end
 
 function OnMouseEnterMiningAnim(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if not ObjStopBtn:IsVisible() then
@@ -205,7 +205,7 @@ function OnMouseEnterMiningAnim(self)
 end
 
 function OnMouseLeaveMiningAnim(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if ObjStopBtn:IsVisible() then
@@ -215,7 +215,7 @@ function OnMouseLeaveMiningAnim(self)
 end
 
 function OnMouseEnterStartBtn(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if not ObjStopBtn:IsVisible() then
@@ -225,7 +225,7 @@ function OnMouseEnterStartBtn(self)
 end
 
 function OnMouseLeaveStartBtn(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		if ObjStopBtn:IsVisible() then
@@ -235,7 +235,7 @@ function OnMouseLeaveStartBtn(self)
 end
 
 function OnMouseEnterStartText(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(true)
@@ -243,7 +243,7 @@ function OnMouseEnterStartText(self)
 end
 
 function OnMouseLeaveStartText(self)
-	if ClientWorkModule:CheckIsWorking() then
+	if MainWorkModule:CheckIsWorking() then
 		local OwnerCtrl = self:GetOwnerControl()
 		local ObjStopBtn = OwnerCtrl:GetControlObject("MiningPanel.Panel.StopBtn")
 		ObjStopBtn:Show(false)
@@ -477,13 +477,13 @@ end
 function ChangeMiningFailVisible(self)
 	local ObjMiningFail = self:GetControlObject("MiningPanel.Panel.MiningFail")
 	local ObjMiningFailDesc = self:GetControlObject("MiningPanel.Panel.MiningFail.Description")
-	if tFunctionHelper.CheckIsUpdatingDriver() and not ClientWorkModule:CheckIsWorking() then
+	if tFunctionHelper.CheckIsUpdatingDriver() and not MainWorkModule:CheckIsWorking() then
 		ObjMiningFailDesc:SetText("正在更新显卡驱动程序，请稍后重试...")
 		ObjMiningFail:SetChildrenVisible(true)
 		ObjMiningFail:SetVisible(true)
 		return
 	end
-	if tFunctionHelper.IsNeedRebootAfterUpdateDriver() and not ClientWorkModule:CheckIsWorking() then
+	if tFunctionHelper.IsNeedRebootAfterUpdateDriver() and not MainWorkModule:CheckIsWorking() then
 		ObjMiningFailDesc:SetText("显卡驱动程序已更新，请重启电脑")
 		ObjMiningFail:SetChildrenVisible(true)
 		ObjMiningFail:SetVisible(true)

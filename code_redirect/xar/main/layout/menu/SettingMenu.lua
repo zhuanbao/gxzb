@@ -39,8 +39,8 @@ end
 
 function menuFunTable.OnSelect_exit(self)
 	local wndMain = UIInterface:GetMainHostWnd()
-	local nRet, nCurBalance = 0, ClientWorkModule:GetUserCurrentBalance()
-	local bBind = ClientWorkModule:CheckIsBinded()
+	local nRet, nCurBalance = 0, MainWorkModule:GetUserCurrentBalance()
+	local bBind = WorkModuleHelper:CheckIsBinded()
 	--未绑定微信且元宝余额不为0
 	if nCurBalance > 0 and not bBind then
 		wndMain:Show(1)

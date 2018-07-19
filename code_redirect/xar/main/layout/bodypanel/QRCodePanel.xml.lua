@@ -61,7 +61,7 @@ function AutoJumpToPanel(OwnerCtrl)
 	local textActiveTime= OwnerCtrl:GetControlObject("QRCodePanel.Panel.ActiveTime")
 	local strPanle = "MiningPanel"
 	local strInfo = "秒后跳转到赚宝界面"
-	if ClientWorkModule:GetUserCurrentBalance() >= gMinTakeCashBalance then
+	if MainWorkModule:GetUserCurrentBalance() >= gMinTakeCashBalance then
 		strPanle = "TakeCashPanel"
 		strInfo = "秒后开始提现"
 	end
@@ -159,7 +159,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 			bQuerying = true
 			TipLog("Cycle query sever for bind result in.")
 			nTimerCounter = 0
-			ClientWorkModule:CycleQuerySeverForBindResult(function(bRet,tabBindInfo)
+			ApiInterfaceModule:CycleQuerySeverForBindResult(function(bRet,tabBindInfo)
 				if not gBinding or not bQuerying then
 					return
 				end
@@ -183,7 +183,7 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
 					ResetGlobalParam()
 					UpdateBindSuccessUI(OwnerCtrl)
-					ClientWorkModule:SetUserBindInfo(tabBindInfo)
+					WorkModuleHelper:SetUserBindInfo(tabBindInfo)
 					ResetLastQRCodeInfo()
 					--Statistic:SendUIReport("bindweixin","success")
 					local tStatInfo = {}
@@ -231,7 +231,7 @@ end
 
 function GetQRCodeFromServer(OwnerCtrl)
 	ResetGlobalParam()
-	ClientWorkModule:DownLoadTempQrcode(function(bRet,info)
+	WorkModuleHelper:DownLoadTempQrcode(function(bRet,info)
 		if not bRet then
 			TipLog("Download temp qrcode failed.")
 			ShowCtrl(OwnerCtrl,"QRCodePanel.Panel.QRCode.GenFailed")
@@ -255,8 +255,8 @@ end
 
 function OnClickBegainMining(self)
 	UIInterface:ChangeMainBodyPanel("MiningPanel")
-	if not ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyStart()
+	if not MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyStart()
 	end
 end
 

@@ -2,6 +2,8 @@ local tFunctionHelper = XLGetGlobal("FunctionHelper")
 local tipUtil = XLGetObject("API.Util")
 local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 local objFactory = XLGetObject("Xunlei.UIEngine.ObjectFactory")
+local tClientProc = XLGetGlobal("ClientProc")
+
 local g_strDriverVer = nil
 local g_nCurHashRate = 0
 
@@ -54,9 +56,10 @@ function OnClickClose(self)
 	local objTree = self:GetOwner()
 	local objHostWnd = objTree:GetBindHostWnd()
 	objHostWnd:EndDialog(0)
+	local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "closemaxspeeddrive"
-	tStatInfo.fu5 = ClientWorkModule:GetRealMiningType() or 0
+	tStatInfo.fu5 = nGPUClient
 	StatisticClient:SendClickReport(tStatInfo)
 	
 	UpadteRecommendTime(false)
@@ -81,21 +84,21 @@ function OnClickUpdate(self)
 	objHostWnd:EndDialog(0)
 	
 	RunUpdateDriverPlugin()
+	local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
 	local tStatInfo = {}
 	tStatInfo.fu1 = "updatemaxspeeddrive"
-	tStatInfo.fu5 = ClientWorkModule:GetRealMiningType() or 0
+	tStatInfo.fu5 = nGPUClient
 	StatisticClient:SendClickReport(tStatInfo)
 	UpadteRecommendTime(true)
-	if ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyQuit()
+	if MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyQuit()
 	end
 	UIInterface:ShowRemindRebootWarning()
 end
 
 function ShowContent(objtree)
-	local nClient = ClientWorkModule:GetRealMiningType()
-	nClient = 2
-	if nClient == 7 or nClient == nil then
+	local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
+	if nGPUClient == 0 then
 		return
 	end
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -108,14 +111,14 @@ function ShowContent(objtree)
 		return
 	end
 	local nRate = 0
-	if nClient == 1 then
+	if nGPUClient == 1 then
 		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "ca", "rate"}) or 0
-	elseif nClient == 2 or nClient == 3 then
+	elseif nGPUClient == 2 or nGPUClient == 3 then
 		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "cb", "rate"}) or 0
-	elseif nClient == 4 or nClient == 5 or nClient == 6 then
+	elseif nGPUClient == 4 or nGPUClient == 5 or nGPUClient == 6 then
 		nRate = tFunctionHelper.FetchValueByPath(tabRate, {"data", "cc", "rate"}) or 0
 	end
-	local tabClientSpeed = tabGpuSpeed[tostring(nClient)]
+	local tabClientSpeed = tabGpuSpeed[tostring(nGPUClient)]
 	if type(tabClientSpeed) ~= "table" then
 		return
 	end
@@ -165,9 +168,10 @@ end
 
 function OnShowWindow(self, bShow)
 	if bShow then
+		local nGPUClient, nCPUClient = tClientProc.GetModeWrokingClient()
 		local tStatInfo = {}
 		tStatInfo.fu1 = "showmaxspeeddrive"
-		tStatInfo.fu5 = ClientWorkModule:GetRealMiningType() or 0
+		tStatInfo.fu5 = nGPUClient
 		StatisticClient:SendEventReport(tStatInfo)
 		local objtree = self:GetBindUIObjectTree()
 		ShowContent(objtree)

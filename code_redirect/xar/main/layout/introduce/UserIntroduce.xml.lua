@@ -78,8 +78,8 @@ end
 
 function OnClickStart(self)
 	FinishUserIntroduce()
-	if not ClientWorkModule:CheckIsWorking() then
-		ClientWorkModule:NotifyStart()
+	if not MainWorkModule:CheckIsWorking() then
+		MainWorkModule:NotifyStart()
 	end
 	local tStatInfo = {}
 	tStatInfo.fu1 = "startworking"
