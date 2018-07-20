@@ -4,7 +4,7 @@
 
 void LuaListenPre::LuaListener(DWORD userdata1,DWORD userdata2, const char* pszType, DISPPARAMS* pParams )
 {
-	TSAUTO();
+	//TSAUTO();
 	USES_CONVERSION;
 	lua_State* pLuaState = (lua_State*)(ULONG_PTR)userdata1;
 	LONG lnStackTop = lua_gettop(pLuaState);

@@ -10,11 +10,12 @@
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
 #define CLIENT_GENOIL_NAME _T("Share4Peer.exe")
 
-CClientGenOil::CClientGenOil(void)
+CClientGenOil::CClientGenOil(UINT uClientType)
 {
 	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
 	m_strLastLeft = "";
 	m_DagProgress = -1;
+	m_uClientType = uClientType;
 }
 
 CClientGenOil::~CClientGenOil(void)
@@ -35,7 +36,7 @@ bool CClientGenOil::IsDebug()
 #endif
 }
 
-void CClientGenOil::TerminateAllClientInstance()
+void CClientGenOil::TerminateClientInstance()
 {
 	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE)
@@ -65,14 +66,19 @@ void CClientGenOil::LogString(const char *szBuffer)
 	}
 }
 
-void CClientGenOil::PostWndMsg(WPARAM wParam, LPARAM lParam)
+void CClientGenOil::PostWndMsg(int iMsgType, int iDetail)
 {
-	PostMessageA(m_hMsgWnd, WM_GENOIL_MSG, wParam, lParam);
+	CLIENTMSG *pInfo = new CLIENTMSG();
+	pInfo->uClientType = m_uClientType;
+	pInfo->iMsgType = iMsgType;
+	pInfo->iDetail = iDetail;
+
+	PostMessageA(m_hMsgWnd, WM_CLIENT_MSG, (WPARAM)pInfo, (LPARAM)0);
 }
 
 void CClientGenOil::OnAutoExit(DWORD dwExitCode)
 {
-	PostWndMsg(WP_GENOIL_AUTOEXIT, dwExitCode);
+	PostWndMsg(MSG_TYPE_AUTOEXIT, dwExitCode);
 }
 
 void CClientGenOil::RetSet()
@@ -125,12 +131,12 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	//失败 示例：":-( Not accepted."
 	if (boost::icontains(strBuffer,"B-) Submitted and accepted."))
 	{
-		PostWndMsg(WP_GENOIL_SHARE, 0);
+		PostWndMsg(MSG_TYPE_SHARE, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"B-) Submitted and accepted");
 	}
 	else if (boost::icontains(strBuffer,":-( Not accepted."))
 	{
-		PostWndMsg(WP_GENOIL_SHARE, 1);
+		PostWndMsg(MSG_TYPE_SHARE, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L":-( Not accepted");
 	}
 	//当前算力
@@ -163,7 +169,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	if (uCurrentSpeed >= 1)
 	{
 		m_DagProgress = 101; //已经有速度了就不再解析DAG了
-		PostWndMsg(WP_GENOIL_SPEED, uCurrentSpeed);
+		PostWndMsg(MSG_TYPE_SPEED, uCurrentSpeed);
 		TSDEBUG4CXX(L"[RegexString]: " << L"uCurrentSpeed = "<< uCurrentSpeed);
 		return;
 	}
@@ -198,7 +204,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 
 		if (m_DagProgress >= 0)
 		{
-			PostWndMsg(WP_GENOIL_DAG, m_DagProgress);
+			PostWndMsg(MSG_TYPE_UNKNOW, m_DagProgress);
 			TSDEBUG4CXX(L"[RegexString]: " << L"m_DagProgress = "<< m_DagProgress);
 			return;
 		}
@@ -209,7 +215,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	//1:"Connected!" 2:"Connected to stratum server "
 	if (boost::icontains(strBuffer,"Connected!") || boost::icontains(strBuffer,"Connected to stratum server "))
 	{
-		PostWndMsg(WP_GENOIL_CONNECT_POOL, 0);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Connecte server success");
 	}
 	//处理错误：
@@ -219,7 +225,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 
 	if (boost::icontains(strBuffer,"Invalid argument:"))
 	{
-		PostWndMsg(WP_GENOIL_ERROR_INFO, 1);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 1);
 
 		PostErrorMsg(strBuffer.c_str(),"invalid argument:");
 
@@ -227,7 +233,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	}
 	else if(boost::icontains(strBuffer,"No GPU device with sufficient memory was found. Can't GPU mine. Remove the -G argument"))
 	{
-		PostWndMsg(WP_GENOIL_ERROR_INFO, 2);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 2);
 		PostErrorMsg(strBuffer.c_str(),"no gpu device");
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
 	}
@@ -239,24 +245,24 @@ void CClientGenOil::RegexString(const char *szBuffer)
 
 	if(boost::icontains(strBuffer,"Reconnecting in 3 seconds..."))
 	{
-		PostWndMsg(WP_GENOIL_CONNECT_POOL, 1);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Connecte server fail, try to reconnect");
 	}
 	else if (boost::icontains(strBuffer,"error: front end compiler failed build"))
 	{
-		PostWndMsg(WP_GENOIL_ERROR_INFO, 3);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 3);
 		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: front end compiler failed build");
 	}
 	else if (boost::icontains(strBuffer,"error: invalid storage-class specifiers in OpenCL"))
 	{
-		PostWndMsg(WP_GENOIL_ERROR_INFO, 4);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 4);
 		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: invalid storage-class specifiers in OpenCL");
 	}
 	else if (boost::icontains(strBuffer,"error: "))
 	{
-		PostWndMsg(WP_GENOIL_ERROR_INFO, 5);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 5);
 		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error: new resone");
 	}
@@ -283,7 +289,7 @@ void CClientGenOil::RegexString(const char *szBuffer)
 	if (iErrorCode < 0)
 	{	
 		TSDEBUG4CXX(L"[RegexString]: " << L"OpenCL Error function start");
-		PostWndMsg(WP_GENOIL_ERROR_OPENCL, iErrorCode);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, iErrorCode);
 		PostErrorMsg(strBuffer.c_str(),"cl");
 		std::wstring wstrErrorFun = ultra::_A2T(strErrorFun);
 		TSDEBUG4CXX(L"[RegexString]: " << L"OpenCL Error function(" <<wstrErrorFun.c_str()<<"), ErrorCode = "<<iErrorCode);

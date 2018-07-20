@@ -45,11 +45,7 @@ public:
 	DECLARE_WND_CLASS(LUA_MSG_WND_CALSS)
 	BEGIN_MSG_MAP(LuaMsgWindow)
 		MESSAGE_HANDLER(WM_COPYDATA, OnCopyData)
-		MESSAGE_HANDLER(WM_GENOIL_MSG, OnGenOilMsg)
-		MESSAGE_HANDLER(WM_ZCASH_N_MSG, OnZcashNMsg)
-		MESSAGE_HANDLER(WM_ZCASH_A_MSG, OnZcashAMsg)
-		MESSAGE_HANDLER(WM_XMR_MSG, OnXmrMsg)
-		MESSAGE_HANDLER(WM_UT_MSG, OnUtMsg)
+		MESSAGE_HANDLER(WM_CLIENT_MSG, OnClientMsg)
 
 		MESSAGE_HANDLER(WM_ERROR_INFO, OnErrorMsg)
 		MESSAGE_HANDLER(WM_HOTKEY,		OnHotKey)
@@ -62,7 +58,7 @@ private:
 
 	void Fire_LuaEvent(const char* pszKey, DISPPARAMS* pParams)
 	{
-		TSAUTO();
+		//TSAUTO();
 		for(size_t i = 0;i<m_allCallBack.size();i++)
 		{
  			m_allCallBack[i].pCallBack(m_allCallBack[i].userData1,m_allCallBack[i].userData2, pszKey,pParams);
@@ -73,11 +69,7 @@ private:
 
 public:
 	LRESULT OnCopyData(UINT , WPARAM , LPARAM , BOOL&);
-	LRESULT OnGenOilMsg(UINT , WPARAM , LPARAM , BOOL&);
-	LRESULT OnZcashNMsg(UINT , WPARAM , LPARAM , BOOL&);
-	LRESULT OnZcashAMsg(UINT , WPARAM , LPARAM , BOOL&);
-	LRESULT OnXmrMsg(UINT , WPARAM , LPARAM , BOOL&);
-	LRESULT OnUtMsg(UINT , WPARAM , LPARAM , BOOL&);
+	LRESULT OnClientMsg(UINT , WPARAM , LPARAM , BOOL&);
 
 	LRESULT OnErrorMsg(UINT , WPARAM , LPARAM , BOOL&);
 	LRESULT OnHotKey(UINT , WPARAM /*wParam*/, LPARAM lParam , BOOL& );

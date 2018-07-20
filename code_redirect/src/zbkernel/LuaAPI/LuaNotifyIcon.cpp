@@ -130,9 +130,9 @@ int LuaNotifyIcon::SetIcon(lua_State* pLuaState)
 	else
 	{
 		HMODULE hInst = ::GetModuleHandle(NULL);
-		TSDEBUG(_T("hInst = 0x%p"), hInst);
+		//TSDEBUG(_T("hInst = 0x%p"), hInst);
 		HICON hExeIcon = (HICON)::LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON,16,16, LR_DEFAULTCOLOR);
-		TSDEBUG(_T("hSmallIcon = 0x%p"), hExeIcon);
+		//TSDEBUG(_T("hSmallIcon = 0x%p"), hExeIcon);
 		gsNotifyIcon.SetIcon(hExeIcon, strTip.c_str());
 	}
 	return 0;

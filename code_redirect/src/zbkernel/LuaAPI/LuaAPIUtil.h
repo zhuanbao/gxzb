@@ -115,6 +115,7 @@ public:
 	static int GetSystemTempPath(lua_State* pLuaState);
 	static int GetFileSize(lua_State* pLuaState);
 	static int GetFileCreateTime(lua_State* pLuaState);
+	static int GetFileWriteTime(lua_State* pLuaState);
 	static int GetTmpFileName(lua_State* pLuaState);
 	static int GetSpecialFolderPathEx(lua_State* pLuaState);
 	static int FindFileList(lua_State* pLuaState);

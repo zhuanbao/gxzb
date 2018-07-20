@@ -10,10 +10,11 @@
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
 #define CLIENT_ZCASHN_NAME _T("Share4PeerZN.exe")
 
-CClientZcashN::CClientZcashN(void)
+CClientZcashN::CClientZcashN(UINT uClientType)
 {
 	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
 	m_strLastLeft = "";
+	m_uClientType = uClientType;
 }
 
 CClientZcashN::~CClientZcashN(void)
@@ -34,7 +35,7 @@ bool CClientZcashN::IsDebug()
 #endif
 }
 
-void CClientZcashN::TerminateAllClientInstance()
+void CClientZcashN::TerminateClientInstance()
 {
 	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE)
@@ -64,14 +65,19 @@ void CClientZcashN::LogString(const char *szBuffer)
 	}
 }
 
-void CClientZcashN::PostWndMsg(WPARAM wParam, LPARAM lParam)
+void CClientZcashN::PostWndMsg(int iMsgType, int iDetail)
 {
-	PostMessageA(m_hMsgWnd, WM_ZCASH_N_MSG, wParam, lParam);
+	CLIENTMSG *pInfo = new CLIENTMSG();
+	pInfo->uClientType = m_uClientType;
+	pInfo->iMsgType = iMsgType;
+	pInfo->iDetail = iDetail;
+
+	PostMessageA(m_hMsgWnd, WM_CLIENT_MSG, (WPARAM)pInfo, (LPARAM)0);
 }
 
 void CClientZcashN::OnAutoExit(DWORD dwExitCode)
 {
-	PostWndMsg(WP_ZCASH_N_AUTOEXIT, dwExitCode);
+	PostWndMsg(MSG_TYPE_AUTOEXIT, dwExitCode);
 }
 
 void CClientZcashN::RetSet()
@@ -142,7 +148,7 @@ void CClientZcashN::RegexString(const char *szBuffer)
 					ssTemp >> iGPUTemp;
 				}
 				LONG lGPUTempInfo = MAKELONG(iGPUTemp,iGPUID);
-				PostWndMsg(WP_ZCASH_N_GPUTEMP, lGPUTempInfo);
+				PostWndMsg(MSG_TYPE_UNKNOW, lGPUTempInfo);
 				TSDEBUG4CXX(L"[RegexString]: GPU"<<iGPUID<<L" "<<iGPUTemp<<L"C");
 			}
 		}
@@ -155,13 +161,13 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	exp.assign(".*: GPU[0-9]+ Accepted share [0-9]+ms.*", boost::regex::icase);
 	if (boost::regex_match(strBuffer,exp))
 	{
-		PostWndMsg(WP_ZCASH_N_SHARE, 0);
+		PostWndMsg(MSG_TYPE_SHARE, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Accepted share");
 	}
 	exp.assign(".*: GPU[0-9]+ Rejected share [0-9]+ms.*", boost::regex::icase);
 	if (boost::regex_match(strBuffer,exp))
 	{
-		PostWndMsg(WP_ZCASH_N_SHARE, 1);
+		PostWndMsg(MSG_TYPE_SHARE, 1);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Rejected share");
 	}
 	//当前算力
@@ -193,7 +199,7 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	} 
 	if (iCurrentSpeed >= 0)
 	{
-		PostWndMsg(WP_ZCASH_N_SPEED, iCurrentSpeed);
+		PostWndMsg(MSG_TYPE_SPEED, iCurrentSpeed);
 		TSDEBUG4CXX(L"[RegexString]: " << L"uCurrentSpeed = "<< iCurrentSpeed);
 		return;
 	}
@@ -204,7 +210,7 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	//1:"INFO: Detected new work" 
 	if (boost::icontains(strBuffer,"INFO: Detected new work"))
 	{
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 0);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Detected new work so connect server success");
 	}
 	//处理错误：
@@ -214,44 +220,44 @@ void CClientZcashN::RegexString(const char *szBuffer)
 	//没找到英伟达的相关dll：ERROR: Cannot load nvml.
 	if (boost::icontains(strBuffer,"ERROR: Cannot load nvml."))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 1);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 1);
 		PostErrorMsg(strBuffer.c_str(),"error: cannot load nvml");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot load nvml");
 	}
 	else if (boost::icontains(strBuffer,"ERROR: No properly configured pool!"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 2);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 2);
 		PostErrorMsg(strBuffer.c_str(),"error: no properly configured pool!");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
 	else if (boost::icontains(strBuffer,"ERROR: Cannot resolve hostname"))
 	{	
 		//PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 1);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 1);
 		PostErrorMsg(strBuffer.c_str(),"error: cannot resolve hostname");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve hostname");
 	}
 	else if(boost::icontains(strBuffer,"ERROR: Cannot connect to the pool"))
 	{
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 2);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 2);
 		PostErrorMsg(strBuffer.c_str(),"error: cannot connect to the pool");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect to the pool");
 	}
 	else if(boost::icontains(strBuffer,"Stratum authorization timeout") || boost::icontains(strBuffer,"Lost connection with the server"))
 	{
-		PostWndMsg(WP_ZCASH_N_CONNECT_POOL, 3);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 3);
 		PostErrorMsg(strBuffer.c_str(),"error:");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error:lost connect when running");
 	}
 	else if(boost::icontains(strBuffer,"Error: CUDA driver version is insufficient for CUDA runtime version"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 3);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 3);
 		PostErrorMsg(strBuffer.c_str(),"error: cuda driver version is insufficient");
 		TSDEBUG4CXX(L"[RegexString]: " << L"No GPU device with sufficient memory was found");
 	}
 	else if(boost::icontains(strBuffer,"Error:"))
 	{
-		PostWndMsg(WP_ZCASH_N_ERROR_INFO, 99);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 99);
 		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Error:other");
 	}

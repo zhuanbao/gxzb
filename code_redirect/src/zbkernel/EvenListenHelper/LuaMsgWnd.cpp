@@ -145,63 +145,17 @@ LRESULT LuaMsgWindow::OnCopyData(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BO
 	return 0;
 }
 
-LRESULT LuaMsgWindow::OnGenOilMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+LRESULT LuaMsgWindow::OnClientMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
-;
-	CComVariant vParam[2];
-	vParam[0] = (int)wParam;
-	vParam[1] = (int)lParam;
+	CLIENTMSG *pInfo = (CLIENTMSG*)wParam;
+	CComVariant vParam[3];
+	vParam[0] = (UINT)pInfo->uClientType;
+	vParam[1] = (int)pInfo->iMsgType;
+	vParam[2] = (int)pInfo->iDetail;
+	delete pInfo;
 
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnGenOilMsg", &params);
-	return 0;
-}
-
-LRESULT LuaMsgWindow::OnZcashNMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
-{
-	;
-	CComVariant vParam[2];
-	vParam[0] = (int)wParam;
-	vParam[1] = (int)lParam;
-
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnZcashNMsg", &params);
-	return 0;
-}
-
-LRESULT LuaMsgWindow::OnZcashAMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
-{
-	;
-	CComVariant vParam[2];
-	vParam[0] = (int)wParam;
-	vParam[1] = (int)lParam;
-
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnZcashAMsg", &params);
-	return 0;
-}
-
-LRESULT LuaMsgWindow::OnXmrMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
-{
-	;
-	CComVariant vParam[2];
-	vParam[0] = (int)wParam;
-	vParam[1] = (int)lParam;
-
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnXmrMsg", &params);
-	return 0;
-}
-
-LRESULT LuaMsgWindow::OnUtMsg(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
-{
-	;
-	CComVariant vParam[2];
-	vParam[0] = (int)wParam;
-	vParam[1] = (int)lParam;
-
-	DISPPARAMS params = { vParam, NULL, 2, 0 };
-	Fire_LuaEvent("OnUtMsg", &params);
+	DISPPARAMS params = { vParam, NULL, 3, 0 };
+	Fire_LuaEvent("OnClientMsg", &params);
 	return 0;
 }
 

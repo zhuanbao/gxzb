@@ -53,6 +53,7 @@ namespace Nvidia {
 		(*NvAPI_EnumPhysicalGPUs)(m_gpuHandles, &m_gpuCount);
 		m_bCanGet = TRUE;
 		TSDEBUG4CXX(L"[GetNvidiaGpuUsgae] init ok");
+		return 0;
 
 	}
 	int NvidiaInfo::GetGpuUsgae()

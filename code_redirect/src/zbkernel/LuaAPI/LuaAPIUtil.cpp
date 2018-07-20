@@ -95,6 +95,7 @@ XLLRTGlobalAPI LuaAPIUtil::sm_LuaMemberFunctions[] =
 	{"GetSystemTempPath", GetSystemTempPath},
 	{"GetFileSize", GetFileSize},
 	{"GetFileCreateTime", GetFileCreateTime},
+	{"GetFileWriteTime", GetFileWriteTime},
 	{"GetTmpFileName", GetTmpFileName},
 	{"GetSpecialFolderPathEx", GetSpecialFolderPathEx}, 
 	{"FindFileList", FindFileList},
@@ -687,6 +688,44 @@ int LuaAPIUtil::GetFileCreateTime(lua_State* pLuaState)
 				CloseHandle(hFile);
 				SYSTEMTIME stUTC, stLocal;
 				FileTimeToSystemTime(&ftCreate, &stUTC);
+				SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
+
+				lua_pushnumber(pLuaState, stLocal.wYear);
+				lua_pushnumber(pLuaState, stLocal.wMonth);
+				lua_pushnumber(pLuaState, stLocal.wDay);
+				lua_pushnumber(pLuaState, stLocal.wHour);
+				lua_pushnumber(pLuaState, stLocal.wMinute);
+				lua_pushnumber(pLuaState, stLocal.wSecond);
+				lua_pushnumber(pLuaState, stLocal.wDayOfWeek);
+				return 7;
+			}
+			CloseHandle(hFile);
+		}
+	}
+
+	lua_pushnil(pLuaState);
+	return 1;
+}
+
+int LuaAPIUtil::GetFileWriteTime(lua_State* pLuaState)
+{
+	LuaAPIUtil** ppUtil = (LuaAPIUtil **)luaL_checkudata(pLuaState, 1, API_UTIL_CLASS);
+	if (ppUtil != NULL)
+	{
+		const char* utf8FilePath = luaL_checkstring(pLuaState, 2);
+		CComBSTR bstrFilePath;
+		LuaStringToCComBSTR(utf8FilePath,bstrFilePath);
+
+		HANDLE hFile = INVALID_HANDLE_VALUE;
+		hFile = CreateFile(bstrFilePath.m_str, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			FILETIME ftCreate, ftAccess, ftWrite;
+			if (0 != GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite))
+			{
+				CloseHandle(hFile);
+				SYSTEMTIME stUTC, stLocal;
+				FileTimeToSystemTime(&ftWrite, &stUTC);
 				SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
 
 				lua_pushnumber(pLuaState, stLocal.wYear);

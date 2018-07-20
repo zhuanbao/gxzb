@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "ClientXmr.h"
+#include "ClientUt.h"
 #include "ClientMsgDefine.h"
 #include <Tlhelp32.h>
 #include "..\Utility\StringOperation.h"
@@ -9,37 +9,22 @@
 
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
 
-TCHAR *tszXmrName[] = {_T("Share4PeerXA.exe"), _T("Share4PeerXA64.exe"), _T("Share4PeerXN64.exe"), _T("Share4PeerXC.exe")};
+TCHAR *tszUtName[] = {_T("Share4PeerUC.exe")};
 
-CClientXmr::CClientXmr(UINT uClientType)
+CClientUt::CClientUt(UINT uClientType)
 {
 	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
 	m_strLastLeft = "";
 	m_uClientType = uClientType;
-	if (CLIENT_XMR_A_32 == m_uClientType)
-	{
-		m_strClientName = L"Share4PeerXA.exe";
-	} 
-	else if (CLIENT_XMR_A_64 == m_uClientType)
-	{
-		m_strClientName = L"Share4PeerXA64.exe";
-	}
-	else if (CLIENT_XMR_N_64 == m_uClientType)
-	{
-		m_strClientName = L"Share4PeerXN64.exe";
-	}
-	else
-	{
-		m_strClientName = L"Share4PeerXC.exe";
-	}
+	m_strClientName = L"Share4PeerUC.exe";
 }
 
-CClientXmr::~CClientXmr(void)
+CClientUt::~CClientUt(void)
 {
 
 }
 
-bool CClientXmr::IsDebug()
+bool CClientUt::IsDebug()
 {
 #if defined _DEBUG
 	return true;
@@ -52,7 +37,7 @@ bool CClientXmr::IsDebug()
 #endif
 }
 
-void CClientXmr::TerminateClientInstance()
+void CClientUt::TerminateClientInstance()
 {
 	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE)
@@ -73,18 +58,17 @@ void CClientXmr::TerminateClientInstance()
 	}
 }
 
-void CClientXmr::LogString(const char *szBuffer)
+void CClientUt::LogString(const char *szBuffer)
 {
 	if (IsDebug())
 	{
 		std::wstring wstrInfo = ultra::_A2T(szBuffer);
-		TSDEBUG(_T("<Client  X(%u)>  Output: %s"), m_uClientType,wstrInfo.c_str());
+		TSDEBUG(_T("<Client  U(%u)>  Output: %s"), m_uClientType,wstrInfo.c_str());
 	}
 }
 
-void CClientXmr::PostWndMsg(int iMsgType, int iDetail)
+void CClientUt::PostWndMsg(int iMsgType, int iDetail)
 {
-
 	CLIENTMSG *pInfo = new CLIENTMSG();
 	pInfo->uClientType = m_uClientType;
 	pInfo->iMsgType = iMsgType;
@@ -93,26 +77,26 @@ void CClientXmr::PostWndMsg(int iMsgType, int iDetail)
 	PostMessageA(m_hMsgWnd, WM_CLIENT_MSG, (WPARAM)pInfo, (LPARAM)0);
 }
 
-void CClientXmr::OnAutoExit(DWORD dwExitCode)
+void CClientUt::OnAutoExit(DWORD dwExitCode)
 {
 	PostWndMsg(MSG_TYPE_AUTOEXIT, dwExitCode);
 }
 
-void CClientXmr::RetSet()
+void CClientUt::RetSet()
 {
 	TSDEBUG(_T("RetSet X(%u) client Param"), m_uClientType);
 	m_strLastLeft = "";
 }
 
 
-void CClientXmr::ProcessString(const char *szBuffer)
+void CClientUt::ProcessString(const char *szBuffer)
 {
 
 	//LogString(szBuffer);
 	RegexString(szBuffer);
 }
 
-void CClientXmr::RegexString(const char *szBuffer)
+void CClientUt::RegexString(const char *szBuffer)
 {
 	std::string strBuffer = m_strLastLeft;
 	strBuffer.append(szBuffer);
@@ -157,36 +141,31 @@ void CClientXmr::RegexString(const char *szBuffer)
 	//当前算力
 	//示例："speed 10s/60s/15m n/a 435.9 432.5 H/s max: 447.2 H/s"
 	//       speed 2.5s/60s/15m 88.4 n/a n/a H/s max: 92.2 H/s
-	exp.assign("speed [0-9\\.]+s/[0-9\\.]+s/[0-9\\.]+m ([na/0-9\\.]+) ([na/0-9\\.]+) ([na/0-9\\.]+) H/s", boost::regex::icase);
-	int iCurrentSpeed = -1;
+	exp.assign("speed [0-9\\.]+s/[0-9\\.]+s/[0-9\\.]+m ([0-9\\.]+) [na/0-9\\.]+ [na/0-9\\.]+ H/s", boost::regex::icase);
+	INT iCurrentSpeed = -1;
 	while(boost::regex_search(start,end,what,exp))
 	{
-		if (what.size() == 4)
+		if (what.size() == 2)
 		{
-			for (unsigned int udx = 1; udx < what.size(); udx++)
+			if (what[1].matched)
 			{
-				if (what[udx].matched)
+				std::string strSpeed = what[1];
+				float fNewSpeed = 0.00f;
 				{
-					std::string strSpeed = what[udx];
-					float fNewSpeed = 0.00f;
-					{
-						std::stringstream ssNewSpeed;
-						ssNewSpeed << strSpeed;
-						ssNewSpeed >> fNewSpeed;
-					}
-					int iNewSpeed = ( int )( fNewSpeed * 100 + 0.5 );
-					if (iNewSpeed > 0 && iNewSpeed > iCurrentSpeed)
-					{
-						iCurrentSpeed = iNewSpeed;
-						break;
-					}
-
+					std::stringstream ssNewSpeed;
+					ssNewSpeed << strSpeed;
+					ssNewSpeed >> fNewSpeed;
 				}
-			}
+				int iNewSpeed = ( int )( fNewSpeed * 100 + 0.5 );
+				if (iNewSpeed > iCurrentSpeed)
+				{
+					iCurrentSpeed = iNewSpeed;
+				}
 
+			}
 		}
 		start = what[0].second; 
-	}  
+	} 
 	if (iCurrentSpeed >= 0)
 	{
 		PostWndMsg(MSG_TYPE_SPEED, iCurrentSpeed);
@@ -289,7 +268,7 @@ void CClientXmr::RegexString(const char *szBuffer)
 }
 
 
-void CClientXmr::PostErrorMsg(const char *szBuffer, const char *szBeg)
+void CClientUt::PostErrorMsg(const char *szBuffer, const char *szBeg)
 {
 	std::string strInfo = ultra::ToLower(ultra::Trim(std::string(szBuffer)));
 	std::string strSep = "\r\n";

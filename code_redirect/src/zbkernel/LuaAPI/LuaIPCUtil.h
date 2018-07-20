@@ -3,17 +3,20 @@
 #define IPC_UTIL_CLASS	"IPC.Util.Class"
 #define IPC_UTIL_OBJ		"IPC.Util"
 
+#include "..\Utility\Lock.h"
 #include "..\MinerType\MinerClient.h"
-/*定义挖矿客户端类型*/
-typedef enum
+#include <map>
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread.hpp>
+
+typedef struct __WORKINST
 {
-	MINER_GENOIL = 1,
-	MINER_ZCASH_N = 2,
-	MINER_ZCASH_A = 3,
-	MINER_XMR_B = 4,
-	MINER_XMR_E = 7,
-	MINER_UT_C= 8,
-}MinerType;
+	UINT	 uMode;      // 1.GPU 2.CPU 等等.
+	UINT	 uClientType;  // Host端口号.
+	UINT     uStartCnt;   //启动轮数，相同的客户端通过这个来判断是否需要重启 
+	wchar_t  wszParam[1024]; //命令行参数
+	BOOL	 bQuit;
+}WORKINST;
 
 
 class LuaIPCUtil
@@ -30,29 +33,30 @@ public:
 
 public:
 	static int Init(lua_State* pLuaState);
-	static int Start(lua_State* pLuaState);
+	static int StartModeClient(lua_State* pLuaState);
+	static int QuitMode(lua_State* pLuaState);
 	static int Quit(lua_State* pLuaState);
-	static int Pause(lua_State* luaState);
-	static int Resume(lua_State* luaState);
-	static int IsWorkProcessRunning(lua_State* pLuaState);
+	static int ForceQuit(lua_State* pLuaState);
 
-	static int SetMinerType(lua_State* pLuaState);
 private:
 	static XLLRTGlobalAPI sm_LuaMemberFunctions[];
-	static HANDLE m_hWorkProcess;
-	static HANDLE m_hPipeThread;
+	
+	typedef std::map<UINT, WORKINST*> WorkInstMap;
+	typedef WorkInstMap::iterator WorkInstMapIter;
+	static WorkInstMap m_mapWorkInst;
 
-	//定义句柄: 构成stdin管道的两端句柄    
-	static HANDLE  m_hStdInRead;         //子进程用的stdin的读入端    
-	static HANDLE  m_hStdInWrite;        //主程序用的stdin的读入端    
+	typedef boost::shared_mutex rwmutex;
+	typedef boost::shared_lock<rwmutex> readLock;
+	typedef boost::unique_lock<rwmutex> writeLock;	
+	
+	static rwmutex m_rwmutex;
+	//static mutable XMLib::CriticalSection m_cs;
 
-	//定义句柄: 构成stdout管道的两端句柄    
-	static HANDLE  m_hStdOutRead;     ///主程序用的stdout的读入端    
-	static HANDLE  m_hStdOutWrite;    ///子进程用的stdout的写入端
 public:
-	static void CycleHandleInfoFromPipe();
-	static void  CycleHandleInfoFromPipeEx();
-	static void Clear();
-	static void TerminateMiningProcess();
+	static UINT WINAPI Run(PVOID pArg);
+	static CMinerClient * CreateClient(UINT uClientType);
+	static BOOL StartProcess(std::wstring wParam, HANDLE & hWorkProcess, HANDLE & hWorkStdOutRead);
+	
+	static void TerminateAllClient();
 	static BOOL EnableDebugPrivilege();
 };

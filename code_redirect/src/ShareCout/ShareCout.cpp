@@ -24,9 +24,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		pszCommandLine = _tcschr(pszCommandLine+1, _T('"'));
 	else
 		pszCommandLine = _tcspbrk(pszCommandLine, _T(" \t"));
-	if (!pszCommandLine) return -1;
+	if (!pszCommandLine) return -11;
 	pszCommandLine += _tcsspn(pszCommandLine+1, _T(" \t"))+1;
-	if (pszCommandLine[0] == '\0') return -1;
+	if (pszCommandLine[0] == '\0') return -12;
 
 	// prepare the console window & inherited screen buffer
 	SECURITY_ATTRIBUTES sa;
@@ -66,7 +66,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
 		CloseHandle(hConsole);
-		return -2;
+		return -13;
 	}
 	CloseHandle(pi.hThread); // always close the hThread after a CreateProcess
 
@@ -75,17 +75,20 @@ int _tmain(int argc, _TCHAR* argv[])
 	bool bExitNow = false;
 	do
 	{
-		if (WaitForSingleObject(pi.hProcess, 0) != WAIT_TIMEOUT)
+		if (WaitForSingleObject(pi.hProcess, 0) == WAIT_OBJECT_0)
+		{
 			bExitNow = true; // exit after this last iteration
-
+			break;
+		}
+			
 		// get screen buffer state
 		BOOL bGet = GetConsoleScreenBufferInfo(hConsole, &csbi);
 		if(!bGet)
 		{
 			TSDEBUG4CXX(L"GetConsoleScreenBufferInfo failed, dwLastError = "<< ::GetLastError()); 
+			break;
 		}
 		int iLineWidth = csbi.dwSize.X;
-		
 		//TSDEBUG4CXX(L"dwCursorPosition.X = "<< csbi.dwCursorPosition.X <<", dwCursorPosition.Y = " << csbi.dwCursorPosition.Y); 
 		//TSDEBUG4CXX(L" lastpos.X = "<<  lastpos.X <<", lastpos.Y = " << lastpos.Y); 
 		if ((csbi.dwCursorPosition.X == lastpos.X) && (csbi.dwCursorPosition.Y == lastpos.Y))
@@ -108,7 +111,6 @@ int _tmain(int argc, _TCHAR* argv[])
 				lastpos = origin;
 			}
 			SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
-
 			// scan screen buffer and transmit character to real output handle
 			LPTSTR szScan = szBuffer;
 			//TSDEBUG4CXX(L"szScan = "<< szBuffer); 
@@ -134,7 +136,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					for (;dwLen;dwLen--)
 						WriteFile(hOutput, "\r\n", 2, &dwDummy, NULL);
 				}
-			} while (dwCnt);
+			} while (dwCnt);; 
 			FlushFileBuffers(hOutput); // seems unnecessary
 			LocalFree(szBuffer);
 		}
@@ -147,7 +149,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// release subprocess handle
 	DWORD dwExitCode;
 	if (!GetExitCodeProcess(pi.hProcess, &dwExitCode))
-		dwExitCode = -3;
+		dwExitCode = -14;
 	CloseHandle(pi.hProcess); 
 	TSDEBUG4CXX(L"dwExitCode = "<< dwExitCode); 
 	return dwExitCode;

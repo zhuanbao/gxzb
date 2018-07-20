@@ -1,11 +1,11 @@
 #pragma once
 #include "MinerClient.h"
 
-class CClientXmr : public CMinerClient
+class CClientUt : public CMinerClient
 {
 public:
-	CClientXmr(UINT uClientType);
-	~CClientXmr(void);
+	CClientUt(UINT uClientType);
+	~CClientUt(void);
 public:
 	void ProcessString(const char *szBuffer);
 	void TerminateClientInstance();

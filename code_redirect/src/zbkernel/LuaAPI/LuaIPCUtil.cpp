@@ -8,8 +8,9 @@
 #include "../MinerType/ClientZcashA.h"
 #include "../MinerType/ClientXmr.h"
 #include "../MinerType/ClientUt.h"
+#include "../MinerType/ClientMsgDefine.h"
 
-CMinerClient *g_pClient = NULL;
+//CMinerClient *g_pClient = NULL;
 
 
 //重定向输出管道的长度
@@ -39,32 +40,26 @@ LuaIPCUtil::LuaIPCUtil(void)
 
 LuaIPCUtil::~LuaIPCUtil(void)
 {
-	Clear();
-	if (NULL != g_pClient)
-	{
-		delete g_pClient;
-		g_pClient = NULL;
-	}
+	//Clear();
+	//if (NULL != g_pClient)
+	//{
+	//	delete g_pClient;
+	//	g_pClient = NULL;
+	//}
 }
 
 XLLRTGlobalAPI LuaIPCUtil::sm_LuaMemberFunctions[] = 
 {
 	{"Init", Init},
-	{"Start", Start},
+	{"StartModeClient", StartModeClient},
+	{"QuitMode", QuitMode},
 	{"Quit", Quit},
-	{"Pause", Pause},
-	{"Resume", Resume},
-	{"IsWorkProcessRunning",IsWorkProcessRunning},
-	{"SetMinerType",SetMinerType},
+	{"ForceQuit", ForceQuit},
 	{NULL, NULL}
 };
 
-HANDLE LuaIPCUtil::m_hPipeThread  = NULL;
-HANDLE LuaIPCUtil::m_hWorkProcess  = NULL;
-HANDLE LuaIPCUtil::m_hStdInRead  = NULL;
-HANDLE LuaIPCUtil::m_hStdInWrite  = NULL;
-HANDLE LuaIPCUtil::m_hStdOutRead  = NULL;
-HANDLE LuaIPCUtil::m_hStdOutWrite  = NULL;
+LuaIPCUtil::rwmutex LuaIPCUtil::m_rwmutex;
+LuaIPCUtil::WorkInstMap LuaIPCUtil::m_mapWorkInst;
 
 LuaIPCUtil* __stdcall LuaIPCUtil::Instance(void *)
 {
@@ -91,11 +86,13 @@ void LuaIPCUtil::RegisterObj( XL_LRT_ENV_HANDLE hEnv )
 
 int LuaIPCUtil::Init(lua_State* pLuaState)
 {
-	static BOOL bEnableDebug = FALSE;
-	if(bEnableDebug)
+	static BOOL bInit = FALSE;
+	if(bInit)
 	{
-		bEnableDebug = EnableDebugPrivilege();
+		return 0;
 	}
+	EnableDebugPrivilege();
+	
 	if (NULL == fnNtSuspendProcess)
 	{
 		fnNtSuspendProcess = (_NtSuspendProcess)GetProcAddress( GetModuleHandle( _T("ntdll") ), "NtSuspendProcess" );  
@@ -104,244 +101,393 @@ int LuaIPCUtil::Init(lua_State* pLuaState)
 	{
 		fnNtResumeProcess = (_NtSuspendProcess)GetProcAddress( GetModuleHandle( _T("ntdll") ), "NtResumeProcess" );  
 	}
-	if (NULL != g_pClient)
-	{
-		delete g_pClient;
-		g_pClient = NULL;
-	}
-
-	UINT uMinerType = (DWORD)lua_tointeger(pLuaState, 2);
-	if (uMinerType == MINER_GENOIL)
-	{
-		g_pClient = new CClientGenOil();
-	}
-	else if(uMinerType == MINER_ZCASH_N)
-	{
-		g_pClient = new CClientZcashN();
-	}
-	else if(uMinerType == MINER_ZCASH_A)
-	{
-		g_pClient = new CClientZcashA();
-	}
-	else if(uMinerType >= MINER_XMR_B && uMinerType <= MINER_XMR_E)
-	{
-		g_pClient = new CClientXmr(uMinerType);
-	}
-	else if(uMinerType == MINER_UT_C)
-	{
-		g_pClient = new CClientUt(uMinerType);
-	}
+	m_mapWorkInst.clear();
+	bInit = TRUE;
 	return 0;
 }
 
-void LuaIPCUtil::Clear()
+CMinerClient * LuaIPCUtil::CreateClient(UINT uClientType)
 {
-	CLOSE_HANDLE(m_hWorkProcess);
-	CLOSE_HANDLE(m_hPipeThread);
-	CLOSE_HANDLE(m_hStdInRead);
-	CLOSE_HANDLE(m_hStdInWrite);
-	CLOSE_HANDLE(m_hStdOutRead);
-	CLOSE_HANDLE(m_hStdOutWrite);
-	if (NULL != g_pClient)
+	CMinerClient *pClient = NULL ;
+	if (uClientType == CLIENT_ETC_64)
 	{
-		//TSDEBUG4CXX(L"Try clear client param");
-		g_pClient->RetSet();
-		
+		pClient = new CClientGenOil(uClientType);
 	}
-}
-
-void LuaIPCUtil::CycleHandleInfoFromPipeEx()
-{
-	DWORD dwExitCode = 0; 
-	while (GetExitCodeProcess(m_hWorkProcess,&dwExitCode))  
-	{  
-		if (dwExitCode != STILL_ACTIVE)
-		{
-			TSDEBUG4CXX(L"Work process exit,dwExitCode = " << dwExitCode); 
-			g_pClient->OnAutoExit(dwExitCode);
-			break;
-		}
-		//dosomeing
-		char szPipeOutBuffer[PIPE_BUFFER_SIZE+1] = {0};  
-		DWORD dwBytesRead = 0;
-		DWORD dwTotalBytesAvail = 0; 
-		//TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] begain read " ); 
-		PeekNamedPipe(m_hStdOutRead,szPipeOutBuffer,PIPE_BUFFER_SIZE,&dwBytesRead,&dwTotalBytesAvail,NULL);
-
-
-		if (dwBytesRead != 0)
-		{
-			ZeroMemory(szPipeOutBuffer,PIPE_BUFFER_SIZE+1);
-			if (dwTotalBytesAvail > PIPE_BUFFER_SIZE)
-			{
-				while (dwBytesRead >= PIPE_BUFFER_SIZE)
-				{
-					TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] begain read " ); 
-					ReadFile(m_hStdOutRead,szPipeOutBuffer,PIPE_BUFFER_SIZE,&dwBytesRead,NULL);  //read the stdout pipe
-					TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] end read ,dwBytesRead = " <<  dwBytesRead);
-					ZeroMemory(szPipeOutBuffer,PIPE_BUFFER_SIZE+1);
-				}
-			}
-			else {
-				TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] begain read " ); 
-				ReadFile(m_hStdOutRead,szPipeOutBuffer,1023,&dwBytesRead,NULL);
-				TSDEBUG4CXX(L"[CycleHandleInfoFromPipeEx] end read ,dwBytesRead = " <<  dwBytesRead);
-			}
-			g_pClient->ProcessString(szPipeOutBuffer);
-		}
-		Sleep(SLEEP_TIME);
-	}
-	return;
-}
-
-void LuaIPCUtil::CycleHandleInfoFromPipe()
-{
-	DWORD dwExitCode = 0;  
-	while (GetExitCodeProcess(m_hWorkProcess,&dwExitCode))  
-	{  
-		if (dwExitCode != STILL_ACTIVE)
-		{
-			TSDEBUG4CXX(L"Work process exit,dwExitCode = " << dwExitCode); 
-			g_pClient->OnAutoExit(dwExitCode);
-			break;
-		}
-		//dosomeing
-		char szPipeOutBuffer[PIPE_BUFFER_SIZE+1] = {0};  
-		DWORD dwBytesRead = 0;  
-		TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] begain read " ); 
-		BOOL bRead = ReadFile(m_hStdOutRead, szPipeOutBuffer, PIPE_BUFFER_SIZE, &dwBytesRead, NULL);  
-		TSDEBUG4CXX(L"[CycleHandleInfoFromPipe] end read ,dwBytesRead = " <<  dwBytesRead);
-		if(!bRead || dwBytesRead <= 0)
-		{
-			DWORD dwLastError = ::GetLastError();
-			TSDEBUG4CXX(L"Work process exit,dwExitCode = " << dwLastError);
-			continue;
-		}
-		g_pClient->ProcessString(szPipeOutBuffer);
-	}
-	return;
-}
-
-UINT WINAPI PipeProc(PVOID pArg)
-{
-	LuaIPCUtil::CycleHandleInfoFromPipeEx();
-	return 0;
-}
-
-int LuaIPCUtil::Start(lua_State* pLuaState)
-{
-	TSAUTO();
-	TerminateMiningProcess();
-	TSDEBUG4CXX(L"After T"); 
-	long lRet = 0;
-	do
+	else if(uClientType == CLIENT_ZCASH_N_64)
 	{
-		const char* pParams = lua_tostring(pLuaState, 2);
-		CComBSTR bstrParams;
-		LuaStringToCComBSTR(pParams,bstrParams);
+		pClient = new CClientZcashN(uClientType);
+	}
+	else if(uClientType == CLIENT_ZCASH_A_64)
+	{
+		pClient = new CClientZcashA(uClientType);
+	}
+	else if(uClientType == CLIENT_XMR_N_64 
+		|| uClientType == CLIENT_XMR_A_64
+		|| uClientType == CLIENT_XMR_A_32
+		|| uClientType == CLIENT_XMR_C_32
+		)
+	{
+		pClient = new CClientXmr(uClientType);
+	}
+	else if(uClientType == CLIENT_UT_C_64)
+	{
+		pClient = new CClientUt(uClientType);
+	}
+	return pClient;
+}
 
-		SECURITY_ATTRIBUTES sa = {0};  
-		sa.nLength = sizeof(sa);  
-		sa.bInheritHandle = TRUE;  
-		//产生一个用于stdin的管道，得到两个HANDLE:  m_hStdInRead用于子进程读数据，m_hStdInWrite用于主程序写入数据     
-		if (!CreatePipe(&m_hStdInRead, &m_hStdInWrite, &sa, 0))  
+BOOL LuaIPCUtil::StartProcess(std::wstring wParam, HANDLE & hWorkProcess, HANDLE & hWorkStdOutRead)
+{
+	BOOL bRet = FALSE;
+	SECURITY_ATTRIBUTES sa = {0};  
+	sa.nLength = sizeof(sa);  
+	sa.bInheritHandle = TRUE;  
+
+	//定义句柄: 构成stdin管道的两端句柄    
+	HANDLE	hStdInRead;         //子进程用的stdin的读入端    
+	HANDLE  hStdInWrite;        //主程序用的stdin的写入端    
+
+	//定义句柄: 构成stdout管道的两端句柄    
+	HANDLE  hStdOutRead;     ///主程序用的stdout的读入端    
+	HANDLE  hStdOutWrite;    ///子进程用的stdout的写入端  
+	do 
+	{
+		if (!CreatePipe(&hStdInRead, &hStdInWrite, &sa, 0))  
+		{	
+			TSDEBUG4CXX(L"create stdin pipe failed, last error = "<< GetLastError()); 
 			break;  
+		}
 
-		//产生一个用于stdout的管道，得到两个HANDLE:  m_hStdOutRead用于主程序读出数据，m_hStdOutWrite用于子程序写入数据    
-		if (!CreatePipe(&m_hStdOutRead, &m_hStdOutWrite, &sa, 0))  
-			break; 
+		//产生一个用于stdout的管道，得到两个HANDLE:  hStdOutRead用于主程序读出数据，hStdOutWrite用于子程序写入数据    
+		if (!CreatePipe(&hStdOutRead, &hStdOutWrite, &sa, 0))  
+		{	
+			TSDEBUG4CXX(L"create stdout pipe failed, last error = "<< GetLastError()); 
+			break;  
+		}
+
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 
 		ZeroMemory(&si, sizeof(STARTUPINFO));  
 		si.cb = sizeof(STARTUPINFO);  
 		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;  //允许设置showwindow和设置新进程的输入输出句柄参数  
-		si.hStdOutput = m_hStdOutWrite;     //意思是：子进程的stdout输出到m_hStdOutWrite    
-		si.hStdError = m_hStdOutWrite;      //意思是：子进程的stderr输出到m_hStdOutWrite    
-		si.hStdInput = m_hStdInRead;  
+		si.hStdOutput = hStdOutWrite;     //意思是：子进程的stdout输出到hStdOutWrite    
+		si.hStdError = hStdOutWrite;      //意思是：子进程的stderr输出到hStdOutWrite    
+		si.hStdInput = hStdInRead;  
 		si.wShowWindow = SW_HIDE;
 
 		ZeroMemory(&pi, sizeof(pi));
-		TSDEBUG4CXX(L"strCmdLine = "<< bstrParams.m_str); 
+		TSDEBUG4CXX(L"strCmdLine = "<< wParam.c_str()); 
 		::SetErrorMode(::SetErrorMode(0)|SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX|SEM_NOGPFAULTERRORBOX|SEM_NOALIGNMENTFAULTEXCEPT);
-		if(!CreateProcess( NULL,(LPTSTR)bstrParams.m_str, NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
+		if(!CreateProcess( NULL,(LPTSTR)wParam.c_str(), NULL, NULL, TRUE, NULL, NULL, NULL,&si,	&pi ))
 		{
 			TSDEBUG4CXX(L"create process failed, last error = "<< GetLastError()); 
-			break; 
+			break;
 		}
-		m_hWorkProcess = pi.hProcess;
+		hWorkProcess = pi.hProcess;
+		hWorkStdOutRead = hStdOutRead;
+		bRet = TRUE;
+	} while (false);
+	CLOSE_HANDLE(hStdInRead);
+	CLOSE_HANDLE(hStdInWrite);
+	CLOSE_HANDLE(hStdOutWrite);
+	if (!bRet)
+	{
+		CLOSE_HANDLE(hStdOutRead);
+	}
+	return bRet;
 
-		m_hPipeThread = (HANDLE)_beginthreadex(NULL, 0, PipeProc, NULL, 0, NULL);
-		lRet = 1;
-	}while(FALSE);
+}
 
-	lua_pushboolean(pLuaState, lRet);
-	return 1;
+#define DELETE_WORKINST() \
+{\
+	{\
+		writeLock wrlock(m_rwmutex);\
+		if (NULL != pwi)\
+		{\
+			delete pwi;\
+			pwi = NULL; \
+		}\
+		WorkInstMapIter iter = m_mapWorkInst.find(wi_old.uMode);\
+		if (iter != m_mapWorkInst.end()) {\
+			iter->second = NULL;\
+		}\
+	}\
+}
+
+UINT WINAPI LuaIPCUtil::Run(PVOID pArg)
+{
+	WORKINST* pwi = (WORKINST *)pArg;
+	WORKINST wi_old = {0};
+	{
+		readLock rdLock(m_rwmutex);
+		memcpy(&wi_old, pwi, sizeof(WORKINST));
+	}
+	CMinerClient *pClient = NULL;
+	HANDLE hWorkStdOutRead = NULL;
+	HANDLE hWorkProcess = NULL;
+	
+	int iExitCode = 0;
+	do 
+	{
+		TSDEBUG4CXX(L"create client type = "<< wi_old.uClientType); 
+		pClient = CreateClient(wi_old.uClientType);
+		if (NULL == pClient)
+		{
+			DELETE_WORKINST();
+			TSDEBUG(L"Create client failed, mode %u thread exit", wi_old.uMode); 
+			break;
+		}
+
+		BOOL bStart = StartProcess(wi_old.wszParam, hWorkProcess, hWorkStdOutRead);
+		if (!bStart)
+		{
+			DELETE_WORKINST();
+			pClient->OnAutoExit(-1);
+			TSDEBUG(L"Start process failed, mode %u thread exit", wi_old.uMode); 
+			break;
+		}
+
+		while(true)
+		{
+			WORKINST wi_new = {0};
+			{
+				//XMLib::CriticalSectionLockGuard lck(m_cs);
+				readLock rdLock(m_rwmutex);
+				memcpy(&wi_new, pwi, sizeof(WORKINST));
+			}
+			if (wi_new.bQuit)
+			{
+				pClient->TerminateClientInstance();
+				Sleep(SLEEP_TIME);
+				if (hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(hWorkProcess, 0))
+				{
+					TerminateProcess(hWorkProcess,-3);
+				}
+				TSDEBUG(L"quit command, mode %u thread exit", wi_new.uMode); 
+				break;
+			}
+			//TSDEBUG(L"uStartCnt old = %u, new = %u", wi_old.uStartCnt, wi_new.uStartCnt); 
+			if (wi_new.uClientType != wi_old.uClientType 
+				|| wi_new.uStartCnt != wi_old.uStartCnt 
+				)
+			{
+				TSDEBUG(L"param change restart"); 
+				pClient->TerminateClientInstance();
+				Sleep(SLEEP_TIME);
+				if (hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(hWorkProcess, 0))
+				{
+					TerminateProcess(hWorkProcess,-2);
+				}
+				CLOSE_HANDLE(hWorkProcess);
+				CLOSE_HANDLE(hWorkStdOutRead);
+				delete pClient;
+				pClient = NULL;
+				pClient = CreateClient(wi_new.uClientType);
+				if (NULL == pClient)
+				{
+					DELETE_WORKINST();
+					TSDEBUG(L"create new client %u failed, mode %u thread exit", wi_new.uClientType, wi_new.uMode); 
+					break;
+				}
+				bStart = StartProcess(wi_new.wszParam, hWorkProcess,hWorkStdOutRead);
+				if (!bStart)
+				{
+					DELETE_WORKINST();
+					pClient->OnAutoExit(-1);
+					TSDEBUG(L"Start process %u failed, mode %u thread exit", wi_new.uClientType, wi_new.uMode); 
+					break;
+				}
+				memcpy(&wi_old, &wi_new, sizeof(WORKINST));
+				Sleep(SLEEP_TIME);
+			}
+			DWORD dwExitCode = 0; 
+			if (GetExitCodeProcess(hWorkProcess,&dwExitCode))
+			{
+				if (dwExitCode != STILL_ACTIVE)
+				{
+					DELETE_WORKINST();
+					pClient->OnAutoExit(dwExitCode);
+					TSDEBUG4CXX(L"Work process exit,dwExitCode = " << dwExitCode); 
+					break;
+				}
+			}
+			char szPipeOutBuffer[PIPE_BUFFER_SIZE+1] = {0};  
+			DWORD dwTotalBytesAvail = 0;  
+			PeekNamedPipe(hWorkStdOutRead, 0, 0, NULL, &dwTotalBytesAvail, NULL);
+			if (dwTotalBytesAvail > 0)
+			{
+				DWORD dwBytesRead = 0;
+				while (ReadFile(hWorkStdOutRead, szPipeOutBuffer, dwTotalBytesAvail > PIPE_BUFFER_SIZE ? PIPE_BUFFER_SIZE : dwTotalBytesAvail, &dwBytesRead, 0))
+				{
+					PeekNamedPipe(hWorkStdOutRead, 0, 0, NULL, &dwTotalBytesAvail, NULL);
+					if (0 == dwTotalBytesAvail)
+						break;
+				}
+				pClient->ProcessString(szPipeOutBuffer);
+			}
+			Sleep(SLEEP_TIME);
+		}
+	} while (false);
+	
+	if (NULL != pClient)
+	{
+		delete pClient;
+		pClient = NULL;
+	}
+	CLOSE_HANDLE(hWorkProcess);
+	CLOSE_HANDLE(hWorkStdOutRead);
+	DELETE_WORKINST();
+	//{
+	//	writeLock wrlock(m_rwmutex);
+	//	if (NULL != pwi)
+	//	{
+	//		delete pwi;
+	//		pwi = NULL; 
+	//		TSDEBUG(L"delete memory");
+	//	}
+	//	WorkInstMapIter iter = m_mapWorkInst.find(wi_old.uMode);
+	//	iter->second = NULL;
+	//}
+	return 0;
+}
+
+//UINT WINAPI WorkThreadProc(PVOID pArg)
+//{
+//	//LuaIPCUtil::Run(pArg);
+//	return 0;
+//}
+
+int LuaIPCUtil::StartModeClient(lua_State* pLuaState)
+{
+	TSAUTO();
+	UINT uMode = (UINT)lua_tointeger(pLuaState, 2);
+	UINT uClientType = (DWORD)lua_tointeger(pLuaState, 3);
+	const char* utf8Params = lua_tostring(pLuaState, 4);
+	std::wstring wstrParam = ultra::_UTF2T(utf8Params);
+	TSDEBUG(L"m_mapWorkInst size = %u ",m_mapWorkInst.size());
+	do 
+	{
+		WorkInstMapIter iter = m_mapWorkInst.find(uMode);
+		if (iter == m_mapWorkInst.end()) {
+			break;
+		}
+		WORKINST wi = {0};
+		{
+			//XMLib::CriticalSectionLockGuard lck(m_cs);
+			readLock rdLock(m_rwmutex);
+			if (iter->second == NULL)
+			{
+				m_mapWorkInst.erase(iter);
+				break;
+			}
+			TSDEBUG(L"has memory");
+			memcpy(&wi,iter->second, sizeof(WORKINST));
+		}
+		wi.uClientType = uClientType;
+		wi.uStartCnt++;
+		wcscpy_s(wi.wszParam,1024-1,wstrParam.c_str());
+		//TSDEBUG(L"uStartCnt = %u", wi.uStartCnt); 
+		{
+			//XMLib::CriticalSectionLockGuard lck(m_cs);
+			writeLock wrlock(m_rwmutex);
+			memcpy(iter->second, &wi, sizeof(WORKINST));
+		}
+		return 0;
+		
+	} while (FALSE);
+
+	WORKINST* pwi = new WORKINST();
+	pwi->uMode = uMode;
+	pwi->uStartCnt = 0;
+	pwi->uClientType = uClientType;
+	wcscpy_s(pwi->wszParam,1024-1,wstrParam.c_str());
+	pwi->bQuit = FALSE;
+	m_mapWorkInst.insert(std::make_pair(uMode, pwi));
+	HANDLE hThread = (HANDLE)_beginthreadex(NULL, 0, LuaIPCUtil::Run,  pwi, 0, NULL);
+	return 0;
+}
+
+int LuaIPCUtil::QuitMode(lua_State* pLuaState)
+{
+	TSAUTO();
+	UINT uMode = (UINT)lua_tointeger(pLuaState, 2);
+	WorkInstMapIter iter = m_mapWorkInst.find(uMode);
+	if (iter == m_mapWorkInst.end()) {
+		return 0;
+	}
+	{
+		writeLock wrlock(m_rwmutex);
+		if (iter->second != NULL)
+		{
+			iter->second->bQuit = TRUE;
+		}
+	}
+	m_mapWorkInst.erase(iter);
+	return 0;
 }
 
 int LuaIPCUtil::Quit(lua_State* pLuaState)
 {
 	TSAUTO();
-	
-	if (g_pClient)
+	for (WorkInstMapIter iter = m_mapWorkInst.begin() ;iter != m_mapWorkInst.end();++iter)
 	{
-		TSDEBUG4CXX(L"Terminate all client"); 
-		g_pClient->TerminateAllClientInstance();
+		{
+			//XMLib::CriticalSectionLockGuard lck(m_cs);
+			writeLock wrlock(m_rwmutex);
+			if (iter->second != NULL)
+			{
+				iter->second->bQuit = TRUE;
+				TSDEBUG(L"Quit mode %u ",iter->second->uMode);
+			}
+			
+		}
 	}
-	if (m_hWorkProcess != NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hWorkProcess, 0))
-	{
-		TSDEBUG4CXX(L"Terminate work process"); 
-		TerminateProcess(m_hWorkProcess,-2);
-	}
-	if ((m_hPipeThread !=NULL && WAIT_OBJECT_0 != ::WaitForSingleObject(m_hPipeThread, 0)))
-	{
-		TSDEBUG4CXX(L"Terminate pipe thread"); 
-		TerminateThread(m_hPipeThread,-2);
-	}
-	TSDEBUG4CXX(L"Terminate finish");
-	Clear();
+	m_mapWorkInst.clear();
+	TSDEBUG(L"m_mapWorkInst size = %u ",m_mapWorkInst.size());
 	return 0;
 }
 
-
-int LuaIPCUtil::Pause(lua_State* pLuaState)
+int LuaIPCUtil::ForceQuit(lua_State* pLuaState)
 {
-	BOOL bRet = 0;
-	if(fnNtSuspendProcess)
-	{
-		fnNtSuspendProcess(m_hWorkProcess);  
-		bRet = 1;
-	}
-	lua_pushboolean(pLuaState, bRet);
-	return 1;
+	TerminateAllClient();
+	return 0;
 }
 
-int LuaIPCUtil::Resume(lua_State* pLuaState)
+void LuaIPCUtil::TerminateAllClient()
 {
-	BOOL bRet = 0;
-	if(fnNtResumeProcess)
+	TCHAR *tszClientName[] = {
+		_T("Share4Peer.exe"),
+		_T("Share4Peer.exe"),
+		_T("Share4PeerZN.exe"),
+		_T("Share4PeerZA.exe"),
+		_T("Share4PeerXA.exe"), 
+		_T("Share4PeerXA64.exe"), 
+		_T("Share4PeerXN64.exe"), 
+		_T("Share4PeerXC.exe"),
+		_T("Share4PeerUC.exe"),
+		_T("ShareCout.exe"),
+	};
+	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnap != INVALID_HANDLE_VALUE)
 	{
-		fnNtResumeProcess(m_hWorkProcess); 
-		bRet = 1;
+		PROCESSENTRY32 pe;
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		BOOL bResult = ::Process32First(hSnap, &pe);
+		while (bResult)
+		{
+			for (int i = 0; i < ARRAYSIZE(tszClientName); i++)
+			{
+				if(_tcsicmp(pe.szExeFile, tszClientName[i]) == 0 && pe.th32ProcessID != 0)
+				{
+					HANDLE hProcess = ::OpenProcess(PROCESS_TERMINATE, FALSE, pe.th32ProcessID);
+					::TerminateProcess(hProcess, 99);
+				}
+			}
+			bResult = ::Process32Next(hSnap, &pe);
+		}
+		::CloseHandle(hSnap);
 	}
-	lua_pushboolean(pLuaState, bRet);
-	return 1;
-}
-
-int LuaIPCUtil::IsWorkProcessRunning(lua_State* pLuaState)
-{
-	long lRet = 1;
-	if (NULL == m_hWorkProcess  || WAIT_OBJECT_0 == ::WaitForSingleObject(m_hWorkProcess, 0))
-	{
-		lRet = 0;
-	}
-	lua_pushboolean(pLuaState, lRet);
-	return 1;
-}
-
-void LuaIPCUtil::TerminateMiningProcess()
-{
-	g_pClient->TerminateAllClientInstance();
 }
 
 BOOL LuaIPCUtil::EnableDebugPrivilege()     
@@ -367,14 +513,4 @@ BOOL LuaIPCUtil::EnableDebugPrivilege()
 		return FALSE;     
 	}     
 	return TRUE;     
-}
-
-int LuaIPCUtil::SetMinerType(lua_State* pLuaState)
-{
-	UINT uMinerType = (DWORD)lua_tointeger(pLuaState, 2);
-	if (g_pClient)
-	{
-		g_pClient->SetMinerType(uMinerType);
-	}
-	return 0;
 }

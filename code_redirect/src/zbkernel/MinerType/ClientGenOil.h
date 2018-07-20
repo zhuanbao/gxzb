@@ -4,17 +4,17 @@
 class CClientGenOil : public CMinerClient
 {
 public:
-	CClientGenOil(void);
+	CClientGenOil(UINT uClientType);
 	~CClientGenOil(void);
 public:
 	void ProcessString(const char *szBuffer);
-	void TerminateAllClientInstance();
+	void TerminateClientInstance();
 	void OnAutoExit(DWORD dwExitCode);
 private:
 	bool IsDebug();
 	void LogString(const char *szBuffer);
 	void RegexString(const char *szBuffer);
-	void PostWndMsg(WPARAM wParam, LPARAM lParam);
+	void PostWndMsg(int iMsgType, int iDetail);
 	void RetSet();
 	void PostErrorMsg(const char *szBuffer, const char *szBeg);
 private:
@@ -22,5 +22,6 @@ private:
 	int  m_DagProgress;
 	//为了完整匹配输出，把上一个被截断的\r\n以后的再留到下一次
 	std::string m_strLastLeft;
+	UINT m_uClientType;
 };
 

@@ -10,10 +10,11 @@
 #define LOGCFG_PATH _T("C:\\GXZB_CONFIG\\Share4Peer.ini")
 #define CLIENT_ZCASHA_NAME _T("Share4PeerZA.exe")
 
-CClientZcashA::CClientZcashA(void)
+CClientZcashA::CClientZcashA(UINT uClientType)
 {
 	m_hMsgWnd = FindWindow(LUA_MSG_WND_CALSS, NULL);
 	m_strLastLeft = "";
+	m_uClientType = uClientType;
 }
 
 CClientZcashA::~CClientZcashA(void)
@@ -34,7 +35,7 @@ bool CClientZcashA::IsDebug()
 #endif
 }
 
-void CClientZcashA::TerminateAllClientInstance()
+void CClientZcashA::TerminateClientInstance()
 {
 	HANDLE hSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE)
@@ -64,14 +65,19 @@ void CClientZcashA::LogString(const char *szBuffer)
 	}
 }
 
-void CClientZcashA::PostWndMsg(WPARAM wParam, LPARAM lParam)
+void CClientZcashA::PostWndMsg(int iMsgType, int iDetail)
 {
-	PostMessageA(m_hMsgWnd, WM_ZCASH_A_MSG, wParam, lParam);
+	CLIENTMSG *pInfo = new CLIENTMSG();
+	pInfo->uClientType = m_uClientType;
+	pInfo->iMsgType = iMsgType;
+	pInfo->iDetail = iDetail;
+
+	PostMessageA(m_hMsgWnd, WM_CLIENT_MSG, (WPARAM)pInfo, (LPARAM)0);
 }
 
 void CClientZcashA::OnAutoExit(DWORD dwExitCode)
 {
-	PostWndMsg(WP_ZCASH_A_AUTOEXIT, dwExitCode);
+	PostWndMsg(MSG_TYPE_AUTOEXIT, dwExitCode);
 }
 
 void CClientZcashA::RetSet()
@@ -142,7 +148,7 @@ void CClientZcashA::RegexString(const char *szBuffer)
 					ssTemp >> iGPUTemp;
 				}
 				LONG lGPUTempInfo = MAKELONG(iGPUTemp,iGPUID);
-				PostWndMsg(WP_ZCASH_A_GPUTEMP, lGPUTempInfo);
+				PostWndMsg(MSG_TYPE_UNKNOW, lGPUTempInfo);
 				TSDEBUG4CXX(L"[RegexString]: GPU"<<iGPUID<<L" "<<iGPUTemp<<L"C");
 			}
 		}
@@ -154,7 +160,7 @@ void CClientZcashA::RegexString(const char *szBuffer)
 	exp.assign("ZEC: Share accepted ([0-9]+ ms)", boost::regex::icase);
 	if (boost::regex_match(strBuffer,exp))
 	{
-		PostWndMsg(WP_ZCASH_A_SHARE, 0);
+		PostWndMsg(MSG_TYPE_SHARE, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Accepted share");
 	}
 	//当前算力
@@ -186,7 +192,7 @@ void CClientZcashA::RegexString(const char *szBuffer)
 	} 
 	if (iCurrentSpeed >= 0)
 	{
-		PostWndMsg(WP_ZCASH_A_SPEED, iCurrentSpeed);
+		PostWndMsg(MSG_TYPE_SPEED, iCurrentSpeed);
 		TSDEBUG4CXX(L"[RegexString]: " << L"uCurrentSpeed = "<< iCurrentSpeed);
 		return;
 	}
@@ -198,7 +204,7 @@ void CClientZcashA::RegexString(const char *szBuffer)
 	//2:"ZEC: 08/25/17-09:57:15 - New job from"
 	if (boost::icontains(strBuffer,"ZEC: Stratum - Connected") || boost::icontains(strBuffer,"- New job from"))
 	{
-		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 0);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 0);
 		TSDEBUG4CXX(L"[RegexString]: " << L"Connect server success");
 	}
 	//处理错误：
@@ -209,32 +215,32 @@ void CClientZcashA::RegexString(const char *szBuffer)
 	//	                           No AMD OPENCLGPUs found, exit
 	if (boost::icontains(strBuffer,"AMD OpenCL platform not found") || boost::icontains(strBuffer,"No AMD OPENCLGPUs found, exit"))
 	{
-		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 1);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 1);
 
 		PostErrorMsg(strBuffer.c_str(),"amd opencl platform not found");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot find AMD Gpu");
 	}
 	else if (boost::icontains(strBuffer,"ZEC: No pools specified"))
 	{
-		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 2);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 2);
 		PostErrorMsg(strBuffer.c_str(),"zec: no pools specified");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Invalid argument");
 	}
 	else if (boost::icontains(strBuffer,"ZEC: Stratum - Cannot connect to"))
 	{	
-		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 1);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 1);
 		PostErrorMsg(strBuffer.c_str(),"zec: stratum - cannot connect to");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot connect pool");
 	}
 	else if(boost::icontains(strBuffer,"Cannot resolve"))
 	{
-		PostWndMsg(WP_ZCASH_A_CONNECT_POOL, 2);
+		PostWndMsg(MSG_TYPE_CONNECT_POOL, 2);
 		PostErrorMsg(strBuffer.c_str(),"cannot resolve");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Cannot resolve");
 	}
 	else if(boost::icontains(strBuffer,"Error:"))
 	{
-		PostWndMsg(WP_ZCASH_A_ERROR_INFO, 99);
+		PostWndMsg(MSG_TYPE_ERROR_INFO, 99);
 		PostErrorMsg(strBuffer.c_str(),"error");
 		TSDEBUG4CXX(L"[RegexString]: " << L"Some error Info");
 	}
