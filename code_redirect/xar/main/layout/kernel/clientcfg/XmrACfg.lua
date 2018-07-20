@@ -86,7 +86,7 @@ function GetPoolParam(nPoolIndex)
 end
 
 function GetClientParam()
-	if g_tabClientInfo["tabSpeedControlParam"]["bRun"] then
+	if not g_tabClientInfo["tabSpeedControlParam"]["bRun"] then
 		return
 	end
 	local tabPoolParam = g_tabClientInfo["tabPoolParam"]
