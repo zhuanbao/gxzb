@@ -218,7 +218,7 @@ function DoUpdating(tabNewVer)
 end
 
 function CheckVersion(nRet, strCfgPath)
-	--strCfgPath = "C:\\Users\\Public\\Share4Money\\ServerConfig - 副本.dat"
+	--strCfgPath = "E:\\github_etherun\\gxzbsvn\\trunk\\code_redirect\\cfg\\ServerConfig.dat"
 	local objChecking = g_objTree:GetUIObject("CheckUpdateWnd.Cehcking")
 	objChecking:SetVisible(false)
 

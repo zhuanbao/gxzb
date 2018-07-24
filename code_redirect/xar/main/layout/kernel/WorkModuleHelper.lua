@@ -277,19 +277,17 @@ function WorkModuleHelper:GetWorkerInfo(bRetry ,funResult)
 				UIInterface:UpdateUserBalance()
 			end	
 		end
-		if tabInfo["data"]["status"] ~= 1 then
+		if type(tabInfo["data"]["status"]) == "number" and tabInfo["data"]["status"] ~= 1 then
 			if self:CheckIsBinded() then
 				self:UnBindingClientFromServer()
 				ApiInterfaceModule:UpdateWorkerInfo(nil, 0)
-				ApiInterfaceModule._tabGetWorkerInfo = nil
-				ApiInterfaceModule._nLastGetWorkerTime = 0
 				return
 			end
 		end
 		if type(tabInfo["data"]["rate"]) == "table" then
 			self:UpdateSpeedRate(tabInfo["data"]["rate"])
 		end
-		ApiInterfaceModule:UpdateWorkerInfo(tabInfo, tFunctionHelper.GetCurrentServerTime())
+		--ApiInterfaceModule:UpdateWorkerInfo(tabInfo, tFunctionHelper.GetCurrentServerTime())
 		if type(funResult) == "function" then
 			funResult(tabInfo)
 		end
@@ -324,15 +322,12 @@ function WorkModuleHelper:PushCalcInfo(nMiningSpeed)
 			if self:CheckIsBinded() then
 				self:UnBindingClientFromServer()
 				ApiInterfaceModule:UpdateWorkerInfo(nil, 0)
-				ApiInterfaceModule._tabGetWorkerInfo = nil
-				ApiInterfaceModule._nLastGetWorkerTime = 0
 				return
 			end
 		end
 		if type(tabInfo["data"]["rate"]) == "table" then
 			self:UpdateSpeedRate(tabInfo["data"]["rate"])
-		end	
-		ApiInterfaceModule:UpdateWorkerInfo(tabInfo, tFunctionHelper.GetCurrentServerTime())
+		end
 		MainWorkModule:UpdatePriority(tabInfo["data"]["efficiency"], tabInfo["data"]["forceplist"])
 		if type(tabInfo["data"]["efficiency"]) == "table" then
 			local tabPriorityNew = tFunctionHelper.ConvertTableStrToNum(tabInfo["data"]["efficiency"])
@@ -343,6 +338,13 @@ function WorkModuleHelper:PushCalcInfo(nMiningSpeed)
 			MainWorkModule:UpdatePriority()
 		end
 		MainWorkModule:UpdateSvrPoolCfg(tabInfo["data"]["lastCfg"])
+		local tabUpdateGetWorkerInfo = {}
+		tabUpdateGetWorkerInfo["rtn"] = tabInfo["rtn"] 
+		tabUpdateGetWorkerInfo["data"] = {}
+		tabUpdateGetWorkerInfo["data"]["balance"] = tabInfo["data"]["balance"]
+		tabUpdateGetWorkerInfo["data"]["lastCfg"] = tabInfo["data"]["lastCfg"]
+		tabUpdateGetWorkerInfo["data"]["rate"] = tabInfo["data"]["rate"]
+		ApiInterfaceModule:UpdateWorkerInfo(tabUpdateGetWorkerInfo, tFunctionHelper.GetCurrentServerTime())
 		
 		--[[
 		tClientProc.UpdateSpeedRate(tabInfo["data"]["rate"])

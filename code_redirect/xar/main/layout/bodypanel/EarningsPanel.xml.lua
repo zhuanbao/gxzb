@@ -30,13 +30,14 @@ end
 
 --相当于强制刷新
 function UpdateClientUnBindState(self)
+	local OwnerCtrl = self:GetOwnerControl()
 	local tEarnings = tFunctionHelper.ReadConfigFromMemByKey("tEarnings") or {}
     tEarnings["hour24"] = nil
     tEarnings["h24"] = nil
     tEarnings["day30"] = nil
     tEarnings["d30"] = nil
 	tFunctionHelper.SaveConfigToFileByKey("tEarnings")
-	UpdateAddIncome(self, nil)
+	UpdateAddIncome(OwnerCtrl, nil)
 end
 
 local xylineFailedBitmap24 = nil
@@ -379,7 +380,7 @@ function UpdateAddIncome(self, tabIncome)
 	local ObjStart= self:GetControlObject("EarningsPanel.AddIncome.Start")
 	local ObjNum= self:GetControlObject("EarningsPanel.AddIncome.Num")
 	local ObjEnd= self:GetControlObject("EarningsPanel.AddIncome.End")
-	
+
 	local nAddIncome = 0
 	if type(tabIncome) == "table" then
 		for Idx=1, #tabIncome do

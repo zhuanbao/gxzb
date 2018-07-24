@@ -448,7 +448,18 @@ function ApiInterfaceModule:QueryWorkerInfo(funResult)
 	strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
 	TipLog("[QueryWorkerInfo] strUrl = " .. strUrl)
 	
-	self:GetServerJsonData(strUrl, funResult)
+	local function funCallBack(bSuccess, tabInfo)
+		if bSuccess then
+			self:UpdateWorkerInfo(tabInfo, tFunctionHelper.GetCurrentServerTime())
+			funResult(true,tabInfo)
+			--这里把解绑状态置nil,不能用缓存的，否则会出问题
+			tabInfo["data"]["status"] = nil
+		else	
+			funResult(false)
+		end
+	end
+	
+	self:GetServerJsonData(strUrl, funCallBack)
 end
 
 --上报算力
