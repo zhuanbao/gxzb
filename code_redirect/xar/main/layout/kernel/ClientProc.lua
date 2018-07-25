@@ -345,6 +345,7 @@ function StartModeCurrentClient(nMode)
 		StartModeNextClient(nMode)
 		return
 	end
+	g_tabWorkMode[nMode]["bWorking"] = true
 	local nModeClientIdx = g_tabWorkMode[nMode]["nModeClientIdx"] 
 	local nModeClient = g_tabWorkMode[nMode]["tabClient"][nModeClientIdx]
 	SupportClientType:SetCrashDebugFlag(nModeClient)

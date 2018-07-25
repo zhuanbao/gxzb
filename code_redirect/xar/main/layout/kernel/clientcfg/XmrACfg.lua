@@ -122,7 +122,8 @@ function ChangeSpeed(bMax)
 	else
 		tabNewParam = g_tabClientInfo["tabMinParam"]
 	end
-	if tabNewParam["bRun"] == g_tabClientInfo["tabSpeedControlParam"]["bRun"] then
+	if type(g_tabClientInfo["tabSpeedControlParam"]) == "table"
+		and tabNewParam["bRun"] == g_tabClientInfo["tabSpeedControlParam"]["bRun"] then
 		return false
 	end
 	return true
