@@ -39,6 +39,9 @@ local g_tabWorkMode = nil
 
 local g_MaxConnectFailCnt = 7
 
+local g_MaxRestartClient = 2
+
+
 function IsRealString(str)
 	return type(str) == "string" and str ~= ""
 end
@@ -93,7 +96,13 @@ function OnClientMsg(tParam)
 		else
 			g_tabWorkMode[nMode]["nCurConnectFailCnt"] = g_tabWorkMode[nMode]["nCurConnectFailCnt"] + 1
 			if g_tabWorkMode[nMode]["nCurConnectFailCnt"] > g_MaxConnectFailCnt then
-				StartModeClientNextPool(nMode)
+				g_tabWorkMode[nMode]["nRestartClientCnt"] = g_tabWorkMode[nMode]["nRestartClientCnt"] + 1
+				if  g_tabWorkMode[nMode]["nRestartClientCnt"] > g_MaxRestartClient then
+					g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
+					StartModeClientNextPool(nMode)
+				else
+					StartModeCurrentClient(nMode)
+				end
 			end
 		end
 	elseif nMsgType == _MsgType_AUTOEXIT then
@@ -103,7 +112,13 @@ function OnClientMsg(tParam)
 		tStatInfo.fu6 = tostring(nClient)
 		tStatInfo.fu7 = tostring(nDetail)
 		StatisticClient:SendClientErrorReport(tStatInfo)
-		StartModeNextClient(nMode)
+		g_tabWorkMode[nMode]["nRestartClientCnt"] = g_tabWorkMode[nMode]["nRestartClientCnt"] + 1
+		if  g_tabWorkMode[nMode]["nRestartClientCnt"] > g_MaxRestartClient then
+			g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
+			StartModeNextClient(nMode)
+		else
+			StartModeCurrentClient(nMode)
+		end
 	elseif nMsgType == _MsgType_ERROR_INFO then
 	
 	end	
@@ -122,6 +137,8 @@ function InitWorkMode()
 	g_tabWorkMode[1]["nLastOutputCorrectTime"] = 0
 	g_tabWorkMode[1]["nCurConnectFailCnt"] = 0
 	g_tabWorkMode[1]["OutputCorrectTimeID"] = nil
+	g_tabWorkMode[1]["nRestartClientCnt"] = 0
+	
 	g_tabWorkMode[2] = {}
 	g_tabWorkMode[2]["tabClient"] = SupportClientType:GetCpuClient() or {}
 	g_tabWorkMode[2]["bWorking"] = false
@@ -130,6 +147,7 @@ function InitWorkMode()
 	g_tabWorkMode[2]["nLastOutputCorrectTime"] = 0
 	g_tabWorkMode[2]["nCurConnectFailCnt"] = 0
 	g_tabWorkMode[2]["OutputCorrectTimeID"] = nil
+	g_tabWorkMode[2]["nRestartClientCnt"] = 0
 	InitModeClient(1)
 	InitModeClient(2)
 end
@@ -283,7 +301,7 @@ function ResetModeClientParam(nMode)
 	SupportClientType:ClearCrashDebugFlag(nModeClient)
 end
 
---3分钟还没有纠错 就当已经不能挖矿了
+--90秒还没有纠错 就当已经不能挖矿了
 function StartOutputCorrectimer(nMode)
 	if g_tabWorkMode[nMode]["OutputCorrectTimeID"] then
 		timeMgr:KillTimer(g_tabWorkMode[nMode]["OutputCorrectTimeID"])
@@ -294,7 +312,14 @@ function StartOutputCorrectimer(nMode)
 		local nCurrentTime = tipUtil:GetCurrentUTCTime()
 		if nCurrentTime - g_tabWorkMode[nMode]["nLastOutputCorrectTime"] > 1.5*60 then
 			TipLog("[StartOutputCorrectimer] output time out, try to restart")
-			StartModeNextClient(nMode) 
+			--StartModeNextClient(nMode) 
+			g_tabWorkMode[nMode]["nRestartClientCnt"] = g_tabWorkMode[nMode]["nRestartClientCnt"] + 1
+			if  g_tabWorkMode[nMode]["nRestartClientCnt"] > g_MaxRestartClient then
+				g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
+				StartModeNextClient(nMode)
+			else
+				StartModeCurrentClient(nMode)
+			end
 		end
 	end, 1000)
 end
@@ -305,6 +330,7 @@ function StartModeClientNextPool(nMode)
 end
 
 function StartModeNextClient(nMode)
+	g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
 	ResetModeClientParam(nMode)
 	g_tabWorkMode[nMode]["nModeClientIdx"] = g_tabWorkMode[nMode]["nModeClientIdx"]+1
 	local nModeClientIdx = g_tabWorkMode[nMode]["nModeClientIdx"]
@@ -314,6 +340,7 @@ function StartModeNextClient(nMode)
 		StopModeClient(nMode)
 		g_tabWorkMode[nMode]["bWorking"] = false
 		g_tabWorkMode[nMode]["nHashSpeed"] = 0
+		g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
 		g_tabWorkMode[nMode]["nModeClientIdx"] = 0
 		g_tabWorkMode[nMode]["tabClientData"] = nil
 		InitModeClient(nMode)
@@ -397,6 +424,7 @@ function QuitAllMode()
 	for nMode=1, #g_tabWorkMode do
 		g_tabWorkMode[nMode]["bWorking"] = false
 		g_tabWorkMode[nMode]["nHashSpeed"] = 0
+		g_tabWorkMode[nMode]["nRestartClientCnt"] = 0
 		ResetModeClientParam(nMode)
 	end
 end
