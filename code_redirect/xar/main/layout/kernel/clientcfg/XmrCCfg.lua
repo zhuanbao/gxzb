@@ -28,9 +28,9 @@ function GetCfgTable(strWorkID)
 	tabCfg["retry-pause"] = 5
 	tabCfg["pools"] = {}
 	tabCfg["pools"][1] = {}
-	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["host"]
-	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["account"]
-	tabCfg["pools"][1]["pass"] = strWorkID
+	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["url"]
+	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["user"]
+	tabCfg["pools"][1]["pass"] = g_tabClientInfo["tabPoolParam"]["pass"]
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
 	tabCfg["pools"][1]["variant"] = -1
@@ -70,8 +70,20 @@ function GetPoolParam(nPoolIndex)
 		if type(tabPoolItem) == "table" then
 			if IsRealString(tabPoolItem["host"]) then
 				g_tabClientInfo["tabPoolParam"] = {}
-				g_tabClientInfo["tabPoolParam"]["host"] = tabPoolItem["host"]
-				g_tabClientInfo["tabPoolParam"]["account"] = tabPoolItem["account"]
+				
+				local strAccount = tabPoolItem["account"]
+				g_tabClientInfo["tabPoolParam"]["url"] = tabPoolItem["host"]
+				local strUser = tabPoolItem["user"]
+				strUser = string.gsub(strUser,"(<account>)",strAccount)
+				strUser = string.gsub(strUser,"(<workid>)",strWorkID)
+				g_tabClientInfo["tabPoolParam"]["user"] = strUser
+				
+				local strPass = tabPoolItem["pass"]
+				strPass = string.gsub(strPass,"(<workid>)",strWorkID)
+				
+				g_tabClientInfo["tabPoolParam"]["user"] = strUser
+				g_tabClientInfo["tabPoolParam"]["pass"] = strPass
+
 			end
 		end	
 	end
@@ -163,7 +175,7 @@ function InitClient(nPlatformId)
 	g_tabClientInfo = {}
 	g_tabClientInfo["tabParam"] = {
 		["strCoinType"] = "cc",
-		["strPoolVerKey"] = "pv2",
+		["strPoolVerKey"] = "pv3",
 		["strDefaultPoolType"] = "x_cc",
 		["strPoolFileName"] = "cpcfg.json",
 		["strClientPath"] = "Share4Peer\\Share4PeerXC.exe",

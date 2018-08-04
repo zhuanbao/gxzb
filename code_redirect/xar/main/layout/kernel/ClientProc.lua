@@ -37,7 +37,7 @@ local _MsgType_ERROR_INFO = 9
 
 local g_tabWorkMode = nil
 
-local g_MaxConnectFailCnt = 7
+local g_MaxConnectFailCnt = 3
 
 local g_MaxRestartClient = 2
 
@@ -310,7 +310,7 @@ function StartOutputCorrectimer(nMode)
 	g_tabWorkMode[nMode]["nLastOutputCorrectTime"] = tipUtil:GetCurrentUTCTime()
 	g_tabWorkMode[nMode]["OutputCorrectTimeID"] = timeMgr:SetTimer(function(Itm, id)
 		local nCurrentTime = tipUtil:GetCurrentUTCTime()
-		if nCurrentTime - g_tabWorkMode[nMode]["nLastOutputCorrectTime"] > 1.5*60 then
+		if nCurrentTime - g_tabWorkMode[nMode]["nLastOutputCorrectTime"] > 2*60 then
 			TipLog("[StartOutputCorrectimer] output time out, try to restart")
 			--StartModeNextClient(nMode) 
 			g_tabWorkMode[nMode]["nRestartClientCnt"] = g_tabWorkMode[nMode]["nRestartClientCnt"] + 1
