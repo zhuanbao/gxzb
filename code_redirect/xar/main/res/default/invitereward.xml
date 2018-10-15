@@ -1,0 +1,33 @@
+﻿<XLUE>
+	<resource>
+		<bitmap id="GXZB.InviteReward.TakeCashEnter.Bkg" path="invitereward\GXZB.InviteReward.TakeCashEnter.Bkg.png" /> 
+		<bitmap id="GXZB.InviteReward.TakeCashEnter.Icon" path="invitereward\GXZB.InviteReward.TakeCashEnter.Icon.png" /> 
+		
+		<bitmap id="GXZB.InviteReward.PopUpWndEnter.Icon" path="invitereward\GXZB.InviteReward.PopUpWndEnter.Icon.png" /> 
+		<imagelist id="GXZB.InviteReward.PopUpWndEnter.Btn" vertical="0" varyblock="0" blocksize="137" image="invitereward\GXZB.InviteReward.PopUpWndEnter.Btn.png"/>
+			<texture id="GXZB.InviteReward.PopUpWndEnter.Btn.normal"  imagelist="GXZB.InviteReward.PopUpWndEnter.Btn" index="1" />
+			<texture id="GXZB.InviteReward.PopUpWndEnter.Btn.disable"  imagelist="GXZB.InviteReward.PopUpWndEnter.Btn" index="2" />
+		
+		<texture id="GXZB.InviteRewardInfo.Bkg" image="invitereward\GXZB.InviteRewardInfo.Bkg.png" />
+		<texture id="GXZB.InviteRewardInfo.Arrow.Down" image="invitereward\GXZB.InviteRewardInfo.Arrow.Down.png" /> 
+		<texture id="GXZB.InviteRewardInfo.Arrow.Up" image="invitereward\GXZB.InviteRewardInfo.Arrow.Up.png" /> 
+		<texture id="GXZB.InviteRewardInfo.Btn.Close" image="invitereward\GXZB.InviteRewardInfo.Btn.Close.png" /> 
+		<bitmap id="GXZB.InviteRewardInfo.Form" path="invitereward\GXZB.InviteRewardInfo.Form.png" /> 
+		<bitmap id="GXZB.InviteRewardInfo.Rule" path="invitereward\GXZB.InviteRewardInfo.Rule.png" /> 
+		<bitmap id="GXZB.InviteRewardInfo.Title" path="invitereward\GXZB.InviteRewardInfo.Title.png" /> 
+		<texture id="GXZB.InviteRewardInfo.TextBottom" type="NineInOne" image="invitereward\GXZB.InviteRewardInfo.TextBottom.png" />
+		<texture id="GXZB.InviteRewardInfo.TextBottom2" type="NineInOne" image="invitereward\GXZB.InviteRewardInfo.TextBottom2.png" />
+		<texture id="GXZB.InviteRewardInfo.CopySuccess" image="invitereward\GXZB.InviteRewardInfo.CopySuccess.png" />
+
+		<imagelist id="GXZB.InviteRewardInfo.Btn.Copy" vertical="0" varyblock="0" blocksize="191" image="invitereward\GXZB.InviteRewardInfo.Btn.Copy.png"/>
+			<texture id="GXZB.InviteRewardInfo.Btn.Copy.normal"  imagelist="GXZB.InviteRewardInfo.Btn.Copy" index="1" />
+			<texture id="GXZB.InviteRewardInfo.Btn.Copy.disable"  imagelist="GXZB.InviteRewardInfo.Btn.Copy" index="2" />
+		
+		<bitmap id="GXZB.CodeBind.PopUpWnd.IconTip" path="invitereward\GXZB.CodeBind.PopUpWnd.IconTip.png" />	
+		<bitmap id="GXZB.CodeBind.PopUpWnd.IconWait" path="invitereward\GXZB.CodeBind.PopUpWnd.IconWait.png" />
+		<bitmap id="GXZB.CodeBind.PopUpWnd.IconSmile" path="invitereward\GXZB.CodeBind.PopUpWnd.IconSmile.png" />
+		<bitmap id="GXZB.CodeBind.PopUpWnd.IconCry" path="invitereward\GXZB.CodeBind.PopUpWnd.IconCry.png" />
+		<bitmap id="GXZB.CodeBind.PopUpWnd.EditBkg" path="invitereward\GXZB.CodeBind.PopUpWnd.EditBkg.png" />
+		
+	</resource>
+</XLUE>

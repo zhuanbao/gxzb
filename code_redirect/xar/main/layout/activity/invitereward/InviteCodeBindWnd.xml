@@ -1,0 +1,433 @@
+<xlue>
+	<objtreetemplate id="GXZB.InviteCodeBindTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>378</width>
+			<height>218</height>
+		</attr>
+		<obj id="InviteCodeBindWnd.Content" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>378</width>
+				<height>218</height>
+				<texture>GXZB.PopUpWnd.Bkg</texture>
+			</attr>	
+			<children>
+				<obj id="InviteCodeBindWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
+					</attr>
+					<children>
+						<obj id="InviteCodeBindWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
+						<obj id="InviteCodeBindWnd.Title" class="TextObject">
+							<attr>
+								<left>26+6</left>
+								<top>8</top>
+								<width>70</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
+								<text>共享赚宝</text>
+							</attr>
+						</obj>
+						<obj id="InviteCodeBindWnd.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close.normal</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close.normal</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close.normal</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="InviteCodeBindWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="InviteCodeBindWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="InviteCodeBindWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
+						</obj>		
+						<obj id="InviteCodeBindWnd.Desc1" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteCodeBindWnd.Desc1.Icon" class="ImageObject">
+									<attr>
+										<left>22</left>
+										<top>53</top>
+										<width>53</width>
+										<height>81</height>
+										<image>GXZB.CodeBind.PopUpWnd.IconTip</image>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc1.Text1" class="TextObject">
+									<attr>
+										<left>22+53+15</left>
+										<top>49</top>
+										<width>father.width-(22+53+15)</width>
+										<height>38</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<linegap>3</linegap>
+										<multiline>1</multiline>
+										<text>温馨提示：
+										使用邀请码，可额外获得10%的收益加成</text>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc1.Edit" class="LayoutObject">
+									<attr>
+										<left>22+53+15</left>
+										<top>49+38+7</top>
+										<width>93</width>
+										<height>24</height>
+									</attr>	
+									<children>
+										<obj id="InviteCodeBindWnd.Desc1.Edit.Line" class="ImageObject">
+											<attr>
+												<left>0</left>
+												<top>22</top>
+												<width>93</width>
+												<height>1</height>
+												<image>GXZB.CodeBind.PopUpWnd.EditBkg</image>
+											</attr>
+										</obj>
+										<obj id="InviteCodeBindWnd.Desc1.Edit.Input" class="EditObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<transparent>1</transparent>
+												<viewinset>-8, 0, 0, 0</viewinset>
+												<textcolor>BCB9B5</textcolor>
+												<font>font.text13</font>
+												<text>在此填写邀请码</text>
+												<disableime>0</disableime>
+											</attr>
+											<eventlist>
+												<event name="OnFocusChange" file="InviteCodeBindWnd.xml.lua" func="OnEditFocusChange" />
+												<!--event name="OnKeyDown" file="InviteCodeBindWnd.xml.lua" func="OnEditKeyDown" /-->
+												<event name="OnChange" file="InviteCodeBindWnd.xml.lua" func="OnEditChange" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc1.Text3" class="TextObject">
+									<attr>
+										<left>22+53+15+100+2</left>
+										<top>49+38+7</top>
+										<width>father.width-(22+53+15+100)</width>
+										<height>16</height>
+										<halign>left</halign>
+										<valign>center</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>如无邀请码请忽略~</text>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc1.Text4" class="TextObject">
+									<attr>
+										<left>22+53+15</left>
+										<top>49+38+7+16+13</top>
+										<width>father.width-(14+56+19)</width>
+										<height>60</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>FD464D</textcolor>
+										<font>font.text13</font>
+										<text>请填写正确的邀请码</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="InviteCodeBindWnd.Desc2" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteCodeBindWnd.Desc2.Icon" class="ImageObject">
+									<attr>
+										<left>14</left>
+										<top>63</top>
+										<width>57</width>
+										<height>57</height>
+										<image>GXZB.CodeBind.PopUpWnd.IconWait</image>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc2.Text1" class="TextObject">
+									<attr>
+										<left>14+57+19</left>
+										<top>61</top>
+										<width>father.width-(14+57+19)</width>
+										<height>16</height>
+										<halign>left</halign>
+										<valign>center</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>邀请码验证中......请稍后~</text>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Checking.Progress" class="TextureObject">
+									<attr>
+										<left>14+57+19</left>
+										<top>61+13+18</top>
+										<width>220</width>
+										<height>10</height>
+										<texture>GXZB.PopUpWnd.ProcessBar.Bkg</texture>
+									</attr>
+									<children>
+										<obj id="InviteCodeBindWnd.Checking.Progress.Completing" class="TextureObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>10</width>
+												<height>10</height>
+												<texture>GXZB.PopUpWnd.ProcessBar.For</texture>
+											</attr>
+										</obj>
+									</children>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc2.Text2" class="TextObject">
+									<attr>
+										<left>14+57+19</left>
+										<top>61+13+18+14</top>
+										<width>220</width>
+										<height>16</height>
+										<halign>center</halign>
+										<valign>center</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>正在验证......</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="InviteCodeBindWnd.Desc3" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteCodeBindWnd.Desc3.Icon" class="ImageObject">
+									<attr>
+										<left>14</left>
+										<top>58</top>
+										<width>56</width>
+										<height>56</height>
+										<image>GXZB.CodeBind.PopUpWnd.IconSmile</image>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc3.Text1" class="TextObject">
+									<attr>
+										<left>14+56+19</left>
+										<top>55</top>
+										<width>father.width-(14+56+19)</width>
+										<height>60</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<linegap>3</linegap>
+										<multiline>1</multiline>
+										<text>受邀成功！
+										您的赚宝收益将每天额外
+										有效期一个月，邀请好友奖励更丰厚~</text>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc3.Text2" class="TextObject">
+									<attr>
+										<left>14+56+19+143</left>
+										<top>55+21</top>
+										<width>father.width-(14+56+19)</width>
+										<height>60</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>FD464D</textcolor>
+										<font>font.text13</font>
+										<text>+10%</text>
+									</attr>
+								</obj>
+							</children>	
+						</obj>
+						<obj id="InviteCodeBindWnd.Desc4" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteCodeBindWnd.Desc4.Icon" class="ImageObject">
+									<attr>
+										<left>14</left>
+										<top>58</top>
+										<width>56</width>
+										<height>56</height>
+										<image>GXZB.CodeBind.PopUpWnd.IconCry</image>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc4.Text1" class="TextObject">
+									<attr>
+										<left>14+56+19</left>
+										<top>55</top>
+										<width>father.width-(14+56+19)</width>
+										<height>60</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<linegap>3</linegap>
+										<multiline>1</multiline>
+										<text>很抱歉，此设备已被其他用户绑定过,
+										绑定更多新设备或邀请好友都可享受推广
+										奖励哦~</text>
+									</attr>
+								</obj>
+							</children>
+						</obj>
+						<obj id="InviteCodeBindWnd.Desc5" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteCodeBindWnd.Desc5.Icon" class="ImageObject">
+									<attr>
+										<left>14</left>
+										<top>58</top>
+										<width>56</width>
+										<height>56</height>
+										<image>GXZB.CodeBind.PopUpWnd.IconCry</image>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc5.Text1" class="TextObject">
+									<attr>
+										<left>14+56+19</left>
+										<top>55</top>
+										<width>father.width-(14+56+19)</width>
+										<height>16</height>
+										<halign>left</halign>
+										<valign>top</valign>
+										<textcolor>6D5539</textcolor>
+										<font>font.text13</font>
+										<text>系统未检测到您输入的邀请码，请重新输入</text>
+									</attr>
+								</obj>
+								<obj id="InviteCodeBindWnd.Desc5.Edit" class="LayoutObject">
+									<attr>
+										<left>22+53+15</left>
+										<top>58+16+15</top>
+										<width>93</width>
+										<height>24</height>
+									</attr>	
+									<children>
+										<obj id="InviteCodeBindWnd.Desc5.Edit.Line" class="ImageObject">
+											<attr>
+												<left>0</left>
+												<top>22</top>
+												<width>93</width>
+												<height>1</height>
+												<image>GXZB.CodeBind.PopUpWnd.EditBkg</image>
+											</attr>
+										</obj>
+										<obj id="InviteCodeBindWnd.Desc5.Edit.Input" class="EditObject">
+											<attr>
+												<left>0</left>
+												<top>0</top>
+												<width>father.width</width>
+												<height>father.height</height>
+												<transparent>1</transparent>
+												<viewinset>-8, 0, 0, 0</viewinset>
+												<textcolor>BCB9B5</textcolor>
+												<font>font.text13</font>
+												<text>填写邀请码</text>
+												<disableime>0</disableime>
+											</attr>
+											<eventlist>
+												<event name="OnFocusChange" file="InviteCodeBindWnd.xml.lua" func="OnEditFocusChange" />
+												<event name="OnChange" file="InviteCodeBindWnd.xml.lua" func="OnEditChange" />
+											</eventlist>
+										</obj>
+									</children>
+								</obj>
+							</children>
+						</obj>	
+						<obj id="InviteCodeBindWnd.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>确定</Text>
+								<TextFont>font.text13</TextFont>
+								<TextColor>FFFFFF</TextColor>
+								<DisableTextColor>FFFFFF</DisableTextColor>
+								<left>father.width-102-14</left>
+								<top>father.height-36-14</top>
+								<width>102</width>
+								<height>36</height>
+								<NormalBkgID>GXZB.Btn.Confirm.normal</NormalBkgID>
+								<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
+								<DownBkgID>GXZB.Btn.Confirm.down</DownBkgID>
+								<DisableBkgID>GXZB.Btn.Cancel.normal</DisableBkgID>
+								<Enable>false</Enable>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="InviteCodeBindWnd.xml.lua" func="OnClickBtn" />
+							</eventlist>	
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.InviteCodeBindWnd" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>378</width>
+			<height>218</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>1</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="InviteCodeBindWnd.xml.lua" func="OnCreate" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

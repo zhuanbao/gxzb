@@ -1,0 +1,172 @@
+<xlue>
+	<objtreetemplate id="GXZB.RewardEnterWndTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>378</width>
+			<height>218</height>
+		</attr>
+		<obj id="RewardEnterWnd.Content" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>378</width>
+				<height>218</height>
+				<texture>GXZB.PopUpWnd.Bkg</texture>
+			</attr>	
+			<children>
+				<obj id="RewardEnterWnd.Caption" class="CaptionObject">
+					<attr>
+						<left>9</left>
+						<top>9</top>
+						<width>father.width-18</width>
+						<height>father.height-18</height>
+					</attr>
+					<children>
+						<obj id="RewardEnterWnd.Logo" class="ImageObject">
+							<attr>
+								<left>12</left>
+								<top>11</top>
+								<width>14</width>
+								<height>13</height>
+								<image>GXZB.Caption.Logo</image>
+							</attr>
+						</obj>
+						<obj id="RewardEnterWnd.Title" class="TextObject">
+							<attr>
+								<left>26+6</left>
+								<top>8</top>
+								<width>200</width>
+								<height>20</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
+								<text>共享赚宝邀请奖励全面升级</text>
+							</attr>
+						</obj>
+						<obj id="RewardEnterWnd.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-27</left>
+								<top>10</top>
+								<width>15</width>
+								<height>15</height>
+								<NormalBkgID>GXZB.PopUpWnd.Btn.Close.normal</NormalBkgID>
+								<DownBkgID>GXZB.PopUpWnd.Btn.Close.normal</DownBkgID>
+								<HoverBkgID>GXZB.PopUpWnd.Btn.Close.normal</HoverBkgID>
+								<DisableBkgID>GXZB.PopUpWnd.Btn.Close.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="RewardEnterWnd.xml.lua" func="OnClickClose" />
+								<event name="OnMouseEnter" file="RewardEnterWnd.xml.lua" func="OnMouseEnter" />
+								<event name="OnMouseLeave" file="RewardEnterWnd.xml.lua" func="OnMouseLeave" />
+							</eventlist>	
+						</obj>
+						<obj id="RewardEnterWnd.Icon" class="ImageObject">
+							<attr>
+								<left>27</left>
+								<top>56</top>
+								<width>65</width>
+								<height>68</height>
+								<image>GXZB.InviteReward.PopUpWndEnter.Icon</image>
+							</attr>
+						</obj>
+						<obj id="RewardEnterWnd.Content.Title" class="TextObject">
+							<attr>
+								<left>107</left>
+								<top>55</top>
+								<width>father.width-107</width>
+								<height>19</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text16.bold</font>
+								<endellipsis>1</endellipsis>
+								<text>好友赚钱你得赏金</text>
+							</attr>
+						</obj>
+						<obj id="RewardEnterWnd.Content.Detail" class="TextObject">
+							<attr>
+								<left>107</left>
+								<top>55+17+11</top>
+								<width>father.width-(107)</width>
+								<height>17+10+17</height>
+								<valign>top</valign>
+								<halign>left</halign>
+								<textcolor>6D5539</textcolor>
+								<font>font.text13</font>
+								<multiline>1</multiline>
+								<linegap>5</linegap>
+								<endellipsis>1</endellipsis>
+								<text>好友在线设备越多，赏金越高，轻松月
+								入500~，多邀多得上不封顶</text>
+							</attr>
+						</obj>
+						<obj id="RewardEnterWnd.ConfigNoPop" class="CheckBox">
+							<attr>
+								<left>12</left>
+								<top>father.height-21-20</top>
+								<width>150</width>
+								<height>20</height>
+								<ImgWidth>13</ImgWidth>
+								<ImgHeight>13</ImgHeight>
+								<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+								<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+								<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+								<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
+								<Select>false</Select>
+								<Text>不再提醒</Text>
+							</attr>
+							<eventlist>
+								<event name="OnSelect" file="RewardEnterWnd.xml.lua" func="OnSelect" />
+							</eventlist>
+						</obj>
+						<obj id="RewardEnterWnd.Btn" class="TipAddin.Button">
+							<attr>
+								<Text>立即赚赏金</Text>
+								<TextFont>font.text16</TextFont>
+								<TextColor>FFFFFF</TextColor>
+								<left>father.width-137-30</left>
+								<top>father.height-37-20</top>
+								<width>137</width>
+								<height>37</height>
+								<NormalBkgID>GXZB.InviteReward.PopUpWndEnter.Btn.normal</NormalBkgID>
+								<HoverBkgID>GXZB.InviteReward.PopUpWndEnter.Btn.normal</HoverBkgID>
+								<DownBkgID>GXZB.InviteReward.PopUpWndEnter.Btn.disable</DownBkgID>
+								<DisableBkgID>GXZB.InviteReward.PopUpWndEnter.Btn.disable</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="RewardEnterWnd.xml.lua" func="OnClickEnter" />
+							</eventlist>	
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+    <hostwndtemplate id="GXZB.RewardEnterWnd" class="FrameHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>378</width>
+			<height>218</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnShowWindow" file="RewardEnterWnd.xml.lua" func="OnShowWindow" />
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

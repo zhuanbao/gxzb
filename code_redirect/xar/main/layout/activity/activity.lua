@@ -12,6 +12,9 @@ XLSetGlobal("Activity", Activity)
 Activity._tabLuaFile = {
 "rewardbindweixin.lua",
 "openbox\\openbox.lua",
+"invitereward\\invitereward.lua",
+"invitereward\\codebind.lua",
+
 }
 
 Activity._tabCfg = {}
@@ -83,7 +86,10 @@ function Activity:OnGetServerActivity(event, strPath)
 end
 
 function Activity:TryToGetServerActivity(tabActivity)
-    if type(tabActivity) ~= "table" or #tabActivity < 0 then
+	--无需读配置的活动
+	InviteReward:PrepareInviteReward()
+    --
+	if type(tabActivity) ~= "table" or #tabActivity < 0 then
         return
     end
     local tabActInfo = nil

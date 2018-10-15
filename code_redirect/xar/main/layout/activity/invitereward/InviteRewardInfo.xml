@@ -1,0 +1,519 @@
+<xlue>
+	<control class="TextJoinObject">
+		<attr_def>
+        </attr_def>
+        <method_def>
+            <SetText file="InviteRewardInfo.xml.lua" func="SetText"/>
+        </method_def>
+		<objtemplate>
+			<children>
+				<obj id="TextJoin.Layout" class="LayoutObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+                        <height>father.height</height>
+					</attr>
+					<children>
+						<obj id="TextJoin.Text1" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>312F2C</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text2" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>FD464D</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text3" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>312F2C</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text4" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>FD464D</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text5" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>312F2C</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text6" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>FD464D</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+						<obj id="TextJoin.Text7" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<textcolor>312F2C</textcolor>
+								<font>font.text13</font>
+								<valign>top</valign>
+								<halign>left</halign>
+							</attr>
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<control class="InviteRewardTipObject">
+		<objtemplate>
+			<children>
+				<obj id="Tip.Bkg" class="TextureObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+						<texture>GXZB.InviteRewardInfo.CopySuccess</texture>
+					</attr>
+					<children>
+						<obj id="Tip.Text" class="TextObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+								<valign>center</valign>
+								<halign>center</halign>
+								<textcolor>FFFFFF</textcolor>
+								<font>font.text12</font>
+								<text>复制成功</text>
+							</attr>
+						</obj>
+					</children>											
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+	
+	<objtreetemplate id="GXZB.InviteRewardInfoTree" class="ObjectTreeTemplate">
+		<attr>
+			<left>0</left>
+			<top>0</top>
+			<width>600</width>
+			<height>425</height>
+		</attr>
+		<obj id="InviteRewardInfo.Content" class="TextureObject">
+			<attr>
+				<left>0</left>
+				<top>0</top>
+				<width>600</width>
+				<height>425</height>
+				<texture>GXZB.InviteRewardInfo.Bkg</texture>
+			</attr>	
+			<children>
+				<obj id="InviteRewardInfo.Caption" class="CaptionObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>father.width</width>
+						<height>father.height</height>
+					</attr>
+					<children>
+						<obj id="InviteRewardInfo.CloseBtn" class="TipAddin.Button">
+							<attr>
+								<left>father.width-20-18</left>
+								<top>20</top>
+								<width>18</width>
+								<height>18</height>
+								<NormalBkgID>GXZB.InviteRewardInfo.Btn.Close</NormalBkgID>
+								<HoverBkgID>GXZB.InviteRewardInfo.Btn.Close</HoverBkgID>
+								<DownBkgID>GXZB.InviteRewardInfo.Btn.Close</DownBkgID>
+								<DisableBkgID>GXZB.InviteRewardInfo.Btn.Close</DisableBkgID>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="InviteRewardInfo.xml.lua" func="OnClickClose" />
+							</eventlist>	
+						</obj>
+						<obj id="InviteRewardInfo.Page1" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>
+							<children>
+								<obj id="InviteRewardInfo.Page1.Title" class="ImageObject">
+									<attr>
+										<left>(father.width-233)/2</left>
+										<top>25</top>
+										<width>233</width>
+										<height>45</height>
+										<image>GXZB.InviteRewardInfo.Title</image>
+									</attr>
+								</obj>
+								<obj id="InviteRewardInfo.Page1.TextBottom" class="TextureObject">
+									<attr>
+										<left>45</left>
+										<top>75</top>
+										<width>father.width-45-45</width>
+										<height>father.height-75-52</height>
+										<texture>GXZB.InviteRewardInfo.TextBottom</texture>
+									</attr>
+									<children>
+										<obj id="InviteRewardInfo.Page1.Title1" class="TextObject">
+											<attr>
+												<left>67</left>
+												<top>14</top>
+												<width>121</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>312F2C</textcolor>
+												<font>font.text13</font>
+												<text>邀请好友双方收益各</text>
+											</attr>
+										</obj>
+										<obj id="InviteRewardInfo.Page1.Title2" class="TextObject">
+											<attr>
+												<left>67+121</left>
+												<top>14</top>
+												<width>38</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>FD464D</textcolor>
+												<font>font.text13</font>
+												<text>+10%</text>
+											</attr>
+										</obj>
+										<obj id="InviteRewardInfo.Page1.Title3" class="TextObject">
+											<attr>
+												<left>67+121+38</left>
+												<top>14</top>
+												<width>237</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>312F2C</textcolor>
+												<font>font.text13</font>
+												<text>奖励重启有效，多邀多得，上不封顶~</text>
+											</attr>
+										</obj>
+										<obj id="InviteRewardInfo.Page1.Form" class="ImageObject">
+											<attr>
+												<left>(father.width-432)/2</left>
+												<top>14+16+13</top>
+												<width>432</width>
+												<height>91</height>
+												<image>GXZB.InviteRewardInfo.Form</image>
+											</attr>
+										</obj>
+										<obj id="InviteRewardInfo.Page1.Notice" class="LayoutObject">
+											<attr>
+												<left>0</left>
+												<top>14+15+13+91+8</top>
+												<width>father.width</width>
+												<height>16+2</height>
+												<limitchild>1</limitchild>
+											</attr>
+											<children>
+												<obj id="InviteRewardInfo.Page1.Notice.Child" class="LayoutObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>(16+2)*2</height>
+													</attr>
+													<children>
+														<obj id="Notice.Child.Top" class="TextJoinObject">
+															<attr>
+																<left>0</left>
+																<top>0</top>
+																<width>father.width</width>
+																<height>16+2</height>
+															</attr>
+														</obj>
+														<obj id="Notice.Child.Buttom" class="TextJoinObject">
+															<attr>
+																<left>0</left>
+																<top>16+2</top>
+																<width>father.width</width>
+																<height>16+2</height>
+															</attr>
+														</obj>
+													</children>
+												</obj>
+											</children>
+										</obj>
+										<obj id="InviteRewardInfo.Page1.CopyData" class="TextureObject">
+											<attr>
+												<left>38</left>
+												<top>14+15+12+91+39</top>
+												<width>father.width-38*2</width>
+												<height>91</height>
+												<texture>GXZB.InviteRewardInfo.TextBottom2</texture>
+											</attr>
+											<children>
+												<obj id="InviteRewardInfo.Page1.CopyData.Text" class="LayoutObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+													</attr>
+													<children>
+														<obj id="CopyData.Text1" class="TextObject">
+															<attr>
+																<left>22</left>
+																<top>10</top>
+																<width>father.width-12*2</width>
+																<height>15</height>
+																<valign>top</valign>
+																<halign>left</halign>
+																<textcolor>605F5E</textcolor>
+																<font>font.text12</font>
+																<text>hi~我在用共享赚宝，这是我见过门槛最低的赚钱软件！我才用一个月就赚</text>
+															</attr>
+														</obj>
+														<obj id="CopyData.Text2.left" class="TextObject">
+															<attr>
+																<left>22</left>
+																<top>10+15+5</top>
+																<width>father.width-12*2</width>
+																<height>15</height>
+																<valign>top</valign>
+																<halign>left</halign>
+																<textcolor>605F5E</textcolor>
+																<font>font.text12</font>
+																<text>了好几十块；用邀请码</text>
+															</attr>
+														</obj>
+														<obj id="CopyData.Text2.center" class="TextObject">
+															<attr>
+																<left>22</left>
+																<top>10+15+5</top>
+																<width>father.width-12*2</width>
+																<height>15</height>
+																<valign>top</valign>
+																<halign>left</halign>
+																<textcolor>FD464D</textcolor>
+																<font>font.text12</font>
+																<text>XXXX</text>
+															</attr>
+														</obj>
+														<obj id="CopyData.Text2.right" class="TextObject">
+															<attr>
+																<left>22</left>
+																<top>10+15+5</top>
+																<width>father.width-12*2</width>
+																<height>15</height>
+																<valign>top</valign>
+																<halign>left</halign>
+																<textcolor>605F5E</textcolor>
+																<font>font.text12</font>
+																<text>，还有额外惊喜~你也快试试！</text>
+															</attr>
+														</obj>
+														<obj id="CopyData.Text3" class="TextObject">
+															<attr>
+																<left>22</left>
+																<top>10+15+5+15+5</top>
+																<width>father.width-12*2</width>
+																<height>15</height>
+																<valign>top</valign>
+																<halign>left</halign>
+																<textcolor>213BF6</textcolor>
+																<font>font.text12</font>
+																<text>http://share4money.cn</text>
+															</attr>
+														</obj>
+													</children>
+												</obj>
+											</children>
+										</obj>
+										<obj id="InviteRewardInfo.CopySuccess" class="LayoutObject">
+											<attr>
+												<left>(father.width-79)/2</left>
+												<top>father.height-13-37-5-22</top>
+												<width>79</width>
+												<height>22</height>
+												<zorder>1000</zorder>
+											</attr>										
+										</obj>
+
+										<obj id="InviteRewardInfo.CopyBtn" class="TipAddin.Button">
+											<attr>
+												<left>(father.width-191)/2</left>
+												<top>father.height-13-37</top>
+												<width>191</width>
+												<height>37</height>
+												<NormalBkgID>GXZB.InviteRewardInfo.Btn.Copy.normal</NormalBkgID>
+												<HoverBkgID>GXZB.InviteRewardInfo.Btn.Copy.normal</HoverBkgID>
+												<DownBkgID>GXZB.InviteRewardInfo.Btn.Copy.disable</DownBkgID>
+												<DisableBkgID>GXZB.InviteRewardInfo.Btn.Copy.disable</DisableBkgID>
+												<TextFont>font.text13</TextFont>
+												<TextColor>FEFEFE</TextColor>
+												<Text>复制并发送给好友</Text>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="InviteRewardInfo.xml.lua" func="OnClickCopyBtn" />
+											</eventlist>	
+										</obj>
+									</children>
+								</obj>
+								<obj id="InviteRewardInfo.Page1.NextPage" class="TipAddin.Button">
+									<attr>
+										<left>(father.width-20)/2</left>
+										<top>father.height-42</top>
+										<width>20</width>
+										<height>10</height>
+										<NormalBkgID>GXZB.InviteRewardInfo.Arrow.Down</NormalBkgID>
+										<HoverBkgID>GXZB.InviteRewardInfo.Arrow.Down</HoverBkgID>
+										<DownBkgID>GXZB.InviteRewardInfo.Arrow.Down</DownBkgID>
+										<DisableBkgID>GXZB.InviteRewardInfo.Arrow.Down</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="InviteRewardInfo.xml.lua" func="OnClickNextPage" />
+									</eventlist>	
+								</obj>
+								<obj id="InviteRewardInfo.Page1.Detail" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>father.height-26</top>
+										<width>father.width</width>
+										<height>15</height>
+										<valign>top</valign>
+										<halign>center</halign>
+										<cursor>IDC_HAND</cursor>
+										<textcolor>FEFEFE</textcolor>
+										<font>font.text12</font>
+										<text>点击查看活动详情</text>
+									</attr>
+									<eventlist>
+										<event name="OnLButtonUp" file="InviteRewardInfo.xml.lua" func="OnClickNextPage" />
+									</eventlist>
+								</obj>
+							</children>
+						</obj>
+						<obj id="InviteRewardInfo.Page2" class="LayoutObject">
+							<attr>
+								<left>0</left>
+								<top>0</top>
+								<width>father.width</width>
+								<height>father.height</height>
+							</attr>	
+							<children>
+								<obj id="InviteRewardInfo.Page2.PreviousPage" class="TipAddin.Button">
+									<attr>
+										<left>(father.width-20)/2</left>
+										<top>20</top>
+										<width>20</width>
+										<height>10</height>
+										<NormalBkgID>GXZB.InviteRewardInfo.Arrow.Up</NormalBkgID>
+										<HoverBkgID>GXZB.InviteRewardInfo.Arrow.Up</HoverBkgID>
+										<DownBkgID>GXZB.InviteRewardInfo.Arrow.Up</DownBkgID>
+										<DisableBkgID>GXZB.InviteRewardInfo.Arrow.Up</DisableBkgID>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="InviteRewardInfo.xml.lua" func="OnClickPreviousPage" />
+									</eventlist>	
+								</obj>
+								<obj id="InviteRewardInfo.Page2.Title" class="TextObject">
+									<attr>
+										<left>0</left>
+										<top>40</top>
+										<width>father.width</width>
+										<height>26</height>
+										<valign>top</valign>
+										<halign>center</halign>
+										<textcolor>312F2C</textcolor>
+										<font>font.text22</font>
+										<texttype>freetype</texttype>
+										<text>活动规则</text>
+									</attr>
+								</obj>
+								<obj id="InviteRewardInfo.Page2.Rule" class="ImageObject">
+									<attr>
+										<left>(father.width-507)/2</left>
+										<top>82</top>
+										<width>507</width>
+										<height>308</height>
+										<image>GXZB.InviteRewardInfo.Rule</image>
+									</attr>
+								</obj>
+							</children>	
+						</obj>
+					</children>
+				</obj>
+			</children>
+		</obj>
+	</objtreetemplate>
+
+	<hostwndtemplate id="GXZB.InviteRewardInfo" class="ModalHostWnd">
+        <attr>
+            <layered>1</layered>
+            <left>0</left>
+            <top>0</top>
+            <width>600</width>
+			<height>425</height>
+            
+            <topmost>0</topmost>
+            <visible>1</visible>
+            <enable>1</enable>
+            <maxbox>0</maxbox>
+            <minbox>1</minbox>
+            <minwidth>50</minwidth>
+            <minheight>50</minheight>
+			<sysmenu>0</sysmenu>
+			<appwindow>0</appwindow>
+            <fps>30</fps>
+			<blur>1</blur>
+        </attr>
+		 <eventlist>
+			<event name="OnCreate" file="InviteRewardInfo.xml.lua" func="OnCreate"/>
+			<event name="OnShowWindow" file="InviteRewardInfo.xml.lua" func="OnShowWindow" />
+			<event name="OnDestroy" file="InviteRewardInfo.xml.lua" func="OnDestroy"/>
+        </eventlist>
+    </hostwndtemplate>
+</xlue>

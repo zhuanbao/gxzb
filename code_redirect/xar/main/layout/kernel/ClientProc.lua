@@ -158,7 +158,7 @@ function InitModeClient(nMode)
 		for Idx=1, #tabClient do
 			local nModeClient = tabClient[Idx]
 			local tabClientData = InitClient(nMode, nModeClient)
-			if tabClientData["tabFun"]["funCheckFile"]() then
+			if type(tabClientData) == "table" and tabClientData["tabFun"]["funCheckFile"]() then
 				g_tabWorkMode[nMode]["nModeClientIdx"]  = Idx
 				g_tabWorkMode[nMode]["tabClientData"] = tabClientData
 				break
@@ -205,12 +205,12 @@ function PrepareClientPoolCfg(nMode, funResult)
 	TipLog("[PrepareClientPoolCfg] nMode = " .. tostring(nMode))
 	local strCoinType = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strCoinType"]
 	local strCfgName = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolFileName"]
+	local strPoolVerKey = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolVerKey"]
 	local nCoinNewCfgTime = g_tabWorkMode["tabNewCfgTime"][strCoinType] or tFunctionHelper.GetCurrentServerTime()
-	if not WorkModuleHelper:IsPoolCfgChanged(strCfgName, nCoinNewCfgTime) then
+	if not WorkModuleHelper:IsPoolCfgChanged(strCfgName, strPoolVerKey, nCoinNewCfgTime) then
 		funResult(true)
 		return
 	end
-	local strPoolVerKey = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolVerKey"]
 	MainWorkModule:GetNewPoolCfg(strCfgName, strPoolVerKey, nCoinNewCfgTime, function(bResult)
 		if bResult then
 			g_tabWorkMode[nMode]["tabClientData"]["tabFun"]["funResetPool"]()
@@ -249,11 +249,12 @@ function UpdateSvrPoolCfg(tabNewCfgTime)
 		if type(g_tabWorkMode[nMode]["tabClientData"]) == "table" then
 			local strCoinType = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strCoinType"]
 			local strCfgName = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolFileName"]
+			local strPoolVerKey = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolVerKey"]
 			local nCoinNewCfgTime = g_tabWorkMode["tabNewCfgTime"][strCoinType] or tFunctionHelper.GetCurrentServerTime()
-			if not WorkModuleHelper:IsPoolCfgChanged(strCfgName, nCoinNewCfgTime) then
+			if not WorkModuleHelper:IsPoolCfgChanged(strCfgName, strPoolVerKey, nCoinNewCfgTime) then
 				return
 			end
-			local strPoolVerKey = g_tabWorkMode[nMode]["tabClientData"]["tabParam"]["strPoolVerKey"]
+			
 			MainWorkModule:GetNewPoolCfg(strCfgName, strPoolVerKey, nCoinNewCfgTime, function(bResult)
 				if bResult then
 					g_tabWorkMode[nMode]["tabClientData"]["tabFun"]["funResetPool"]()

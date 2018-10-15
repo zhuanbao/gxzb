@@ -89,7 +89,15 @@ function UpdateBindSuccessUI(OwnerCtrl)
 	--ObjBtnBegainMining:Show(true) 
 	local ObjTextLinkUnBind= OwnerCtrl:GetControlObject("QRCodePanel.Panel.UnBind")
 	ObjTextLinkUnBind:Show(false)
-	AutoJumpToPanel(OwnerCtrl)
+	
+	--弹邀请码框
+	CodeBind:ShowCodeBindWnd(function()
+		AutoJumpToPanel(OwnerCtrl)
+	end)
+	--展示邀请入口
+	InviteReward:PrepareInviteReward()
+	
+	
 end
 
 function ResetUIVisible(OwnerCtrl)
@@ -182,8 +190,8 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 				nQueryBindFailCnt = 0
 				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
 					ResetGlobalParam()
-					UpdateBindSuccessUI(OwnerCtrl)
 					WorkModuleHelper:SetUserBindInfo(tabBindInfo)
+					UpdateBindSuccessUI(OwnerCtrl)
 					ResetLastQRCodeInfo()
 					--Statistic:SendUIReport("bindweixin","success")
 					local tStatInfo = {}

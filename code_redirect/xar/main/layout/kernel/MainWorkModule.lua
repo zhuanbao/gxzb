@@ -132,6 +132,8 @@ function MainWorkModule:GetNewPoolCfg(strCfgName, strPoolVerKey, nCoinNewCfgTime
 			tUserConfig["tSvrPoolInfo"][strCfgName][key] = value
 		end
 		tUserConfig["tSvrPoolInfo"][strCfgName]["nLastUpdateCfgTime"] = nCoinNewCfgTime
+		tUserConfig["tSvrPoolInfo"][strCfgName]["strPoolVerKey"] = strPoolVerKey
+		
 		tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 		funResult(true)
 		return

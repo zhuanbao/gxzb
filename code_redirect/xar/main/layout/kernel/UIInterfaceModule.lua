@@ -663,7 +663,9 @@ function UIInterface:SetStateInfoToUser(strInfo)
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
 	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
 	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
-	self:ChangeMainBodyPanel("MiningPanel")
+	if IsRealString(strInfo) then
+		self:ChangeMainBodyPanel("MiningPanel")
+	end	
 	objMiningPanel:SetStateInfoToUser(strInfo)
 	TipLog("[SetStateInfoToUser] strInfo = " .. tostring(strInfo))
 end
@@ -814,6 +816,7 @@ function UIInterface:UnBindSuccess()
 	self:ChangeClientTitle("共享赚宝 (未绑定)")
 	self:ChangeMainBodyPanel("MiningPanel")
 	self:UpdateClientUnBindState()
+	InviteReward:ClearInviteReward()
 end	
 
 function UIInterface:UnBindFail()

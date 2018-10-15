@@ -1,0 +1,45 @@
+<xlue>
+	<control class="TakeCashRewardEnter">
+		<objtemplate>
+			<children>
+				<obj id="GXZB.InviteReward.Bkg" class="ImageObject">
+					<attr>
+						<left>0</left>
+						<top>0</top>
+						<width>263</width>
+						<height>36</height>
+						<cursor>IDC_HAND</cursor>
+						<image>GXZB.InviteReward.TakeCashEnter.Bkg</image>
+					</attr>
+					<children>
+						<obj id="GXZB.InviteReward.Icon" class="ImageObject">
+							<attr>
+								<left>19</left>
+								<top>4</top>
+								<width>26</width>
+								<height>27</height>
+								<image>GXZB.InviteReward.TakeCashEnter.Icon</image>
+							</attr>
+						</obj>
+						<obj id="GXZB.InviteReward.Text" class="TextObject">
+							<attr>
+								<left>19+26+14</left>
+								<top>0</top>
+								<width>father.width-(19+26+14)</width>
+								<height>36</height>
+								<halign>left</halign>
+								<valign>center</valign>
+								<textcolor>6E563C</textcolor>
+								<font>font.text14</font>
+								<text>邀请好友赚赏金，上不封顶</text>
+							</attr>
+						</obj>
+					</children>
+					<eventlist>
+						<event name="OnLButtonDown" file="RewardEnter.xml.lua" func="OnClickRewardEnter" />
+					</eventlist>
+				</obj>
+			</children>
+		</objtemplate>
+	</control>
+</xlue>

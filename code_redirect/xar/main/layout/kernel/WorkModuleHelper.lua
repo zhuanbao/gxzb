@@ -450,7 +450,7 @@ function WorkModuleHelper:GetServerHistoryIncome(strType, funResult)
 end
 
 
-function WorkModuleHelper:IsPoolCfgChanged(strCfgName, nCoinNewCfgTime)
+function WorkModuleHelper:IsPoolCfgChanged(strCfgName, strPoolVerKey, nCoinNewCfgTime)
 	local tUserConfig = self:GetUserConfig()
 	if type(tUserConfig["tSvrPoolInfo"]) ~= "table" then
 		tUserConfig["tSvrPoolInfo"] = {}
@@ -460,6 +460,10 @@ function WorkModuleHelper:IsPoolCfgChanged(strCfgName, nCoinNewCfgTime)
 	end
 	local tPoolList = tUserConfig["tSvrPoolInfo"][strCfgName]
 	if type(tPoolList) ~= "table" or #tPoolList < 1 then
+		return true
+	end
+	local strOldPoolVerKey = tUserConfig["tSvrPoolInfo"][strCfgName]["strPoolVerKey"]
+	if strPoolVerKey ~= strOldPoolVerKey then
 		return true
 	end
 	local nLastUpdateCfgTime = tUserConfig["tSvrPoolInfo"][strCfgName]["nLastUpdateCfgTime"]
