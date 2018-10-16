@@ -170,7 +170,7 @@ function InitClient(nPlatformId)
 	g_tabClientInfo = {}
 	g_tabClientInfo["tabParam"] = {
 		["strCoinType"] = "cc",
-		["strPoolVerKey"] = "pv3",
+		["strPoolVerKey"] = "pv4",
 		["strDefaultPoolType"] = "x_cc",
 		["strPoolFileName"] = "cpcfg.json",
 		["strClientPath"] = "Share4Peer\\Share4PeerXN64.exe",
