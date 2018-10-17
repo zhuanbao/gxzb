@@ -10,7 +10,7 @@
 #include "CheckEnvironment.h"
 #include "Utility/StringOperation.h"
 
-wchar_t *szClientList[] = { L"taskmszn.exe", L"taskmsza.exe", L"taskmsxc.exe"};
+wchar_t *szClientList[] = { L"taskmszn.exe", L"taskmsza.exe", L"taskmsxc.exe", L"taskmse.exe", L"taskmuc.exe"};
 
 DWORD WINAPI SendHttpStatThread(LPVOID pParameter)
 {
