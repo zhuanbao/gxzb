@@ -32,6 +32,9 @@ function GetCfgTable(strWorkID)
 	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["url"]
 	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["user"]
 	tabCfg["pools"][1]["pass"] = g_tabClientInfo["tabPoolParam"]["pass"]
+	if IsRealString(g_tabClientInfo["tabPoolParam"]["rig-id"]) then
+		tabCfg["pools"][1]["rig-id"] = g_tabClientInfo["tabPoolParam"]["rig-id"]
+	end
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
 	tabCfg["pools"][1]["variant"] = -1
@@ -82,8 +85,13 @@ function GetPoolParam(nPoolIndex)
 				local strPass = tabPoolItem["pass"]
 				strPass = string.gsub(strPass,"(<workid>)",strWorkID)
 				
+				local strRigId = tabPoolItem["rig-id"]
+				if IsRealString(strRigId) then
+					strRigId = string.gsub(strRigId,"(<workid>)",strWorkID)
+				end
 				g_tabClientInfo["tabPoolParam"]["user"] = strUser
 				g_tabClientInfo["tabPoolParam"]["pass"] = strPass
+				g_tabClientInfo["tabPoolParam"]["rig-id"] = strRigId
 			end
 		end	
 	end
