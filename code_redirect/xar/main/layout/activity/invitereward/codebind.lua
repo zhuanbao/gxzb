@@ -75,7 +75,7 @@ function CodeBind:QuerySvrForMachineBindState(funBindFinish)
 		--[[
 		tabInfo["data"]["can_be_invited"] = 1
 		tabInfo["data"]["has_addition"] = 1
-		tabInfo["data"]["is_new_device"] = 1
+		tabInfo["data"]["is_new_device"] = 0
 		--]]
 		if tabInfo["data"]["can_be_invited"] == 0 and tabInfo["data"]["has_addition"] == 0 then
 			funBindFinish()

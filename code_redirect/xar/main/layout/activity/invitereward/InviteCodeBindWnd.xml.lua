@@ -28,6 +28,12 @@ function OnClickClose(self)
 	objHostWnd:EndDialog(0)
 end
 
+function OnClickCancel(self)
+	local objTree = self:GetOwner()
+	local objHostWnd = objTree:GetBindHostWnd()
+	objHostWnd:EndDialog(0)
+end
+
 function ShowDescByIdx(nShowIdx)
 	g_nShowIdx = nShowIdx
 	for Idx=1, 5 do
@@ -41,6 +47,7 @@ function ShowDescByIdx(nShowIdx)
 		objDesc:SetChildrenVisible(bShow)
 	end
 	local objBtn = g_objTree:GetUIObject("InviteCodeBindWnd.Btn")
+	local objCancel = g_objTree:GetUIObject("InviteCodeBindWnd.Cancel")
 	if nShowIdx == 2 then
 		objBtn:Show(false)
 	else
@@ -48,8 +55,10 @@ function ShowDescByIdx(nShowIdx)
 	end
 	if nShowIdx == 3 or  nShowIdx == 4 then
 		objBtn:SetText("去邀请")
+		objCancel:Show(true)
 	else
 		objBtn:SetText("确定")
+		objCancel:Show(false)
 	end
 	if nShowIdx == 1 or nShowIdx == 5 then
 		objBtn:Enable(false)

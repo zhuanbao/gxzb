@@ -256,13 +256,13 @@
 										<linegap>3</linegap>
 										<multiline>1</multiline>
 										<text>受邀成功！
-										您的赚宝收益将每天额外
-										有效期一个月，邀请好友奖励更丰厚~</text>
+										新手期您将享受赚宝收益额外
+										邀请好友奖励更丰厚~</text>
 									</attr>
 								</obj>
 								<obj id="InviteCodeBindWnd.Desc3.Text2" class="TextObject">
 									<attr>
-										<left>14+56+19+143</left>
+										<left>14+56+19+169</left>
 										<top>55+21</top>
 										<width>father.width-(14+56+19)</width>
 										<height>60</height>
@@ -380,6 +380,25 @@
 								</obj>
 							</children>
 						</obj>	
+						<obj id="InviteCodeBindWnd.Cancel" class="TextLinkEx">
+							<attr>
+								<left>father.width-102-15-25-60</left>
+								<top>father.height-15-26</top>
+								<width>60</width>
+								<height>16</height>
+								<HAlign>right</HAlign>
+								<VAlign>top</VAlign>
+								<Text>下次再说</Text>
+								<Font>font.text13</Font>
+								<TextColor>6D5539</TextColor>
+								<TextHoverColor>6D5539</TextHoverColor>
+								<Underline>false</Underline>
+								<Show>false</Show>
+							</attr>
+							<eventlist>
+								<event name="OnClick" file="InviteCodeBindWnd.xml.lua" func="OnClickCancel" />
+							</eventlist>
+						</obj>
 						<obj id="InviteCodeBindWnd.Btn" class="TipAddin.Button">
 							<attr>
 								<Text>确定</Text>
