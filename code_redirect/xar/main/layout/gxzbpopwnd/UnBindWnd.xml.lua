@@ -70,9 +70,18 @@ function OnCreate(self)
 		else
 			strNickName = "*"
 		end
-		
-		local strText = "当前绑定微信账号是（*" .. tostring(strNickName) .. "）,\r\n"
-		strText = strText .. "解除绑定赚宝收益无法提现，确定解绑吗?"
-		ObjText:SetText(strText)
+		if UIInterface:TestForLoginUI() then
+			local strText = "当前登陆微信账号是（*" .. tostring(strNickName) .. "）,\r\n"
+			strText = strText .. "退出登录赚宝收益无法提现，确定退出吗?"
+			ObjText:SetText(strText)
+			local objUnBind = objTree:GetUIObject("UnBindWnd.UnBind")
+			local left,	top, right,	bottom = objUnBind:GetObjPos()
+			objUnBind:SetObjPos(left-30, top, right, bottom)
+			objUnBind:SetText("退出登录")
+		else
+			local strText = "当前绑定微信账号是（*" .. tostring(strNickName) .. "）,\r\n"
+			strText = strText .. "解除绑定赚宝收益无法提现，确定解绑吗?"
+			ObjText:SetText(strText)
+		end	
 	end
 end

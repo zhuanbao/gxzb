@@ -206,10 +206,10 @@
 												<Text>重新绑定</Text>
 												<TextFont>font.text14</TextFont>
 												<TextColor>system.white</TextColor>
-												<NormalBkgID>setting-surebtn-normal</NormalBkgID>
-												<DownBkgID>setting-surebtn-normal</DownBkgID>
-												<HoverBkgID>setting-surebtn-hover</HoverBkgID>
-												<DisableBkgID>setting-surebtn-hover</DisableBkgID>
+												<NormalBkgID>GXZB.Btn.Confirm.normal</NormalBkgID>
+												<DownBkgID>GXZB.Btn.Confirm.normal</DownBkgID>
+												<HoverBkgID>GXZB.Btn.Confirm.hover</HoverBkgID>
+												<DisableBkgID>GXZB.Btn.Confirm.hover</DisableBkgID>
 											</attr>
 											<eventlist>
 												<event name="OnClick" file="QRCodePanel.xml.lua" func="OnClickRefreshQRCode" />
@@ -242,9 +242,9 @@
 										<obj id="QRCodePanel.Panel.QRCode.Success.Desc" class="TextObject">
 											<attr>
 												<left>1</left>
-												<top>(father.height-16)/2</top>
+												<top>(father.height-18)/2</top>
 												<width>father.width - 2</width>
-												<height>16</height>
+												<height>18</height>
 												<valign>center</valign>
 												<halign>center</halign>
 												<textcolor>system.white</textcolor>

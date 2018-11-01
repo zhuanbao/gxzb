@@ -182,6 +182,8 @@ function SupportClientType:GetMachineSupportClient()
 			if type(tabItem) == "table" 
 				and type(tabItem["memory_size"]) == "number"
 				and type(tabItem["vendor"]) == "number" then
+				TipLog("[GetMachineSupportClient] memory_size = " .. tostring(tabItem["memory_size"]))
+				TipLog("[GetMachineSupportClient] vendor = " .. tostring(tabItem["vendor"]))
 				local tabClient = {}
 				if self:IsWow64() then
 					if tabItem["memory_size"] >= 3000000000 
@@ -216,6 +218,7 @@ function SupportClientType:GetMachineSupportClient()
 						tabClient[#tabClient+1] = self.ClientType.XMR_A32
 					end
 				end	
+				--TipLog("[GetMachineSupportClient] tabClient num = " .. tostring(#tabClient))
 				local nPlatformId = tabItem["platformid"]
 				self:CompareGpuPlatform(tabClient, nPlatformId, tabItem)
 			end					
@@ -285,6 +288,20 @@ function SupportClientType:SortGpuClientTable()
 				table.insert(tabClientInfo,self._tabGpuClient[nCIndex])
 				break
 			end
+		end
+	end
+	--没在优先级表里的再添加进去
+	for	nCIdx=1, #self._tabGpuClient do 
+		local nItem = self._tabGpuClient[nCIdx]
+		local bAdd = true
+		for nPIdx=1, #tabClientInfo do
+			if nItem == tabClientInfo[nPIdx] then
+				bAdd = false
+				break
+			end
+		end
+		if bAdd then
+			table.insert(tabClientInfo, nItem)
 		end
 	end
 	self._tabGpuClient = tabClientInfo

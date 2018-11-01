@@ -326,7 +326,16 @@
 																<halign>left</halign>
 																<textcolor>605F5E</textcolor>
 																<font>font.text12</font>
-																<text>了好几十块；用邀请码</text>
+																<text>了好几十块；用</text>
+															</attr>
+														</obj>
+														<obj id="InviteRewardInfo.Text2.center.Bkg" class="TextureObject">
+															<attr>
+																<left>22</left>
+																<top>10+15+5</top>
+																<width>98</width>
+																<height>19</height>
+																<texture>GXZB.InviteRewardInfo.CodeBkg</texture>
 															</attr>
 														</obj>
 														<obj id="CopyData.Text2.center" class="TextObject">
@@ -337,9 +346,10 @@
 																<height>15</height>
 																<valign>top</valign>
 																<halign>left</halign>
-																<textcolor>FD464D</textcolor>
-																<font>font.text12</font>
-																<text>XXXX</text>
+																<textcolor>system.white</textcolor>
+																<font>font.text12.bold</font>
+																<text>邀请码XXXX</text>
+																<zorder>1000</zorder>
 															</attr>
 														</obj>
 														<obj id="CopyData.Text2.right" class="TextObject">

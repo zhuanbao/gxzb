@@ -243,7 +243,11 @@ function TipMain()
 	tFunctionHelper.InitMachineName()
 	tFunctionHelper.SaveConfigInTimer()
 	if not WorkModuleHelper:CheckIsBinded() then
-		UIInterface:ChangeClientTitle("共享赚宝(未绑定)")
+		if UIInterface:TestForLoginUI() then
+			UIInterface:ChangeClientTitle("共享赚宝(未登录)")
+		else
+			UIInterface:ChangeClientTitle("共享赚宝(未绑定)")
+		end
 	end
 	--显示悬浮框
 	UIInterface:CreateSuspendWnd()

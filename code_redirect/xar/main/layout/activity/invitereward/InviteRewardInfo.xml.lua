@@ -135,16 +135,19 @@ function UpdateCopyData()
 	local nHeight = nBottom - nTop
 	local nStart = nLeft
 	
-	objText2Left:SetText("了好几十块；用邀请码")
+	objText2Left:SetText("了好几十块；用")
 	local nLen = objText2Left:GetTextExtent()
 	objText2Left:SetObjPos2(nStart, nTop, nLen, nHeight)
-	nStart = nStart + nLen
+	nStart = nStart + nLen+3
 	
 	local objText2Center = g_objTree:GetUIObject("CopyData.Text2.center")
+	strInviteCode = "邀请码" .. tostring(strInviteCode)
 	objText2Center:SetText(tostring(strInviteCode))
 	nLen = objText2Center:GetTextExtent()
-	objText2Center:SetObjPos2(nStart, nTop, nLen, nHeight)
-	nStart = nStart + nLen
+	objText2Center:SetObjPos2(nStart+3, nTop, nLen, nHeight)
+	local objText2CenterBkg = g_objTree:GetUIObject("InviteRewardInfo.Text2.center.Bkg")
+	objText2CenterBkg:SetObjPos2(nStart, nTop-1, nLen+6, 19)
+	nStart = nStart + nLen+6 + 3
 	
 	local objText2Right = g_objTree:GetUIObject("CopyData.Text2.right")
 	objText2Right:SetText("，还有额外惊喜~你也快试试！")

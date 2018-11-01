@@ -813,7 +813,11 @@ function UIInterface:UnBindSuccess()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	tUserConfig["tUserInfo"] = nil
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
-	self:ChangeClientTitle("共享赚宝 (未绑定)")
+	if self:TestForLoginUI() then
+		self:ChangeClientTitle("共享赚宝 (未登录)")
+	else
+		self:ChangeClientTitle("共享赚宝 (未绑定)")
+	end
 	self:ChangeMainBodyPanel("MiningPanel")
 	self:UpdateClientUnBindState()
 	InviteReward:ClearInviteReward()
@@ -1012,4 +1016,12 @@ end
 UIInterface._bCanShowRewardInfo = true
 function UIInterface:CheckCanShowRewardInfo()	
 	return self._bCanShowRewardInfo
+end
+
+function UIInterface:TestForLoginUI()
+	local tabPID = {"1", "2", "3", "4", "5", "6", "7", "8"}
+	if tFunctionHelper.CheckPeerIDList(tabPID) then
+		return true
+	end
+	return false
 end

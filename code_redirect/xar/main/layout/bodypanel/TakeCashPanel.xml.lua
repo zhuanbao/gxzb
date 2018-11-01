@@ -178,6 +178,7 @@ end
 
 function OnInitControl(self)
 	gOwnerCtrl = self
+	
 end
 
 function CheckCanTakeCash()
@@ -199,11 +200,25 @@ function UpdateTakeRule(self)
 	else
 		strNickName = "*"
 	end
-	local strText = "提现规则 ：\r\n"
-	strText = strText .. "1. 提现通过微信红包发放，10000元宝可提现1元人民币\r\n"
-	strText = strText .. "2. 提现金额最小1元，最大200元，每天只能提现1次\r\n"
-	strText = strText .. "3. 红包将发到您已绑定的微信账号（*"..tostring(strNickName).."）中,"
-	ObjTakeRule:SetText(strText)
+	if UIInterface:TestForLoginUI() then
+		local strText = "提现规则 ：\r\n"
+		strText = strText .. "1. 提现通过微信红包发放，10000元宝可提现1元人民币\r\n"
+		strText = strText .. "2. 提现金额最小1元，最大200元，每天只能提现1次\r\n"
+		strText = strText .. "3. 红包将发到您已登陆的微信账号（*"..tostring(strNickName).."）中,点此"
+		ObjTakeRule:SetText(strText)
+		self:GetControlObject("TakeCashPanel.Panel.TakeRule")
+		local objUnBind = self:GetControlObject("TakeCashPanel.Panel.UnBindWeiXin")
+		objUnBind:SetText("退出登录")
+		objUnBind:SetObjPos(255+13+7+20, 325+33+50+1, 255+13+7+20+60, 325+33+50+1+16)
+		
+	else
+		local strText = "提现规则 ：\r\n"
+		strText = strText .. "1. 提现通过微信红包发放，10000元宝可提现1元人民币\r\n"
+		strText = strText .. "2. 提现金额最小1元，最大200元，每天只能提现1次\r\n"
+		strText = strText .. "3. 红包将发到您已绑定的微信账号（*"..tostring(strNickName).."）中,"
+		ObjTakeRule:SetText(strText)
+	end
+	
 end
 
 function UpdateUIByBalance(self, nBalance)

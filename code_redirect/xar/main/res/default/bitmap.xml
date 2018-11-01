@@ -96,5 +96,6 @@
 		<texture id="GXZB.Caption.SuperPC.Menu" image="bitmap\GXZB.Caption.SuperPC.Menu.png"/>
 		<bitmap id="GXZB.Caption.SuperPC.Remind" path="bitmap\GXZB.Caption.SuperPC.Remind.png"/>	
 		<bitmap id="GXZB.QRCodePanel.Title.Default" path="bitmap\GXZB.QRCodePanel.Title.Default.png"/>
+		<bitmap id="GXZB.QRCodePanel.Title.Login" path="bitmap\GXZB.QRCodePanel.Title.Login.png"/>
 	</resource>
 </XLUE>

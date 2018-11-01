@@ -44,6 +44,7 @@ function FinishUserIntroduce()
 end
 
 function ShowQrCodePanle(strReportKey)
+	--[[
 	local wnd = UIInterface:GetMainHostWnd()
 	local objtree = wnd:GetBindUIObjectTree()
 	local objRootCtrl = objtree:GetUIObject("root.layout:root.ctrl")
@@ -57,6 +58,7 @@ function ShowQrCodePanle(strReportKey)
 		objTitle:SetObjPos2("(father.width-267)/2", 49, 267, 51)	
 		objTitle:SetResID("GXZB.QRCodePanel.Title.IntroduceB")
 	end
+	--]]
     UIInterface:ChangeMainBodyPanel("QRCodePanel")
 	local tStatInfo = {}
 	tStatInfo.fu1 = "showpanel"

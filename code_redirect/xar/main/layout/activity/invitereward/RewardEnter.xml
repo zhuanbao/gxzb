@@ -30,7 +30,7 @@
 								<halign>left</halign>
 								<valign>center</valign>
 								<textcolor>6E563C</textcolor>
-								<font>font.text14</font>
+								<font>font.text14.underline</font>
 								<text>邀请好友赚赏金，上不封顶</text>
 							</attr>
 						</obj>

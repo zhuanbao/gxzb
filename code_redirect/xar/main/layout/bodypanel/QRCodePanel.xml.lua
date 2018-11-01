@@ -160,8 +160,12 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 			return
 		end
 		nExpire = nExpire - 1
-		local strText = "二维码有效时间" .. nExpire .. "秒"
-		textActiveTime:SetText(tostring(strText))
+		if UIInterface:TestForLoginUI() then
+			textActiveTime:SetText(tostring("请使用微信扫描二维码登录"))
+		else
+			local strText = "二维码有效时间" .. nExpire .. "秒"
+			textActiveTime:SetText(tostring(strText))
+		end	
 		textActiveTime:SetVisible(true)
 		if not bQuerying and nTimerCounter > nQueryInterval then
 			bQuerying = true
@@ -183,26 +187,28 @@ function CycleQueryBindState(OwnerCtrl,tabInfo,ObjBitmap)
 						tStatInfo.fu1 = "bindwx"
 						tStatInfo.fu5 = "fail"
 						tStatInfo.fu6 = "svrerror"
+						StatisticClient:SendEventReport(tStatInfo) 
+						return
+					end	
+				else
+					nQueryBindFailCnt = 0
+					if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
+						ResetGlobalParam()
+						WorkModuleHelper:SetUserBindInfo(tabBindInfo)
+						UpdateBindSuccessUI(OwnerCtrl)
+						ResetLastQRCodeInfo()
+						--Statistic:SendUIReport("bindweixin","success")
+						local tStatInfo = {}
+						tStatInfo.fu1 = "bindwx"
+						tStatInfo.fu5 = "success"
 						StatisticClient:SendEventReport(tStatInfo)
-						return 
+						
+						if RewardBindWX and RewardBindWX:HasShowedRewardEnter() then
+							RewardBindWX:GetBindWeiXinRewardInfo()
+						end    
 					end	
 				end
-				nQueryBindFailCnt = 0
-				if type(tabBindInfo["data"]) == "table" and tabBindInfo["data"]["wxOpenID"] ~= nil then
-					ResetGlobalParam()
-					WorkModuleHelper:SetUserBindInfo(tabBindInfo)
-					UpdateBindSuccessUI(OwnerCtrl)
-					ResetLastQRCodeInfo()
-					--Statistic:SendUIReport("bindweixin","success")
-					local tStatInfo = {}
-					tStatInfo.fu1 = "bindwx"
-					tStatInfo.fu5 = "success"
-					StatisticClient:SendEventReport(tStatInfo)
-                    
-                    if RewardBindWX and RewardBindWX:HasShowedRewardEnter() then
-                        RewardBindWX:GetBindWeiXinRewardInfo()
-                    end    
-				end	
+				
 				bQuerying = false
 			end)
 		end
@@ -276,6 +282,20 @@ end
 
 function OnInitControl(self)
 	ShowCtrl(self,nil)
+	if UIInterface:TestForLoginUI() then
+		local objTitle = self:GetControlObject("QRCodePanel.Panel.Title")
+		objTitle:SetObjPos2("(father.width-204)/2", 49, 204, 49)	
+		objTitle:SetResID("GXZB.QRCodePanel.Title.Login")
+		
+		local objBindFailDesc = self:GetControlObject("QRCodePanel.Panel.QRCode.BindFailed.Desc")
+		objBindFailDesc:SetText("登录失败")
+		
+		local objRefresh = self:GetControlObject("QRCodePanel.Panel.QRCode.BindFailed.Refresh")
+		objRefresh:SetText("重新登录")
+		
+		local objBindSucText = self:GetControlObject("QRCodePanel.Panel.QRCode.Success.Desc")
+		objBindSucText:SetText("登录成功")
+	end
 end
 
 function OnVisibleChange(self, bVisible)

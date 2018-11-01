@@ -18,7 +18,8 @@
 		<texture id="GXZB.InviteRewardInfo.TextBottom" type="NineInOne" image="invitereward\GXZB.InviteRewardInfo.TextBottom.png" />
 		<texture id="GXZB.InviteRewardInfo.TextBottom2" type="NineInOne" image="invitereward\GXZB.InviteRewardInfo.TextBottom2.png" />
 		<texture id="GXZB.InviteRewardInfo.CopySuccess" image="invitereward\GXZB.InviteRewardInfo.CopySuccess.png" />
-
+		<texture id="GXZB.InviteRewardInfo.CodeBkg" type="ThreeInOneH" image="invitereward\GXZB.InviteRewardInfo.CodeBkg.png" />
+		
 		<imagelist id="GXZB.InviteRewardInfo.Btn.Copy" vertical="0" varyblock="0" blocksize="191" image="invitereward\GXZB.InviteRewardInfo.Btn.Copy.png"/>
 			<texture id="GXZB.InviteRewardInfo.Btn.Copy.normal"  imagelist="GXZB.InviteRewardInfo.Btn.Copy" index="1" />
 			<texture id="GXZB.InviteRewardInfo.Btn.Copy.disable"  imagelist="GXZB.InviteRewardInfo.Btn.Copy" index="2" />
@@ -28,6 +29,7 @@
 		<bitmap id="GXZB.CodeBind.PopUpWnd.IconSmile" path="invitereward\GXZB.CodeBind.PopUpWnd.IconSmile.png" />
 		<bitmap id="GXZB.CodeBind.PopUpWnd.IconCry" path="invitereward\GXZB.CodeBind.PopUpWnd.IconCry.png" />
 		<bitmap id="GXZB.CodeBind.PopUpWnd.EditBkg" path="invitereward\GXZB.CodeBind.PopUpWnd.EditBkg.png" />
+		
 		
 	</resource>
 </XLUE>

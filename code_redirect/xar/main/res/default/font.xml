@@ -11,6 +11,7 @@
 		<font id="font.text9" height="9" facename="defaultfont" /> 
 		<font id="font.text10" height="10" facename="defaultfont" /> 
 		<font id="font.text11" height="11" facename="defaultfont" /> 
+		<font id="font.text12.bold" height="12" facename="defaultfont" weight="bold"/> 
 		<font id="font.text12" height="12" facename="defaultfont" /> 
 		<font id="font.text12.underline" height="12" facename="defaultfont" underline="1"/> 
 		<font id="font.text13" height="13" facename="defaultfont" /> 
@@ -18,6 +19,7 @@
         <font id="font.text13.underline" height="13" facename="defaultfont" underline="1"/>
 		<font id="font.text13.xp" height="13" facename="宋体" />
 		<font id="font.text14" height="14" facename="defaultfont" /> 
+		<font id="font.text14.underline" height="14" facename="defaultfont" underline="1"/> 
 		<font id="font.text15" height="15" facename="defaultfont" />
 		<font id="font.text15.arial.bold" height="15" facename="Arial" weight="bold" /> 		
 		<font id="font.text16.bold" height="16" facename="defaultfont" weight="bold"/> 
