@@ -19,7 +19,7 @@ OpenBox._CalcTimerId = nil
 OpenBox._PrepareNextDayTimerId = nil
 OpenBox._StartActivityTimerId = nil
 OpenBox._PopupTipTimerId = nil
-
+OpenBox._bHasOpenedWeb = false
 
 function IsNilString(AString)
 	if AString == nil or AString == "" then
@@ -44,6 +44,7 @@ function OpenBox:Init()
 end
 
 function OpenBox:OpenWeb()
+	self._bHasOpenedWeb = true
 	local tUserConfig = WorkModuleHelper:GetUserConfig()
 	local strWorkID = tFunctionHelper.FetchValueByPath(tUserConfig, {"tUserInfo", "strWorkID"})
 	local strWebUrl = "http://www.eastredm.com/activity/treasure-box?workerID=" .. tostring(strWorkID)
@@ -136,6 +137,23 @@ function OpenBox:RemoveMainWndAni()
 	end
 	
 	local ObjCloseBtn = ObjMiningPanel:GetObject("Activity.OpenBox.MainWndAni.CloseBtn")
+	if ObjCloseBtn then
+		ObjMiningPanel:RemoveChild(ObjCloseBtn)
+	end
+end
+
+function OpenBox:RemoveStaticEntry()
+	local wndMain = UIInterface:GetMainHostWnd()
+	local Objtree = wndMain:GetBindUIObjectTree()
+	local ObjRootCtrl = Objtree:GetUIObject("root.layout:root.ctrl")
+	local ObjMainBodyCtrl = ObjRootCtrl:GetControlObject("WndPanel.MainBody")
+	local ObjMiningPanel = ObjMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	local ObjStaticEntry = ObjMiningPanel:GetObject("Activity.OpenBox.StaticEntry")
+	if ObjStaticEntry then
+		ObjMiningPanel:RemoveChild(ObjStaticEntry)
+	end
+	
+	local ObjCloseBtn = ObjMiningPanel:GetObject("GXZB.OpenBox.CloseEntry.Btn")
 	if ObjCloseBtn then
 		ObjMiningPanel:RemoveChild(ObjCloseBtn)
 	end
@@ -429,6 +447,51 @@ function OpenBox:CalcWorkingTime()
 	self:PrepareNextDay()
 end
 
+function OpenBox:AddStaticEntry()
+	local wndMain = UIInterface:GetMainHostWnd()
+	local objTree = wndMain:GetBindUIObjectTree()
+	local objRootCtrl = objTree:GetUIObject("root.layout:root.ctrl")
+	local objMainBodyCtrl = objRootCtrl:GetControlObject("WndPanel.MainBody")
+	local objMiningPanel = objMainBodyCtrl:GetChildObjByCtrlName("MiningPanel")
+	local objStaticEntry = objMiningPanel:GetObject("Activity.OpenBox.StaticEntry")
+	if objStaticEntry == nil then
+		objStaticEntry = objFactory:CreateUIObject("Activity.OpenBox.StaticEntry", "ImageObject")
+		objStaticEntry:SetCursorID("IDC_HAND")
+		objStaticEntry:SetResID("GXZB.OpenBox.StaticEntry")
+		objMiningPanel:AddChild(objStaticEntry)
+		local nFLeft, nFTop, nFRight, nFButtom = objMiningPanel:GetObjPos()
+		objStaticEntry:SetObjPos2("father.width-27-83", 65-29, 83, 78)						
+		objStaticEntry:AttachListener("OnLButtonUp", false, function()
+									self:OpenWeb()
+									local tStatInfo = {}
+									tStatInfo.fu1 = "openbox"
+									tStatInfo.fu5 = "openweb"
+									tStatInfo.fu6 = "mainwnd"
+									StatisticClient:SendClickReport(tStatInfo)
+								end)
+								
+		local objCloseBtn = objFactory:CreateUIObject("GXZB.OpenBox.CloseEntry.Btn", "TipAddin.Button")
+		local attrBtn = objCloseBtn:GetAttribute()
+		attrBtn.NormalBkgID = "GXZB.OpenBox.CloseEntry.Btn.normal"
+		attrBtn.DownBkgID = "GXZB.OpenBox.CloseEntry.Btn.down"
+		attrBtn.HoverBkgID = "GXZB.OpenBox.CloseEntry.Btn.down"
+		attrBtn.DisableBkgID = "GXZB.OpenBox.CloseEntry.Btn.down"
+		objCloseBtn:Updata()
+		objMiningPanel:AddChild(objCloseBtn)
+		objCloseBtn:SetObjPos2("father.width-27-14", 65-29, 14, 14)	
+		objCloseBtn:AttachListener("OnClick", false, function()
+									local tStatInfo = {}
+									tStatInfo.fu1 = "openbox"
+									tStatInfo.fu5 = "closemainwndbox"
+									StatisticClient:SendClickReport(tStatInfo)
+									OpenBox:RemoveStaticEntry()
+									if not self._bHasOpenedWeb then
+										self:SaveCloseEnterTime()
+									end	
+								end)		
+	end
+end
+
 function OpenBox:OnGetWhiteListInfo(event, bSuccess, tabInfo)
 	local nValue = tipUtil:QueryRegValue("HKEY_CURRENT_USER", "SOFTWARE\\Share4Money", "nOpenBoxInWhiteList")
 	if nValue ~= 1 then
@@ -450,12 +513,66 @@ function OpenBox:OnGetWhiteListInfo(event, bSuccess, tabInfo)
 	tStatInfo.fu1 = "openbox"
 	tStatInfo.fu5 = "showactivity"
 	StatisticClient:SendEventReport(tStatInfo)
-	
+	--减少骚扰换静态入口
+	--[[
 	if self:CheckPopupWndCond() then
 		self:DoPopupTip()
 	end	
 	self:AddMainWndAni()
 	self:CalcWorkingTime()
+	--]]
+	if self:CheckStaticEntryCond() then
+		self:AddStaticEntry()
+	end
+end
+
+function OpenBox:SaveCloseEnterTime()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
+	if type(tUserConfig["tActive"]) ~= "table" then
+		tUserConfig["tActive"] = {}
+	end
+	if type(tUserConfig["tActive"]["tOpenBox"]) ~= "table" then
+		tUserConfig["tActive"]["tOpenBox"] = {}
+	end
+	if type(tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"]) ~= "table" then
+		tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"] = {}
+	end
+	tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"][3] = tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"][2]
+	tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"][2] = tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"][1]
+	tUserConfig["tActive"]["tOpenBox"]["tCloseEnterTime"][1] = tFunctionHelper.GetCurrentServerTime()
+	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
+end
+
+function OpenBox:GetDayStartTime(nTime)
+	local nYear, nMonth, nDay = tipUtil:FormatCrtTime(nTime)
+	local utc = tipUtil:DateTime2Seconds(nYear,nMonth,nDay,0,0,0)
+	return utc
+end
+
+--[[
+当天没有打开活动页直接关闭的，当天不再展示，
+连续三天不打开活动页直接关闭的，后面不再显示。
+--]]
+function OpenBox:CheckStaticEntryCond()
+	local tUserConfig = WorkModuleHelper:GetUserConfig()
+	local tCloseEnterTime =  tFunctionHelper.FetchValueByPath(tUserConfig, {"tActive", "tOpenBox", "tCloseEnterTime"}) or 0
+	if type(tCloseEnterTime) ~= "table" or  type(tCloseEnterTime[1]) ~= "number" then
+		TipLog("[CheckStaticEntryCond] no last close time")
+		return true
+	end
+	local nCurrentTime = tFunctionHelper.GetCurrentServerTime()
+	if not tFunctionHelper.CheckIsAnotherDay(nCurrentTime, tCloseEnterTime[1]) then
+		TipLog("[CheckStaticEntryCond] last close time is the same day")
+		return false
+	end
+	local nCurStartTime = self:GetDayStartTime(nCurrentTime)
+	if (type(tCloseEnterTime[1]) == "number" and tCloseEnterTime[1] < nCurStartTime and tCloseEnterTime[1] >= nCurStartTime-86400)
+		and (type(tCloseEnterTime[2]) == "number" and tCloseEnterTime[2] < nCurStartTime-86400 and tCloseEnterTime[2] >= nCurStartTime-86400*2)
+		and (type(tCloseEnterTime[3]) == "number" and tCloseEnterTime[3] < nCurStartTime-86400*2 and tCloseEnterTime[3] >= nCurStartTime-86400*3) then
+		TipLog("[CheckStaticEntryCond] continuity 3 days close")
+		return false
+	end
+	return true
 end
 
 function OpenBox:CheckPopupWndCond()
