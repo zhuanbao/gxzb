@@ -460,7 +460,7 @@ function OpenBox:AddStaticEntry()
 		objStaticEntry:SetResID("GXZB.OpenBox.StaticEntry")
 		objMiningPanel:AddChild(objStaticEntry)
 		local nFLeft, nFTop, nFRight, nFButtom = objMiningPanel:GetObjPos()
-		objStaticEntry:SetObjPos2("father.width-27-83", 65-29, 83, 78)						
+		objStaticEntry:SetObjPos2("father.width-8-83", 95-29, 83, 78)						
 		objStaticEntry:AttachListener("OnLButtonUp", false, function()
 									self:OpenWeb()
 									local tStatInfo = {}
@@ -478,7 +478,7 @@ function OpenBox:AddStaticEntry()
 		attrBtn.DisableBkgID = "GXZB.OpenBox.CloseEntry.Btn.down"
 		objCloseBtn:Updata()
 		objMiningPanel:AddChild(objCloseBtn)
-		objCloseBtn:SetObjPos2("father.width-27-14", 65-29, 14, 14)	
+		objCloseBtn:SetObjPos2("father.width-8-14", 95-29, 14, 14)	
 		objCloseBtn:AttachListener("OnClick", false, function()
 									local tStatInfo = {}
 									tStatInfo.fu1 = "openbox"
