@@ -215,7 +215,7 @@ function SupportClientType:GetMachineSupportClient()
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.AMD
 						and not self:CheckHasCrashed(self.ClientType.XMR_A32) then						
-						tabClient[#tabClient+1] = self.ClientType.XMR_A32
+						--tabClient[#tabClient+1] = self.ClientType.XMR_A32
 					end
 				end	
 				--TipLog("[GetMachineSupportClient] tabClient num = " .. tostring(#tabClient))

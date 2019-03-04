@@ -54,6 +54,7 @@ function WriteCfgByName()
 		tipUtil:DeletePathFile(strCfgPath)
 	end
 	tipUtil:WriteStringToFile(strCfgPath, strJson)
+	return strCfgPath
 end
 
 function GetPoolParam(nPoolIndex)		
@@ -112,13 +113,13 @@ function GetClientParam()
 	if tabPoolParam == nil then
 		return
 	end
-	WriteCfgByName()
+	local strCfgPath = WriteCfgByName()
 	local strDir = tFunctionHelper.GetModuleDir()
 	local strWorkExe = tipUtil:PathCombine(strDir, g_tabClientInfo["tabParam"]["strClientPath"])
     if not tipUtil:QueryFileExists(strWorkExe) then
         return
     end
-	local strCmdLine = strWorkExe
+	local strCmdLine = strWorkExe .. " -c " .. '"' .. strCfgPath .. '"'
 	--控制台输出代理
 	local strCoutAgent = tipUtil:PathCombine(strDir, "ShareCout.exe")
 	strCmdLine =  "\"" .. strCoutAgent .. "\" " .. strCmdLine
