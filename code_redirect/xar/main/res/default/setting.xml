@@ -3,5 +3,14 @@
 		<texture id="GXZB.Setting.Bkg" type="NineInOne" image="setting\GXZB.Setting.Bkg.png" />
 		<bitmap id="GXZB.Setting.Tip" path="setting\GXZB.Setting.Tip.png"/>
 		<texture id="GXZB.Setting.Edit" type="ThreeInOneH" image="setting\GXZB.Setting.Edit.png" />
+		<imagelist id="imagelist.Setting.Btn.ChangeDir" vertical="0" varyblock="1" splitter="1" image="setting\GXZB.Setting.Btn.ChangeDir.png"/>
+			<texture id="texture.Setting.Btn.ChangeDir.normal"  imagelist="imagelist.Setting.Btn.ChangeDir" index="1" />
+			<texture id="texture.Setting.Btn.ChangeDir.hover"  imagelist="imagelist.Setting.Btn.ChangeDir" index="2" />
+			<texture id="texture.Setting.Btn.ChangeDir.down"  imagelist="imagelist.Setting.Btn.ChangeDir" index="3" />
+		<texture id="GXZB.Setting.SetCache.DefaultMaxUsage" type="ThreeInOneH" image="setting\GXZB.Setting.SetCache.DefaultMaxUsage.png" />
+		<texture id="GXZB.Setting.SetCache.RealMaxUsage" type="ThreeInOneH" image="setting\GXZB.Setting.SetCache.RealMaxUsage.png" />
+		<imagelist id="GXZB.Setting.ChangeUsage" vertical="0" varyblock="1" splitter="1" image="setting\GXZB.Setting.ChangeUsage.png"/>
+			<texture id="GXZB.Setting.ChangeUsage.normal"  imagelist="GXZB.Setting.ChangeUsage" index="1" />
+			<texture id="GXZB.Setting.ChangeUsage.down"  imagelist="GXZB.Setting.ChangeUsage" index="2" />
 	</resource>
 </XLUE>

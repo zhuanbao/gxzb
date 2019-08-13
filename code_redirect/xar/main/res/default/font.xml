@@ -15,6 +15,7 @@
 		<font id="font.text12" height="12" facename="defaultfont" /> 
 		<font id="font.text12.underline" height="12" facename="defaultfont" underline="1"/> 
 		<font id="font.text13" height="13" facename="defaultfont" /> 
+		<font id="font.text13.bold" height="13" facename="defaultfont" weight="bold"/> 
 		<font id="font.text13.Arial" height="13" facename="Arial" /> 
         <font id="font.text13.underline" height="13" facename="defaultfont" underline="1"/>
 		<font id="font.text13.xp" height="13" facename="宋体" />
