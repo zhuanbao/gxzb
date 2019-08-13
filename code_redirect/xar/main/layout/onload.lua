@@ -63,6 +63,7 @@ local tabLuaFile = {
 
 
 "activity\\activity.lua",
+"plugin\\sharebindwidth.lua",
 }
 LoadLuaModule(tabLuaFile, __document)
 

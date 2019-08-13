@@ -1105,6 +1105,19 @@ function StringTrim(str)
 	return strResult
 end 
 
+function GetDiskList()
+	local tAll = tipUtil:GetLogicalDrive()
+	local tDisk = {}
+	for _, v in ipairs(tAll) do
+		TipLog("GetDiskList v = "..tostring(v))
+		v = string.gsub(tostring(v), "[/\\]*$", "")
+		if tipUtil:QueryFileExists(v) then
+			tDisk[#tDisk+1] = v
+		end
+	end
+	return tDisk
+end
+
 function RegisterFunctionObject(self)
 	local obj = {}
 	--通用功能函数
@@ -1135,6 +1148,7 @@ function RegisterFunctionObject(self)
 	obj.RegDeleteValue = RegDeleteValue
 	obj.RegSetValue = RegSetValue
 	obj.ConvertTableStrToNum = ConvertTableStrToNum
+	obj.GetDiskList = GetDiskList
 	
 	obj.QueryAllUsersDir = QueryAllUsersDir
 	obj.GetPeerID = GetPeerID

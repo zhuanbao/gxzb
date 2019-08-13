@@ -10,6 +10,7 @@ local g_AutoRunState = false
 --[[
 0 全速，1智能
 --]]
+local g_tTaskMrgData = {}
 local g_nWorkModel = 1
 local g_SuspendedWndState = 0
 
@@ -29,6 +30,10 @@ local g_tKey2String =
 	[189] = "-", [190] = ".", [191] = "/", [192] = "`", [219] = "[", [220] = "\\", [221] = "]",
 	[222] = "\'", [16] = "Shift", [17] = "Ctrl", [18] = "Alt"
 }
+
+function IsRealString(str)
+	return type(str) == "string" and str ~= ""
+end
 
 function OnMouseEnter(self)
 	local objBtnHover = self:GetObject("BtnHover")
@@ -71,6 +76,13 @@ function OnClickBaseSetting(self)
 	
 	local objItemAdvance = objTree:GetUIObject("SettingWnd.Content.Item.Advance")
 	objItemAdvance:SetTextColorID("6D5539")
+	
+	local objTaskMgr = objTree:GetUIObject("SettingWnd.Content.TaskMgr")
+	objTaskMgr:SetVisible(false)
+	objTaskMgr:SetChildrenVisible(false)
+	
+	local objItemTaskMgr = objTree:GetUIObject("SettingWnd.Content.Item.TaskMgr")
+	objItemTaskMgr:SetTextColorID("6D5539")
 end
 
 function OnClickAdvanceSetting(self)
@@ -86,6 +98,35 @@ function OnClickAdvanceSetting(self)
 	
 	local objItemBase = objTree:GetUIObject("SettingWnd.Content.Item.Base")
 	objItemBase:SetTextColorID("6D5539")
+	
+	local objTaskMgr = objTree:GetUIObject("SettingWnd.Content.TaskMgr")
+	objTaskMgr:SetVisible(false)
+	objTaskMgr:SetChildrenVisible(false)
+	
+	local objItemTaskMgr = objTree:GetUIObject("SettingWnd.Content.Item.TaskMgr")
+	objItemTaskMgr:SetTextColorID("6D5539")
+end
+
+function OnClickTaskMgrSetting(self)
+	local objTree = self:GetOwner()
+	local objTaskMgr = objTree:GetUIObject("SettingWnd.Content.TaskMgr")
+	objTaskMgr:SetVisible(true)
+	objTaskMgr:SetChildrenVisible(true)
+	self:SetTextColorID("DEAF37")
+	
+	local objBase = objTree:GetUIObject("SettingWnd.Content.Base")
+	objBase:SetVisible(false)
+	objBase:SetChildrenVisible(false)
+	
+	local objItemBase = objTree:GetUIObject("SettingWnd.Content.Item.Base")
+	objItemBase:SetTextColorID("6D5539")
+	
+	local objAdvance = objTree:GetUIObject("SettingWnd.Content.Advance")
+	objAdvance:SetVisible(false)
+	objAdvance:SetChildrenVisible(false)
+	
+	local objItemAdvance = objTree:GetUIObject("SettingWnd.Content.Item.Advance")
+	objItemAdvance:SetTextColorID("6D5539")
 end
 
 function SaveSettingConfig(objTree)
@@ -162,6 +203,17 @@ function SaveSettingConfig(objTree)
 	end
 	tUserConfig["tConfig"]["EarningRemind"]["bCheck"] = ObjRemindAttr.Select
 	
+	--任务管理
+	if type(tUserConfig["tConfig"]["ShareBindWindth"]) ~= "table" then
+		tUserConfig["tConfig"]["ShareBindWindth"] = {}
+	end
+	local objCheckBandWidth = objTree:GetUIObject("SettingWnd.Content.TaskMgr.CheckBandWidth")
+	local objBandWidthAttr = objCheckBandWidth:GetAttribute()
+	tUserConfig["tConfig"]["ShareBindWindth"]["bCheck"] = objBandWidthAttr.Select
+
+	tUserConfig["tConfig"]["ShareBindWindth"]["strPluginDataDir"] = g_tTaskMrgData["strPluginDataDir"]
+	tUserConfig["tConfig"]["ShareBindWindth"]["nMaxDiskUsageGB"] = g_tTaskMrgData["nMaxDiskUsageGB"]
+	tUserConfig["tConfig"]["ShareBindWindth"]["nMinDiskAvailGB"] = g_tTaskMrgData["nMinDiskAvailGB"]
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
@@ -373,6 +425,191 @@ function OnMouseLeaveAbout(self)
 	Helper.Tip:DestoryTipWnd()
 end
 
+--任务管理
+function OnSelectBandWidth(self, event, bSelect)
+	local tStatInfo = {}
+	if bSelect then
+		g_AutoRunState = true
+		tStatInfo.fu5 = 1
+	else
+		g_AutoRunState = false
+		tStatInfo.fu5 = 0
+	end	
+	tStatInfo.fu1 = "bandwidth"
+	tStatInfo.fu6 = "settingwnd"
+	StatisticClient:SendClickReport(tStatInfo)
+end
+
+function OnClickChangeDir(self)
+	local objTree = self:GetOwner()
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local strPluginDataDir = g_tTaskMrgData["strPluginDataDir"]
+	local strTitle = "请选择保存数据文件的路径"
+	local strNewDataDir = tipUtil:FolderDialog(strTitle, strPluginDataDir)
+	if not IsRealString(strNewDataDir) 
+		or not tipUtil:QueryFileExists(strNewDataDir) 
+		or string.lower(strNewDataDir) == string.lower(strPluginDataDir) then
+		return
+	end	
+	local _,_, strDisk = string.find(strNewDataDir, "([^\\]+).+$")
+	local nFreeBytesAvailable, nTotalNumberOfBytes, nTotalNumberOfFreeBytes = tipUtil:GetDiskFreeSpace(strDisk)
+	local nMaxFreeSpaceInGB = nFreeBytesAvailable/1024/1024/1024
+	
+	if not tipUtil:QueryFileExists(strNewDataDir) then
+		tipUtil:CreateDir(strNewDataDir)
+	end
+	local nDataSize = ShareBindWidth:GetDataSize(strNewDataDir)/1024/1024/1024
+	local nTotalFreeGB = nMaxFreeSpaceInGB+nDataSize
+	local nMaxDiskUsageGB = math.floor(nTotalFreeGB*0.9)
+	local nMinDiskAvailGB = math.floor(nTotalFreeGB-nMaxDiskUsageGB)
+	
+	local objCacheDirEdit = objTree:GetUIObject("SettingWnd.Content.TaskMgr.CacheDirEdit.Input")
+	objCacheDirEdit:SetText(strNewDataDir)
+
+	local objDefaultMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.DefaultMaxUsage")
+	local nDefaultL, nDefaultT, nDefaultR, nDefaultB = objDefaultMaxUsage:GetObjPos()
+	local objRealMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.RealMaxUsage")
+	local objChangeUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.ChangeUsage")
+	local nBtnL, nBtnT, nBtnR, nBtnB = objChangeUsage:GetObjPos()
+	local nBtnWidth = nBtnR-nBtnL
+	local nBtnMid = math.floor(nBtnWidth/2)
+	objRealMaxUsage:SetObjPos(nDefaultL,nDefaultT, nDefaultR, nDefaultB)
+	objChangeUsage:SetObjPos(nDefaultR-nBtnMid,nBtnT, nDefaultR-nBtnMid+nBtnWidth, nBtnB)
+	
+	
+	local objUsageGB = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.UsageGB")
+	objUsageGB:SetText(tostring(nMaxDiskUsageGB) .. "GB")
+	
+	local objRemainingSpace = objTree:GetUIObject("SettingWnd.Content.TaskMgr.RemainingSpace")
+	objRemainingSpace:SetText("剩余空间：" .. tostring(nMaxFreeSpaceInGB-nMaxFreeSpaceInGB%0.01) .. "GB")
+	g_tTaskMrgData["strPluginDataDir"] = strNewDataDir
+	g_tTaskMrgData["nMaxDiskUsageGB"] = nMaxDiskUsageGB
+	g_tTaskMrgData["nMinDiskAvailGB"] = nMinDiskAvailGB
+end
+
+local g_tabUsage = {}
+g_tabUsage.bHit = false
+function OnLButtonDownChangeUsage(self, x, y)
+	self:SetCaptureMouse(true)
+	g_tabUsage.bHit = true
+	g_tabUsage.nHitX = x
+	g_tabUsage.nHitY = y
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local strPluginDataDir = g_tTaskMrgData["strPluginDataDir"]
+	local _,_, strDisk = string.find(strPluginDataDir, "([^\\]+).+$")
+	local nDataSize = ShareBindWidth:GetDataSize(strPluginDataDir)/1024/1024/1024
+	local nFreeBytesAvailable, nTotalNumberOfBytes, nTotalNumberOfFreeBytes = tipUtil:GetDiskFreeSpace(strDisk)
+	nFreeBytesAvailable = nFreeBytesAvailable/1024/1024/1024
+	local nTotalFreeGB = nFreeBytesAvailable+nDataSize
+	local nMaxTotalFreeGB = math.floor(nTotalFreeGB*0.9)
+	local nMinTotalFreeGB = math.floor(math.min(nTotalFreeGB/2, 30))
+	g_tabUsage.nMaxTotalFreeGB = nMaxTotalFreeGB
+	g_tabUsage.nMinTotalFreeGB = nMinTotalFreeGB
+	self:SetTextureID("GXZB.Setting.ChangeUsage.down")
+end
+
+function OnLButtonUpChangeUsage(self, x, y)
+	self:SetCaptureMouse(false)
+	g_tabUsage = {}
+	self:SetTextureID("GXZB.Setting.ChangeUsage.normal")
+end
+
+function OnMouseEnterChangeUsage(self, x, y)
+end
+
+function OnMouseLeaveChangeUsage(self, x, y)
+	--g_tabUsage.bHit = false
+	--g_tabUsage.nHitX = 0
+	--g_tabUsage.nHitY = 0
+	--self:SetTextureID("GXZB.Setting.ChangeUsage.normal")
+end
+
+function OnMouseMoveChangeUsage(self, x, y)
+	if g_tabUsage.bHit then
+		local objTree = self:GetOwner()
+		local objDefaultMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.DefaultMaxUsage")
+		local nDefaultL, nDefaultT, nDefaultR, nDefaultB = objDefaultMaxUsage:GetObjPos()
+		local objRealMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.RealMaxUsage")
+		local nBtnL, nBtnT, nBtnR, nBtnB = self:GetObjPos()
+		local nBtnWidth = nBtnR-nBtnL
+		local nBtnMid = math.floor((nBtnWidth)/2)
+		if x > g_tabUsage.nHitX then
+			local dx = x-g_tabUsage.nHitX
+			nBtnL = math.min(nDefaultR-nBtnMid, nBtnL+dx)
+			nBtnR = nBtnL + nBtnWidth
+		elseif x < g_tabUsage.nHitX then
+			local dx = g_tabUsage.nHitX-x
+			nBtnL = math.max(nDefaultL-nBtnMid,nBtnL-dx)
+			nBtnR = nBtnL + nBtnWidth
+		end
+		self:SetObjPos(nBtnL, nBtnT, nBtnR, nBtnB) 
+		local nBtnMid = math.floor((nBtnL+nBtnR)/2)
+		objRealMaxUsage:SetObjPos(nDefaultL,nDefaultT, nBtnMid, nDefaultB)
+		
+		local nMaxDiskUsageGB = math.floor(g_tabUsage.nMinTotalFreeGB+(g_tabUsage.nMaxTotalFreeGB-g_tabUsage.nMinTotalFreeGB)*nBtnMid/(nDefaultR-nDefaultL))
+		local objUsageGB = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.UsageGB")
+		objUsageGB:SetText(tostring(nMaxDiskUsageGB) .. "GB")
+		g_tTaskMrgData["nMaxDiskUsageGB"] = nMaxDiskUsageGB
+	end
+end
+
+function OnMouseEnterUsageAbout(self)
+	Helper.Tip:SetTips("缓存越大，有效资源越多，收益越高")
+end
+
+function OnMouseLeaveUsageAbout(self)
+	Helper.Tip:DestoryTipWnd()
+end
+
+function InitTaskMgr(objTree)
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	local strPluginDataDir = tUserConfig["tConfig"]["ShareBindWindth"]["strPluginDataDir"]
+	local nMaxDiskUsageGB = tUserConfig["tConfig"]["ShareBindWindth"]["nMaxDiskUsageGB"]
+	local nMinDiskAvailGB = tUserConfig["tConfig"]["ShareBindWindth"]["nMinDiskAvailGB"]
+	g_tTaskMrgData["strPluginDataDir"] = strPluginDataDir
+	g_tTaskMrgData["nMaxDiskUsageGB"] = nMaxDiskUsageGB
+	g_tTaskMrgData["nMinDiskAvailGB"] = nMinDiskAvailGB
+	local _,_, strDisk = string.find(strPluginDataDir, "([^\\]+).+$")
+	local objCacheDirEdit = objTree:GetUIObject("SettingWnd.Content.TaskMgr.CacheDirEdit.Input")
+	objCacheDirEdit:SetText(strPluginDataDir)
+	local nDataSize = ShareBindWidth:GetDataSize(strPluginDataDir)/1024/1024/1024
+	local nFreeBytesAvailable, nTotalNumberOfBytes, nTotalNumberOfFreeBytes = tipUtil:GetDiskFreeSpace(strDisk)
+	nFreeBytesAvailable = nFreeBytesAvailable/1024/1024/1024
+	local nTotalFreeGB = nFreeBytesAvailable+nDataSize
+	local nMaxTotalFreeGB = math.floor(nTotalFreeGB*0.9)
+	local nMinTotalFreeGB = math.floor(math.min(nTotalFreeGB/2, 30))
+
+	local objDefaultMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.DefaultMaxUsage")
+	local nDefaultL, nDefaultT, nDefaultR, nDefaultB = objDefaultMaxUsage:GetObjPos()
+	local objRealMaxUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.RealMaxUsage")
+	local objChangeUsage = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.ChangeUsage")
+	local nBtnL, nBtnT, nBtnR, nBtnB = objChangeUsage:GetObjPos()
+	local nBtnWidth = nBtnR-nBtnL
+	local nBtnMid = math.floor(nBtnWidth/2)
+	local nRealMaxUsageWidth = (nMaxDiskUsageGB-nMinTotalFreeGB)/(nMaxTotalFreeGB-nMinTotalFreeGB)*(nDefaultR-nDefaultL)
+	objRealMaxUsage:SetObjPos(nDefaultL,nDefaultT, nRealMaxUsageWidth, nDefaultB)
+	
+	nBtnL = nRealMaxUsageWidth-nBtnMid
+	nBtnR = nBtnL+nBtnWidth
+	if nBtnL < nDefaultL-nBtnMid then
+		nBtnL = nDefaultL-nBtnMid
+		nBtnR = nBtnL + nBtnWidth
+	elseif nBtnL + nBtnMid > nDefaultR then
+		nBtnL = nDefaultR - nBtnMid
+		nBtnR = nBtnL+nBtnMid
+	end
+	objChangeUsage:SetObjPos(nBtnL,nBtnT, nBtnR, nBtnB)
+	
+	
+	local objUsageGB = objTree:GetUIObject("SettingWnd.Content.TaskMgr.SetCache.UsageGB")
+	objUsageGB:SetText(tostring(nMaxDiskUsageGB) .. "GB")
+	
+	local objRemainingSpace = objTree:GetUIObject("SettingWnd.Content.TaskMgr.RemainingSpace")
+	objRemainingSpace:SetText("剩余空间：" .. tostring(nFreeBytesAvailable-nFreeBytesAvailable%0.01) .. "GB")
+	
+	
+end
+
 function OnCreate(self)
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	local userData = self:GetUserData()
@@ -496,5 +733,24 @@ function OnCreate(self)
 		else
 			objCheckMonitor:SetCheck(false, true)
 		end
+		
+		
+		--任务管理
+		local objCheckBandWidth = objTree:GetUIObject("SettingWnd.Content.TaskMgr.CheckBandWidth")
+		if type(tUserConfig["tConfig"]["ShareBindWindth"]) ~= "table" then
+			tUserConfig["tConfig"]["ShareBindWindth"] = {}
+		end
+		local bCheck = tUserConfig["tConfig"]["ShareBindWindth"]["bCheck"]
+		if bCheck == nil then
+			bCheck = true
+		end
+		if bCheck then
+			objCheckBandWidth:SetCheck(true, true)
+		else
+			objCheckBandWidth:SetCheck(false, true)
+		end
+		ShareBindWidth:GetCacheCfg()
+		InitTaskMgr(objTree)
+		
 	end
 end

@@ -104,7 +104,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>开机启动：</text>
 											</attr>
 										</obj>
@@ -137,7 +137,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>设备标识ID：</text>
 											</attr>
 										</obj>
@@ -178,7 +178,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>悬浮窗显示设置：</text>
 											</attr>
 										</obj>
@@ -246,7 +246,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>赚宝模式：</text>
 											</attr>
 										</obj>
@@ -324,7 +324,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>掉线监控：</text>
 											</attr>
 										</obj>
@@ -357,7 +357,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>收益提醒：</text>
 											</attr>
 										</obj>
@@ -390,7 +390,7 @@
 												<valign>top</valign>
 												<halign>left</halign>
 												<textcolor>6D5539</textcolor>
-												<font>font.text13</font>
+												<font>font.text13.bold</font>
 												<text>老板键：</text>
 											</attr>
 										</obj>
@@ -484,6 +484,251 @@
 												</obj>
 											</children>
 										</obj>	
+									</children>
+								</obj>
+								<obj id="SettingWnd.Content.Item.TaskMgr" class="TextLinkEx">
+									<attr>
+										<left>40</left>
+										<top>48+16+25+16+25</top>
+										<width>53</width>
+										<height>16</height>
+										<HAlign>left</HAlign>
+										<VAlign>top</VAlign>
+										<Text>任务管理</Text>
+										<Font>font.text13</Font>
+										<TextColor>6D5539</TextColor>
+										<TextHoverColor>DEAF37</TextHoverColor>
+										<Underline>false</Underline>
+									</attr>
+									<eventlist>
+										<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickTaskMgrSetting" />
+									</eventlist>
+								</obj>
+								<obj id="SettingWnd.Content.TaskMgr" class="LayoutObject">
+									<attr>
+										<left>0</left>
+										<top>0</top>
+										<width>father.width</width>
+										<height>father.height</height>
+									</attr>
+									<children>
+										<obj id="SettingWnd.Content.TaskMgr.BandWidth" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48</top>
+												<width>120</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13.bold</font>
+												<text>任务管理：</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.CheckBandWidth" class="CheckBox">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8)</top>
+												<width>150</width>
+												<height>17</height>
+												<ImgWidth>13</ImgWidth>
+												<ImgHeight>13</ImgHeight>
+												<CheckNormal>GXZB.Btn.CheckBox.check</CheckNormal>
+												<CheckHover>GXZB.Btn.CheckBox.check</CheckHover>
+												<UnCheckNormal>GXZB.Btn.CheckBox.normal</UnCheckNormal>
+												<UnCheckHover>GXZB.Btn.CheckBox.hover</UnCheckHover>
+												<Select>false</Select>
+												<Text>开启带宽共享（预计延迟1小时结算）</Text>
+											</attr>
+											<eventlist>
+												<event name="OnSelect" file="SettingWnd.xml.lua" func="OnSelectBandWidth" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.CacheDir" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16</top>
+												<width>120</width>
+												<height>18</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13.bold</font>
+												<text>缓存目录：</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.CacheDirEdit" class="TextureObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(18+7)</top>
+												<width>228</width>
+												<height>24</height>
+												<texture>GXZB.Setting.Edit</texture>
+											</attr>	
+											<children>
+												<obj id="SettingWnd.Content.TaskMgr.CacheDirEdit.Input" class="EditObject">
+													<attr>
+														<left>0</left>
+														<top>0</top>
+														<width>father.width</width>
+														<height>father.height</height>
+														<transparent>1</transparent>
+														<viewinset>2, 2, 2, 2</viewinset>
+														<textcolor>555555</textcolor>
+														<font>font.text13</font>
+														<text></text>
+														<readonly>1</readonly>
+													</attr>
+													<eventlist>
+														<!--event name="OnFocusChange" file="SettingWnd.xml.lua" func="OnMachineEditFocusChange" /-->
+													</eventlist>
+												</obj>
+											</children>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.ChangeDirBtn" class="TipAddin.Button">
+											<attr>
+												<left>40+53+75+228+8</left>
+												<top>48+(16+8+17)+16+(18+7)</top>
+												<width>62</width>
+												<height>24</height>
+												<Text>更改目录</Text>
+												<TextFont>font.text13</TextFont>
+												<TextColor>555555</TextColor>
+												<NormalBkgID>texture.Setting.Btn.ChangeDir.normal</NormalBkgID>
+												<HoverBkgID>texture.Setting.Btn.ChangeDir.hover</HoverBkgID>
+												<DownBkgID>texture.Setting.Btn.ChangeDir.down</DownBkgID>
+												<DisableBkgID>texture.Setting.Btn.ChangeDir.down</DisableBkgID>
+											</attr>
+											<eventlist>
+												<event name="OnClick" file="SettingWnd.xml.lua" func="OnClickChangeDir" />
+											</eventlist>	
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.ChangeDirDesc" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(18+7+24+6)</top>
+												<width>130</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>555555</textcolor>
+												<font>font.text13</font>
+												<text>*设置后重启软件生效</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.SetCache" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17</top>
+												<width>120</width>
+												<height>18</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13.bold</font>
+												<text>缓存设置：</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.SetCache.Desc" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17+(16+10)</top>
+												<width>77</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>6D5539</textcolor>
+												<font>font.text13</font>
+												<text>缓存最大占用</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.SetCache.Usage" class="LayoutObject">
+											<attr>
+												<left>40+53+75+77+4+6</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17+(16+10)</top>
+												<width>160</width>
+												<height>16</height>
+											</attr>
+											<children>
+												<obj id="SettingWnd.Content.TaskMgr.SetCache.DefaultMaxUsage" class="TextureObject">
+													<attr>
+														<left>0</left>
+														<top>8</top>
+														<width>160</width>
+														<height>3</height>
+														<texture>GXZB.Setting.SetCache.DefaultMaxUsage</texture>
+													</attr>
+												</obj>
+												<obj id="SettingWnd.Content.TaskMgr.SetCache.RealMaxUsage" class="TextureObject">
+													<attr>
+														<left>0</left>
+														<top>8</top>
+														<width>0</width>
+														<height>3</height>
+														<texture>GXZB.Setting.SetCache.RealMaxUsage</texture>
+														<visible>1</visible>
+														<zorder>50</zorder>
+													</attr>
+												</obj>
+												<obj id="SettingWnd.Content.TaskMgr.SetCache.ChangeUsage" class="TextureObject">
+													<attr>
+														<left>10</left>
+														<top>3</top>
+														<width>13</width>
+														<height>13</height>
+														<texture>GXZB.Setting.ChangeUsage.normal</texture>
+														<zorder>100</zorder>
+													</attr>
+													<eventlist>
+														<event name="OnMouseMove" file="SettingWnd.xml.lua" func="OnMouseMoveChangeUsage" />
+														<event name="OnLButtonDown" file="SettingWnd.xml.lua" func="OnLButtonDownChangeUsage" />
+														<event name="OnLButtonUp" file="SettingWnd.xml.lua" func="OnLButtonUpChangeUsage" />
+														<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnterChangeUsage" />
+														<event name="OnMouseLeave" file="SettingWnd.xml.lua" func="OnMouseLeaveChangeUsage" />
+													</eventlist>	
+												</obj>
+											</children>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.SetCache.UsageGB" class="TextObject">
+											<attr>
+												<left>40+53+75+77+4+6+160+4+6</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17+(16+10)</top>
+												<width>30</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>DEAF37</textcolor>
+												<font>font.text13</font>
+												<text>30GB</text>
+											</attr>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.SetCache.UsageAbout" class="ImageObject">
+											<attr>
+												<left>40+53+75+77+4+6+160+4+6+30+4</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17+(16+10)+2</top>
+												<width>16</width>
+												<height>16</height>
+												<cursor>IDC_HAND</cursor>
+												<image>GXZB.Setting.Tip</image>
+											</attr>
+											<eventlist>
+												<event name="OnMouseEnter" file="SettingWnd.xml.lua" func="OnMouseEnterUsageAbout" />
+												<event name="OnMouseLeave" file="SettingWnd.xml.lua" func="OnMouseLeaveUsageAbout" />
+											</eventlist>
+										</obj>
+										<obj id="SettingWnd.Content.TaskMgr.RemainingSpace" class="TextObject">
+											<attr>
+												<left>40+53+75</left>
+												<top>48+(16+8+17)+16+(18+7+24+6+16)+17+(16+10+16)+10</top>
+												<width>130</width>
+												<height>16</height>
+												<valign>top</valign>
+												<halign>left</halign>
+												<textcolor>555555</textcolor>
+												<font>font.text13</font>
+												<text>剩余空间：123.58GB</text>
+											</attr>
+										</obj>
 									</children>
 								</obj>
 							</children>

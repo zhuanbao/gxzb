@@ -41,6 +41,7 @@ local g_MaxConnectFailCnt = 3
 
 local g_MaxRestartClient = 2
 
+local g_tabPluginData = {}
 
 function IsRealString(str)
 	return type(str) == "string" and str ~= ""
@@ -198,6 +199,10 @@ function GetMiningSpeed()
 			nMiningSpeed = nMiningSpeed + g_tabWorkMode[nMode]["nHashSpeed"]*nRate
 		end
 	end
+	--plugindata
+	TipLog("[GetMiningSpeed] nMiningSpeed = " .. tostring(nMiningSpeed) .. ", nShareBWSpeed = " .. tostring(g_tabPluginData["nShareBWSpeed"]))
+	nMiningSpeed = nMiningSpeed+ (tonumber(g_tabPluginData["nShareBWSpeed"]) or 0)
+	
 	return math.floor(nMiningSpeed)
 end
 
@@ -443,6 +448,9 @@ function ModeErrorOccur()
 	end
 end
 
+function SetPluginData(strKey, value)
+	g_tabPluginData[strKey] = value
+end
 
 function RegisterFunctionObject(self)
 	local obj = {}
@@ -458,7 +466,7 @@ function RegisterFunctionObject(self)
 	obj.GetModeWrokingClient = GetModeWrokingClient
 	obj.GetModeWrokingHashSpeed = GetModeWrokingHashSpeed
 	obj.OnClientMsg = OnClientMsg
-
+	obj.SetPluginData = SetPluginData
 	
 	XLSetGlobal("ClientProc", obj)
 end

@@ -293,6 +293,7 @@ function MainWorkModule:StartClientProc(tabInfo)
 	ProfitMax:CheckRecommendDriver()
 	self:WorkingTimerHandle()
 	self:GeneratePrepareProgress()
+	ShareBindWidth:StartPlugin()
 end
 
 function MainWorkModule:StartFail()
@@ -312,6 +313,7 @@ function MainWorkModule:QuitClear()
 	self:ClearTimerID()
 	UIInterface:OnQuit()
 	ProfitMax:ClearRecommendDriver()
+	ShareBindWidth:StopPlugin()
 	
 end
 
@@ -320,6 +322,7 @@ function MainWorkModule:NotifyQuit()
 	self:QuitClear()
 	tClientProc.QuitAllMode()
 	ApiInterfaceModule:SendStopMiningInfoToServer("stop")
+	
 end
 
 function MainWorkModule:SlientQuit()
