@@ -141,8 +141,8 @@ function UpdateCopyData()
 	nStart = nStart + nLen+3
 	
 	local objText2Center = g_objTree:GetUIObject("CopyData.Text2.center")
-	strInviteCode = "邀请码" .. tostring(strInviteCode)
-	objText2Center:SetText(tostring(strInviteCode))
+	local strInviteCodeDesc = "邀请码" .. tostring(strInviteCode)
+	objText2Center:SetText(tostring(strInviteCodeDesc))
 	nLen = objText2Center:GetTextExtent()
 	objText2Center:SetObjPos2(nStart+3, nTop, nLen, nHeight)
 	local objText2CenterBkg = g_objTree:GetUIObject("InviteRewardInfo.Text2.center.Bkg")
