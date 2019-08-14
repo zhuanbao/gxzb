@@ -132,7 +132,7 @@ end
 function ShareBindWidth:GetPluginDir()
 	local bOk, strBaseDir = tFunctionHelper.QueryAllUsersDir()
 	local strPluginDir = tipUtil:PathCombine(strBaseDir, "Share4Money\\plugin\\scdn_app")
-	strPluginDir = "G:\\third_app\\scdn_app"
+	--strPluginDir = "G:\\third_app\\scdn_app"
 	return strPluginDir
 end
 
