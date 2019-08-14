@@ -270,9 +270,9 @@ function ShareBindWidth:CycleQuerySvrForBWPluginData()
 	end
 	
 	self._CycleTimerId = timeMgr:SetTimer(function(Itm, id)
-		strUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
-		TipLog("[CycleQuerySvrForBWPluginData] strUrl = " .. strUrl)
-		ApiInterfaceModule:GetServerJsonData(strUrl, fnCallBack)
+		local strTmpUrl = strUrl .. "&rd="..tostring(tipUtil:GetCurrentUTCTime())
+		TipLog("[CycleQuerySvrForBWPluginData] strUrl = " .. strTmpUrl)
+		ApiInterfaceModule:GetServerJsonData(strTmpUrl, fnCallBack)
 	end, nCycleTime*1000)
 	
 end
