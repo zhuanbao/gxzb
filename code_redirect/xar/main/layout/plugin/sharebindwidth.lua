@@ -12,7 +12,7 @@ XLSetGlobal("ShareBindWidth", ShareBindWidth)
 ShareBindWidth._bStart = true
 ShareBindWidth._nProcessID = 0
 ShareBindWidth._CycleTimerId = nil
-ShareBindWidth._strInterfacePrefix = "http://api.eastredm.com"
+ShareBindWidth._strInterfacePrefix = "http://api.eastredm.com/pc"
 ShareBindWidth._strCoinType = "ce"
 
 function IsNilString(AString)
@@ -122,6 +122,9 @@ end
 
 function ShareBindWidth:CheckCanStart()
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if type(tUserConfig["tConfig"]["ShareBindWindth"]) ~= "table" then
+		tUserConfig["tConfig"]["ShareBindWindth"] = {}
+	end
 	local bCheck = tUserConfig["tConfig"]["ShareBindWindth"]["bCheck"]
 	if bCheck == nil then
 		bCheck = true
@@ -230,7 +233,7 @@ function ShareBindWidth:GetBWPluginRequestUrl()
 	if not IsRealString(strWorkID) then
 		return
 	end
-	local strInterfaceName = "getXlSpeed"
+	local strInterfaceName = "/getXlSpeed"
 	local strInterfaceParam = "workerID=" .. Helper:UrlEncode(strWorkID)
 	local strParam = ApiInterfaceModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self._strInterfacePrefix .. strParam
@@ -250,10 +253,12 @@ function ShareBindWidth:CycleQuerySvrForBWPluginData()
 	local function fnCallBack(bRet, tabInfo)
 		---[[
 		if not bRet or type(tabInfo["data"]) ~= "table" then
+			TipLog("[CycleQuerySvrForBWPluginData] get error")
 			return
 		end
 		local nSpeed = tonumber(tabInfo["data"]["speed"])
 		if type(nSpeed) ~= "number" then
+			TipLog("[CycleQuerySvrForBWPluginData] prase error")
 			return
 		end
 		--]]
