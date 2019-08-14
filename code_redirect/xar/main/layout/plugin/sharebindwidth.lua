@@ -176,7 +176,6 @@ function ShareBindWidth:StartPlugin()
 		timeMgr:KillTimer(self._CycleTimerId)
 		self._CycleTimerId = nil
 	end
-	
 	if not self:CheckCanStart() then
 		return false
 	end
@@ -233,7 +232,7 @@ function ShareBindWidth:GetBWPluginRequestUrl()
 	if not IsRealString(strWorkID) then
 		return
 	end
-	local strInterfaceName = "/getXlSpeed"
+	local strInterfaceName = "getXlSpeed"
 	local strInterfaceParam = "workerID=" .. Helper:UrlEncode(strWorkID)
 	local strParam = ApiInterfaceModule:MakeInterfaceMd5(strInterfaceName, strInterfaceParam)
 	local strReguestUrl =  self._strInterfacePrefix .. strParam
