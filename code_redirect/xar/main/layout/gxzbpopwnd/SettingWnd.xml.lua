@@ -429,10 +429,8 @@ end
 function OnSelectBandWidth(self, event, bSelect)
 	local tStatInfo = {}
 	if bSelect then
-		g_AutoRunState = true
 		tStatInfo.fu5 = 1
 	else
-		g_AutoRunState = false
 		tStatInfo.fu5 = 0
 	end	
 	tStatInfo.fu1 = "bandwidth"
