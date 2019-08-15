@@ -96,6 +96,29 @@ function ShareBindWidth:GetCacheCfg()
 	end
 end
 
+function ShareBindWidth:GetDirSize(strDir)
+	local tabFiles = tipUtil:FindFileList(strDir,'*')
+	local nDataSize = 0
+	if type(tabFiles) == "table" then
+		for i=1, #tabFiles do
+			if tipUtil:QueryFileExists(tabFiles[i]) then
+				local nSize = tipUtil:GetFileSize(tabFiles[i])
+				nDataSize = nDataSize+nSize
+			end
+		end
+	end
+	local tabDirs = tipUtil:FindDirList(strDir)
+	if type(tabDirs) == "table" then
+		for i=1, #tabDirs do
+			if tipUtil:QueryFileExists(tabDirs[i]) then
+				local nSize = self:GetDirSize(tabDirs[i])
+				nDataSize = nDataSize+nSize
+			end
+		end
+	end
+	return nDataSize
+end
+
 function ShareBindWidth:GetDataSize(strDataDir)
 	--[[
 	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
@@ -105,6 +128,7 @@ function ShareBindWidth:GetDataSize(strDataDir)
 	local strPluginDataDir = tUserConfig["tConfig"]["ShareBindWindth"]["strPluginDataDir"]
 	--]]
 	if IsRealString(strDataDir) and tipUtil:QueryFileExists(strDataDir) then
+		--[[
 		local tabFiles = tipUtil:FindFileList(strDataDir,'*')
 		local nDataSize = 0
 		if type(tabFiles) == "table" then
@@ -114,7 +138,8 @@ function ShareBindWidth:GetDataSize(strDataDir)
 					nDataSize = nDataSize+nSize
 				end
 			end
-		end
+		end--]]
+		local nDataSize = self:GetDirSize(strDataDir)
 		return nDataSize
 	end
 	return 0
