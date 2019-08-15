@@ -88,7 +88,10 @@ function ServerCfg:TryForceUpdate()
 	if(type(tForceUpdate)) ~= "table" then
 		return 
 	end
-	
+	if type(tForceUpdate["tPID"]) == "table" and not tFunctionHelper.CheckPeerIDList(tForceUpdate["tPID"]) then
+		TipLog("[TryForceUpdate] CheckPeerIDList failed")
+		return
+	end
 	local strCurVersion = tFunctionHelper.GetGXZBVersion()
 	--local versionInfo = CheckCondition(tForceUpdate)
 	local strNewVersion = tForceUpdate.strVersion		
