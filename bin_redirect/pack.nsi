@@ -33,7 +33,7 @@ RequestExecutionLevel admin
 !define INSTALL_CHANNELID "0001"
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "共享赚宝"
-!define PRODUCT_VERSION "1.0.0.86"
+!define PRODUCT_VERSION "1.0.0.92"
 ;TestCheckFlag==0 非测试模式
 ;!if ${TestCheckFlag} == 0
 	;!define EM_OUTFILE_NAME "Share4MoneySetup_${INSTALL_CHANNELID}.exe"
@@ -60,7 +60,7 @@ VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=2052 "Comments" ""
 VIAddVersionKey /LANG=2052 "CompanyName" "深圳开心豆豆科技有限公司"
-VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2016-2018 深圳开心豆豆科技有限公司"
+VIAddVersionKey /LANG=2052 "LegalCopyright" "Copyright (c) 2016-2019 深圳开心豆豆科技有限公司"
 VIAddVersionKey /LANG=2052 "FileDescription" "${PRODUCT_NAME}安装程序"
 VIAddVersionKey /LANG=2052 "FileVersion" ${PRODUCT_VERSION}
 VIAddVersionKey /LANG=2052 "ProductVersion" ${PRODUCT_VERSION}
@@ -363,6 +363,8 @@ Function CloseExe
 	${FKillProc} "Share4PeerXA64"
 	${FKillProc} "SharePlugin"
 	${FKillProc} "Share4PeerUC"
+	;插件
+	${FKillProc} "platinumd"
 FunctionEnd
 
 Function un.CloseExe
@@ -379,6 +381,8 @@ Function un.CloseExe
 	${FKillProc} "Share4PeerXA64"
 	${FKillProc} "SharePlugin"
 	${FKillProc} "Share4PeerUC"
+	;插件
+	${FKillProc} "platinumd"
 FunctionEnd
 
 Function CheckHasInstall
@@ -663,6 +667,13 @@ Function DoInstall
 	SetOutPath "$BaseCfgDir"
 	SetOverwrite on
 	File /r "config\*"
+	;插件
+	IfFileExists $BaseCfgDir\Share4Money\plugin 0 +2
+	RMDir /r "$BaseCfgDir\Share4Money\plugin"
+	SetOutPath "$BaseCfgDir\Share4Money\plugin"
+	SetOverwrite on
+	File /r "plugin\*"
+	
 	
 	;先删再装
 	RMDir /r "$INSTDIR\program"
