@@ -29,7 +29,7 @@ SupportClientType.ClientType.XMR_N64 = 4
 SupportClientType.ClientType.XMR_A64 = 5
 SupportClientType.ClientType.XMR_A32 = 6
 SupportClientType.ClientType.XMR_C32 = 7
-SupportClientType.ClientType.UT_C64 = 8
+--SupportClientType.ClientType.UT_C64 = 8
 
 SupportClientType._VENDOR = {}
 SupportClientType._VENDOR.AMD = 1
@@ -228,7 +228,7 @@ function SupportClientType:GetMachineSupportClient()
 	self._tabCpuClient = {}
 	if self:IsWow64() then
 		--8: CPU      Share4PeerUC.exe  UT
-		self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.UT_C64
+		--self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.UT_C64
 	end	
 	--7: CPU      Share4PeerXC.exe  XMR
 	self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.XMR_C32
@@ -240,7 +240,7 @@ end
 
 function SupportClientType:GetLocalPriorityTable()
 	local tForcePlist = nil
-    local tPriority = {2,1,3,4,5,6,7,8}
+    local tPriority = {2,1,3,4,5,6,7}
     local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
 	if type(tUserConfig["tPriority"]) == "table" then
 		tPriority = tUserConfig["tPriority"]
