@@ -19,16 +19,20 @@ end
 
 function GetCfgTable(strWorkID)
 	local tabCfg = {}
-	tabCfg["algo"] = "cryptonight"
+	--tabCfg["algo"] = "cryptonight"
+	tabCfg["cpu"] = false
+	tabCfg["opencl"] = false
+	tabCfg["cuda"] = true
 	tabCfg["print-time"] = 10
 	tabCfg["retries"] = 5
 	tabCfg["retry-pause"] = 5
-	tabCfg["bfactor"] = "12"
-	tabCfg["max-gpu-threads"] = 0
-	tabCfg["max-gpu-usage"] = g_tabClientInfo["tabSpeedControlParam"]["nGpuUsage"]
-	tabCfg["bsleep"] = tostring(g_tabClientInfo["tabSpeedControlParam"]["strSleepTime"])
+	--tabCfg["bfactor"] = "12"
+	--tabCfg["max-gpu-threads"] = 0
+	--tabCfg["max-gpu-usage"] = g_tabClientInfo["tabSpeedControlParam"]["nGpuUsage"]
+	--tabCfg["bsleep"] = tostring(g_tabClientInfo["tabSpeedControlParam"]["strSleepTime"])
 	tabCfg["pools"] = {}
 	tabCfg["pools"][1] = {}
+	tabCfg["pools"][1]["coin"] = "monero"
 	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["url"]
 	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["user"]
 	tabCfg["pools"][1]["pass"] = g_tabClientInfo["tabPoolParam"]["pass"]
@@ -36,8 +40,12 @@ function GetCfgTable(strWorkID)
 		tabCfg["pools"][1]["rig-id"] = g_tabClientInfo["tabPoolParam"]["rig-id"]
 	end
 	tabCfg["pools"][1]["keepalive"] = true
-	tabCfg["pools"][1]["nicehash"] = true
-	tabCfg["pools"][1]["variant"] = -1
+	tabCfg["pools"][1]["nicehash"] = false
+	if g_tabClientInfo["tabPoolParam"]["tls"] then
+		tabCfg["pools"][1]["tls"] = true
+	end
+	
+	--tabCfg["pools"][1]["variant"] = -1
 	return tabCfg
 end
 
@@ -93,6 +101,7 @@ function GetPoolParam(nPoolIndex)
 				g_tabClientInfo["tabPoolParam"]["user"] = strUser
 				g_tabClientInfo["tabPoolParam"]["pass"] = strPass
 				g_tabClientInfo["tabPoolParam"]["rig-id"] = strRigId
+				g_tabClientInfo["tabPoolParam"]["tls"] = tabPoolItem["tls"]
 			end
 		end	
 	end
@@ -194,7 +203,7 @@ function InitClient(nPlatformId)
 		["funResetPool"] = ResetPool,
 	}
 	g_tabClientInfo["tabMinParam"] = {
-		["nGpuUsage"] = 35,
+		["nGpuUsage"] = 45,
 		["strSleepTime"] = "98",
 	}
 	g_tabClientInfo["tabMaxParam"] = {

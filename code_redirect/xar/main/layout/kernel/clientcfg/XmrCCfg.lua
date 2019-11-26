@@ -19,15 +19,19 @@ end
 
 function GetCfgTable(strWorkID)
 	local tabCfg = {}
-	tabCfg["algo"] = "cryptonight"
-	tabCfg["cpu-affinity"] = nil
-	tabCfg["cpu-priority"] = nil
-	tabCfg["max-cpu-usage"] =  g_tabClientInfo["tabSpeedControlParam"]["nCpuUsage"]
+	--tabCfg["algo"] = "cryptonight"
+	tabCfg["cpu"] = true
+	tabCfg["opencl"] = false
+	tabCfg["cuda"] = false
+	--tabCfg["cpu-affinity"] = nil
+	--tabCfg["cpu-priority"] = nil
+	--tabCfg["max-cpu-usage"] =  g_tabClientInfo["tabSpeedControlParam"]["nCpuUsage"]
 	tabCfg["print-time"] = 10
 	tabCfg["retries"] = 5
 	tabCfg["retry-pause"] = 5
 	tabCfg["pools"] = {}
 	tabCfg["pools"][1] = {}
+	tabCfg["pools"][1]["coin"] = "monero"
 	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["url"]
 	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["user"]
 	tabCfg["pools"][1]["pass"] = g_tabClientInfo["tabPoolParam"]["pass"]
@@ -36,7 +40,10 @@ function GetCfgTable(strWorkID)
 	end
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
-	tabCfg["pools"][1]["variant"] = -1
+	if g_tabClientInfo["tabPoolParam"]["tls"] then
+		tabCfg["pools"][1]["tls"] = true
+	end
+	--tabCfg["pools"][1]["variant"] = -1
 	return tabCfg
 end
 
@@ -93,6 +100,8 @@ function GetPoolParam(nPoolIndex)
 				g_tabClientInfo["tabPoolParam"]["user"] = strUser
 				g_tabClientInfo["tabPoolParam"]["pass"] = strPass
 				g_tabClientInfo["tabPoolParam"]["rig-id"] = strRigId
+				
+				g_tabClientInfo["tabPoolParam"]["tls"] = tabPoolItem["tls"]
 
 			end
 		end	
@@ -200,7 +209,7 @@ function InitClient(nPlatformId)
 		["funResetPool"] = ResetPool,
 	}
 	g_tabClientInfo["tabMinParam"] = {
-		["nCpuUsage"] = 50,
+		["nCpuUsage"] = 75,
 	}
 	g_tabClientInfo["tabMaxParam"] = {
 		["nCpuUsage"] = 75,

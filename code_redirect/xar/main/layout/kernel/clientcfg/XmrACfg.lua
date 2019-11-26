@@ -19,14 +19,18 @@ end
 
 function GetCfgTable(strWorkID)
 	local tabCfg = {}
-	tabCfg["algo"] = "cryptonight"
+	--tabCfg["algo"] = "cryptonight"
+	tabCfg["cpu"] = false
+	tabCfg["opencl"] = true
+	tabCfg["cuda"] = false
 	tabCfg["print-time"] = 10
 	tabCfg["retries"] = 5
 	tabCfg["retry-pause"] = 5
-	tabCfg["opencl-platform"] = g_tabClientInfo["nPlatformId"]
-	tabCfg["threads"] = nil
+	--tabCfg["opencl-platform"] = g_tabClientInfo["nPlatformId"]
+	--tabCfg["threads"] = nil
 	tabCfg["pools"] = {}
 	tabCfg["pools"][1] = {}
+	tabCfg["pools"][1]["coin"] = "monero"
 	tabCfg["pools"][1]["url"] = g_tabClientInfo["tabPoolParam"]["url"]
 	tabCfg["pools"][1]["user"] = g_tabClientInfo["tabPoolParam"]["user"]
 	tabCfg["pools"][1]["pass"] = g_tabClientInfo["tabPoolParam"]["pass"]
@@ -35,11 +39,14 @@ function GetCfgTable(strWorkID)
 	end
 	tabCfg["pools"][1]["keepalive"] = true
 	tabCfg["pools"][1]["nicehash"] = true
-	tabCfg["pools"][1]["variant"] = -1
-	tabCfg["sharehelper"] = {}
-	tabCfg["sharehelper"]["intensity"] = 512
-	tabCfg["sharehelper"]["worksize"] = 8
-	tabCfg["sharehelper"]["sleep"] = 500
+	--tabCfg["pools"][1]["variant"] = -1
+	--tabCfg["sharehelper"] = {}
+	--tabCfg["sharehelper"]["intensity"] = 512
+	--tabCfg["sharehelper"]["worksize"] = 8
+	--tabCfg["sharehelper"]["sleep"] = 500
+	if g_tabClientInfo["tabPoolParam"]["tls"] then
+		tabCfg["pools"][1]["tls"] = true
+	end
 	return tabCfg
 end
 
@@ -96,6 +103,8 @@ function GetPoolParam(nPoolIndex)
 				g_tabClientInfo["tabPoolParam"]["user"] = strUser
 				g_tabClientInfo["tabPoolParam"]["pass"] = strPass
 				g_tabClientInfo["tabPoolParam"]["rig-id"] = strRigId
+				
+				g_tabClientInfo["tabPoolParam"]["tls"] = tabPoolItem["tls"]
 			end
 		end	
 	end
