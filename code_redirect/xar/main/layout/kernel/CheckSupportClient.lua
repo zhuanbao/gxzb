@@ -186,7 +186,7 @@ function SupportClientType:GetMachineSupportClient()
 				TipLog("[GetMachineSupportClient] vendor = " .. tostring(tabItem["vendor"]))
 				local tabClient = {}
 				if self:IsWow64() then
-					if tabItem["memory_size"] >= 3000000000 
+					if tabItem["memory_size"] >= 4000000000 
 						and (tabItem["vendor"] == self._VENDOR.AMD or tabItem["vendor"] == self._VENDOR.NVIDIA) 
 						and not self:CheckHasCrashed(self.ClientType.ETC_NA64) then
 						tabClient[#tabClient+1] = self.ClientType.ETC_NA64
