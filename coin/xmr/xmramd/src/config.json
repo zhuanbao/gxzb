@@ -12,7 +12,7 @@
     "threads": null,
     "pools": [
         {
-            "url": "pool.monero.hashvault.pro:5555",
+            "url": "pool.hashvault.pro:5555",
             "user": "",
             "pass": "x",
             "keepalive": true,
