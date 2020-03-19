@@ -58,6 +58,12 @@ function ServerCfg:SaveServerCfgtoLocal()
 	else
 		tUserConfig["tServerConfig"]["tRemindCfg"] = nil
 	end
+	if type(self._ServerConfig["tClientTypeNoRun"]) == "table" then
+		tUserConfig["tServerConfig"]["tClientTypeNoRun"] = self._ServerConfig["tClientTypeNoRun"]	
+	else
+		tUserConfig["tServerConfig"]["tClientTypeNoRun"] = nil
+	end
+	
 	tFunctionHelper.SaveConfigToFileByKey("tUserConfig")
 end
 
@@ -187,6 +193,7 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 	self:RemoveListener("OnDownLoadSvrCfgFinish", self.OnDownLoadSvrCfgFinish, self)
 	if strServerPath ~= nil then
 		TipLog("[OnDownLoadSvrCfgFinish] download server config success")
+		
 		--Statistic:StartRunCountTimer()
 		if UIInterface:CheckShouldRemindBind() then
 			UIInterface:ChangeMainBodyPanel("QRCodePanel")
@@ -195,13 +202,15 @@ function ServerCfg:OnDownLoadSvrCfgFinish(event, strServerPath)
 		local tServerConfig = tFunctionHelper.LoadTableFromFile(strServerPath) or {}
 		
 		self._ServerConfig = tServerConfig
+		--保存配置到本地
+		self:SaveServerCfgtoLocal()
 		self:UpdateShareSvcCfg()
 		UIInterface:CheckCanShowUserIntroduce(self._ServerConfig["tIntroduce_v2"])
         Activity:TryToGetServerActivity(self._ServerConfig["tActivity"])
 		NoticeTip:TryToGetNoticeCfg(self._ServerConfig["tNotice"])
 		UIInterface:ShowSupperPC(self._ServerConfig["tSupperPC"])
 		--保存配置到本地
-		self:SaveServerCfgtoLocal()
+		--self:SaveServerCfgtoLocal()
 		--4小时1次提醒
 		UIInterface:PopTipPre4Hour()
 		self:TryExecuteExtraCode()

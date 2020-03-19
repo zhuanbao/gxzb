@@ -209,11 +209,6 @@ function ShareBindWidth:StartPlugin()
 	end
 	ShareBindWidth:GetCacheCfg()
 	local strModuleDir = self:GetPluginDir()
-	local strWorkDir = tipUtil:PathCombine(strModuleDir, "bin")
-	local strExePath = tipUtil:PathCombine(strModuleDir, "bin\\platinumd.exe")
-	if not tipUtil:QueryFileExists(strExePath) then
-		return false
-	end
 	local strCfgPath = tipUtil:PathCombine(strModuleDir, "conf\\server.ini")
 	if not tipUtil:QueryFileExists(strCfgPath) then
 		return false
@@ -225,9 +220,19 @@ function ShareBindWidth:StartPlugin()
 	if not IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
 		return false
 	end
-	local strHostname = "GXZB" .. tUserConfig["tUserInfo"]["strWorkID"]
+	--local strHostname = "GXZB" .. tUserConfig["tUserInfo"]["strWorkID"]
+	local strHostName, strBinDir = self:GetHostInfo()
+	if not IsRealString(strHostName) then
+		return false
+	end
+	local strWorkDir = tipUtil:PathCombine(strModuleDir, strBinDir)
+	local strExePath = tipUtil:PathCombine(strModuleDir, strBinDir .. "\\platinumd.exe")
+	if not tipUtil:QueryFileExists(strExePath) then
+		return false
+	end
+
 	tipUtil:WriteINI("user", "Repository", tUserConfig["tConfig"]["ShareBindWindth"]["strPluginDataDir"], strCfgPath)
-	tipUtil:WriteINI("user", "Hostname", strHostname, strCfgPath)
+	tipUtil:WriteINI("user", "Hostname", strHostName, strCfgPath)
 	tipUtil:WriteINI("disk", "MaxDiskUsageGB", tUserConfig["tConfig"]["ShareBindWindth"]["nMaxDiskUsageGB"], strCfgPath)
 	tipUtil:WriteINI("disk", "MinDiskAvailGB", tUserConfig["tConfig"]["ShareBindWindth"]["nMinDiskAvailGB"], strCfgPath)
 	self._bStart = true
@@ -300,4 +305,25 @@ function ShareBindWidth:CycleQuerySvrForBWPluginData()
 		ApiInterfaceModule:GetServerJsonData(strTmpUrl, fnCallBack)
 	end, nCycleTime*1000)
 	
+end
+
+function ShareBindWidth:GetHostInfo()
+	local tUserConfig = tFunctionHelper.ReadConfigFromMemByKey("tUserConfig") or {}
+	if not IsRealString(tUserConfig["tUserInfo"]["strWorkID"]) then
+		return nil, nil
+	end
+	local strOldHostname = "GXZB" .. tUserConfig["tUserInfo"]["strWorkID"]
+	local strOldBinDir = "binzb" 
+	local tHostNameInfo = ServerCfg:GetServerCfgData({"tShareBindWindth", "tHostNameFormat"})
+	if type(tHostNameInfo) ~= "table" or not IsRealString(tHostNameInfo["strFormat"])  then
+		return strOldHostname, strOldBinDir
+	end 
+	local strFormat = tHostNameInfo["strFormat"]
+	strNewHostname = string.gsub(strFormat,"(<workid>)",tUserConfig["tUserInfo"]["strWorkID"])
+	local tPID = tHostNameInfo["tPID"]
+	local strNewBinDir = tHostNameInfo["strBin"]
+	if tFunctionHelper.CheckPeerIDList(tPID) and IsRealString(strNewBinDir) then
+		return strNewHostname, strNewBinDir
+	end
+	return strOldHostname,strOldBinDir
 end
