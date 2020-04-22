@@ -9,6 +9,11 @@ wchar_t *szBlackProcList[] = {
 	L"steam.exe",
 	L"jx3client.exe",
 	L"shootergame.exe",
+	L"tgame.exe",
+	L"ntcls_daemon.exe",
+	L"qqspeed_loader.exe",
+	L"computerz_cn.exe",
+	L"computerztray.exe",
 
 	//L"procexp.exe",
 	//L"taskmgr.exe",

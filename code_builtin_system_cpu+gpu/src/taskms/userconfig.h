@@ -16,7 +16,7 @@
 //USER12:wiaa1m7w	//   天涯海角(装系统或者安装软件)		1689366089   wiaa4mnw
 //USER13:wiaa1sq7	//   路人甲(装机装系统)					876938985    wiaa4mv8
 //USER14:wiaa4f9y	//   菜刀(十几台电脑)					1352575858   wiaa4ncl
-//USER15:wiaa3hbp	//   动物园的饲养员						773378420   
+//USER15:wiaa3hbp	//   动物园的饲养员						773378420   直接用 USER41
 //USER16:wiaa3fxq	//   ゞm-幸福一生(装机装系统)			371304665  
 //USER17:wiaawmgg	//   孤星泪（40多台CPU）				24791036  
 //USER18:wiaa458z	//   陌上寒oo(朋友网吧100台，其他渠道几百台)	734666291    wiaa458z
@@ -34,10 +34,10 @@
 //USER30:wiabbhxi	//   工作QQ(1814586817)
 //USER31:wiabbtbu	//   无声胜有声＜°o°＞(592278876)
 //USER32:wiabb1in	//   正规江苏小李影视(2908414755)
-//USER33:wiabb8d4	//   Aaaaaaaaaaaaaaaaa羽
+//USER33:wiabb8d4	//   Aaaaaaaaaaaaaaaaa羽               65
 //USER34:wiabc62q	//   城上城
 //USER35:wiaa8ttq	//   郭顺 15984311519
-//USER36:wiabc7w1	//   抖音有毒
+//USER36:wiabc7w1	//   抖音有毒                          105
 //USER37:wiabc7mm	//   姚盛硕
 //USER38:wiabc62n	//   飘叶电脑
 //USER39:wiabc7zl	//   丨丶ove 华仔
@@ -45,18 +45,29 @@
 //USER41:wiabdiup	//   石凯
 //USER42:wiabdivp	//   彩虹之约
 //USER43:wiaamyxe	//   蒙
-//USER44:wiaa8ewm	//   王凯8691
-//USER45:wiabdxne	//   A景瑉镂18916083722
+//USER44:wiaa8ewm	//   王凯8691						 41
+//USER45:wiabdxne	//   A景瑉镂18916083722              170
 //USER46:wiabd4hl	//   邬建平
 //USER47:wiabd3s4	//   闰土
 //USER48:wiabd4hk	//   Miyu
-//USER49:wiabebrv	//   超越电脑
-//USER50:wiabdgbg	//   Kevin
-//USER51:wiabdkp0	//   XFY
+//USER49:wiabebrv	//   超越电脑						194
+//USER50:wiabdgbg	//   Kevin							198
+//USER51:wiabdkp0	//   XFY                            191
+//USER52:wiaa1tgd	//   ___Mr. Yao                     212
+//USER53:wiabdfu5	//   吴楠                     215
+//USER54:wiabeuc3	//   年华似锦                     257
+//USER55:wiabexxf	//   宝宝爸爸                     267
+//USER56:wiabeiwj	//   阿里巴巴                     276
+//USER57:wiabewl6	//   洪亮                     297
+//USER60:wiabe6i4	//   UNG                      310
+//USER61:wiabe6ez	//   马茚钧19943464113【太和义马】2C7                      308
+//USER62:wiabf78n	//   影                      351
+//USER63:wiabgkw6	//   VIP、小龙    	385
 
-#define USER51
+#define USER22
 
 #if defined (USER)
+	//cpu 75
 	#define  ACCOUNT  L"t1bamUQcqHYDQAqkEM2XhaGouBD9weu1ZYz"
 	#define  CHANNEL  L"0005"
 	#define  USERID_X  L"wiaaw1pq"
@@ -144,6 +155,7 @@
 	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
 	#define  CHANNEL  L"0005"
 	#define  USERID_Z  L"wiaa37ds"
+	#define  USERID_X  L"wiaa37ds"
 	#define  CHECKCARD  true
 	#define  NOT_MONITOR  false
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
@@ -416,11 +428,16 @@
 	#define  GPU_MEMORYSIZE  2000000000
 	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
 #elif defined (USER35)
+//1.CPU版本25%带检测
+//2.CPU版本50%带检测
+//3.显卡和CPU25%带检测
+
 	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
 	#define  CHANNEL  L"0005"
 	#define  USERID_X  L"wiaa8ttq"
+	#define  USERID_Z  L"wiaa8ttq"
 	#define  CHECKCARD  true
-	#define  NOT_MONITOR  true
+	#define  NOT_MONITOR  false
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
 	#define  GPU_MEMORYSIZE  2000000000
 	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
@@ -446,6 +463,7 @@
 	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
 	#define  CHANNEL  L"0005"
 	#define  USERID_X  L"wiabc62n"
+	#define  USERID_Z  L"wiabc62n"
 	#define  CHECKCARD  true
 	#define  NOT_MONITOR  false
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
@@ -494,7 +512,7 @@
 	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
 	#define  CHANNEL  L"0005"
 	#define  USERID_X  L"wiaamyxe"
-	#define  USERID_Z  L"wiaamyxe"
+	//#define  USERID_Z  L"wiaamyxe"
 	#define  CHECKCARD  true
 	#define  NOT_MONITOR  false
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
@@ -564,7 +582,7 @@
 	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
 	#define  CHANNEL  L"0005"
 	#define  USERID_X  L"wiabdgbg"
-	//#define  USERID_Z  L"wiabdgbg"
+	#define  USERID_Z  L"wiabdgbg"
 	#define  CHECKCARD  true
 	#define  NOT_MONITOR  false
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
@@ -580,6 +598,100 @@
 	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
 	#define  GPU_MEMORYSIZE  2000000000
 	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER52)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiaa1tgd"
+	#define  CHECKCARD  true
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER53)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabdfu5"
+	#define  CHECKCARD  true
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER54)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabeuc3"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER55)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabexxf"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER56)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabeiwj"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER57)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabewl6"
+	#define  USERID_Z  L"wiabewl6"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"750","760","770","850","860","870","950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER60)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabe6i4"
+	#define  USERID_Z  L"wiabe6i4"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"750","760","770","850","860","870","950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER61)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabe6ez"
+	#define  USERID_Z  L"wiabe6ez"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"750","760","770","850","860","870","950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER62)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabf78n"
+	#define  USERID_Z  L"wiabf78n"
+	#define  CHECKCARD  true
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"750","760","770","850","860","870","950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
+#elif defined (USER63)
+	#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
+	#define  CHANNEL  L"0005"
+	#define  USERID_X  L"wiabgkw6"
+	#define  CHECKCARD  false
+	#define  NOT_MONITOR  false
+	#define  ZA_CMD  L"-zpool zec.f2pool.com:3357 -zwal %s.%s -zpsw x -i 0 -li 1 -dbg -1"
+	#define  GPU_MEMORYSIZE  2000000000
+	#define  GPU_N_NAME  {"750","760","770","850","860","870","950","960","970","980","1050","1060","1070","1080","2050","2060","2070","2080", "titan xp", "titan v", "titan z", "titan x"}
 #else
 	//test
 	//#define  ACCOUNT  L"t1UkC3HsNNe9AC28qTxBesiCGv2MXaQRgmZ"
